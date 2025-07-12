@@ -1,30 +1,30 @@
 import React from 'react';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName } from '../utils';
-import { ShirtVersion } from '../types';
+import { getProductName, getImagePath, getColorDisplayName } from '../utils';
+import { ColorVersion } from '../types';
 
-interface ShirtVersionCardProps {
+interface ColorVersionCardProps {
   categoryPath: string;
   imageName: string;
-  shirtVersions?: ShirtVersion;
-  availableVersions?: string[];
-  onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
+  colorVersions?: ColorVersion;
+  availableColors?: string[];
+  onColorVersionChange?: (imagePath: string, color: keyof ColorVersion, value: string) => void;
   readOnly?: boolean;
 }
 
-const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
+const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
   categoryPath,
   imageName,
-  shirtVersions = { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' },
-  availableVersions = ['tshirt'],
-  onShirtVersionChange,
+  colorVersions = { black: '', forest: '', white: '', gray: '' },
+  availableColors = ['black', 'forest'],
+  onColorVersionChange,
   readOnly = false
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = getProductName(imageName);
-  const totalQuantity = getShirtVersionTotal(shirtVersions, availableVersions);
+  const totalQuantity = Object.values(colorVersions).reduce((sum, qty) => sum + Number(qty || 0), 0);
 
-  const handleVersionChange = (version: keyof ShirtVersion, value: string) => {
-    onShirtVersionChange?.(imagePath, version, value);
+  const handleColorChange = (color: keyof ColorVersion, value: string) => {
+    onColorVersionChange?.(imagePath, color, value);
   };
 
   return (
@@ -66,19 +66,19 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
           borderRadius: 'var(--radius)',
           border: '1px solid var(--color-border)'
         }}>
-          {availableVersions.map((version) => {
-            const versionKey = version as keyof ShirtVersion;
-            const displayName = getVersionDisplayName(version);
+          {availableColors.map((color) => {
+            const colorKey = color as keyof ColorVersion;
+            const displayName = getColorDisplayName(color);
             
             return (
-              <div key={version} style={{ 
+              <div key={color} style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between',
                 gap: 'var(--space-2)' 
               }}>
                 <label 
-                  htmlFor={`${version}-${imagePath}`} 
+                  htmlFor={`${color}-${imagePath}`} 
                   style={{ 
                     fontSize: '0.75rem', 
                     fontWeight: '600',
@@ -90,10 +90,10 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
                 </label>
                 <input
                   type="number"
-                  id={`${version}-${imagePath}`}
+                  id={`${color}-${imagePath}`}
                   min="0"
-                  value={shirtVersions[versionKey] || ''}
-                  onChange={(e) => handleVersionChange(versionKey, e.target.value)}
+                  value={colorVersions[colorKey] || ''}
+                  onChange={(e) => handleColorChange(colorKey, e.target.value)}
                   style={{
                     width: '50px',
                     padding: 'var(--space-1) var(--space-2)',
@@ -116,13 +116,13 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
           borderRadius: 'var(--radius)',
           border: '1px solid var(--color-border)'
         }}>
-          {availableVersions.map((version) => {
-            const versionKey = version as keyof ShirtVersion;
-            const displayName = getVersionDisplayName(version);
-            const quantity = shirtVersions[versionKey] || '';
+          {availableColors.map((color) => {
+            const colorKey = color as keyof ColorVersion;
+            const displayName = getColorDisplayName(color);
+            const quantity = colorVersions[colorKey] || '';
             
             return (
-              <div key={version} style={{
+              <div key={color} style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 marginBottom: 'var(--space-1)'
@@ -150,4 +150,4 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
   );
 };
 
-export default ShirtVersionCard; 
+export default ColorVersionCard; 

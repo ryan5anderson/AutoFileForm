@@ -13,6 +13,7 @@ function App() {
     handleFormDataChange,
     handleQuantityChange,
     handleShirtVersionChange,
+    handleColorVersionChange,
     handleSelectAll,
     handleFormSubmit,
     handleBack,
@@ -46,6 +47,7 @@ function App() {
       onFormDataChange={handleFormDataChange}
       onQuantityChange={handleQuantityChange}
       onShirtVersionChange={handleShirtVersionChange}
+      onColorVersionChange={handleColorVersionChange}
       onSelectAll={handleSelectAll}
       onSubmit={handleFormSubmit}
       error={error}

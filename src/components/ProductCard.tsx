@@ -1,8 +1,9 @@
 import React from 'react';
-import { getProductName, getImagePath } from '../utils';
+import { getProductName, getImagePath, getRackDisplayName } from '../utils';
 
 interface ProductCardProps {
   categoryPath: string;
+  categoryName: string;
   imageName: string;
   quantity?: string;
   onQuantityChange?: (imagePath: string, value: string) => void;
@@ -12,6 +13,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({
   categoryPath,
+  categoryName,
   imageName,
   quantity = '',
   onQuantityChange,
@@ -19,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   readOnly = false
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
-  const productName = getProductName(imageName);
+  const productName = categoryName === 'Rack' ? getRackDisplayName(imageName) : getProductName(imageName);
 
   return (
     <div style={{ 
@@ -78,7 +80,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
               background: 'var(--color-input-bg)',
               textAlign: 'center'
             }}
-            required
           />
         </div>
       )}
@@ -89,7 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           textAlign: 'center',
           color: 'var(--color-primary)'
         }}>
-          Quantity: {quantity}
+          Quantity: {quantity || '0'}
         </div>
       )}
     </div>

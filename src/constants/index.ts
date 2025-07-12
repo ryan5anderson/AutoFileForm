@@ -7,10 +7,21 @@ export const PROVIDER_EMAIL = 'anderson.t.ryan@gmail.com';
 
 export const categories: Category[] = [
   {
-    name: 'Tshirt (Men)',
+    name: 'Rack',
+    path: 'rack',
+    images: [
+      'Michigan_State_University_3FT_Inline_500px.jpg',
+      'Michigan_state_University_Premium Floor Display 2.0_500px.jpg',
+      'Michigan_State_University_Tier2_Display_Floor_500px.jpg',
+    ],
+  },
+  {
+    name: 'Tshirt (Unisex)',
     path: 'tshirt/men',
     hasShirtVersions: true,
     shirtVersions: ['tshirt', 'longsleeve', 'hoodie', 'crewneck'],
+    hasColorVersions: true,
+    colorVersions: ['black', 'forest'],
     images: [
       'M100444086 SH2FDS Custom School DTF on Steel .png',
       'M100435370 SDVECS Vector DTF on Steel .png',
@@ -55,7 +66,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'PJ',
+    name: 'Flannel',
     path: 'pj',
     images: [
       'M100445564 SDBOPF Bondi DTF Flannels .png',
@@ -83,6 +94,8 @@ export const categories: Category[] = [
   {
     name: 'Hat',
     path: 'hat',
+    hasColorVersions: true,
+    colorVersions: ['white', 'gray'],
     images: [
       'M100489153 SHE1CH Custom Hat on White or Grays .png',
       'M100488283 SHE1CH Custom Logo on White or Gray.png',
@@ -111,18 +124,10 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Bottle',
+    name: 'Water Bottle',
     path: 'bottle',
     images: [
       'M100454089 SHWBOT Custom Water Bottle .png',
-    ],
-  },
-  {
-    name: 'Card',
-    path: 'card',
-    images: [
-      'M100516676 SHWGCH PFD Header Card.png',
-      'M100516533 SHWGCS Spinner Header Card.png',
     ],
   },
 ]; 

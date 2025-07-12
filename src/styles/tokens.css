@@ -5,6 +5,7 @@
   --color-text: #111827;
   --color-border: #e5e7eb;      /* Light gray for subtle borders */
   --color-input-bg: #ffffff;    /* White input backgrounds */
+  --color-success: #059669;      /* Green for success actions */
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;

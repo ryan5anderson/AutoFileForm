@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FormData, Page, ShirtVersion } from '../types';
+import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion } from '../types';
 import { validateFormData, createTemplateParams } from '../utils';
 import { sendOrderEmail } from '../services/emailService';
 import { categories } from '../constants';
@@ -7,11 +7,15 @@ import { getImagePath } from '../utils';
 
 export const useOrderForm = () => {
   const [formData, setFormData] = useState<FormData>({
+    company: '',
     storeNumber: '',
     storeManager: '',
     date: new Date().toISOString().split('T')[0],
+    orderNotes: '',
     quantities: {} as Record<string, string>,
-    shirtVersions: {} as Record<string, ShirtVersion>
+    shirtVersions: {} as Record<string, ShirtVersion>,
+    colorVersions: {} as Record<string, ColorVersion>,
+    shirtColorComboVersions: {} as Record<string, ShirtColorComboVersion>
   });
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>('form');
@@ -44,16 +48,51 @@ export const useOrderForm = () => {
     }));
   };
 
+  const handleColorVersionChange = (imagePath: string, color: keyof ColorVersion, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      colorVersions: {
+        ...prev.colorVersions,
+        [imagePath]: {
+          ...prev.colorVersions?.[imagePath],
+          [color]: value
+        } as ColorVersion
+      }
+    }));
+  };
+
+  const handleShirtColorComboChange = (imagePath: string, version: string, color: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      shirtColorComboVersions: {
+        ...prev.shirtColorComboVersions,
+        [imagePath]: {
+          ...prev.shirtColorComboVersions?.[imagePath],
+          [`${version}_${color}`]: value
+        } as ShirtColorComboVersion
+      }
+    }));
+  };
+
   const handleSelectAll = () => {
     const newQuantities: Record<string, string> = {};
     const newShirtVersions: Record<string, ShirtVersion> = {};
+    const newColorVersions: Record<string, ColorVersion> = {};
+    const newShirtColorComboVersions: Record<string, ShirtColorComboVersion> = {};
 
-    // Set all regular quantities to 10
     categories.forEach(category => {
       category.images.forEach(img => {
         const imagePath = getImagePath(category.path, img);
-        if (category.hasShirtVersions && category.shirtVersions) {
-          // For shirt categories, set all versions to 10
+        if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' && category.shirtVersions && category.colorVersions) {
+          // For the special shirt, set all combos to 10
+          const combo: ShirtColorComboVersion = {};
+          for (const color of category.colorVersions) {
+            for (const version of category.shirtVersions) {
+              combo[`${version}_${color}`] = '10';
+            }
+          }
+          newShirtColorComboVersions[imagePath] = combo;
+        } else if (category.hasShirtVersions && category.shirtVersions) {
           const shirtVersion: ShirtVersion = {
             tshirt: '10',
             longsleeve: '10',
@@ -61,8 +100,15 @@ export const useOrderForm = () => {
             crewneck: '10'
           };
           newShirtVersions[imagePath] = shirtVersion;
+        } else if (category.hasColorVersions && category.colorVersions) {
+          const colorVersion: ColorVersion = {
+            black: '10',
+            forest: '10',
+            white: '10',
+            gray: '10'
+          };
+          newColorVersions[imagePath] = colorVersion;
         } else {
-          // For regular categories, set quantity to 10
           newQuantities[imagePath] = '10';
         }
       });
@@ -71,7 +117,9 @@ export const useOrderForm = () => {
     setFormData(prev => ({
       ...prev,
       quantities: newQuantities,
-      shirtVersions: newShirtVersions
+      shirtVersions: newShirtVersions,
+      colorVersions: newColorVersions,
+      shirtColorComboVersions: newShirtColorComboVersions
     }));
   };
 
@@ -122,6 +170,8 @@ export const useOrderForm = () => {
     handleFormDataChange,
     handleQuantityChange,
     handleShirtVersionChange,
+    handleColorVersionChange,
+    handleShirtColorComboChange,
     handleSelectAll,
     handleFormSubmit,
     handleBack,

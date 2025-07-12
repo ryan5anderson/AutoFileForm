@@ -19,6 +19,31 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
       border: '1px solid var(--color-border)'
     }}>
       <div>
+        <label htmlFor="company" style={{ 
+          display: 'block', 
+          marginBottom: 'var(--space-2)', 
+          fontWeight: '600',
+          color: 'var(--color-text)'
+        }}>
+          Company
+        </label>
+        <input
+          type="text"
+          id="company"
+          value={formData.company}
+          onChange={(e) => onFormDataChange({ company: e.target.value })}
+          style={{
+            width: '100%',
+            padding: 'var(--space-3)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius)',
+            fontSize: '1rem',
+            background: 'var(--color-input-bg)'
+          }}
+          required
+        />
+      </div>
+      <div>
         <label htmlFor="storeNumber" style={{ 
           display: 'block', 
           marginBottom: 'var(--space-2)', 

@@ -4,6 +4,8 @@ export interface Category {
   images: string[];
   hasShirtVersions?: boolean;
   shirtVersions?: string[]; // Array of available versions for this category
+  hasColorVersions?: boolean;
+  colorVersions?: string[]; // Array of available colors for this category
 }
 
 export interface ShirtVersion {
@@ -13,12 +15,27 @@ export interface ShirtVersion {
   crewneck?: string;
 }
 
+export interface ColorVersion {
+  black?: string;
+  forest?: string;
+  white?: string;
+  gray?: string;
+}
+
+export interface ShirtColorComboVersion {
+  [versionColor: string]: string; // e.g. 'tshirt_black', 'hoodie_forest'
+}
+
 export interface FormData {
+  company: string;
   storeNumber: string;
   storeManager: string;
   date: string;
+  orderNotes: string;
   quantities: Record<string, string>;
   shirtVersions?: Record<string, ShirtVersion>;
+  colorVersions?: Record<string, ColorVersion>;
+  shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
 }
 
 export interface EmailCategory {
@@ -34,9 +51,11 @@ export interface EmailItem {
 }
 
 export interface TemplateParams extends Record<string, unknown> {
+  company: string;
   store_number: string;
   manager_name: string;
   date: string;
+  order_notes: string;
   categories: EmailCategory[];
   total_units: string;
   provider_email: string;
