@@ -21,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   readOnly = false
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
-  const productName = categoryName === 'Rack' ? getRackDisplayName(imageName) : getProductName(imageName);
+  const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
 
   return (
     <div style={{ 

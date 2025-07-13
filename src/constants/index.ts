@@ -7,16 +7,16 @@ export const PROVIDER_EMAIL = 'anderson.t.ryan@gmail.com';
 
 export const categories: Category[] = [
   {
-    name: 'Rack',
+    name: 'Display Options',
     path: 'rack',
     images: [
-      'Michigan_State_University_3FT_Inline_500px.jpg',
       'Michigan_state_University_Premium Floor Display 2.0_500px.jpg',
       'Michigan_State_University_Tier2_Display_Floor_500px.jpg',
+      'Michigan_State_University_3FT_Inline_500px.jpg',
     ],
   },
   {
-    name: 'Tshirt (Unisex)',
+    name: 'Tshirts (Unisex)',
     path: 'tshirt/men',
     hasShirtVersions: true,
     shirtVersions: ['tshirt', 'longsleeve', 'hoodie', 'crewneck'],
@@ -41,7 +41,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Tshirt (Women)',
+    name: 'Tshirts (Women)',
     path: 'tshirt/women',
     images: [
       'M100966592 SDVGIC Jr Valley Girl DTF on Forest.png',
@@ -50,14 +50,14 @@ export const categories: Category[] = [
       'M100964847 SHMCDS Jr Mom Club DTF on Steel.png',
       'M100964663 SDFAMS Jr Family DTF on Steel .png',
       'M100436060 SH2FDS Custom Spartan DTFN on Steel.png',
-      'M100439889 SDABSC Absent DTF on Fores.png',
+      'M100439889 SDABSC Absent DTF on Forest.png',
       'M100963545 SHMCDW Jr Mom Club DTF on Green .png',
       'M100963714 SDFAMW Jr Family DTF on Forest.png',
       'M100438383 SH2FDW Custom DTFN on Forest.png',
     ],
   },
   {
-    name: 'Raincoat',
+    name: 'Jackets',
     path: 'raincoat',
     images: [
       'M100490133 SEASLW Aspire Jacket .png',
@@ -66,7 +66,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Flannel',
+    name: 'Flannel lounge pants',
     path: 'pj',
     images: [
       'M100445564 SDBOPF Bondi DTF Flannels .png',
@@ -75,7 +75,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Sweatpant',
+    name: 'Sweatpants/Joggers',
     path: 'sweatpant',
     images: [
       'M100447223 SHVSCD Value DTF Gray Pants .png',
@@ -84,7 +84,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Short',
+    name: 'Shorts',
     path: 'short',
     images: [
       'M100453813 SHSHDS Custom DTF Gray Shorts .png',
@@ -92,7 +92,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Hat',
+    name: 'Caps',
     path: 'hat',
     hasColorVersions: true,
     colorVersions: ['white', 'gray'],
@@ -106,7 +106,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Beanie',
+    name: 'Knit Caps',
     path: 'beanie',
     images: [
       'M100494173 SHE1CB Custom Spartan Gray Beanie .png',

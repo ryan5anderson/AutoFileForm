@@ -112,7 +112,7 @@ export const createEmailCategories = (formData: FormData): EmailCategory[] => {
           });
 
           // If this is a rack item, add corresponding cards
-          if (cat.name === 'Rack') {
+          if (cat.name === 'Display Options') {
             const cardMapping = rackToCardMapping[imagePath];
             if (cardMapping) {
               // Add the card for each quantity of the rack item

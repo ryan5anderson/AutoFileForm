@@ -18,7 +18,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
     const autoAddedCards: { sku: string; name: string; qty: number }[] = [];
 
     // Find the rack category
-    const rackCategory = categories.find(cat => cat.name === 'Rack');
+    const rackCategory = categories.find(cat => cat.name === 'Display Options');
     if (rackCategory) {
       rackCategory.images.forEach((img) => {
         const imagePath = getImagePath(rackCategory.path, img);
@@ -124,7 +124,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
               </div>
               {category.images.map((img) => {
                 const imagePath = getImagePath(category.path, img);
-                const productName = category.name === 'Rack' ? getRackDisplayName(img) : getProductName(img);
+                const productName = category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img);
                 
                 if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png') {
                   // Special case for shirt with both versions and colors

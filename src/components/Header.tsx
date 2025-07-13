@@ -11,6 +11,7 @@ const Header: React.FC = () => {
       width: '100%',
       boxSizing: 'border-box'
     }}>
+      {/* Logo Section */}
       <div style={{
         width: '100%',
         margin: '0 auto',
@@ -18,7 +19,8 @@ const Header: React.FC = () => {
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: 'var(--space-4)',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        marginBottom: 'var(--space-3)'
       }}>
         {/* Left side - Campus Traditions */}
         <div style={{
@@ -38,12 +40,31 @@ const Header: React.FC = () => {
           />
         </div>
 
-        {/* Center - Michigan State */}
+        {/* Center - Ohiopyle81 (switched from Michigan State) */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flex: '0 0 auto'
+        }}>
+          <img
+            src={process.env.PUBLIC_URL + '/logo/ohiopyle81.png'}
+            alt="Ohiopyle81"
+            style={{
+              height: 'clamp(60px, 8vw, 100px)',
+              width: 'auto',
+              objectFit: 'contain'
+            }}
+          />
+        </div>
+
+        {/* Right side - Michigan State (switched from Ohiopyle81) */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          flex: '1 1 auto',
+          minWidth: 0
         }}>
           <img
             src={process.env.PUBLIC_URL + '/logo/michiganstatelogo.png'}
@@ -55,24 +76,34 @@ const Header: React.FC = () => {
             }}
           />
         </div>
+      </div>
 
-        {/* Right side - Ohiopyle81 */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          flex: '1 1 auto',
-          minWidth: 0
-        }}>
-          <img
-            src={process.env.PUBLIC_URL + '/logo/ohiopyle81.png'}
-            alt="Ohiopyle81"
-            style={{
-              height: 'clamp(30px, 5vw, 50px)',
-              width: 'auto',
-              objectFit: 'contain'
-            }}
-          />
+      {/* Contact Information Section */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 'var(--space-4)',
+        fontSize: '0.875rem',
+        color: 'var(--color-text)',
+        flexWrap: 'wrap',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontWeight: '600' }}>
+          Dana Anderson
+        </div>
+        <div>
+          Collegiate Representative
+        </div>
+        <div>
+          <a href="mailto:Dana@ohiopyleprints.com" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
+            Dana@ohiopyleprints.com
+          </a>
+        </div>
+        <div>
+          <a href="tel:724-562-2764" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
+            724-562-2764
+          </a>
         </div>
       </div>
     </header>
