@@ -1,5 +1,6 @@
 export { default as ProductCard } from './ProductCard';
 export { default as CategorySection } from './CategorySection';
+export { default as DisplayOptionCard } from './DisplayOptionCard';
 export { default as StoreInfoForm } from './StoreInfoForm';
 export { default as FormPage } from './FormPage';
 export { default as SummaryPage } from './SummaryPage';

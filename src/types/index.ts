@@ -6,6 +6,7 @@ export interface Category {
   shirtVersions?: string[]; // Array of available versions for this category
   hasColorVersions?: boolean;
   colorVersions?: string[]; // Array of available colors for this category
+  hasDisplayOptions?: boolean; // New property for display options
 }
 
 export interface ShirtVersion {
@@ -26,6 +27,18 @@ export interface ShirtColorComboVersion {
   [versionColor: string]: string; // e.g. 'tshirt_black', 'hoodie_forest'
 }
 
+export interface DisplayOption {
+  displayOnly: string;
+  displayStandardCasePack: string;
+}
+
+export interface SweatpantJoggerOption {
+  sweatpantSteel: string;
+  sweatpantOxford: string;
+  joggerSteel: string;
+  joggerOxford: string;
+}
+
 export interface FormData {
   company: string;
   storeNumber: string;
@@ -36,6 +49,8 @@ export interface FormData {
   shirtVersions?: Record<string, ShirtVersion>;
   colorVersions?: Record<string, ColorVersion>;
   shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
+  displayOptions?: Record<string, DisplayOption>;
+  sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
 }
 
 export interface EmailCategory {

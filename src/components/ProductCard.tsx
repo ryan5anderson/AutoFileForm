@@ -1,5 +1,6 @@
 import React from 'react';
-import { getProductName, getImagePath, getRackDisplayName } from '../utils';
+import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../utils';
+import { SweatpantJoggerOption } from '../types';
 
 interface ProductCardProps {
   categoryPath: string;
@@ -9,6 +10,8 @@ interface ProductCardProps {
   onQuantityChange?: (imagePath: string, value: string) => void;
   showQuantityInput?: boolean;
   readOnly?: boolean;
+  sweatpantJoggerOption?: SweatpantJoggerOption;
+  onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -18,7 +21,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   quantity = '',
   onQuantityChange,
   showQuantityInput = true,
-  readOnly = false
+  readOnly = false,
+  sweatpantJoggerOption,
+  onSweatpantJoggerOptionChange
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
@@ -54,33 +59,102 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {showQuantityInput && !readOnly && (
         <div style={{ 
           display: 'flex', 
-          alignItems: 'center', 
+          flexDirection: categoryName === 'Sweatpants/Joggers' ? 'column' : 'row',
+          alignItems: categoryName === 'Sweatpants/Joggers' ? 'flex-start' : 'center',
           justifyContent: 'center',
-          gap: 'var(--space-2)' 
+          gap: 'var(--space-2)'
         }}>
-          <label htmlFor={`qty-${imagePath}`} style={{ 
-            fontSize: '0.875rem', 
-            fontWeight: '600',
-            color: 'var(--color-text)'
-          }}>
-            Quantity:
-          </label>
-          <input
-            type="number"
-            id={`qty-${imagePath}`}
-            min="0"
-            value={quantity}
-            onChange={(e) => onQuantityChange?.(imagePath, e.target.value)}
-            style={{
-              width: '60px',
-              padding: 'var(--space-2)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius)',
-              fontSize: '0.875rem',
-              background: 'var(--color-input-bg)',
-              textAlign: 'center'
-            }}
-          />
+          {categoryName === 'Sweatpants/Joggers' ? (
+            <>
+              <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--color-text)', marginBottom: '4px' }}>Quantity:</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                {['sweatpantSteel', 'sweatpantOxford', 'joggerSteel', 'joggerOxford'].map((optionKey) => (
+                  <div key={optionKey} style={{ display: 'flex', alignItems: 'center', marginBottom: '4px', width: '100%' }}>
+                    <span style={{ fontSize: '0.875rem', marginRight: '8px' }}>
+                      {optionKey === 'sweatpantSteel' && 'Straight-Leg Steel:'}
+                      {optionKey === 'sweatpantOxford' && 'Straight-Leg Oxford:'}
+                      {optionKey === 'joggerSteel' && 'Jogger Steel:'}
+                      {optionKey === 'joggerOxford' && 'Jogger Oxford:'}
+                    </span>
+                    <select
+                      id={`${optionKey}-${imagePath}`}
+                      value={(sweatpantJoggerOption ? sweatpantJoggerOption[optionKey as keyof SweatpantJoggerOption] : '') || ''}
+                      onChange={e => onSweatpantJoggerOptionChange && onSweatpantJoggerOptionChange(imagePath, optionKey as keyof SweatpantJoggerOption, e.target.value)}
+                      style={{
+                        width: '120px',
+                        padding: 'var(--space-2)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius)',
+                        fontSize: '0.875rem',
+                        background: 'var(--color-input-bg)',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <option value="">Select</option>
+                      {getQuantityMultiples(imageName, 'Sweatpants/Joggers').map(val => (
+                        <option key={val} value={val}>{val}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (categoryName === 'Display Options' || categoryName === 'Water Bottle') ? (
+            <>
+              <label htmlFor={`qty-${imagePath}`} style={{ 
+                fontSize: '0.875rem', 
+                fontWeight: '600',
+                color: 'var(--color-text)'
+              }}>
+                Quantity:
+              </label>
+              <input
+                type="number"
+                id={`qty-${imagePath}`}
+                min="0"
+                value={quantity}
+                onChange={(e) => onQuantityChange?.(imagePath, e.target.value)}
+                style={{
+                  width: '80px',
+                  padding: 'var(--space-2)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: '0.875rem',
+                  background: 'var(--color-input-bg)',
+                  textAlign: 'center'
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <label htmlFor={`qty-${imagePath}`} style={{ 
+                fontSize: '0.875rem', 
+                fontWeight: '600',
+                color: 'var(--color-text)'
+              }}>
+                Quantity:
+              </label>
+              <select
+                id={`qty-${imagePath}`}
+                value={quantity}
+                onChange={(e) => onQuantityChange?.(imagePath, e.target.value)}
+                style={{
+                  width: '80px',
+                  padding: 'var(--space-2)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: '0.875rem',
+                  background: 'var(--color-input-bg)',
+                  textAlign: 'center'
+                }}
+              >
+                <option value="">Select</option>
+                {getQuantityMultiples(imageName, categoryName).map(val => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </>
+          )}
         </div>
       )}
       {readOnly && (

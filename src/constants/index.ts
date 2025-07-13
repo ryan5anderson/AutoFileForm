@@ -9,6 +9,7 @@ export const categories: Category[] = [
   {
     name: 'Display Options',
     path: 'rack',
+    hasDisplayOptions: true,
     images: [
       'Michigan_state_University_Premium Floor Display 2.0_500px.jpg',
       'Michigan_State_University_Tier2_Display_Floor_500px.jpg',

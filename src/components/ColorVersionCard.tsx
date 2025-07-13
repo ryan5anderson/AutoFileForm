@@ -1,5 +1,5 @@
 import React from 'react';
-import { getProductName, getImagePath, getColorDisplayName } from '../utils';
+import { getProductName, getImagePath, getColorDisplayName, getQuantityMultiples } from '../utils';
 import { ColorVersion } from '../types';
 
 interface ColorVersionCardProps {
@@ -88,14 +88,12 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
                 >
                   {displayName}:
                 </label>
-                <input
-                  type="number"
+                <select
                   id={`${color}-${imagePath}`}
-                  min="0"
                   value={colorVersions[colorKey] || ''}
                   onChange={(e) => handleColorChange(colorKey, e.target.value)}
                   style={{
-                    width: '50px',
+                    width: '60px',
                     padding: 'var(--space-1) var(--space-2)',
                     border: '1px solid var(--color-border)',
                     borderRadius: 'var(--radius)',
@@ -103,7 +101,12 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
                     background: 'var(--color-input-bg)',
                     textAlign: 'center'
                   }}
-                />
+                >
+                  <option value="">Select</option>
+                  {getQuantityMultiples(imageName, categoryPath).map(val => (
+                    <option key={val} value={val}>{val}</option>
+                  ))}
+                </select>
               </div>
             );
           })}

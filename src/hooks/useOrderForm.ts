@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion } from '../types';
+import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../types';
 import { validateFormData, createTemplateParams } from '../utils';
 import { sendOrderEmail } from '../services/emailService';
-import { categories } from '../constants';
-import { getImagePath } from '../utils';
 
 export const useOrderForm = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -15,7 +13,9 @@ export const useOrderForm = () => {
     quantities: {} as Record<string, string>,
     shirtVersions: {} as Record<string, ShirtVersion>,
     colorVersions: {} as Record<string, ColorVersion>,
-    shirtColorComboVersions: {} as Record<string, ShirtColorComboVersion>
+    shirtColorComboVersions: {} as Record<string, ShirtColorComboVersion>,
+    displayOptions: {} as Record<string, DisplayOption>,
+    sweatpantJoggerOptions: {} as Record<string, SweatpantJoggerOption>,
   });
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>('form');
@@ -74,52 +74,29 @@ export const useOrderForm = () => {
     }));
   };
 
-  const handleSelectAll = () => {
-    const newQuantities: Record<string, string> = {};
-    const newShirtVersions: Record<string, ShirtVersion> = {};
-    const newColorVersions: Record<string, ColorVersion> = {};
-    const newShirtColorComboVersions: Record<string, ShirtColorComboVersion> = {};
-
-    categories.forEach(category => {
-      category.images.forEach(img => {
-        const imagePath = getImagePath(category.path, img);
-        if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' && category.shirtVersions && category.colorVersions) {
-          // For the special shirt, set all combos to 10
-          const combo: ShirtColorComboVersion = {};
-          for (const color of category.colorVersions) {
-            for (const version of category.shirtVersions) {
-              combo[`${version}_${color}`] = '10';
-            }
-          }
-          newShirtColorComboVersions[imagePath] = combo;
-        } else if (category.hasShirtVersions && category.shirtVersions) {
-          const shirtVersion: ShirtVersion = {
-            tshirt: '10',
-            longsleeve: '10',
-            hoodie: '10',
-            crewneck: '10'
-          };
-          newShirtVersions[imagePath] = shirtVersion;
-        } else if (category.hasColorVersions && category.colorVersions) {
-          const colorVersion: ColorVersion = {
-            black: '10',
-            forest: '10',
-            white: '10',
-            gray: '10'
-          };
-          newColorVersions[imagePath] = colorVersion;
-        } else {
-          newQuantities[imagePath] = '10';
-        }
-      });
-    });
-
+  const handleDisplayOptionChange = (imagePath: string, option: keyof DisplayOption, value: string) => {
     setFormData(prev => ({
       ...prev,
-      quantities: newQuantities,
-      shirtVersions: newShirtVersions,
-      colorVersions: newColorVersions,
-      shirtColorComboVersions: newShirtColorComboVersions
+      displayOptions: {
+        ...prev.displayOptions,
+        [imagePath]: {
+          ...prev.displayOptions?.[imagePath],
+          [option]: value
+        } as DisplayOption
+      }
+    }));
+  };
+
+  const handleSweatpantJoggerOptionChange = (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      sweatpantJoggerOptions: {
+        ...prev.sweatpantJoggerOptions,
+        [imagePath]: {
+          ...prev.sweatpantJoggerOptions?.[imagePath],
+          [option]: value
+        } as SweatpantJoggerOption
+      }
     }));
   };
 
@@ -172,7 +149,8 @@ export const useOrderForm = () => {
     handleShirtVersionChange,
     handleColorVersionChange,
     handleShirtColorComboChange,
-    handleSelectAll,
+    handleDisplayOptionChange,
+    handleSweatpantJoggerOptionChange,
     handleFormSubmit,
     handleBack,
     handleBackToSummary,

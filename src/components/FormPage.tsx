@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormData, Category, ShirtVersion, ColorVersion } from '../types';
+import { FormData, Category, ShirtVersion, ColorVersion, DisplayOption, SweatpantJoggerOption } from '../types';
 import { categories } from '../constants';
 import StoreInfoForm from './StoreInfoForm';
 import CategorySection from './CategorySection';
@@ -13,9 +13,11 @@ interface FormPageProps {
   onQuantityChange: (imagePath: string, value: string) => void;
   onShirtVersionChange: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
   onColorVersionChange: (imagePath: string, color: keyof ColorVersion, value: string) => void;
-  onSelectAll: () => void;
+  onDisplayOptionChange: (imagePath: string, option: keyof DisplayOption, value: string) => void;
+  onSweatpantJoggerOptionChange: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   error: string | null;
+  onShirtColorComboChange: (imagePath: string, version: string, color: string, value: string) => void;
 }
 
 const FormPage: React.FC<FormPageProps> = ({
@@ -24,9 +26,11 @@ const FormPage: React.FC<FormPageProps> = ({
   onQuantityChange,
   onShirtVersionChange,
   onColorVersionChange,
-  onSelectAll,
+  onDisplayOptionChange,
+  onSweatpantJoggerOptionChange,
   onSubmit,
-  error
+  error,
+  onShirtColorComboChange
 }) => {
   return (
     <div style={{ 
@@ -64,9 +68,15 @@ const FormPage: React.FC<FormPageProps> = ({
               quantities={formData.quantities}
               shirtVersions={formData.shirtVersions}
               colorVersions={formData.colorVersions}
+              shirtColorComboVersions={formData.shirtColorComboVersions}
+              displayOptions={formData.displayOptions}
+              sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
               onQuantityChange={onQuantityChange}
               onShirtVersionChange={onShirtVersionChange}
               onColorVersionChange={onColorVersionChange}
+              onShirtColorComboChange={onShirtColorComboChange}
+              onDisplayOptionChange={onDisplayOptionChange}
+              onSweatpantJoggerOptionChange={onSweatpantJoggerOptionChange}
             />
           ))}
 
@@ -94,23 +104,6 @@ const FormPage: React.FC<FormPageProps> = ({
             marginTop: 'var(--space-6)',
             flexWrap: 'wrap'
           }}>
-            <button
-              type="button"
-              onClick={onSelectAll}
-              style={{
-                background: 'var(--color-bg)',
-                color: 'var(--color-primary)',
-                padding: 'var(--space-3) var(--space-4)',
-                border: '2px solid var(--color-primary)',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-                minWidth: '150px'
-              }}
-            >
-              Select All (10)
-            </button>
             
             <button
               type="submit"

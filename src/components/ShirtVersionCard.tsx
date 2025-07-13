@@ -1,5 +1,5 @@
 import React from 'react';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName } from '../utils';
+import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getQuantityMultiples } from '../utils';
 import { ShirtVersion } from '../types';
 
 interface ShirtVersionCardProps {
@@ -68,7 +68,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
         }}>
           {availableVersions.map((version) => {
             const versionKey = version as keyof ShirtVersion;
-            const displayName = getVersionDisplayName(version);
+            const displayName = getVersionDisplayName(version, imageName);
             
             return (
               <div key={version} style={{ 
@@ -88,14 +88,12 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
                 >
                   {displayName}:
                 </label>
-                <input
-                  type="number"
+                <select
                   id={`${version}-${imagePath}`}
-                  min="0"
                   value={shirtVersions[versionKey] || ''}
                   onChange={(e) => handleVersionChange(versionKey, e.target.value)}
                   style={{
-                    width: '50px',
+                    width: '60px',
                     padding: 'var(--space-1) var(--space-2)',
                     border: '1px solid var(--color-border)',
                     borderRadius: 'var(--radius)',
@@ -103,7 +101,12 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
                     background: 'var(--color-input-bg)',
                     textAlign: 'center'
                   }}
-                />
+                >
+                  <option value="">Select</option>
+                  {getQuantityMultiples(imageName, version).map(val => (
+                    <option key={val} value={val}>{val}</option>
+                  ))}
+                </select>
               </div>
             );
           })}
@@ -118,7 +121,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
         }}>
           {availableVersions.map((version) => {
             const versionKey = version as keyof ShirtVersion;
-            const displayName = getVersionDisplayName(version);
+            const displayName = getVersionDisplayName(version, imageName);
             const quantity = shirtVersions[versionKey] || '';
             
             return (

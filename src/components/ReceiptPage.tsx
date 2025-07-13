@@ -125,140 +125,70 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
               {category.images.map((img) => {
                 const imagePath = getImagePath(category.path, img);
                 const productName = category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img);
-                
-                if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png') {
-                  // Special case for shirt with both versions and colors
-                  const shirtVersions = formData.shirtVersions?.[imagePath];
-                  const colorVersions = formData.colorVersions?.[imagePath];
-                  const totalShirtQty = getShirtVersionTotal(shirtVersions, category.shirtVersions);
-                  const totalColorQty = Object.values(colorVersions || {}).reduce((sum, qty) => sum + Number(qty || 0), 0);
-                  
-                  if (totalShirtQty > 0 && totalColorQty > 0) {
+                // --- BEGIN TIE-DYE FIRST ---
+                const tieDyeImages = [
+                  'M100965414 SHOUDC OU Go Green DTF on Forest.png',
+                  'M100482538 SHHODC Hover DTF on Black or Forest .png',
+                  'M100437896 SHOUDC Over Under DTF on Forest.png',
+                ];
+                if (tieDyeImages.includes(img)) {
+                  const comboVersions = formData.shirtColorComboVersions?.[imagePath];
+                  const categoryShirtVersions = category.shirtVersions || ['tshirt', 'longsleeve', 'hoodie'];
+                  const categoryColors = category.colorVersions || ['black', 'forest'];
+                  let totalQty = 0;
+                  const rows = [];
+                  for (const version of categoryShirtVersions) {
+                    for (const color of categoryColors) {
+                      const comboKey = `${version}_${color}`;
+                      const value = comboVersions?.[comboKey];
+                      if (value && Number(value) > 0) {
+                        totalQty += Number(value);
+                        rows.push(
+                          <div key={comboKey} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                            <span>{getVersionDisplayName(version, img)} {getColorDisplayName(color)}</span>
+                            <span style={{ fontWeight: '500' }}>Qty: {value}</span>
+                          </div>
+                        );
+                      }
+                    }
+                  }
+                  if (totalQty > 0) {
                     return (
-                      <div key={img} style={{ 
+                      <div key={img} style={{
                         marginBottom: 'var(--space-3)',
                         padding: 'var(--space-3)',
                         background: 'var(--color-bg)',
                         borderRadius: 'var(--radius)',
                         border: '1px solid var(--color-border)'
                       }}>
-                        <div style={{ 
-                          fontWeight: '600', 
-                          fontSize: '1rem',
-                          marginBottom: 'var(--space-2)',
-                          color: 'var(--color-text)'
+                        <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)' }}>{productName}</div>
+                        {rows}
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: 'var(--space-1) 0',
+                          fontSize: '0.875rem',
+                          marginLeft: 'var(--space-3)',
+                          fontWeight: '600',
+                          color: 'var(--color-primary)',
+                          borderTop: '1px solid var(--color-border)',
+                          marginTop: 'var(--space-2)',
+                          paddingTop: 'var(--space-2)'
                         }}>
-                          {productName}
-                        </div>
-                        
-                        {/* Shirt Versions */}
-                        <div style={{ 
-                          borderBottom: '1px solid var(--color-border)', 
-                          paddingBottom: 'var(--space-2)', 
-                          marginBottom: 'var(--space-2)' 
-                        }}>
-                          <div style={{ 
-                            fontSize: '0.75rem', 
-                            fontWeight: '600',
-                            color: 'var(--color-primary)',
-                            marginBottom: 'var(--space-1)'
-                          }}>
-                            Shirt Versions:
-                          </div>
-                          {category.shirtVersions?.map((version) => {
-                            const versionKey = version as keyof ShirtVersion;
-                            const versionValue = shirtVersions?.[versionKey];
-                            const displayName = getVersionDisplayName(version);
-                            
-                            if (versionValue && Number(versionValue) > 0) {
-                              return (
-                                <div key={version} style={{ 
-                                  display: 'flex', 
-                                  justifyContent: 'space-between', 
-                                  padding: 'var(--space-1) 0', 
-                                  fontSize: '0.875rem', 
-                                  marginLeft: 'var(--space-3)' 
-                                }}>
-                                  <span>{displayName}</span>
-                                  <span style={{ fontWeight: '500' }}>Qty: {versionValue}</span>
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
-                          <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            padding: 'var(--space-1) 0', 
-                            fontSize: '0.875rem', 
-                            marginLeft: 'var(--space-3)', 
-                            fontWeight: '600',
-                            color: 'var(--color-primary)',
-                            borderTop: '1px solid var(--color-border)',
-                            marginTop: 'var(--space-2)',
-                            paddingTop: 'var(--space-2)'
-                          }}>
-                            <span>Shirt Total</span>
-                            <span>Qty: {totalShirtQty}</span>
-                          </div>
-                        </div>
-
-                        {/* Color Versions */}
-                        <div>
-                          <div style={{ 
-                            fontSize: '0.75rem', 
-                            fontWeight: '600',
-                            color: 'var(--color-primary)',
-                            marginBottom: 'var(--space-1)'
-                          }}>
-                            Colors:
-                          </div>
-                          {category.colorVersions?.map((color) => {
-                            const colorKey = color as keyof ColorVersion;
-                            const colorValue = colorVersions?.[colorKey];
-                            const displayName = getColorDisplayName(color);
-                            
-                            if (colorValue && Number(colorValue) > 0) {
-                              return (
-                                <div key={color} style={{ 
-                                  display: 'flex', 
-                                  justifyContent: 'space-between', 
-                                  padding: 'var(--space-1) 0', 
-                                  fontSize: '0.875rem', 
-                                  marginLeft: 'var(--space-3)' 
-                                }}>
-                                  <span>{displayName}</span>
-                                  <span style={{ fontWeight: '500' }}>Qty: {colorValue}</span>
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
-                          <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            padding: 'var(--space-1) 0', 
-                            fontSize: '0.875rem', 
-                            marginLeft: 'var(--space-3)', 
-                            fontWeight: '600',
-                            color: 'var(--color-primary)',
-                            borderTop: '1px solid var(--color-border)',
-                            marginTop: 'var(--space-2)',
-                            paddingTop: 'var(--space-2)'
-                          }}>
-                            <span>Color Total</span>
-                            <span>Qty: {totalColorQty}</span>
-                          </div>
+                          <span>Total</span>
+                          <span>Qty: {totalQty}</span>
                         </div>
                       </div>
                     );
                   }
-                  return null; // Don't show items with 0 quantity
-                } else if (hasColorVersions(img)) {
-                  const colorVersions = formData.colorVersions?.[imagePath];
-                  const totalQty = Object.values(colorVersions || {}).reduce((sum, qty) => sum + Number(qty || 0), 0);
-                  
-                  if (totalQty > 0) {
+                  return null;
+                }
+                // --- END TIE-DYE FIRST ---
+                // Handle Display Options
+                if (category.hasDisplayOptions) {
+                  const displayOption = formData.displayOptions?.[imagePath];
+                  const totalDisplayQty = (Number(displayOption?.displayOnly || 0) + Number(displayOption?.displayStandardCasePack || 0));
+                  if (totalDisplayQty > 0) {
                     return (
                       <div key={img} style={{ 
                         marginBottom: 'var(--space-3)',
@@ -275,33 +205,139 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
                         }}>
                           {productName}
                         </div>
+                        {displayOption?.displayOnly && Number(displayOption.displayOnly) > 0 && (
+                          <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            padding: 'var(--space-1) 0', 
+                            fontSize: '0.875rem', 
+                            marginLeft: 'var(--space-3)' 
+                          }}>
+                            <span>Display Only</span>
+                            <span style={{ fontWeight: '500' }}>Qty: {displayOption.displayOnly}</span>
+                          </div>
+                        )}
+                        {displayOption?.displayStandardCasePack && Number(displayOption.displayStandardCasePack) > 0 && (
+                          <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            padding: 'var(--space-1) 0', 
+                            fontSize: '0.875rem', 
+                            marginLeft: 'var(--space-3)' 
+                          }}>
+                            <span>Display Standard Case Pack</span>
+                            <span style={{ fontWeight: '500' }}>Qty: {displayOption.displayStandardCasePack}</span>
+                          </div>
+                        )}
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          padding: 'var(--space-1) 0', 
+                          fontSize: '0.875rem', 
+                          marginLeft: 'var(--space-3)', 
+                          fontWeight: '600',
+                          color: 'var(--color-primary)',
+                          borderTop: '1px solid var(--color-border)',
+                          marginTop: 'var(--space-2)',
+                          paddingTop: 'var(--space-2)'
+                        }}>
+                          <span>Total</span>
+                          <span>Qty: {totalDisplayQty}</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }
+                // Handle Sweatpants/Joggers
+                if (category.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
+                  const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: '' };
+                  const options = [
+                    { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
+                    { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
+                    { key: 'joggerSteel', label: 'Jogger Steel' },
+                    { key: 'joggerOxford', label: 'Jogger Oxford' },
+                  ];
+                  const total = options.reduce((sum, opt) => sum + Number(sj[opt.key as keyof typeof sj] || 0), 0);
+                  if (total > 0) {
+                    return (
+                      <div key={img} style={{
+                        marginBottom: 'var(--space-3)',
+                        padding: 'var(--space-3)',
+                        background: 'var(--color-bg)',
+                        borderRadius: 'var(--radius)',
+                        border: '1px solid var(--color-border)'
+                      }}>
+                        <div style={{
+                          fontWeight: '600',
+                          fontSize: '1rem',
+                          marginBottom: 'var(--space-2)',
+                          color: 'var(--color-text)'
+                        }}>{productName}</div>
+                        {options.map(opt => (
+                          Number(sj[opt.key as keyof typeof sj]) > 0 && (
+                            <div key={opt.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                              <span>{opt.label}</span>
+                              <span style={{ fontWeight: '500' }}>Qty: {sj[opt.key as keyof typeof sj]}</span>
+                            </div>
+                          )
+                        ))}
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: 'var(--space-1) 0',
+                          fontSize: '0.875rem',
+                          marginLeft: 'var(--space-3)',
+                          fontWeight: '600',
+                          color: 'var(--color-primary)',
+                          borderTop: '1px solid var(--color-border)',
+                          marginTop: 'var(--space-2)',
+                          paddingTop: 'var(--space-2)'
+                        }}>
+                          <span>Total</span>
+                          <span>Qty: {total}</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }
+                // Handle Color Versions
+                if (hasColorVersions(img)) {
+                  const colorVersions = formData.colorVersions?.[imagePath];
+                  const totalQty = Object.values(colorVersions || {}).reduce((sum, qty) => sum + Number(qty || 0), 0);
+                  if (totalQty > 0) {
+                    return (
+                      <div key={img} style={{
+                        marginBottom: 'var(--space-3)',
+                        padding: 'var(--space-3)',
+                        background: 'var(--color-bg)',
+                        borderRadius: 'var(--radius)',
+                        border: '1px solid var(--color-border)'
+                      }}>
+                        <div style={{
+                          fontWeight: '600',
+                          fontSize: '1rem',
+                          marginBottom: 'var(--space-2)',
+                          color: 'var(--color-text)'
+                        }}>{productName}</div>
                         {category.colorVersions?.map((color) => {
                           const colorKey = color as keyof ColorVersion;
                           const colorValue = colorVersions?.[colorKey];
                           const displayName = getColorDisplayName(color);
-                          
-                          if (colorValue && Number(colorValue) > 0) {
-                            return (
-                              <div key={color} style={{ 
-                                display: 'flex', 
-                                justifyContent: 'space-between', 
-                                padding: 'var(--space-1) 0', 
-                                fontSize: '0.875rem', 
-                                marginLeft: 'var(--space-3)' 
-                              }}>
-                                <span>{displayName}</span>
-                                <span style={{ fontWeight: '500' }}>Qty: {colorValue}</span>
-                              </div>
-                            );
-                          }
-                          return null;
+                          return (Number(colorValue) > 0 ? (
+                            <div key={color} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                              <span>{displayName}</span>
+                              <span style={{ fontWeight: '500' }}>Qty: {colorValue}</span>
+                            </div>
+                          ) : null);
                         })}
-                        <div style={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          padding: 'var(--space-1) 0', 
-                          fontSize: '0.875rem', 
-                          marginLeft: 'var(--space-3)', 
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: 'var(--space-1) 0',
+                          fontSize: '0.875rem',
+                          marginLeft: 'var(--space-3)',
                           fontWeight: '600',
                           color: 'var(--color-primary)',
                           borderTop: '1px solid var(--color-border)',
@@ -314,55 +350,44 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
                       </div>
                     );
                   }
-                  return null; // Don't show items with 0 quantity
-                } else if (category.hasShirtVersions && category.shirtVersions) {
+                  return null;
+                }
+                // Handle Shirt Versions
+                if (category.hasShirtVersions && category.shirtVersions) {
                   const shirtVersions = formData.shirtVersions?.[imagePath];
                   const totalQty = getShirtVersionTotal(shirtVersions, category.shirtVersions);
-                  
                   if (totalQty > 0) {
                     return (
-                      <div key={img} style={{ 
+                      <div key={img} style={{
                         marginBottom: 'var(--space-3)',
                         padding: 'var(--space-3)',
                         background: 'var(--color-bg)',
                         borderRadius: 'var(--radius)',
                         border: '1px solid var(--color-border)'
                       }}>
-                        <div style={{ 
-                          fontWeight: '600', 
+                        <div style={{
+                          fontWeight: '600',
                           fontSize: '1rem',
                           marginBottom: 'var(--space-2)',
                           color: 'var(--color-text)'
-                        }}>
-                          {productName}
-                        </div>
+                        }}>{productName}</div>
                         {category.shirtVersions.map((version) => {
                           const versionKey = version as keyof ShirtVersion;
                           const versionValue = shirtVersions?.[versionKey];
                           const displayName = getVersionDisplayName(version);
-                          
-                          if (versionValue && Number(versionValue) > 0) {
-                            return (
-                              <div key={version} style={{ 
-                                display: 'flex', 
-                                justifyContent: 'space-between', 
-                                padding: 'var(--space-1) 0', 
-                                fontSize: '0.875rem', 
-                                marginLeft: 'var(--space-3)' 
-                              }}>
-                                <span>{displayName}</span>
-                                <span style={{ fontWeight: '500' }}>Qty: {versionValue}</span>
-                              </div>
-                            );
-                          }
-                          return null;
+                          return (Number(versionValue) > 0 ? (
+                            <div key={version} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                              <span>{displayName}</span>
+                              <span style={{ fontWeight: '500' }}>Qty: {versionValue}</span>
+                            </div>
+                          ) : null);
                         })}
-                        <div style={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          padding: 'var(--space-1) 0', 
-                          fontSize: '0.875rem', 
-                          marginLeft: 'var(--space-3)', 
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: 'var(--space-1) 0',
+                          fontSize: '0.875rem',
+                          marginLeft: 'var(--space-3)',
                           fontWeight: '600',
                           color: 'var(--color-primary)',
                           borderTop: '1px solid var(--color-border)',
@@ -375,25 +400,44 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
                       </div>
                     );
                   }
-                  return null; // Don't show items with 0 quantity
-                } else {
-                  const qty = formData.quantities[imagePath] || '0';
-                  if (Number(qty) > 0) {
-                    return (
-                      <div key={img} style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        padding: 'var(--space-2) 0', 
-                        fontSize: '1rem',
-                        borderBottom: '1px solid var(--color-border)'
-                      }}>
-                        <span style={{ fontWeight: '500' }}>{productName}</span>
-                        <span style={{ fontWeight: '600', color: 'var(--color-primary)' }}>Qty: {qty}</span>
-                      </div>
-                    );
-                  }
-                  return null; // Don't show items with 0 quantity
+                  return null;
                 }
+                // Handle simple quantity items
+                const qty = formData.quantities[imagePath] || '0';
+                if (Number(qty) > 0) {
+                  return (
+                    <div key={img} style={{
+                      marginBottom: 'var(--space-3)',
+                      padding: 'var(--space-3)',
+                      background: 'var(--color-bg)',
+                      borderRadius: 'var(--radius)',
+                      border: '1px solid var(--color-border)'
+                    }}>
+                      <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)' }}>{productName}</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                        <span>Qty</span>
+                        <span style={{ fontWeight: '500' }}>{qty}</span>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: 'var(--space-1) 0',
+                        fontSize: '0.875rem',
+                        marginLeft: 'var(--space-3)',
+                        fontWeight: '600',
+                        color: 'var(--color-primary)',
+                        borderTop: '1px solid var(--color-border)',
+                        marginTop: 'var(--space-2)',
+                        paddingTop: 'var(--space-2)'
+                      }}>
+                        <span>Total</span>
+                        <span>Qty: {qty}</span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+                // --- END UNIFIED CARD LAYOUT ---
               })}
             </div>
           ))}

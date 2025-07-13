@@ -1,0 +1,36 @@
+Display Options
+	- order rack only (DONE)
+	- order standard case pack (includes garment) (DONE)
+T-shirts
+	- T-shirt multiples of 7 (DONE)
+	- long sleeve multiples of 7 (DONE)
+	- crews multiples of 6 (DONE)
+	- Hoodie, multiples of 8  (DONE)
+	- "Long Sleeve" to "Long Sleeve T-shirt' (DONE)
+	- "Crewneck" to Crew Sweatshirt" (DONE)
+Tie-dye
+	- all garments multiples of 8 (DONE)
+	- No crewnecks (DONE)
+	- "T-Shirt" to "Tie-dye T-Shirt" (DONE)
+Sweatpants/Joggers
+	- multiples of 6 (DONE)
+	- Sweatpants or jogger for each design
+		- in steel or oxford
+Shorts
+	- multiples of 8 (DONE)
+Flannels
+	- multiples of 8 (DONE)
+Jackets 
+	- multiples of 6 (DONE)
+Women
+	- Multiples of 8
+Cap & knit Cap
+	- multiples of 6 (DONE)
+Socks
+	- multiples of 6 (DONE)
+Bottle
+	- any (DONE)
+
+
+
+Max bunches of 6

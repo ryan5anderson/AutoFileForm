@@ -56,7 +56,7 @@ export const createEmailCategories = (formData: FormData): EmailCategory[] => {
               const comboKey = `${version}_${color}`;
               const value = comboVersions[comboKey];
               if (value && value.trim() !== '' && Number(value) > 0) {
-                const versionName = getVersionDisplayName(version);
+                const versionName = getVersionDisplayName(version, img);
                 const colorName = getColorDisplayName(color);
                 categoryItems.push({
                   sku,
@@ -92,7 +92,7 @@ export const createEmailCategories = (formData: FormData): EmailCategory[] => {
         for (const version of cat.shirtVersions) {
           const versionValue = shirtVersions?.[version as keyof ShirtVersion];
           if (versionValue && versionValue.trim() !== '') {
-            const versionName = getVersionDisplayName(version);
+            const versionName = getVersionDisplayName(version, img);
             categoryItems.push({
               sku,
               name: `${name} (${versionName})`,
@@ -101,6 +101,46 @@ export const createEmailCategories = (formData: FormData): EmailCategory[] => {
             });
           }
         }
+      } else if (cat.hasDisplayOptions) {
+        // For display options, create separate items for each option
+        const displayOption = formData.displayOptions?.[imagePath];
+        
+        if (displayOption) {
+          if (displayOption.displayOnly && displayOption.displayOnly.trim() !== '' && Number(displayOption.displayOnly) > 0) {
+            categoryItems.push({
+              sku,
+              name: `${name} (Display Only)`,
+              qty: displayOption.displayOnly
+            });
+          }
+          
+          if (displayOption.displayStandardCasePack && displayOption.displayStandardCasePack.trim() !== '' && Number(displayOption.displayStandardCasePack) > 0) {
+            categoryItems.push({
+              sku,
+              name: `${name} (Display Standard Case Pack)`,
+              qty: displayOption.displayStandardCasePack
+            });
+          }
+        }
+      } else if (cat.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
+        // For sweatpant/jogger, add each of the four options as a line item
+        const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: '' };
+        const options = [
+          { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
+          { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
+          { key: 'joggerSteel', label: 'Jogger Steel' },
+          { key: 'joggerOxford', label: 'Jogger Oxford' },
+        ];
+        options.forEach(opt => {
+          const qty = sj[opt.key as keyof typeof sj];
+          if (qty && Number(qty) > 0) {
+            categoryItems.push({
+              sku,
+              name: `${name} (${opt.label})`,
+              qty
+            });
+          }
+        });
       } else {
         // For non-shirt categories, use regular quantity
         const quantity = formData.quantities[imagePath] || '0';
@@ -184,15 +224,17 @@ export const createTemplateParams = (formData: FormData): TemplateParams => {
 
 export const getProductName = (imageName: string): string => {
   const baseName = imageName.replace(/\.(png|jpg)$/, '');
-  
+
   // Custom display names for specific sweatpant items
   const sweatpantDisplayMapping: Record<string, string> = {
-    'M100447223 SHVSCD Value DTF Gray Pants .png': 'M100447223 SHVSCD Value DTF Gray Pants Jogger',
-    'M100446293 SHPSDS Shake it DTF Gray Pants.png': 'M100446293 SHPSDS Shake it DTF Gray Pants Jogger',
-    'M100448649 SHFDDS Force Down DTF Gray Pants.png': 'M100448649 SHFDDS Force Down DTF Gray Pants Straight-Leg'
+    'M100447223 SHVSCD Value DTF Gray Pants Jogger.png': 'M100447223 SHVSCD Value DTF Gray Pants',
+    'M100446293 SHPSDS Shake it DTF Gray Pants Jogger.png': 'M100446293 SHPSDS Shake it DTF Gray Pants',
+    'M100448649 SHFDDS Force Down DTF Gray Pants Straight-Leg.png': 'M100448649 SHFDDS Force Down DTF Gray Pants',
   };
-  
-  return sweatpantDisplayMapping[imageName] || baseName;
+
+  if (sweatpantDisplayMapping[imageName]) return sweatpantDisplayMapping[imageName];
+
+  return baseName;
 };
 
 export const getRackDisplayName = (imageName: string): string => {
@@ -218,14 +260,27 @@ export const getShirtVersionTotal = (shirtVersions: ShirtVersion | undefined, av
   }, 0);
 };
 
-export const getVersionDisplayName = (version: string): string => {
+export const getVersionDisplayName = (version: string, imageName?: string): string => {
+  // List of images that should use 'Tie-dye' prefix
+  const tieDyeImages = [
+    'M100965414 SHOUDC OU Go Green DTF on Forest.png',
+    'M100482538 SHHODC Hover DTF on Black or Forest .png',
+    'M100437896 SHOUDC Over Under DTF on Forest.png',
+  ];
+
+  let display = '';
   switch (version) {
-    case 'tshirt': return 'T-Shirt';
-    case 'longsleeve': return 'Long Sleeve';
-    case 'hoodie': return 'Hoodie';
-    case 'crewneck': return 'Crewneck';
-    default: return version;
+    case 'tshirt': display = 'T-Shirt'; break;
+    case 'longsleeve': display = 'Long Sleeve T-shirt'; break;
+    case 'hoodie': display = 'Hoodie'; break;
+    case 'crewneck': display = 'Crew Sweatshirt'; break;
+    default: display = version;
   }
+
+  if (imageName && tieDyeImages.includes(imageName)) {
+    return `Tie-dye ${display}`;
+  }
+  return display;
 };
 
 export const hasColorVersions = (imageName: string): boolean => {
@@ -246,3 +301,56 @@ export const getColorDisplayName = (color: string): string => {
     default: return color;
   }
 }; 
+
+export function getQuantityMultiples(imageName: string, categoryName: string): number[] {
+  // Lowercase helpers
+  const name = imageName.toLowerCase();
+  const cat = categoryName.toLowerCase();
+
+  // Explicit override for three specific tie-dye images
+  const tieDyeSKUs = [
+    'm100965414 shoudc ou go green dtf on forest.png',
+    'm100482538 shhodc hover dtf on black or forest .png',
+    'm100437896 shoudc over under dtf on forest.png',
+  ];
+  if (tieDyeSKUs.includes(name)) return [8, 16, 24, 32, 40, 48];
+
+  // Tie-dye (always takes precedence)
+  if (name.includes('tie-dye') || cat.includes('tie-dye')) return [8, 16, 24, 32, 40, 48];
+
+  // Women (force 8)
+  if (cat.includes('women')) return [8, 16, 24, 32, 40, 48];
+
+  // Crew/Crewneck/Crew Sweatshirt
+  if (name.includes('crew') || cat.includes('crew')) return [6, 12, 18, 24, 30, 36];
+
+  // Hoodie
+  if (name.includes('hoodie') || cat.includes('hoodie')) return [8, 16, 24, 32, 40, 48];
+
+  // T-shirts (Unisex, Long Sleeve)
+  if (cat.includes('tshirt') || cat.includes('longsleeve') || cat.includes('long sleeve') || cat === 'longsleeve' || cat === 'long sleeve' || cat === 'tshirt') return [7, 14, 21, 28, 35, 42];
+
+  // Sweatpants/Joggers
+  if (cat.includes('sweatpant') || cat.includes('jogger')) return [6, 12, 18, 24, 30, 36];
+
+  // Shorts
+  if (cat.includes('short')) return [8, 16, 24, 32, 40, 48];
+
+  // Flannels
+  if (cat.includes('flannel')) return [8, 16, 24, 32, 40, 48];
+
+  // Jackets
+  if (cat.includes('jacket') || cat.includes('raincoat')) return [6, 12, 18, 24, 30, 36];
+
+  // Cap & knit Cap
+  if (cat.includes('cap') || cat.includes('beanie') || cat.includes('hat')) return [6, 12, 18, 24, 30, 36];
+
+  // Socks
+  if (cat.includes('sock')) return [6, 12, 18, 24, 30, 36];
+
+  // Bottle
+  if (cat.includes('bottle')) return [1, 2, 3, 4, 5, 6];
+
+  // Default
+  return [6, 12, 18, 24, 30, 36];
+} 

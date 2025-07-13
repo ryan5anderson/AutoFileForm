@@ -14,7 +14,9 @@ function App() {
     handleQuantityChange,
     handleShirtVersionChange,
     handleColorVersionChange,
-    handleSelectAll,
+    handleShirtColorComboChange,
+    handleDisplayOptionChange,
+    handleSweatpantJoggerOptionChange,
     handleFormSubmit,
     handleBack,
     handleBackToSummary,
@@ -48,7 +50,9 @@ function App() {
       onQuantityChange={handleQuantityChange}
       onShirtVersionChange={handleShirtVersionChange}
       onColorVersionChange={handleColorVersionChange}
-      onSelectAll={handleSelectAll}
+      onDisplayOptionChange={handleDisplayOptionChange}
+      onSweatpantJoggerOptionChange={handleSweatpantJoggerOptionChange}
+      onShirtColorComboChange={handleShirtColorComboChange}
       onSubmit={handleFormSubmit}
       error={error}
     />
