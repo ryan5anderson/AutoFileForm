@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/autofileform/michiganstate/static/css/main.6aa88264.css",
-    "main.js": "/autofileform/michiganstate/static/js/main.46b0f748.js",
+    "main.js": "/autofileform/michiganstate/static/js/main.dbe4a038.js",
     "index.html": "/autofileform/michiganstate/index.html",
     "main.6aa88264.css.map": "/autofileform/michiganstate/static/css/main.6aa88264.css.map",
-    "main.46b0f748.js.map": "/autofileform/michiganstate/static/js/main.46b0f748.js.map"
+    "main.dbe4a038.js.map": "/autofileform/michiganstate/static/js/main.dbe4a038.js.map"
   },
   "entrypoints": [
     "static/css/main.6aa88264.css",
-    "static/js/main.46b0f748.js"
+    "static/js/main.dbe4a038.js"
   ]
 }
