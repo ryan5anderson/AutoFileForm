@@ -23,7 +23,7 @@ Flannels
 Jackets 
 	- multiples of 6 (DONE)
 Women
-	- Multiples of 8
+	- Multiples of 8 (DONE)
 Cap & knit Cap
 	- multiples of 6 (DONE)
 Socks

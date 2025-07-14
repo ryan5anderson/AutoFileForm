@@ -189,10 +189,13 @@ export const createEmailCategories = (formData: FormData): EmailCategory[] => {
       }
     });
 
-    emailCategories.push({
-      category: 'Auto-Added Cards',
-      items: Object.values(groupedCards)
-    });
+    const autoAddedItems = Object.values(groupedCards);
+    if (autoAddedItems.length > 0) {
+      emailCategories.push({
+        category: 'Auto-Added Cards',
+        items: autoAddedItems
+      });
+    }
   }
 
   return emailCategories;

@@ -110,7 +110,49 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
             </div>
           </div>
           
-          {categories.map((category: Category) => (
+          {categories.filter(category => {
+            // Check if any image in the category has a nonzero quantity or selection
+            return category.images.some(img => {
+              const imagePath = getImagePath(category.path, img);
+              // Tie-dye
+              const tieDyeImages = [
+                'M100965414 SHOUDC OU Go Green DTF on Forest.png',
+                'M100482538 SHHODC Hover DTF on Black or Forest .png',
+                'M100437896 SHOUDC Over Under DTF on Forest.png',
+              ];
+              if (tieDyeImages.includes(img)) {
+                const comboVersions = formData.shirtColorComboVersions?.[imagePath];
+                if (comboVersions) {
+                  for (const value of Object.values(comboVersions)) {
+                    if (value && Number(value) > 0) return true;
+                  }
+                }
+              }
+              // Display Options
+              if (category.hasDisplayOptions) {
+                const displayOption = formData.displayOptions?.[imagePath];
+                if ((displayOption && (Number(displayOption.displayOnly) > 0 || Number(displayOption.displayStandardCasePack) > 0))) return true;
+              }
+              // Sweatpants/Joggers
+              if (category.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
+                const sj = formData.sweatpantJoggerOptions[imagePath];
+                if (sj && Object.values(sj).some(val => Number(val) > 0)) return true;
+              }
+              // Color Versions
+              if (hasColorVersions(img)) {
+                const colorVersions = formData.colorVersions?.[imagePath];
+                if (colorVersions && Object.values(colorVersions).some(val => Number(val) > 0)) return true;
+              }
+              // Shirt Versions
+              if (category.hasShirtVersions && category.shirtVersions) {
+                const shirtVersions = formData.shirtVersions?.[imagePath];
+                if (shirtVersions && Object.values(shirtVersions).some(val => Number(val) > 0)) return true;
+              }
+              // Simple quantity
+              if (Number(formData.quantities[imagePath] || 0) > 0) return true;
+              return false;
+            });
+          }).map((category: Category) => (
             <div key={category.name} style={{ marginBottom: 'var(--space-4)' }}>
               <div style={{ 
                 fontWeight: '600', 
