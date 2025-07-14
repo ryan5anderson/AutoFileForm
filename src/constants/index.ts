@@ -117,7 +117,7 @@ export const categories: Category[] = [
     ],
   },
   {
-    name: 'Sock',
+    name: 'Socks',
     path: 'sock',
     images: [
       'M100415850 SS8052 Custom Logo Socks .png',
