@@ -30,6 +30,12 @@ Socks
 	- multiples of 6 (DONE)
 Bottle
 	- any (DONE)
+Fleece Shorts
+	- multiples of 4
+Sticker
+	- multiples of 20
+Plushie
+	- mutiples of 6
 
 
 
