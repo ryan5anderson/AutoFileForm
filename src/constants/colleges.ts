@@ -1,0 +1,138 @@
+export const colleges = {
+  michiganstate: {
+    name: "Michigan State",
+    logo: "/logo/michiganstatelogo.png",
+    categories: [
+      {
+        name: 'Display Options',
+        path: 'rack',
+        hasDisplayOptions: true,
+        images: [
+          'Michigan_state_University_Premium Floor Display 2.0_500px.jpg',
+          'Michigan_State_University_Tier2_Display_Floor_500px.jpg',
+          'Michigan_State_University_3FT_Inline_500px.jpg',
+        ],
+      },
+      {
+        name: 'Tshirts (Unisex)',
+        path: 'tshirt/men',
+        hasShirtVersions: true,
+        shirtVersions: ['tshirt', 'longsleeve', 'hoodie', 'crewneck'],
+        hasColorVersions: true,
+        colorVersions: ['black', 'forest'],
+        images: [
+          'M100444086 SH2FDS Custom School DTF on Steel .png',
+          'M100435370 SDVECS Vector DTF on Steel .png',
+          'M100438285 SDARMS Aristotle DTF on Steel.png',
+          'M101005933 SDOLAS Overlay DTF on Steel .png',
+          'M100435821 SH2FDS Custom State DTF on Steel.png',
+          'M100965141 SHDCDW Dad Club DTF on Forest .png',
+          'M100965024 SHDCDS Dad Club DTF on Steel.png',
+          'M100965414 SHOUDC OU Go Green DTF on Forest.png',
+          'M100482538 SHHODC Hover DTF on Black or Forest .png',
+          'M100437896 SHOUDC Over Under DTF on Forest.png',
+          'M101010777 SH2FDC Custom Go Green DTF of Forest .png',
+          'M100431261 SDRENC Renown Mascot DTF on Forest.png',
+          'M100432187 SDFREG Frege DTF on Forest .png',
+          'M100430821 SH2FDW Custom S DTFN on Forest.png',
+          'M100430257 SH2FDW Custom Spartan DTFN on Forest .png',
+        ],
+      },
+      {
+        name: 'Tshirts (Women)',
+        path: 'tshirt/women',
+        images: [
+          'M100966592 SDVGIC Jr Valley Girl DTF on Forest.png',
+          'M100438745 SDLOCS Locke DTFN on Steel .png',
+          'M100965923 SDVGIS Jr Valley Girl DTF on Steel .png',
+          'M100964847 SHMCDS Jr Mom Club DTF on Steel.png',
+          'M100964663 SDFAMS Jr Family DTF on Steel .png',
+          'M100436060 SH2FDS Custom Spartan DTFN on Steel.png',
+          'M100439889 SDABSC Absent DTF on Forest.png',
+          'M100963545 SHMCDW Jr Mom Club DTF on Green .png',
+          'M100963714 SDFAMW Jr Family DTF on Forest.png',
+          'M100438383 SH2FDW Custom DTFN on Forest.png',
+        ],
+      },
+      {
+        name: 'Jackets',
+        path: 'raincoat',
+        images: [
+          'M100490133 SEASLW Aspire Jacket .png',
+          'M100490691 SHE2CJ Custom Forest Green Jacket.png',
+          'M100490842 SDLCJA Custom Logo Gray Jacket.png',
+        ],
+      },
+      {
+        name: 'Flannel lounge pants',
+        path: 'pj',
+        images: [
+          'M100445564 SDBOPF Bondi DTF Flannels .png',
+          'M100446076 SHFDDF Force down DTF Flannels .png',
+          'M100445359 SHPHFD Custom DTF Flannels.png',
+        ],
+      },
+      {
+        name: 'Sweatpants/Joggers',
+        path: 'sweatpant',
+        images: [
+          'M100447223 SHVSCD Value DTF Gray Pants .png',
+          'M100448649 SHFDDS Force Down DTF Gray Pants.png',
+          'M100446293 SHPSDS Shake it DTF Gray Pants.png',
+        ],
+      },
+      {
+        name: 'Shorts',
+        path: 'short',
+        images: [
+          'M100453813 SHSHDS Custom DTF Gray Shorts .png',
+          'M100453381 SHCCDS Carbon Copy DTF Gray Shorts.png',
+        ],
+      },
+      {
+        name: 'Caps',
+        path: 'hat',
+        hasColorVersions: true,
+        colorVersions: ['white', 'gray'],
+        images: [
+          'M100489153 SHE1CH Custom Hat on White or Grays .png',
+          'M100488283 SHE1CH Custom Logo on White or Gray.png',
+          'M100485992 SHE2CH Custom Spartan on Green .png',
+          'M100487428 SECHHC Chirp Gray Hat.png',
+          'M100489250 SHE1CH Custom Hat on Forest .png',
+          'M100490059 SHEHFL Front Line Forest Green Hat.png',
+        ],
+      },
+      {
+        name: 'Knit Caps',
+        path: 'beanie',
+        images: [
+          'M100494173 SHE1CB Custom Spartan Gray Beanie .png',
+          'M101011832 SHERBE Rugby Forest Beanie.png',
+          'M100494213 SHE2CB Custom Green Beanie .png',
+          'M100492686 SHETMB Talisman Green Beanie.png',
+        ],
+      },
+      {
+        name: 'Socks',
+        path: 'sock',
+        images: [
+          'M100415850 SS8052 Custom Logo Socks .png',
+          'M100497935 SS8052 Custom Michigan State Socks.png',
+        ],
+      },
+      {
+        name: 'Water Bottle',
+        path: 'bottle',
+        images: [
+          'M100454089 SHWBOT Custom Water Bottle .png',
+        ],
+      },
+    ],
+  },
+  arizonastate: {
+    name: "Arizona State",
+    logo: "/logo/arizonastatelogo.png",
+    categories: [], // TODO: Add Arizona State categories
+  },
+}; 

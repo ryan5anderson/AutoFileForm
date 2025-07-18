@@ -1,11 +1,16 @@
 import React from 'react';
 import { FormData, Category, ShirtVersion, ColorVersion, DisplayOption, SweatpantJoggerOption } from '../types';
-import { categories } from '../constants';
 import StoreInfoForm from './StoreInfoForm';
 import CategorySection from './CategorySection';
 import OrderNotesSection from './OrderNotesSection';
 import Header from './Header';
 import Footer from './Footer';
+
+interface CollegeConfig {
+  name: string;
+  logo: string;
+  categories: Category[];
+}
 
 interface FormPageProps {
   formData: FormData;
@@ -18,6 +23,7 @@ interface FormPageProps {
   onSubmit: (e: React.FormEvent) => void;
   error: string | null;
   onShirtColorComboChange: (imagePath: string, version: string, color: string, value: string) => void;
+  collegeConfig?: CollegeConfig;
 }
 
 const FormPage: React.FC<FormPageProps> = ({
@@ -30,8 +36,11 @@ const FormPage: React.FC<FormPageProps> = ({
   onSweatpantJoggerOptionChange,
   onSubmit,
   error,
-  onShirtColorComboChange
+  onShirtColorComboChange,
+  collegeConfig
 }) => {
+  const categories = collegeConfig ? collegeConfig.categories : [];
+  const collegeName = collegeConfig ? collegeConfig.name : 'College';
   return (
     <div style={{ 
       background: 'var(--color-bg)', 
@@ -55,7 +64,7 @@ const FormPage: React.FC<FormPageProps> = ({
           fontWeight: '600',
           textAlign: 'center'
         }}>
-          Michigan State Product Order Form
+          {collegeName} Product Order Form
         </h1>
         
         <form onSubmit={onSubmit}>

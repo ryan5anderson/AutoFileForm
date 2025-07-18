@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../types';
+import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, Category } from '../types';
 import { validateFormData, createTemplateParams } from '../utils';
 import { sendOrderEmail } from '../services/emailService';
 
-export const useOrderForm = () => {
+export const useOrderForm = (categories: Category[]) => {
   const [formData, setFormData] = useState<FormData>({
     company: '',
     storeNumber: '',
@@ -128,7 +128,7 @@ export const useOrderForm = () => {
     setSending(true);
     
     try {
-      const templateParams = createTemplateParams(formData);
+      const templateParams = createTemplateParams(formData, categories);
       await sendOrderEmail(templateParams);
       setPage('receipt');
     } catch (err) {

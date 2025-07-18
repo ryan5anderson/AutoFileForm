@@ -1,6 +1,5 @@
 import React from 'react';
 import { FormData, Category, ShirtVersion, ColorVersion } from '../types';
-import { categories } from '../constants';
 import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, hasColorVersions, getColorDisplayName } from '../utils';
 import Header from './Header';
 import Footer from './Footer';
@@ -9,18 +8,19 @@ interface ReceiptPageProps {
   formData: FormData;
   onBackToSummary: () => void;
   onExit: () => void;
+  categories: Category[];
 }
 
-const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, onExit }) => {
+const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, onExit, categories }) => {
   // Generate auto-added cards based on rack selections
   const generateAutoAddedCards = () => {
     const rackToCardMapping = getRackToCardMapping();
     const autoAddedCards: { sku: string; name: string; qty: number }[] = [];
 
     // Find the rack category
-    const rackCategory = categories.find(cat => cat.name === 'Display Options');
+    const rackCategory = categories.find((cat: Category) => cat.name === 'Display Options');
     if (rackCategory) {
-      rackCategory.images.forEach((img) => {
+      rackCategory.images.forEach((img: string) => {
         const imagePath = getImagePath(rackCategory.path, img);
         const quantity = formData.quantities[imagePath] || '0';
         

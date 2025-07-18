@@ -1,7 +1,7 @@
 import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion, ColorVersion } from '../types';
-import { categories, PROVIDER_EMAIL } from '../constants';
+import { PROVIDER_EMAIL } from '../constants';
 
-export const getAllImagePaths = (): string[] => {
+export const getAllImagePaths = (categories: Category[]): string[] => {
   return categories.flatMap(cat => cat.images.map(img => `${cat.path}/${img}`));
 };
 
@@ -33,7 +33,7 @@ export const validateFormData = (formData: FormData): string | null => {
   return null;
 };
 
-export const createEmailCategories = (formData: FormData): EmailCategory[] => {
+export const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {
   const emailCategories: EmailCategory[] = [];
   const rackToCardMapping = getRackToCardMapping();
   const autoAddedCards: EmailItem[] = [];
@@ -209,8 +209,8 @@ export const calculateTotalUnits = (emailCategories: EmailCategory[]): number =>
   );
 };
 
-export const createTemplateParams = (formData: FormData): TemplateParams => {
-  const emailCategories = createEmailCategories(formData);
+export const createTemplateParams = (formData: FormData, categories: Category[]): TemplateParams => {
+  const emailCategories = createEmailCategories(formData, categories);
   const total_units = calculateTotalUnits(emailCategories);
 
   return {

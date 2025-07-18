@@ -1,6 +1,5 @@
 import React from 'react';
 import { FormData, Category } from '../types';
-import { categories } from '../constants';
 import CategorySection from './CategorySection';
 import Header from './Header';
 import Footer from './Footer';
@@ -10,13 +9,15 @@ interface SummaryPageProps {
   onBack: () => void;
   onConfirm: () => void;
   sending: boolean;
+  categories: Category[];
 }
 
 const SummaryPage: React.FC<SummaryPageProps> = ({
   formData,
   onBack,
   onConfirm,
-  sending
+  sending,
+  categories
 }) => {
   return (
     <div style={{ 
