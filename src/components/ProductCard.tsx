@@ -13,6 +13,7 @@ interface ProductCardProps {
   sweatpantJoggerOption?: SweatpantJoggerOption;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   hideImage?: boolean;
+  college?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -25,7 +26,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   readOnly = false,
   sweatpantJoggerOption,
   onSweatpantJoggerOptionChange,
-  hideImage = false
+  hideImage = false,
+  college
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
@@ -42,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }}>
       {!hideImage && (
         <img
-          src={process.env.PUBLIC_URL + `/MichiganState/${imagePath}`}
+          src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
           alt={imageName}
           style={{ 
             width: '100%', 
@@ -52,14 +54,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }}
         />
       )}
-      <div style={{ 
-        fontSize: '0.875rem', 
-        fontWeight: '500',
-        color: 'var(--color-text)',
-        textAlign: 'center'
-      }}>
-        {productName}
-      </div>
+      {!hideImage && (
+        <div style={{ 
+          fontSize: '0.875rem', 
+          fontWeight: '500',
+          color: 'var(--color-text)',
+          textAlign: 'center'
+        }}>
+          {productName}
+        </div>
+      )}
       {showQuantityInput && !readOnly && (
         <div style={{ 
           display: 'flex', 

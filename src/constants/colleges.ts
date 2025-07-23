@@ -132,7 +132,151 @@ export const colleges = {
   },
   arizonastate: {
     name: "Arizona State",
-    logo: "/logo/arizonastatelogo.png",
-    categories: [], // TODO: Add Arizona State categories
+    logo: "/logo/arizonastatelogo.png", // TODO: Add Arizona State logo
+    categories: [
+      {
+        name: 'Tshirts (Unisex)',
+        path: 'tshirt/men',
+        hasShirtVersions: true,
+        shirtVersions: ['tshirt', 'longsleeve', 'hoodie', 'crewneck'],
+        hasColorVersions: true,
+        colorVersions: ['maroon', 'steel', 'gold', 'black'],
+        images: [
+          'M102687033 SH2FDC Custom DTF on Gold.png',
+          'M102595496 SH2FDC Custom DTF on Maroon .png',
+          'M102595122 SDWALC Warlock DTF on Black.png',
+          'M102593327 SDBMCC Battle Master DTF on Black .png',
+          'M102520049 SH2FDC Custom DTF on Gold .png',
+          'M102518813 SDBARC Barbarian DTF on Gold.png',
+          'M102518793 SDMONC Monk DTF on Gold .png',
+          'M102298135 SDBMCC Battle Master DTF on Maroon.png',
+          'M102133445 SH2FDS Custom DTF on Steel.png',
+          'M102133353 SH2FDS Custom DTF on Steel .png',
+          'M102075015 SH2FDC Custom DTF on Maroon .png',
+          'M102074993 SH2FDC Custom DTF on Maroon .png',
+          'M102074682 SDWIZC Wizard DTF on Maroon.png',
+          'M102074553 SDWALC Warlock DTF on Maroon .png',
+          'M102074324 SDROGC Rogue DTF on Maroon.png',
+          'M102074265 SDMUCS Multiclass DTF on Steel.png',
+          'M102073929 SDMONC Monk DTF on Maroon .png',
+          'M102073642 SDFIGS Fighter DTF on Steel.png',
+          'M102073526 SDHUMC Hunters Mark DTF on Maroon.png',
+          'M102073413 SDDRUS Druid DTF on Steel .png',
+          'M102073197 SDCAVC Cavalier DTF on Maroon .png',
+          'M102073024 SDBADC Bard DTF on Maroon.png',
+          'M102035595 SDBARC Barbarian DTF on Maroon .png',
+          'M102035313 SDARTC Artificer DTF on Maroon.png',
+        ],
+      },
+      {
+        name: 'Tshirts (Women)',
+        path: 'tshirt/women',
+        images: [
+          'M102074486 SDSORS Jr Socrates DTF on Steel.png',
+          'M102073749 SDMAIC Jr Magician DTF on Maroon.png',
+        ],
+      },
+      {
+        name: 'Jackets',
+        path: 'raincoat',
+        images: [
+          'M102260434 SHE1CJ Custom Logo Charcoal Jacket.png',
+          'M102133660 SHE1CJ Custom Logo Maroon Jacket .png',
+        ],
+      },
+      {
+        name: 'Flannel lounge pants',
+        path: 'pj',
+        images: [
+          'M103092034 SHPHFD Custom Hip DTF Flannels .png',
+          'M102076095 SDGMPF Game Master DTF Flannels.png',
+        ],
+      },
+      {
+        name: 'Sweatpants/Joggers',
+        path: 'sweatpant',
+        images: [
+          'M102332956 SDGMPS Game Master DTF Steel Pants .png',
+          'M102310221 SHPHDS Custom DTF Steel Pants.png',
+          'M102076247 SDINPC Initiative DTF Black Pants .png',
+        ],
+      },
+      {
+        name: 'Shorts',
+        path: 'short',
+        images: [
+          'M102525019 SDSPSS Custom Side Print Maroon Shorts.png',
+          'M102075970 SDEVSS Evocation DTF Oxford Shorts .png',
+        ],
+      },
+      {
+        name: 'Caps',
+        path: 'hat',
+        hasColorVersions: true,
+        colorVersions: ['maroon', 'gray', 'gold'],
+        images: [
+          'M102542536 SHE2CH Custom Logo Gold ONLY Hat .png',
+          'M102542014 SHE2CH Custom Logo Gold Hat.png',
+          'M102349699 SHE1CH Custom Logo Maroon Hat .png',
+          'M102300329 SHE1CH Custom Logo Gray Hat.png',
+          'M102300177 SHE1CH Custom Logo Maroon Hat.png',
+        ],
+      },
+      {
+        name: 'Knit Caps',
+        path: 'beanie',
+        images: [
+          'M102542759 SHE2CB Custom Logo Gray Beanie.png',
+          'M102300567 SHE1CB Custom Logo Gray Beanie .png',
+          'M102300460 SHE1CB Custom Logo Maroon Beanie .png',
+        ],
+      },
+      {
+        name: 'Socks',
+        path: 'sock',
+        images: [
+          'M102076380 SS8052 Custom Logo Socks.png',
+        ],
+      },
+      {
+        name: 'Water Bottles',
+        path: 'bottle',
+        images: [
+          'M103092526 SHSSUV Custom UV Water Bottle.png',
+          'M103092441 SHWBUV Custom UV Water Bottle.png',
+          'M102983914 SHWBUV Custom UV Water Bottle .png',
+          'M102983866 SHWBUV Custom UV Water Bottle.png',
+          'M102983468 SHSSUV Custom UV Steel Bottle .png',
+          'M102822680 SHWBUV Custom UV Water Bottle .png',
+          'M102821852 SHSSUV Custom UV Steel Bottle.png',
+        ],
+      },
+      {
+        name: 'Display Cards',
+        path: 'card',
+        images: [
+          'M102630540 SHMH24 Custom 4ft Shelf Magnet.png',
+          'M102313972 SHWGCS Custom Spinner Header Card.png',
+          'M102313692 SHWGCH Custom PFD Header Card .png',
+        ],
+      },
+      {
+        name: 'Plush',
+        path: 'plush',
+        images: [
+          'M102812532 SHPLUD Custom DTF Plush.png',
+        ],
+      },
+      {
+        name: 'Stickers',
+        path: 'sticker',
+        images: [
+          'M103006972 SHAVES Advenger Mascot Sticker .png',
+          'M103006839 SHSTPK Custom Sticker Pack .png',
+          'M103006734 SHSWMS Swoosh Mascot Sticker Pack.png',
+          'M103006622 SHMEMS Mesh Stripe Sticker.png',
+        ],
+      },
+    ],
   },
 }; 

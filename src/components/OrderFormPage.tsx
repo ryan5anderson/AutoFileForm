@@ -54,6 +54,7 @@ const OrderFormPage: React.FC = () => {
         onConfirm={handleConfirm}
         sending={sending}
         categories={categories}
+        college={college}
       />
     );
   }
@@ -79,6 +80,7 @@ const OrderFormPage: React.FC = () => {
       onSubmit={handleFormSubmit}
       error={error}
       collegeConfig={collegeConfig}
+      college={college}
     />
   );
 };

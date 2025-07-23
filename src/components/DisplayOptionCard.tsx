@@ -9,6 +9,7 @@ interface DisplayOptionCardProps {
   onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   readOnly?: boolean;
   hideImage?: boolean;
+  college?: string;
 }
 
 const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
@@ -17,7 +18,8 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
   displayOption = { displayOnly: '', displayStandardCasePack: '' },
   onDisplayOptionChange,
   readOnly = false,
-  hideImage = false
+  hideImage = false,
+  college
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = getRackDisplayName(imageName);
@@ -38,7 +40,7 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
     }}>
       {!hideImage && (
         <img
-          src={process.env.PUBLIC_URL + `/MichiganState/${imagePath}`}
+          src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
           alt={imageName}
           style={{ 
             width: '100%', 
@@ -48,15 +50,17 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
           }}
         />
       )}
-      <div style={{ 
-        fontSize: '0.875rem', 
-        fontWeight: '500',
-        color: 'var(--color-text)',
-        textAlign: 'center',
-        marginBottom: 'var(--space-2)'
-      }}>
-        {productName}
-      </div>
+      {!hideImage && (
+        <div style={{ 
+          fontSize: '0.875rem', 
+          fontWeight: '500',
+          color: 'var(--color-text)',
+          textAlign: 'center',
+          marginBottom: 'var(--space-2)'
+        }}>
+          {productName}
+        </div>
+      )}
       
       {!readOnly ? (
         <div style={{ 
@@ -65,8 +69,7 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
           gap: 'var(--space-2)',
           padding: 'var(--space-2)',
           background: 'var(--color-bg)',
-          borderRadius: 'var(--radius)',
-          border: '1px solid var(--color-border)'
+          borderRadius: 'var(--radius)'
         }}>
           <div style={{ 
             display: 'flex', 

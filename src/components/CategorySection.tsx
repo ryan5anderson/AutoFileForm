@@ -5,7 +5,8 @@ import ShirtVersionCard from './ShirtVersionCard';
 import ColorVersionCard from './ColorVersionCard';
 import ShirtColorVersionCard from './ShirtColorVersionCard';
 import DisplayOptionCard from './DisplayOptionCard';
-import { getImagePath, hasColorVersions, getProductName } from '../utils';
+import OrderSummaryCard from './OrderSummaryCard';
+import { getImagePath, hasColorVersions, getProductName, getRackDisplayName } from '../utils';
 
 interface CategorySectionProps {
   category: Category;
@@ -22,6 +23,7 @@ interface CategorySectionProps {
   onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   readOnly?: boolean;
+  college?: string;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -38,10 +40,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onShirtColorComboChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
-  readOnly = false
+  readOnly = false,
+  college
 }) => {
   const [modalProduct, setModalProduct] = useState<null | { img: string; imagePath: string }>(null);
-  const [modalNotes, setModalNotes] = useState<string>('');
 
   return (
     <section style={{ 
@@ -87,7 +89,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             <div
               key={img}
               style={{
-                cursor: 'pointer',
+                cursor: readOnly ? 'default' : 'pointer',
                 background: 'var(--color-bg)',
                 border: '1px solid var(--color-border)',
                 borderRadius: 'var(--radius-lg)',
@@ -99,10 +101,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                 position: 'relative',
               }}
-              onClick={() => setModalProduct({ img, imagePath })}
+              onClick={() => !readOnly && setModalProduct({ img, imagePath })}
             >
               <img
-                src={process.env.PUBLIC_URL + `/MichiganState/${imagePath}`}
+                src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
                 alt={img}
                 style={{
                   width: '100%',
@@ -118,8 +120,35 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 textAlign: 'center',
                 marginTop: 'var(--space-2)'
               }}>
-                {getProductName(img)}
+                {category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img)}
               </div>
+              {!readOnly && (
+                <div style={{ 
+                  fontSize: '0.75rem',
+                  color: 'var(--color-text-muted)',
+                  textAlign: 'center',
+                  marginTop: 'auto',
+                  paddingTop: 'var(--space-2)',
+                  fontStyle: 'italic'
+                }}>
+                  tap to order
+                </div>
+              )}
+              {readOnly && (
+                <OrderSummaryCard
+                  categoryPath={category.path}
+                  imageName={img}
+                  categoryName={category.name}
+                  quantities={quantities}
+                  shirtVersions={shirtVersions}
+                  colorVersions={colorVersions}
+                  shirtColorComboVersions={shirtColorComboVersions}
+                  displayOptions={displayOptions}
+                  sweatpantJoggerOptions={sweatpantJoggerOptions}
+                  college={college}
+                  hasShirtVersions={category.hasShirtVersions}
+                />
+              )}
             </div>
           );
         })}
@@ -139,7 +168,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             justifyContent: 'center',
             zIndex: 1000
           }}
-          onClick={() => { setModalProduct(null); setModalNotes(''); }}
+          onClick={() => { setModalProduct(null); }}
         >
           <div
             style={{
@@ -160,7 +189,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             onClick={e => e.stopPropagation()}
           >
             <button
-              onClick={() => { setModalProduct(null); setModalNotes(''); }}
+              onClick={() => { setModalProduct(null); }}
               style={{
                 position: 'absolute',
                 top: 12,
@@ -195,7 +224,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
               }}
               className="modal-title"
             >
-              {getProductName(modalProduct.img)}
+              {category.name === 'Display Options' ? getRackDisplayName(modalProduct.img) : getProductName(modalProduct.img)}
             </div>
             {/* Main 2-column grid */}
             <div
@@ -223,7 +252,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 boxSizing: 'border-box',
               }}>
                 <img
-                  src={process.env.PUBLIC_URL + `/MichiganState/${modalProduct.imagePath}`}
+                  src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${modalProduct.imagePath}`}
                   alt={modalProduct.img}
                   style={{
                     width: '100%',
@@ -273,6 +302,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                         'M100965414 SHOUDC OU Go Green DTF on Forest.png',
                         'M100482538 SHHODC Hover DTF on Black or Forest .png',
                         'M100437896 SHOUDC Over Under DTF on Forest.png',
+                        'M102595496 SH2FDC Custom DTF on Maroon .png',
                       ];
                       const isTieDye = tieDyeImages.includes(img);
                       const filteredShirtVersions = isTieDye && category.shirtVersions
@@ -282,6 +312,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                         categoryPath: category.path,
                         imageName: img,
                         hideImage: true,
+                        college,
                         dropdownStyle: {
                           width: '100%',
                           minWidth: '120px',
@@ -313,7 +344,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                             onDisplayOptionChange={onDisplayOptionChange}
                           />
                         );
-                      } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png') {
+                      } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
                         const comboVersion = shirtColorComboVersions[imagePath] || {};
                         return (
                           <ShirtColorVersionCard
@@ -360,41 +391,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     })()}
                   </div>
                 </div>
-                {/* Additional Notes Section */}
-                <div style={{ width: '100%' }}>
-                  <div style={{
-                    fontWeight: 700,
-                    fontSize: '1.1rem',
-                    marginBottom: '1rem',
-                    color: 'var(--color-primary)',
-                    letterSpacing: '0.01em',
-                  }}>
-                    Additional Notes
-                  </div>
-                  <textarea
-                    id="modal-notes"
-                    value={modalNotes}
-                    onChange={e => setModalNotes(e.target.value)}
-                    placeholder="Add notes for this item..."
-                    style={{
-                      width: '100%',
-                      minHeight: '180px',
-                      padding: '1.25rem',
-                      border: '1.5px solid var(--color-border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: '1.1rem',
-                      background: 'var(--color-input-bg)',
-                      fontFamily: 'inherit',
-                      resize: 'vertical',
-                      marginTop: 0,
-                      boxSizing: 'border-box',
-                      transition: 'border-color 0.2s, box-shadow 0.2s',
-                      outline: 'none',
-                    }}
-                    onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-                    onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
-                  />
-                </div>
               </div>
             </div>
             {/* Responsive styles */}
@@ -412,11 +408,11 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   padding: 1rem 0 !important;
                 }
               }
-              textarea:focus, select:focus {
+              select:focus {
                 border-color: var(--color-primary) !important;
                 box-shadow: 0 0 0 2px rgba(22,101,52,0.15);
               }
-              select:hover, textarea:hover {
+              select:hover {
                 border-color: var(--color-primary) !important;
               }
             `}</style>

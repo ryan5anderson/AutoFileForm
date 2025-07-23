@@ -119,6 +119,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
                 'M100965414 SHOUDC OU Go Green DTF on Forest.png',
                 'M100482538 SHHODC Hover DTF on Black or Forest .png',
                 'M100437896 SHOUDC Over Under DTF on Forest.png',
+                'M102595496 SH2FDC Custom DTF on Maroon .png',
               ];
               if (tieDyeImages.includes(img)) {
                 const comboVersions = formData.shirtColorComboVersions?.[imagePath];
@@ -172,6 +173,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
                   'M100965414 SHOUDC OU Go Green DTF on Forest.png',
                   'M100482538 SHHODC Hover DTF on Black or Forest .png',
                   'M100437896 SHOUDC Over Under DTF on Forest.png',
+                  'M102595496 SH2FDC Custom DTF on Maroon .png',
                 ];
                 if (tieDyeImages.includes(img)) {
                   const comboVersions = formData.shirtColorComboVersions?.[imagePath];

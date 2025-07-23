@@ -10,6 +10,7 @@ interface SummaryPageProps {
   onConfirm: () => void;
   sending: boolean;
   categories: Category[];
+  college?: string;
 }
 
 const SummaryPage: React.FC<SummaryPageProps> = ({
@@ -17,7 +18,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
   onBack,
   onConfirm,
   sending,
-  categories
+  categories,
+  college
 }) => {
   return (
     <div style={{ 
@@ -97,6 +99,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             displayOptions={formData.displayOptions}
             sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
             readOnly={true}
+            college={college}
           />
         ))}
 

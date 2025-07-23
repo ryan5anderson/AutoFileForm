@@ -24,6 +24,7 @@ interface FormPageProps {
   error: string | null;
   onShirtColorComboChange: (imagePath: string, version: string, color: string, value: string) => void;
   collegeConfig?: CollegeConfig;
+  college?: string;
 }
 
 const FormPage: React.FC<FormPageProps> = ({
@@ -37,7 +38,8 @@ const FormPage: React.FC<FormPageProps> = ({
   onSubmit,
   error,
   onShirtColorComboChange,
-  collegeConfig
+  collegeConfig,
+  college
 }) => {
   const categories = collegeConfig ? collegeConfig.categories : [];
   const collegeName = collegeConfig ? collegeConfig.name : 'College';
@@ -86,6 +88,7 @@ const FormPage: React.FC<FormPageProps> = ({
               onShirtColorComboChange={onShirtColorComboChange}
               onDisplayOptionChange={onDisplayOptionChange}
               onSweatpantJoggerOptionChange={onSweatpantJoggerOptionChange}
+              college={college}
             />
           ))}
 

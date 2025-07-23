@@ -40,25 +40,7 @@ const Header: React.FC = () => {
           />
         </div>
 
-        {/* Center - Ohiopyle81 (switched from Michigan State) */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: '0 0 auto'
-        }}>
-          <img
-            src={process.env.PUBLIC_URL + '/logo/ohiopyle81.png'}
-            alt="Ohiopyle81"
-            style={{
-              height: 'clamp(60px, 8vw, 100px)',
-              width: 'auto',
-              objectFit: 'contain'
-            }}
-          />
-        </div>
-
-        {/* Right side - Michigan State (switched from Ohiopyle81) */}
+        {/* Right side - OPI Logo */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -67,8 +49,8 @@ const Header: React.FC = () => {
           minWidth: 0
         }}>
           <img
-            src={process.env.PUBLIC_URL + '/logo/michiganstatelogo.png'}
-            alt="Michigan State University"
+            src={process.env.PUBLIC_URL + '/logo/opi-logo-no-bg.png'}
+            alt="OPI"
             style={{
               height: 'clamp(30px, 5vw, 50px)',
               width: 'auto',

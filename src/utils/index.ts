@@ -47,7 +47,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
       const sku = img.split(' ')[0]; // Extract SKU (first part before space)
       const name = img.replace(/\.(png|jpg)$/, ''); // Full product name
       
-      if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png') {
+      if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
         // Special case for shirt with both versions and colors (color-major order)
         const comboVersions = formData.shirtColorComboVersions?.[imagePath];
         if (comboVersions && cat.colorVersions && cat.shirtVersions) {
@@ -269,6 +269,7 @@ export const getVersionDisplayName = (version: string, imageName?: string): stri
     'M100965414 SHOUDC OU Go Green DTF on Forest.png',
     'M100482538 SHHODC Hover DTF on Black or Forest .png',
     'M100437896 SHOUDC Over Under DTF on Forest.png',
+    'M102595496 SH2FDC Custom DTF on Maroon .png',
   ];
 
   let display = '';
@@ -315,6 +316,7 @@ export function getQuantityMultiples(imageName: string, categoryName: string): n
     'm100965414 shoudc ou go green dtf on forest.png',
     'm100482538 shhodc hover dtf on black or forest .png',
     'm100437896 shoudc over under dtf on forest.png',
+    'm102595496 sh2fdc custom dtf on maroon .png',
   ];
   if (tieDyeSKUs.includes(name)) return [8, 16, 24, 32, 40, 48];
 
