@@ -12,6 +12,8 @@ interface ProductCardProps {
   readOnly?: boolean;
   sweatpantJoggerOption?: SweatpantJoggerOption;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
+  hideImage?: boolean;
+  college?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -23,7 +25,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   showQuantityInput = true,
   readOnly = false,
   sweatpantJoggerOption,
-  onSweatpantJoggerOptionChange
+  onSweatpantJoggerOptionChange,
+  hideImage = false,
+  college
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
@@ -38,24 +42,28 @@ const ProductCard: React.FC<ProductCardProps> = ({
       flexDirection: 'column',
       gap: 'var(--space-2)'
     }}>
-      <img
-        src={process.env.PUBLIC_URL + `/MichiganState/${imagePath}`}
-        alt={imageName}
-        style={{ 
-          width: '100%', 
-          borderRadius: 'var(--radius)', 
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid var(--color-border)'
-        }}
-      />
-      <div style={{ 
-        fontSize: '0.875rem', 
-        fontWeight: '500',
-        color: 'var(--color-text)',
-        textAlign: 'center'
-      }}>
-        {productName}
-      </div>
+      {!hideImage && (
+        <img
+          src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+          alt={imageName}
+          style={{ 
+            width: '100%', 
+            borderRadius: 'var(--radius)', 
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            border: '1px solid var(--color-border)'
+          }}
+        />
+      )}
+      {!hideImage && (
+        <div style={{ 
+          fontSize: '0.875rem', 
+          fontWeight: '500',
+          color: 'var(--color-text)',
+          textAlign: 'center'
+        }}>
+          {productName}
+        </div>
+      )}
       {showQuantityInput && !readOnly && (
         <div style={{ 
           display: 'flex', 

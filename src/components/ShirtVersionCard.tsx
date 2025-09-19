@@ -9,6 +9,8 @@ interface ShirtVersionCardProps {
   availableVersions?: string[];
   onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
   readOnly?: boolean;
+  hideImage?: boolean;
+  college?: string;
 }
 
 const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
@@ -17,7 +19,9 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
   shirtVersions = { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' },
   availableVersions = ['tshirt'],
   onShirtVersionChange,
-  readOnly = false
+  readOnly = false,
+  hideImage = false,
+  college
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = getProductName(imageName);
@@ -37,24 +41,28 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
       flexDirection: 'column',
       gap: 'var(--space-2)'
     }}>
-      <img
-        src={process.env.PUBLIC_URL + `/MichiganState/${imagePath}`}
-        alt={imageName}
-        style={{ 
-          width: '100%', 
-          borderRadius: 'var(--radius)', 
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid var(--color-border)'
-        }}
-      />
-      <div style={{ 
-        fontSize: '0.875rem', 
-        fontWeight: '500',
-        color: 'var(--color-text)',
-        textAlign: 'center'
-      }}>
-        {productName}
-      </div>
+      {!hideImage && (
+        <img
+          src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+          alt={imageName}
+          style={{ 
+            width: '100%', 
+            borderRadius: 'var(--radius)', 
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            border: '1px solid var(--color-border)'
+          }}
+        />
+      )}
+      {!hideImage && (
+        <div style={{ 
+          fontSize: '0.875rem', 
+          fontWeight: '500',
+          color: 'var(--color-text)',
+          textAlign: 'center'
+        }}>
+          {productName}
+        </div>
+      )}
       
       {!readOnly ? (
         <div style={{ 
@@ -63,8 +71,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
           gap: 'var(--space-2)',
           padding: 'var(--space-2)',
           background: 'var(--color-bg)',
-          borderRadius: 'var(--radius)',
-          border: '1px solid var(--color-border)'
+          borderRadius: 'var(--radius)'
         }}>
           {availableVersions.map((version) => {
             const versionKey = version as keyof ShirtVersion;
@@ -93,7 +100,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
                   value={shirtVersions[versionKey] || ''}
                   onChange={(e) => handleVersionChange(versionKey, e.target.value)}
                   style={{
-                    width: '60px',
+                    width: '80px',
                     padding: 'var(--space-1) var(--space-2)',
                     border: '1px solid var(--color-border)',
                     borderRadius: 'var(--radius)',

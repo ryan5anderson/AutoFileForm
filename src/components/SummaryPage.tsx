@@ -1,6 +1,5 @@
 import React from 'react';
 import { FormData, Category } from '../types';
-import { categories } from '../constants';
 import CategorySection from './CategorySection';
 import Header from './Header';
 import Footer from './Footer';
@@ -10,13 +9,17 @@ interface SummaryPageProps {
   onBack: () => void;
   onConfirm: () => void;
   sending: boolean;
+  categories: Category[];
+  college?: string;
 }
 
 const SummaryPage: React.FC<SummaryPageProps> = ({
   formData,
   onBack,
   onConfirm,
-  sending
+  sending,
+  categories,
+  college
 }) => {
   return (
     <div style={{ 
@@ -96,6 +99,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             displayOptions={formData.displayOptions}
             sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
             readOnly={true}
+            college={college}
           />
         ))}
 

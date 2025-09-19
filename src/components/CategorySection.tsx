@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Category, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../types';
 import ProductCard from './ProductCard';
 import ShirtVersionCard from './ShirtVersionCard';
 import ColorVersionCard from './ColorVersionCard';
 import ShirtColorVersionCard from './ShirtColorVersionCard';
 import DisplayOptionCard from './DisplayOptionCard';
-import { getImagePath, hasColorVersions, getProductName } from '../utils';
+import OrderSummaryCard from './OrderSummaryCard';
+import { getImagePath, hasColorVersions, getProductName, getRackDisplayName } from '../utils';
 
 interface CategorySectionProps {
   category: Category;
@@ -22,6 +23,7 @@ interface CategorySectionProps {
   onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   readOnly?: boolean;
+  college?: string;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -38,8 +40,11 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onShirtColorComboChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
-  readOnly = false
+  readOnly = false,
+  college
 }) => {
+  const [modalProduct, setModalProduct] = useState<null | { img: string; imagePath: string }>(null);
+
   return (
     <section style={{ 
       marginBottom: 'var(--space-6)', 
@@ -80,153 +85,340 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       }}>
         {category.images.map((img) => {
           const imagePath = getImagePath(category.path, img);
-
-          // List of images that should use Tie-dye and omit crewneck
-          const tieDyeImages = [
-            'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-            'M100482538 SHHODC Hover DTF on Black or Forest .png',
-            'M100437896 SHOUDC Over Under DTF on Forest.png',
-          ];
-
-          // If this is a Tie-dye image, filter out 'crewneck' from available versions
-          const isTieDye = tieDyeImages.includes(img);
-          const filteredShirtVersions = isTieDye && category.shirtVersions
-            ? category.shirtVersions.filter(v => v !== 'crewneck')
-            : category.shirtVersions;
-
-          if (category.hasDisplayOptions) {
-            const displayOption = displayOptions[imagePath] || { displayOnly: '', displayStandardCasePack: '' };
-            
-            return (
-              <DisplayOptionCard
-                key={img}
-                categoryPath={category.path}
-                imageName={img}
-                displayOption={displayOption}
-                onDisplayOptionChange={onDisplayOptionChange}
-                readOnly={readOnly}
+          return (
+            <div
+              key={img}
+              style={{
+                cursor: readOnly ? 'default' : 'pointer',
+                background: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-3)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                transition: 'box-shadow 0.2s',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                position: 'relative',
+              }}
+              onClick={() => !readOnly && setModalProduct({ img, imagePath })}
+            >
+              <img
+                src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+                alt={img}
+                style={{
+                  width: '100%',
+                  borderRadius: 'var(--radius)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  border: '1px solid var(--color-border)'
+                }}
               />
-            );
-          } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png') {
-            // Special case for shirt with both versions and colors
-            const comboVersion = shirtColorComboVersions[imagePath] || {};
-            return (
-              <ShirtColorVersionCard
-                key={img}
-                categoryPath={category.path}
-                imageName={img}
-                shirtColorComboVersion={comboVersion}
-                availableVersions={filteredShirtVersions}
-                availableColors={category.colorVersions}
-                onShirtColorComboChange={onShirtColorComboChange}
-                readOnly={readOnly}
-              />
-            );
-          } else if (hasColorVersions(img)) {
-            const colorVersion = colorVersions[imagePath] || { black: '', forest: '', white: '', gray: '' };
-            
-            return (
-              <ColorVersionCard
-                key={img}
-                categoryPath={category.path}
-                imageName={img}
-                colorVersions={colorVersion}
-                availableColors={category.colorVersions}
-                onColorVersionChange={onColorVersionChange}
-                readOnly={readOnly}
-              />
-            );
-          } else if (category.hasShirtVersions) {
-            const shirtVersion = shirtVersions[imagePath] || { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' };
-            
-            return (
-              <ShirtVersionCard
-                key={img}
-                categoryPath={category.path}
-                imageName={img}
-                shirtVersions={shirtVersion}
-                availableVersions={filteredShirtVersions}
-                onShirtVersionChange={onShirtVersionChange}
-                readOnly={readOnly}
-              />
-            );
-          } else {
-            const quantity = quantities[imagePath] || '';
-            if (readOnly && category.name === 'Sweatpants/Joggers' && sweatpantJoggerOptions) {
-              const sj = sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: '' };
-              const options = [
-                { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
-                { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
-                { key: 'joggerSteel', label: 'Jogger Steel' },
-                { key: 'joggerOxford', label: 'Jogger Oxford' },
-              ];
-              const total = options.reduce((sum, opt) => sum + Number(sj[opt.key as keyof SweatpantJoggerOption] || 0), 0);
-              return (
-                <div key={img} style={{
-                  background: 'var(--color-bg)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: 'var(--space-3)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 'var(--space-2)'
+              <div style={{
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: 'var(--color-text)',
+                textAlign: 'center',
+                marginTop: 'var(--space-2)'
+              }}>
+                {category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img)}
+              </div>
+              {!readOnly && (
+                <div style={{ 
+                  fontSize: '0.75rem',
+                  color: 'var(--color-text-muted)',
+                  textAlign: 'center',
+                  marginTop: 'auto',
+                  paddingTop: 'var(--space-2)',
+                  fontStyle: 'italic'
                 }}>
-                  <img
-                    src={process.env.PUBLIC_URL + `/MichiganState/${imagePath}`}
-                    alt={img}
-                    style={{
-                      width: '100%',
-                      borderRadius: 'var(--radius)',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                      border: '1px solid var(--color-border)'
-                    }}
-                  />
-                  <div style={{
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    color: 'var(--color-text)',
-                    textAlign: 'center',
-                    marginBottom: 'var(--space-2)'
-                  }}>
-                    {getProductName(img)}
-                  </div>
-                  {options.map(opt => (
-                    <div key={opt.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '2px' }}>
-                      <span>{opt.label}:</span>
-                      <span style={{ fontWeight: '500' }}>{sj[opt.key as keyof SweatpantJoggerOption] || '0'}</span>
-                    </div>
-                  ))}
-                  <div style={{
-                    fontWeight: '600',
-                    marginTop: 'var(--space-2)',
-                    paddingTop: 'var(--space-2)',
-                    borderTop: '1px solid var(--color-border)',
-                    color: 'var(--color-primary)',
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}>
-                    <span>Total:</span>
-                    <span>{total}</span>
-                  </div>
+                  tap to order
                 </div>
-              );
-            }
-            return (
-              <ProductCard
-                key={img}
-                categoryPath={category.path}
-                categoryName={category.name}
-                imageName={img}
-                quantity={quantity}
-                onQuantityChange={onQuantityChange}
-                readOnly={readOnly}
-                sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' ? (sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) : undefined}
-                onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
-              />
-            );
-          }
+              )}
+              {readOnly && (
+                <OrderSummaryCard
+                  categoryPath={category.path}
+                  imageName={img}
+                  categoryName={category.name}
+                  quantities={quantities}
+                  shirtVersions={shirtVersions}
+                  colorVersions={colorVersions}
+                  shirtColorComboVersions={shirtColorComboVersions}
+                  displayOptions={displayOptions}
+                  sweatpantJoggerOptions={sweatpantJoggerOptions}
+                  college={college}
+                  hasShirtVersions={category.hasShirtVersions}
+                />
+              )}
+            </div>
+          );
         })}
       </div>
+      {/* Modal Overlay */}
+      {modalProduct && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          onClick={() => { setModalProduct(null); }}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: 'var(--radius-lg)',
+              padding: '2rem',
+              minWidth: '320px',
+              maxWidth: '900px',
+              width: '95vw',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 4px 32px rgba(0,0,0,0.18)',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'stretch',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => { setModalProduct(null); }}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                background: 'transparent',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                color: '#888',
+                zIndex: 2
+              }}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            {/* Product Title at Top Center */}
+            <div
+              style={{
+                width: '100%',
+                textAlign: 'center',
+                fontWeight: 900,
+                fontSize: '2rem',
+                color: 'var(--color-primary)',
+                marginBottom: '2rem',
+                letterSpacing: '0.01em',
+                position: 'sticky',
+                top: 0,
+                background: 'white',
+                zIndex: 1,
+                padding: '0.75rem 0 1.5rem 0',
+                boxSizing: 'border-box',
+              }}
+              className="modal-title"
+            >
+              {category.name === 'Display Options' ? getRackDisplayName(modalProduct.img) : getProductName(modalProduct.img)}
+            </div>
+            {/* Main 2-column grid */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)',
+                gap: '2.5rem',
+                width: '100%',
+                alignItems: 'stretch',
+                boxSizing: 'border-box',
+                overflowX: 'hidden',
+              }}
+              className="modal-grid"
+            >
+              {/* Left: Product Image, vertically centered */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+                minHeight: '320px',
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
+              }}>
+                <img
+                  src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${modalProduct.imagePath}`}
+                  alt={modalProduct.img}
+                  style={{
+                    width: '100%',
+                    maxWidth: '340px',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    borderRadius: 'var(--radius)',
+                    border: '1px solid var(--color-border)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
+              </div>
+              {/* Right: Select Options and Notes */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                width: '100%',
+                maxWidth: '420px',
+                gap: '2.5rem',
+                minWidth: 0,
+                position: 'relative',
+                boxSizing: 'border-box',
+              }}>
+                {/* Select Options Section */}
+                <div style={{ width: '100%' }}>
+                  <div style={{
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    marginBottom: '1.25rem',
+                    color: 'var(--color-primary)',
+                    letterSpacing: '0.01em',
+                  }}>
+                    Select Options
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1.25rem',
+                    width: '100%'
+                  }}>
+                    {(() => {
+                      if (!modalProduct) return null;
+                      const { img, imagePath } = modalProduct;
+                      // Tie-dye special case
+                      const tieDyeImages = [
+                        'M100965414 SHOUDC OU Go Green DTF on Forest.png',
+                        'M100482538 SHHODC Hover DTF on Black or Forest .png',
+                        'M100437896 SHOUDC Over Under DTF on Forest.png',
+                        'M102595496 SH2FDC Custom DTF on Maroon .png',
+                      ];
+                      const isTieDye = tieDyeImages.includes(img);
+                      const filteredShirtVersions = isTieDye && category.shirtVersions
+                        ? category.shirtVersions.filter(v => v !== 'crewneck')
+                        : category.shirtVersions;
+                      const cardProps = {
+                        categoryPath: category.path,
+                        imageName: img,
+                        hideImage: true,
+                        college,
+                        dropdownStyle: {
+                          width: '100%',
+                          minWidth: '120px',
+                          padding: '0.5rem 1rem',
+                          border: '1.5px solid var(--color-border)',
+                          borderRadius: 'var(--radius)',
+                          fontSize: '1rem',
+                          background: 'var(--color-input-bg)',
+                          textAlign: 'left',
+                          transition: 'border-color 0.2s, box-shadow 0.2s',
+                        },
+                        labelStyle: {
+                          fontWeight: 600,
+                          color: 'var(--color-primary)',
+                          marginBottom: 4,
+                          display: 'block',
+                          fontSize: '1rem',
+                        },
+                        inputWrapperStyle: {
+                          marginBottom: '0.5rem',
+                        },
+                      };
+                      if (category.hasDisplayOptions) {
+                        const displayOption = displayOptions[imagePath] || { displayOnly: '', displayStandardCasePack: '' };
+                        return (
+                          <DisplayOptionCard
+                            {...cardProps}
+                            displayOption={displayOption}
+                            onDisplayOptionChange={onDisplayOptionChange}
+                          />
+                        );
+                      } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
+                        const comboVersion = shirtColorComboVersions[imagePath] || {};
+                        return (
+                          <ShirtColorVersionCard
+                            {...cardProps}
+                            shirtColorComboVersion={comboVersion}
+                            availableVersions={filteredShirtVersions}
+                            availableColors={category.colorVersions}
+                            onShirtColorComboChange={onShirtColorComboChange}
+                          />
+                        );
+                      } else if (hasColorVersions(img)) {
+                        const colorVersion = colorVersions[imagePath] || { black: '', forest: '', white: '', gray: '' };
+                        return (
+                          <ColorVersionCard
+                            {...cardProps}
+                            colorVersions={colorVersion}
+                            availableColors={category.colorVersions}
+                            onColorVersionChange={onColorVersionChange}
+                          />
+                        );
+                      } else if (category.hasShirtVersions) {
+                        const shirtVersion = shirtVersions[imagePath] || { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' };
+                        return (
+                          <ShirtVersionCard
+                            {...cardProps}
+                            shirtVersions={shirtVersion}
+                            availableVersions={filteredShirtVersions}
+                            onShirtVersionChange={onShirtVersionChange}
+                          />
+                        );
+                      } else {
+                        const quantity = quantities[imagePath] || '';
+                        return (
+                          <ProductCard
+                            {...cardProps}
+                            categoryName={category.name}
+                            quantity={quantity}
+                            onQuantityChange={onQuantityChange}
+                            sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' ? (sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) : undefined}
+                            onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
+                          />
+                        );
+                      }
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Responsive styles */}
+            <style>{`
+              @media (max-width: 800px) {
+                .modal-grid {
+                  grid-template-columns: 1fr !important;
+                  gap: 1.5rem !important;
+                  overflow-x: hidden !important;
+                }
+                .modal-title {
+                  text-align: center !important;
+                  font-size: 1.3rem !important;
+                  position: static !important;
+                  padding: 1rem 0 !important;
+                }
+              }
+              select:focus {
+                border-color: var(--color-primary) !important;
+                box-shadow: 0 0 0 2px rgba(22,101,52,0.15);
+              }
+              select:hover {
+                border-color: var(--color-primary) !important;
+              }
+            `}</style>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
