@@ -2,6 +2,7 @@ import React from 'react';
 import { getProductName, getImagePath, getColorDisplayName, getQuantityMultiples } from '../../utils';
 import { ColorVersion } from '../../../types';
 import { Field } from '../../../components/ui';
+import { asset } from '../../../utils/asset';
 
 interface ColorVersionCardProps {
   categoryPath: string;
@@ -44,7 +45,7 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
     }}>
       {!hideImage && (
         <img
-          src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+          src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
           alt={imageName}
           style={{ 
             width: '100%', 

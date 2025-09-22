@@ -2,6 +2,7 @@ import React from 'react';
 import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getQuantityMultiples } from '../../utils';
 import { ShirtVersion } from '../../../types';
 import { Field } from '../../../components/ui';
+import { asset } from '../../../utils/asset';
 
 interface ShirtVersionCardProps {
   categoryPath: string;
@@ -44,7 +45,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
     }}>
       {!hideImage && (
         <img
-          src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+          src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
           alt={imageName}
           style={{ 
             width: '100%', 

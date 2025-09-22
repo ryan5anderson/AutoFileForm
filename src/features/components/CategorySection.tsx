@@ -8,6 +8,7 @@ import DisplayOptionCard from './panels/DisplayOptionsPanel';
 import OrderSummaryCard from './OrderSummaryCard';
 import { Card, ButtonIcon } from '../../components/ui';
 import { getImagePath, hasColorVersions, getProductName, getRackDisplayName, getShirtVersionTotal } from '../utils';
+import { asset } from '../../utils/asset';
 
 interface CategorySectionProps {
   category: Category;
@@ -188,7 +189,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
                 <div className="card__image-container">
                   <img
-                    src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+                    src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
                     alt={img}
                     className="card__image"
                   />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { asset } from '../../utils/asset';
 
 const Footer: React.FC = () => {
   return (
@@ -23,7 +24,7 @@ const Footer: React.FC = () => {
           alignItems: 'center'
         }}>
           <img
-            src={process.env.PUBLIC_URL + '/logo/ohiopyle81.png'}
+            src={asset('logo/ohiopyle81.png')}
             alt="Ohiopyle81"
             style={{
               height: '40px',

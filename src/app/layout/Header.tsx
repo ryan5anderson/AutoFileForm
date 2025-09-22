@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { asset } from '../../utils/asset';
 
 interface HeaderProps {
   showSidebarToggle?: boolean;
@@ -113,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({
             </button>
           )}
           <img
-            src={process.env.PUBLIC_URL + '/logo/campustraditions.png'}
+            src={asset('logo/campustraditions.png')}
             alt="Campus Traditions"
             style={{
               height: 'clamp(30px, 5vw, 50px)',
@@ -132,7 +133,7 @@ const Header: React.FC<HeaderProps> = ({
           minWidth: 0
         }}>
           <img
-            src={process.env.PUBLIC_URL + '/logo/opi-logo-no-bg.png'}
+            src={asset('logo/opi-logo-no-bg.png')}
             alt="OPI"
             style={{
               height: 'clamp(30px, 5vw, 50px)',

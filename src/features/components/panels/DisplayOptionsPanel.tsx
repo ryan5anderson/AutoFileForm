@@ -1,6 +1,7 @@
 import React from 'react';
 import { DisplayOption } from '../../../types';
 import { getImagePath, getRackDisplayName } from '../../utils';
+import { asset } from '../../../utils/asset';
 
 interface DisplayOptionCardProps {
   categoryPath: string;
@@ -76,7 +77,7 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
       gap: 'var(--space-2)'
     }}>
       <img
-        src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+        src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
         alt={imageName}
         style={{ 
           width: '100%', 

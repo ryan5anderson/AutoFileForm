@@ -1,6 +1,7 @@
 import React from 'react';
 import { getProductName, getImagePath, getVersionDisplayName, getColorDisplayName, getQuantityMultiples } from '../../utils';
 import { ShirtColorComboVersion } from '../../../types';
+import { asset } from '../../../utils/asset';
 
 interface ShirtColorVersionCardProps {
   categoryPath: string;
@@ -46,7 +47,7 @@ const ShirtColorVersionCard: React.FC<ShirtColorVersionCardProps> = ({
     }}>
       {!hideImage && (
         <img
-          src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+          src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
           alt={imageName}
           style={{ 
             width: '100%', 

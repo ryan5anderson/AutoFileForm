@@ -1,6 +1,7 @@
 import React from 'react';
 import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../../utils';
 import { SweatpantJoggerOption } from '../../../types';
+import { asset } from '../../../utils/asset';
 
 interface ProductCardProps {
   categoryPath: string;
@@ -115,7 +116,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       gap: 'var(--space-2)'
     }}>
       <img
-        src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+        src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
         alt={imageName}
         style={{ 
           width: '100%', 

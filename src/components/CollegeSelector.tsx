@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { colleges } from '../config';
+import { asset } from '../utils/asset';
 import './CollegeSelector.css';
 
 const CollegeSelector: React.FC = () => {
@@ -30,12 +31,12 @@ const CollegeSelector: React.FC = () => {
           >
             <div className="college-logo">
               <img 
-                src={process.env.PUBLIC_URL + college.logo} 
+                src={asset(college.logo)} 
                 alt={`${college.name} Logo`}
                 onError={(e) => {
                   // Fallback to a default logo if the college logo doesn't exist
                   const target = e.target as HTMLImageElement;
-                  target.src = process.env.PUBLIC_URL + '/logo/asulogo.png';
+                  target.src = asset('logo/asulogo.png');
                 }}
               />
             </div>
