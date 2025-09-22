@@ -7,12 +7,7 @@ import './styles/global.css';
 import './styles/tokens.css';
 import './styles/components.css';
 
-// Check if we're accessing from the correct path before rendering
-const currentPath = window.location.pathname;
-if (currentPath !== '/orderform/') {
-  // Redirect to the correct path
-  window.location.href = '/orderform/';
-}
+// GitHub Pages SPA script in index.html handles path redirects
 
 const root = document.getElementById('root');
 if (root) {

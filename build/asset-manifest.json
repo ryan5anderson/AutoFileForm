@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/orderform/static/css/main.e187d902.css",
-    "main.js": "/orderform/static/js/main.633af309.js",
+    "main.js": "/orderform/static/js/main.050598fc.js",
     "index.html": "/orderform/index.html",
     "main.e187d902.css.map": "/orderform/static/css/main.e187d902.css.map",
-    "main.633af309.js.map": "/orderform/static/js/main.633af309.js.map"
+    "main.050598fc.js.map": "/orderform/static/js/main.050598fc.js.map"
   },
   "entrypoints": [
     "static/css/main.e187d902.css",
-    "static/js/main.633af309.js"
+    "static/js/main.050598fc.js"
   ]
 }
