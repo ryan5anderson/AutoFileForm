@@ -1,6 +1,19 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  showBackButton?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBackClick = () => {
+    navigate('/');
+  };
+
+  const shouldShowBackButton = showBackButton || (location.pathname !== '/' && location.hash !== '#/');
   return (
     <header style={{
       background: 'var(--color-bg)',
@@ -22,13 +35,44 @@ const Header: React.FC = () => {
         flexWrap: 'wrap',
         marginBottom: 'var(--space-3)'
       }}>
-        {/* Left side - Campus Traditions */}
+        {/* Left side - Back Button and Campus Traditions */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           flex: '1 1 auto',
-          minWidth: 0
+          minWidth: 0,
+          gap: 'var(--space-3)'
         }}>
+          {shouldShowBackButton && (
+            <button
+              onClick={handleBackClick}
+              style={{
+                background: 'none',
+                border: '1px solid var(--color-border)',
+                borderRadius: '6px',
+                padding: 'var(--space-2) var(--space-3)',
+                cursor: 'pointer',
+                color: 'var(--color-text)',
+                fontSize: '0.875rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--color-primary)';
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.borderColor = 'var(--color-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'none';
+                e.currentTarget.style.color = 'var(--color-text)';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+              }}
+            >
+              ← Back to Colleges
+            </button>
+          )}
           <img
             src={process.env.PUBLIC_URL + '/logo/campustraditions.png'}
             alt="Campus Traditions"

@@ -1,0 +1,117 @@
+.college-selector {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.college-selector-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.college-selector-header h1 {
+  font-size: 2.5rem;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.college-selector-header p {
+  font-size: 1.2rem;
+  color: #4a5568;
+  margin: 0;
+}
+
+.college-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 800px;
+  width: 100%;
+}
+
+.college-button {
+  background: white;
+  border: none;
+  border-radius: 16px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.college-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.college-button:active {
+  transform: translateY(-2px);
+}
+
+.college-logo {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.college-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.college-info h2 {
+  font-size: 1.5rem;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.college-key {
+  font-size: 0.9rem;
+  color: #718096;
+  background: #edf2f7;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .college-selector {
+    padding: 1rem;
+  }
+  
+  .college-selector-header h1 {
+    font-size: 2rem;
+  }
+  
+  .college-buttons {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .college-button {
+    padding: 1.5rem;
+  }
+  
+  .college-logo {
+    width: 60px;
+    height: 60px;
+  }
+}

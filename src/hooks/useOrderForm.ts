@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, Category } from '../types';
 import { validateFormData, createTemplateParams } from '../utils';
 import { sendOrderEmail } from '../services/emailService';
 
 export const useOrderForm = (categories: Category[]) => {
+  const navigate = useNavigate();
+  const { college } = useParams();
+  const location = useLocation();
   const [formData, setFormData] = useState<FormData>({
     company: '',
     storeNumber: '',
@@ -20,6 +24,25 @@ export const useOrderForm = (categories: Category[]) => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>('form');
   const [sending, setSending] = useState(false);
+
+  // Reset page state when URL changes
+  useEffect(() => {
+    const isSummaryPage = location.pathname.endsWith('/summary');
+    const isReceiptPage = location.pathname.endsWith('/receipt');
+    const isThankYouPage = location.pathname.endsWith('/thankyou');
+    
+    if (!isSummaryPage && page === 'summary') {
+      setPage('form');
+    }
+    
+    if (isReceiptPage && page !== 'receipt') {
+      setPage('receipt');
+    }
+    
+    if (isThankYouPage && page !== 'thankyou') {
+      setPage('thankyou');
+    }
+  }, [location.pathname, page]);
 
   const handleFormDataChange = (updates: Partial<FormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -109,18 +132,34 @@ export const useOrderForm = (categories: Category[]) => {
     }
     setError(null);
     setPage('summary');
+    // Navigate to summary URL
+    if (college) {
+      navigate(`/${college}/summary`);
+    }
   };
 
   const handleBack = () => {
     setPage('form');
+    // Navigate back to form URL
+    if (college) {
+      navigate(`/${college}`);
+    }
   };
 
   const handleBackToSummary = () => {
     setPage('summary');
+    // Navigate to summary URL
+    if (college) {
+      navigate(`/${college}/summary`);
+    }
   };
 
   const handleExit = () => {
     setPage('thankyou');
+    // Navigate to thankyou URL
+    if (college) {
+      navigate(`/${college}/thankyou`);
+    }
   };
 
   const handleConfirm = async () => {
@@ -131,6 +170,10 @@ export const useOrderForm = (categories: Category[]) => {
       const templateParams = createTemplateParams(formData, categories);
       await sendOrderEmail(templateParams);
       setPage('receipt');
+      // Navigate to receipt URL
+      if (college) {
+        navigate(`/${college}/receipt`);
+      }
     } catch (err) {
       console.error('Email error:', err);
       alert('Failed to send email. Please check your EmailJS configuration and try again.');

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { colleges } from '../constants/colleges';
 import FormPage from './FormPage';
 import SummaryPage from './SummaryPage';
@@ -9,8 +9,14 @@ import { useOrderForm } from '../hooks';
 
 const OrderFormPage: React.FC = () => {
   const { college } = useParams();
+  const location = useLocation();
   const collegeConfig = colleges[college as keyof typeof colleges];
   const categories = collegeConfig ? collegeConfig.categories : [];
+  
+  // Check if we're on the summary, receipt, or thankyou route
+  const isSummaryPage = location.pathname.endsWith('/summary');
+  const isReceiptPage = location.pathname.endsWith('/receipt');
+  const isThankYouPage = location.pathname.endsWith('/thankyou');
 
   // Dynamically set --color-primary for Arizona State
   React.useEffect(() => {
@@ -46,24 +52,27 @@ const OrderFormPage: React.FC = () => {
     return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>College not found</div>;
   }
 
-  if (page === 'summary') {
-    return (
-      <SummaryPage
-        formData={formData}
-        onBack={handleBack}
-        onConfirm={handleConfirm}
-        sending={sending}
-        categories={categories}
-        college={college}
-      />
-    );
+  if (isSummaryPage) {
+    return <SummaryPage 
+      formData={formData}
+      onBack={handleBack}
+      onConfirm={handleConfirm}
+      sending={sending}
+      categories={categories}
+      college={college}
+    />;
   }
 
-  if (page === 'receipt') {
-    return <ReceiptPage formData={formData} onBackToSummary={handleBackToSummary} onExit={handleExit} categories={categories} />;
+  if (isReceiptPage || page === 'receipt') {
+    return <ReceiptPage 
+      formData={formData}
+      onBackToSummary={handleBackToSummary}
+      onExit={handleExit}
+      categories={categories}
+    />;
   }
 
-  if (page === 'thankyou') {
+  if (isThankYouPage || page === 'thankyou') {
     return <ThankYouPage />;
   }
 
@@ -85,4 +94,4 @@ const OrderFormPage: React.FC = () => {
   );
 };
 
-export default OrderFormPage; 
+export default OrderFormPage;

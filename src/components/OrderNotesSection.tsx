@@ -8,23 +8,8 @@ interface OrderNotesSectionProps {
 
 const OrderNotesSection: React.FC<OrderNotesSectionProps> = ({ formData, onFormDataChange }) => {
   return (
-    <div style={{
-      marginBottom: 'var(--space-6)',
-      background: 'var(--color-bg)',
-      padding: 'var(--space-4)',
-      borderRadius: 'var(--radius-lg)',
-      border: '1px solid var(--color-border)'
-    }}>
-      <h2 style={{ 
-        color: 'var(--color-primary)',
-        fontSize: '1.25rem',
-        fontWeight: '600',
-        marginBottom: 'var(--space-3)',
-        borderBottom: '2px solid var(--color-primary)',
-        paddingBottom: 'var(--space-2)'
-      }}>
-        Order Notes
-      </h2>
+    <div className="form-section">
+      <h2>Order Notes</h2>
       
       <div>
         <label htmlFor="orderNotes" style={{ 

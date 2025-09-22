@@ -1,42 +1,64 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { FormData, Category } from '../types';
+import { colleges } from '../constants/colleges';
 import CategorySection from './CategorySection';
 import Header from './Header';
 import Footer from './Footer';
+import { useOrderForm } from '../hooks';
+import '../styles/college-pages.css';
 
 interface SummaryPageProps {
-  formData: FormData;
-  onBack: () => void;
-  onConfirm: () => void;
-  sending: boolean;
-  categories: Category[];
+  formData?: FormData;
+  onBack?: () => void;
+  onConfirm?: () => void;
+  sending?: boolean;
+  categories?: Category[];
   college?: string;
 }
 
 const SummaryPage: React.FC<SummaryPageProps> = ({
-  formData,
-  onBack,
-  onConfirm,
-  sending,
-  categories,
-  college
+  formData: propFormData,
+  onBack: propOnBack,
+  onConfirm: propOnConfirm,
+  sending: propSending,
+  categories: propCategories,
+  college: propCollege
 }) => {
+  // URL parameter handling
+  const { college: urlCollege } = useParams();
+  const collegeConfig = colleges[urlCollege as keyof typeof colleges];
+  const categories = propCategories || (collegeConfig ? collegeConfig.categories : []);
+  
+  // Use hook if no props provided (standalone mode)
+  const hookData = useOrderForm(categories);
+  const formData = propFormData || hookData.formData;
+  const onBack = propOnBack || hookData.handleBack;
+  const onConfirm = propOnConfirm || hookData.handleConfirm;
+  const sending = propSending || hookData.sending;
+  const college = propCollege || urlCollege;
+
+  // Dynamically set --color-primary for college branding
+  React.useEffect(() => {
+    if (college === 'arizonastate') {
+      document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
+    } else if (college === 'michiganstate') {
+      document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else {
+      document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
+    }
+  }, [college]);
+
+  if (!collegeConfig && !propCategories) {
+    return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>College not found</div>;
+  }
   return (
-    <div style={{ 
-      background: 'var(--color-bg)', 
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <Header />
+    <div className="summary-page-container">
+      <div className="college-page-header">
+        <Header showBackButton={true} />
+      </div>
       
-      <main style={{
-        flex: 1,
-        padding: 'var(--space-4)',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        width: '100%'
-      }}>
+      <main className="summary-page-main">
         <h1 style={{ 
           color: 'var(--color-primary)', 
           marginBottom: 'var(--space-6)', 

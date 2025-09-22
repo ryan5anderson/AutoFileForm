@@ -132,7 +132,7 @@ export const colleges = {
   },
   arizonastate: {
     name: "Arizona State",
-    logo: "/logo/arizonastatelogo.png", // TODO: Add Arizona State logo
+    logo: "/logo/asulogo.png", 
     categories: [
       {
         name: 'Tshirts (Unisex)',

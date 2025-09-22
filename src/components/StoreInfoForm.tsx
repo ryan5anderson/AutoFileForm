@@ -8,16 +8,7 @@ interface StoreInfoFormProps {
 
 const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChange }) => {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-      gap: 'var(--space-4)',
-      marginBottom: 'var(--space-6)',
-      background: 'var(--color-bg)',
-      padding: 'var(--space-4)',
-      borderRadius: 'var(--radius-lg)',
-      border: '1px solid var(--color-border)'
-    }}>
+    <div className="form-section">
       <div>
         <label htmlFor="company" style={{ 
           display: 'block', 

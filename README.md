@@ -31,7 +31,14 @@ A React-based order form system for college retail stores to create and submit p
 1. Clone the repository
 2. Install dependencies: `npm install`
 3. Start development server: `npm start`
-4. Navigate to `http://localhost:3000/#/michiganstate` or `http://localhost:3000/#/arizonastate`
+4. Navigate to `http://localhost:3000/orderform/` to select your college
+
+## URL Structure
+- **College Selection**: `http://localhost:3000/orderform/`
+- **Order Form**: `http://localhost:3000/orderform/#/michiganstate` or `http://localhost:3000/orderform/#/arizonastate`
+- **Order Summary**: `http://localhost:3000/orderform/#/michiganstate/summary`
+- **Order Receipt**: `http://localhost:3000/orderform/#/michiganstate/receipt`
+- **Thank You**: `http://localhost:3000/orderform/#/michiganstate/thankyou`
 
 ## Project Structure
 ```

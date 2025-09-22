@@ -1,17 +1,51 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { FormData, Category, ShirtVersion, ColorVersion } from '../types';
+import { colleges } from '../constants/colleges';
 import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, hasColorVersions, getColorDisplayName } from '../utils';
 import Header from './Header';
 import Footer from './Footer';
+import { useOrderForm } from '../hooks';
+import '../styles/college-pages.css';
 
 interface ReceiptPageProps {
-  formData: FormData;
-  onBackToSummary: () => void;
-  onExit: () => void;
-  categories: Category[];
+  formData?: FormData;
+  onBackToSummary?: () => void;
+  onExit?: () => void;
+  categories?: Category[];
 }
 
-const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, onExit, categories }) => {
+const ReceiptPage: React.FC<ReceiptPageProps> = ({ 
+  formData: propFormData, 
+  onBackToSummary: propOnBackToSummary, 
+  onExit: propOnExit, 
+  categories: propCategories 
+}) => {
+  // URL parameter handling
+  const { college: urlCollege } = useParams();
+  const collegeConfig = colleges[urlCollege as keyof typeof colleges];
+  const categories: Category[] = propCategories || (collegeConfig ? collegeConfig.categories : []);
+  
+  // Use hook if no props provided (standalone mode)
+  const hookData = useOrderForm(categories);
+  const formData = propFormData || hookData.formData;
+  const onBackToSummary = propOnBackToSummary || hookData.handleBackToSummary;
+  const onExit = propOnExit || hookData.handleExit;
+
+  // Dynamically set --color-primary for college branding
+  React.useEffect(() => {
+    if (urlCollege === 'arizonastate') {
+      document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
+    } else if (urlCollege === 'michiganstate') {
+      document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else {
+      document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
+    }
+  }, [urlCollege]);
+
+  if (!collegeConfig && !propCategories) {
+    return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>College not found</div>;
+  }
   // Generate auto-added cards based on rack selections
   const generateAutoAddedCards = () => {
     const rackToCardMapping = getRackToCardMapping();
@@ -66,7 +100,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({ formData, onBackToSummary, on
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <Header />
+      <Header showBackButton={true} />
       
       <main style={{
         flex: 1,

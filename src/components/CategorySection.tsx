@@ -6,7 +6,7 @@ import ColorVersionCard from './ColorVersionCard';
 import ShirtColorVersionCard from './ShirtColorVersionCard';
 import DisplayOptionCard from './DisplayOptionCard';
 import OrderSummaryCard from './OrderSummaryCard';
-import { getImagePath, hasColorVersions, getProductName, getRackDisplayName } from '../utils';
+import { getImagePath, hasColorVersions, getProductName, getRackDisplayName, getShirtVersionTotal } from '../utils';
 
 interface CategorySectionProps {
   category: Category;
@@ -45,24 +45,85 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 }) => {
   const [modalProduct, setModalProduct] = useState<null | { img: string; imagePath: string }>(null);
 
+  // Helper function to check if an item has any quantity
+  const hasQuantity = (imagePath: string, imageName: string) => {
+    // Handle tie-dye special case
+    const tieDyeImages = [
+      'M100965414 SHOUDC OU Go Green DTF on Forest.png',
+      'M100482538 SHHODC Hover DTF on Black or Forest .png',
+      'M100437896 SHOUDC Over Under DTF on Forest.png',
+      'M102595496 SH2FDC Custom DTF on Maroon .png',
+    ];
+    
+    if (tieDyeImages.includes(imageName)) {
+      const comboVersions = shirtColorComboVersions[imagePath];
+      if (comboVersions) {
+        const totalQty = Object.values(comboVersions).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
+    // Handle display options
+    if (category.name === 'Display Options') {
+      const displayOption = displayOptions[imagePath];
+      if (displayOption) {
+        const totalQty = Number(displayOption.displayOnly || 0) + Number(displayOption.displayStandardCasePack || 0);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
+    // Handle sweatpants/joggers
+    if (category.name === 'Sweatpants/Joggers') {
+      const sjOptions = sweatpantJoggerOptions[imagePath];
+      if (sjOptions) {
+        const totalQty = Object.values(sjOptions).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
+    // Handle color versions
+    if (hasColorVersions(imageName)) {
+      const colorVersion = colorVersions[imagePath];
+      if (colorVersion) {
+        const totalQty = Object.values(colorVersion).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
+    // Handle shirt versions
+    if (category.hasShirtVersions) {
+      const shirtVersion = shirtVersions[imagePath];
+      if (shirtVersion) {
+        const totalQty = getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
+    // Handle regular quantities
+    const quantity = quantities[imagePath];
+    return quantity && Number(quantity) > 0;
+  };
+
+  // Filter images to only show those with quantities in read-only mode
+  const filteredImages = category.images.filter((img) => {
+    if (!readOnly) return true; // Show all items in form mode
+    const imagePath = getImagePath(category.path, img);
+    return hasQuantity(imagePath, img);
+  });
+
+  // Don't render the category section if no items have quantities in read-only mode
+  if (readOnly && filteredImages.length === 0) {
+    return null;
+  }
+
   return (
-    <section style={{ 
-      marginBottom: 'var(--space-6)', 
-      background: 'var(--color-bg)', 
-      borderRadius: 'var(--radius-lg)', 
-      padding: 'var(--space-4)',
-      border: '1px solid var(--color-border)'
-    }}>
-      <h2 style={{ 
-        color: 'var(--color-primary)', 
-        marginBottom: 'var(--space-4)', 
-        fontSize: '1.5rem',
-        fontWeight: '600',
-        borderBottom: '2px solid var(--color-primary)',
-        paddingBottom: 'var(--space-2)'
-      }}>
-        {category.name}
-      </h2>
+    <section className="category-section">
+      <h3>{category.name}</h3>
       {category.hasDisplayOptions && (
         <div style={{
           marginBottom: 'var(--space-4)',
@@ -83,7 +144,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
         gap: 'var(--space-3)' 
       }}>
-        {category.images.map((img) => {
+        {filteredImages.map((img) => {
           const imagePath = getImagePath(category.path, img);
           return (
             <div

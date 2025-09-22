@@ -5,6 +5,7 @@ import CategorySection from './CategorySection';
 import OrderNotesSection from './OrderNotesSection';
 import Header from './Header';
 import Footer from './Footer';
+import '../styles/college-pages.css';
 
 interface CollegeConfig {
   name: string;
@@ -44,30 +45,16 @@ const FormPage: React.FC<FormPageProps> = ({
   const categories = collegeConfig ? collegeConfig.categories : [];
   const collegeName = collegeConfig ? collegeConfig.name : 'College';
   return (
-    <div style={{ 
-      background: 'var(--color-bg)', 
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <Header />
+    <div className="college-page-container">
+      <div className="college-page-header">
+        <Header showBackButton={true} />
+      </div>
       
-      <main style={{
-        flex: 1,
-        padding: 'var(--space-4)',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        width: '100%'
-      }}>
-        <h1 style={{ 
-          color: 'var(--color-primary)', 
-          marginBottom: 'var(--space-6)', 
-          fontSize: '2rem',
-          fontWeight: '600',
-          textAlign: 'center'
-        }}>
-          {collegeName} Product Order Form
-        </h1>
+      <main className="college-page-main">
+        <div className="college-page-title">
+          <h1>{collegeName} Product Order Form</h1>
+          <p>Select your merchandise and quantities below</p>
+        </div>
         
         <form onSubmit={onSubmit}>
           <StoreInfoForm formData={formData} onFormDataChange={onFormDataChange} />
@@ -95,41 +82,15 @@ const FormPage: React.FC<FormPageProps> = ({
           <OrderNotesSection formData={formData} onFormDataChange={onFormDataChange} />
 
           {error && (
-            <div style={{ 
-              color: '#dc2626', 
-              marginBottom: 'var(--space-3)', 
-              fontWeight: '500',
-              padding: 'var(--space-3)',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: 'var(--radius)',
-              textAlign: 'center'
-            }}>
+            <div className="error-message">
               {error}
             </div>
           )}
           
-          <div style={{
-            display: 'flex',
-            gap: 'var(--space-3)',
-            justifyContent: 'center',
-            marginTop: 'var(--space-6)',
-            flexWrap: 'wrap'
-          }}>
-            
+          <div className="submit-section">
             <button
               type="submit"
-              style={{
-                background: 'var(--color-primary)',
-                color: 'white',
-                padding: 'var(--space-3) var(--space-4)',
-                border: 'none',
-                borderRadius: 'var(--radius-lg)',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: 'pointer',
-                minWidth: '150px'
-              }}
+              className="submit-button"
             >
               Review Order
             </button>
