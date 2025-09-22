@@ -4,24 +4,17 @@
     <meta charset="utf-8">
     <title>Order Form</title>
     <script type="text/javascript">
-      // Simplified redirect for HashRouter compatibility
-      // Redirect any path to the base URL with hash routing
+      // Simple one-time redirect to base URL for HashRouter
       var l = window.location;
       var basePath = '/orderform/';
       
-      // Extract the path that should become a hash route
-      var pathAfterBase = l.pathname.replace(basePath, '');
-      
-      if (pathAfterBase && pathAfterBase !== '') {
-        // Redirect to base path with hash routing
-        l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + 
-                  basePath + '#/' + pathAfterBase + l.search + l.hash);
-      } else {
-        // Just redirect to base path
-        l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + basePath);
+      // Only redirect if we're not already at the base path
+      if (l.pathname !== basePath) {
+        window.location.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + basePath);
       }
     </script>
   </head>
   <body>
+    <p>Redirecting...</p>
   </body>
 </html> 
