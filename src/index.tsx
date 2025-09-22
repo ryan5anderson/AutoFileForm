@@ -5,6 +5,7 @@ import CollegeSelector from './components/CollegeSelector';
 import OrderFormPage from './components/OrderFormPage';
 import './styles/global.css';
 import './styles/tokens.css';
+import './styles/components.css';
 
 // Check if we're accessing from the correct path before rendering
 const currentPath = window.location.pathname;

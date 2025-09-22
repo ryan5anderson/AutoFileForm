@@ -1,6 +1,7 @@
 import React from 'react';
 import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getQuantityMultiples } from '../utils';
 import { ShirtVersion } from '../types';
+import { Field } from './ui';
 
 interface ShirtVersionCardProps {
   categoryPath: string;
@@ -68,35 +69,21 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
         const versionKey = version as keyof ShirtVersion;
         const displayName = getVersionDisplayName(version, imageName);
         
-        return (
-          <div key={version} className="field">
-            <div className="field-label">{displayName}</div>
-            <div className="field-control">
-              <select
-                id={`${version}-${imagePath}`}
-                value={shirtVersions[versionKey] || ''}
-                onChange={(e) => handleVersionChange(versionKey, e.target.value)}
-                disabled={readOnly}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  background: '#fff',
-                  minHeight: '44px',
-                  boxSizing: 'border-box'
-                }}
-              >
-                <option value="">Select</option>
-                {getQuantityMultiples(imageName, version).map(val => (
-                  <option key={val} value={val}>{val}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        );
+            return (
+              <Field key={version} label={displayName} htmlFor={`${version}-${imagePath}`}>
+                <Field.Select
+                  id={`${version}-${imagePath}`}
+                  value={shirtVersions[versionKey] || ''}
+                  onChange={(e) => handleVersionChange(versionKey, e.target.value)}
+                  disabled={readOnly}
+                >
+                  <option value="">Select</option>
+                  {getQuantityMultiples(imageName, version).map(val => (
+                    <option key={val} value={val}>{val}</option>
+                  ))}
+                </Field.Select>
+              </Field>
+            );
       })}
       {readOnly && (
         <div style={{ 

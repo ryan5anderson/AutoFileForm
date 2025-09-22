@@ -1,6 +1,7 @@
 import React from 'react';
 import { getProductName, getImagePath, getColorDisplayName, getQuantityMultiples } from '../utils';
 import { ColorVersion } from '../types';
+import { Field } from './ui';
 
 interface ColorVersionCardProps {
   categoryPath: string;
@@ -68,24 +69,21 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
         const colorKey = color as keyof ColorVersion;
         const displayName = getColorDisplayName(color);
         
-        return (
-          <div key={color} className="field">
-            <div className="field-label">{displayName}</div>
-            <div className="field-control">
-              <select
-                id={`${color}-${imagePath}`}
-                value={colorVersions[colorKey] || ''}
-                onChange={(e) => handleColorChange(colorKey, e.target.value)}
-                disabled={readOnly}
-              >
-                <option value="">Select</option>
-                {getQuantityMultiples(imageName, categoryPath).map(val => (
-                  <option key={val} value={val}>{val}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        );
+            return (
+              <Field key={color} label={displayName} htmlFor={`${color}-${imagePath}`}>
+                <Field.Select
+                  id={`${color}-${imagePath}`}
+                  value={colorVersions[colorKey] || ''}
+                  onChange={(e) => handleColorChange(colorKey, e.target.value)}
+                  disabled={readOnly}
+                >
+                  <option value="">Select</option>
+                  {getQuantityMultiples(imageName, categoryPath).map(val => (
+                    <option key={val} value={val}>{val}</option>
+                  ))}
+                </Field.Select>
+              </Field>
+            );
       })}
       {readOnly && (
         <div style={{ 
