@@ -27,9 +27,11 @@
           var decoded = l.search.slice(1).split('&').map(function(s) { 
             return s.replace(/~and~/g, '&')
           }).join('?');
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
-          );
+          // Only replace state if the decoded URL is different from current
+          var newPath = l.pathname.slice(0, -1) + decoded + l.hash;
+          if (newPath !== l.pathname + l.search + l.hash) {
+            window.history.replaceState(null, null, newPath);
+          }
         }
       }(window.location))
     </script>
