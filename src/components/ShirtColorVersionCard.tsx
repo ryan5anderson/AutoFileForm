@@ -67,63 +67,32 @@ const ShirtColorVersionCard: React.FC<ShirtColorVersionCardProps> = ({
           {productName}
         </div>
       )}
-      {!readOnly ? (
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: 'var(--space-2)',
-          padding: 'var(--space-2)',
-          background: 'var(--color-bg)',
-          borderRadius: 'var(--radius)'
-        }}>
-          {availableColors.map(color => (
-            availableVersions.map(version => {
-              const comboKey = getComboKey(version, color);
-              return (
-                <div key={comboKey} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  gap: 'var(--space-2)'
-                }}>
-                  <label
-                    htmlFor={`${comboKey}-${imagePath}`}
-                    style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      color: 'var(--color-text)',
-                      minWidth: '60px',
-                      textAlign: 'left',
-                    }}
-                  >
-                    {getVersionDisplayName(version, imageName)} {getColorDisplayName(color)}:
-                  </label>
-                  <select
-                    id={`${comboKey}-${imagePath}`}
-                    value={shirtColorComboVersion[comboKey] || ''}
-                    onChange={e => handleComboChange(version, color, e.target.value)}
-                    style={{
-                      width: '80px',
-                      padding: 'var(--space-1) var(--space-2)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: '0.75rem',
-                      background: 'var(--color-input-bg)',
-                      textAlign: 'center',
-                    }}
-                    disabled={readOnly}
-                  >
-                    <option value="">Select</option>
-                    {getQuantityMultiples(imageName, categoryPath).map(val => (
-                      <option key={val} value={val}>{val}</option>
-                    ))}
-                  </select>
-                </div>
-              );
-            })
-          ))}
-        </div>
-      ) : (
+      {availableColors.map(color => (
+        availableVersions.map(version => {
+          const comboKey = getComboKey(version, color);
+          return (
+            <div key={comboKey} className="field">
+              <div className="field-label">
+                {getVersionDisplayName(version, imageName)} {getColorDisplayName(color)}
+              </div>
+              <div className="field-control">
+                <select
+                  id={`${comboKey}-${imagePath}`}
+                  value={shirtColorComboVersion[comboKey] || ''}
+                  onChange={e => handleComboChange(version, color, e.target.value)}
+                  disabled={readOnly}
+                >
+                  <option value="">Select</option>
+                  {getQuantityMultiples(imageName, categoryPath).map(val => (
+                    <option key={val} value={val}>{val}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          );
+        })
+      ))}
+      {readOnly && (
         <div style={{ 
           fontSize: '0.875rem',
           padding: 'var(--space-2)',

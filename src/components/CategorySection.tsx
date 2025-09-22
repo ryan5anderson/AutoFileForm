@@ -26,6 +26,17 @@ interface CategorySectionProps {
   college?: string;
 }
 
+// Local layout helper for consistent label/control rows
+const FormField: React.FC<{ 
+  label: React.ReactNode; 
+  children: React.ReactNode; 
+}> = ({ label, children }) => (
+  <div className="field">
+    <div className="field-label">{label}</div>
+    <div className="field-control">{children}</div>
+  </div>
+);
+
 const CategorySection: React.FC<CategorySectionProps> = ({
   category,
   quantities,
@@ -43,7 +54,20 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   readOnly = false,
   college
 }) => {
-  const [modalProduct, setModalProduct] = useState<null | { img: string; imagePath: string }>(null);
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+
+  // Helper function to toggle card expansion
+  const toggleCardExpansion = (imagePath: string) => {
+    setExpandedCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(imagePath)) {
+        newSet.delete(imagePath);
+      } else {
+        newSet.add(imagePath);
+      }
+      return newSet;
+    });
+  };
 
   // Helper function to check if an item has any quantity
   const hasQuantity = (imagePath: string, imageName: string) => {
@@ -146,340 +170,497 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       }}>
         {filteredImages.map((img) => {
           const imagePath = getImagePath(category.path, img);
+          const isExpanded = expandedCards.has(imagePath);
+          
           return (
             <div
               key={img}
+              className={`product-card ${isExpanded ? 'expanded' : ''}`}
               style={{
-                cursor: readOnly ? 'default' : 'pointer',
-                background: 'var(--color-bg)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'var(--space-3)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                transition: 'box-shadow 0.2s',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                background: 'white',
+                border: '1px solid #e2e8f0',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: isExpanded 
+                  ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' 
+                  : '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
                 position: 'relative',
+                transform: isExpanded ? 'translateY(-4px)' : 'translateY(0)',
               }}
-              onClick={() => !readOnly && setModalProduct({ img, imagePath })}
             >
-              <img
-                src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
-                alt={img}
+              {/* Card Header */}
+              <div
                 style={{
-                  width: '100%',
-                  borderRadius: 'var(--radius)',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                  border: '1px solid var(--color-border)'
+                  padding: '1rem',
+                  cursor: readOnly ? 'default' : 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  background: 'white',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  borderBottom: isExpanded ? '1px solid #e2e8f0' : 'none',
+                  position: 'relative',
                 }}
-              />
-              <div style={{
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: 'var(--color-text)',
-                textAlign: 'center',
-                marginTop: 'var(--space-2)'
-              }}>
-                {category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img)}
-              </div>
-              {!readOnly && (
-                <div style={{ 
-                  fontSize: '0.75rem',
-                  color: 'var(--color-text-muted)',
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!readOnly) {
+                    toggleCardExpansion(imagePath);
+                  }
+                }}
+              >
+                {/* Product Title - Top Center */}
+                <h3 style={{
+                  margin: '0 0 0.75rem 0',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#1f2937',
                   textAlign: 'center',
-                  marginTop: 'auto',
-                  paddingTop: 'var(--space-2)',
-                  fontStyle: 'italic'
+                  lineHeight: '1.2',
+                  letterSpacing: '-0.01em',
                 }}>
-                  tap to order
+                  {category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img)}
+                </h3>
+
+                {/* Product Image - Focal Point */}
+                <div style={{
+                  width: '160px',
+                  height: '160px',
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  border: '2px solid #e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                  marginBottom: '0.75rem',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}>
+                  <img
+                    src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`}
+                    alt={img}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      borderRadius: '8px',
+                    }}
+                  />
                 </div>
-              )}
-              {readOnly && (
-                <OrderSummaryCard
-                  categoryPath={category.path}
-                  imageName={img}
-                  categoryName={category.name}
-                  quantities={quantities}
-                  shirtVersions={shirtVersions}
-                  colorVersions={colorVersions}
-                  shirtColorComboVersions={shirtColorComboVersions}
-                  displayOptions={displayOptions}
-                  sweatpantJoggerOptions={sweatpantJoggerOptions}
-                  college={college}
-                  hasShirtVersions={category.hasShirtVersions}
-                />
+
+                {/* Action Text */}
+                {!readOnly && (
+                  <p style={{
+                    margin: '0 0 0.5rem 0',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    fontWeight: '500',
+                    textAlign: 'center',
+                  }}>
+                    {isExpanded ? 'Tap to minimize' : 'Tap to configure options'}
+                  </p>
+                )}
+
+                {/* Expand/Collapse Button */}
+                {!readOnly && (
+                  <button
+                    type="button"
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '8px',
+                      background: isExpanded 
+                        ? 'linear-gradient(135deg, var(--color-primary) 0%, #059669 100%)' 
+                        : 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                      color: isExpanded ? 'white' : '#64748b',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                      boxShadow: isExpanded 
+                        ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' 
+                        : '0 1px 2px rgba(0, 0, 0, 0.05)',
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleCardExpansion(imagePath);
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isExpanded) {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)';
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isExpanded) {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                  </button>
+                )}
+
+                {/* Quantity Badge for Summary View */}
+                {readOnly && (
+                  <OrderSummaryCard
+                    categoryPath={category.path}
+                    imageName={img}
+                    categoryName={category.name}
+                    quantities={quantities}
+                    shirtVersions={shirtVersions}
+                    colorVersions={colorVersions}
+                    shirtColorComboVersions={shirtColorComboVersions}
+                    displayOptions={displayOptions}
+                    sweatpantJoggerOptions={sweatpantJoggerOptions}
+                    college={college}
+                    hasShirtVersions={category.hasShirtVersions}
+                  />
+                )}
+              </div>
+
+              {/* Expandable Content */}
+              {!readOnly && (
+                <div
+                  className="expandable-content config-panel"
+                  style={{
+                    maxHeight: isExpanded ? '800px' : '0',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    opacity: isExpanded ? 1 : 0,
+                    padding: isExpanded ? 'clamp(1rem, 2.5vw, 2rem)' : '0',
+                  }}
+                >
+                  <h4 className="config-title">
+                    Options
+                  </h4>
+                    
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'clamp(10px, 2vw, 16px)',
+                      width: '100%',
+                    }}>
+                      {(() => {
+                        // Tie-dye special case
+                        const tieDyeImages = [
+                          'M100965414 SHOUDC OU Go Green DTF on Forest.png',
+                          'M100482538 SHHODC Hover DTF on Black or Forest .png',
+                          'M100437896 SHOUDC Over Under DTF on Forest.png',
+                          'M102595496 SH2FDC Custom DTF on Maroon .png',
+                        ];
+                        const isTieDye = tieDyeImages.includes(img);
+                        const filteredShirtVersions = isTieDye && category.shirtVersions
+                          ? category.shirtVersions.filter(v => v !== 'crewneck')
+                          : category.shirtVersions;
+                        const cardProps = {
+                          categoryPath: category.path,
+                          imageName: img,
+                          hideImage: true,
+                          college,
+                        };
+                        if (category.hasDisplayOptions) {
+                          const displayOption = displayOptions[imagePath] || { displayOnly: '', displayStandardCasePack: '' };
+                          return (
+                            <DisplayOptionCard
+                              {...cardProps}
+                              displayOption={displayOption}
+                              onDisplayOptionChange={onDisplayOptionChange}
+                            />
+                          );
+                        } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
+                          const comboVersion = shirtColorComboVersions[imagePath] || {};
+                          return (
+                            <ShirtColorVersionCard
+                              {...cardProps}
+                              shirtColorComboVersion={comboVersion}
+                              availableVersions={filteredShirtVersions}
+                              availableColors={category.colorVersions}
+                              onShirtColorComboChange={onShirtColorComboChange}
+                            />
+                          );
+                        } else if (hasColorVersions(img)) {
+                          const colorVersion = colorVersions[imagePath] || { black: '', forest: '', white: '', gray: '' };
+                          return (
+                            <ColorVersionCard
+                              {...cardProps}
+                              colorVersions={colorVersion}
+                              availableColors={category.colorVersions}
+                              onColorVersionChange={onColorVersionChange}
+                            />
+                          );
+                        } else if (category.hasShirtVersions) {
+                          const shirtVersion = shirtVersions[imagePath] || { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' };
+                          return (
+                            <ShirtVersionCard
+                              {...cardProps}
+                              shirtVersions={shirtVersion}
+                              availableVersions={filteredShirtVersions}
+                              onShirtVersionChange={onShirtVersionChange}
+                            />
+                          );
+                        } else {
+                          const quantity = quantities[imagePath] || '';
+                          return (
+                            <ProductCard
+                              {...cardProps}
+                              categoryName={category.name}
+                              quantity={quantity}
+                              onQuantityChange={onQuantityChange}
+                              sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' ? (sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) : undefined}
+                              onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
+                            />
+                          );
+                        }
+                      })()}
+                    </div>
+                </div>
               )}
             </div>
           );
         })}
       </div>
-      {/* Modal Overlay */}
-      {modalProduct && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}
-          onClick={() => { setModalProduct(null); }}
-        >
-          <div
-            style={{
-              background: 'white',
-              borderRadius: 'var(--radius-lg)',
-              padding: '2rem',
-              minWidth: '320px',
-              maxWidth: '900px',
-              width: '95vw',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              boxShadow: '0 4px 32px rgba(0,0,0,0.18)',
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'stretch',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={() => { setModalProduct(null); }}
-              style={{
-                position: 'absolute',
-                top: 12,
-                right: 12,
-                background: 'transparent',
-                border: 'none',
-                fontSize: '1.5rem',
-                cursor: 'pointer',
-                color: '#888',
-                zIndex: 2
-              }}
-              aria-label="Close"
-            >
-              ×
-            </button>
-            {/* Product Title at Top Center */}
-            <div
-              style={{
-                width: '100%',
-                textAlign: 'center',
-                fontWeight: 900,
-                fontSize: '2rem',
-                color: 'var(--color-primary)',
-                marginBottom: '2rem',
-                letterSpacing: '0.01em',
-                position: 'sticky',
-                top: 0,
-                background: 'white',
-                zIndex: 1,
-                padding: '0.75rem 0 1.5rem 0',
-                boxSizing: 'border-box',
-              }}
-              className="modal-title"
-            >
-              {category.name === 'Display Options' ? getRackDisplayName(modalProduct.img) : getProductName(modalProduct.img)}
-            </div>
-            {/* Main 2-column grid */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)',
-                gap: '2.5rem',
-                width: '100%',
-                alignItems: 'stretch',
-                boxSizing: 'border-box',
-                overflowX: 'hidden',
-              }}
-              className="modal-grid"
-            >
-              {/* Left: Product Image, vertically centered */}
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-                minHeight: '320px',
-                width: '100%',
-                maxWidth: '100%',
-                boxSizing: 'border-box',
-              }}>
-                <img
-                  src={process.env.PUBLIC_URL + `/${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${modalProduct.imagePath}`}
-                  alt={modalProduct.img}
-                  style={{
-                    width: '100%',
-                    maxWidth: '340px',
-                    height: 'auto',
-                    objectFit: 'contain',
-                    borderRadius: 'var(--radius)',
-                    border: '1px solid var(--color-border)',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                  }}
-                />
-              </div>
-              {/* Right: Select Options and Notes */}
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                width: '100%',
-                maxWidth: '420px',
-                gap: '2.5rem',
-                minWidth: 0,
-                position: 'relative',
-                boxSizing: 'border-box',
-              }}>
-                {/* Select Options Section */}
-                <div style={{ width: '100%' }}>
-                  <div style={{
-                    fontWeight: 700,
-                    fontSize: '1.1rem',
-                    marginBottom: '1.25rem',
-                    color: 'var(--color-primary)',
-                    letterSpacing: '0.01em',
-                  }}>
-                    Select Options
-                  </div>
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1.25rem',
-                    width: '100%'
-                  }}>
-                    {(() => {
-                      if (!modalProduct) return null;
-                      const { img, imagePath } = modalProduct;
-                      // Tie-dye special case
-                      const tieDyeImages = [
-                        'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-                        'M100482538 SHHODC Hover DTF on Black or Forest .png',
-                        'M100437896 SHOUDC Over Under DTF on Forest.png',
-                        'M102595496 SH2FDC Custom DTF on Maroon .png',
-                      ];
-                      const isTieDye = tieDyeImages.includes(img);
-                      const filteredShirtVersions = isTieDye && category.shirtVersions
-                        ? category.shirtVersions.filter(v => v !== 'crewneck')
-                        : category.shirtVersions;
-                      const cardProps = {
-                        categoryPath: category.path,
-                        imageName: img,
-                        hideImage: true,
-                        college,
-                        dropdownStyle: {
-                          width: '100%',
-                          minWidth: '120px',
-                          padding: '0.5rem 1rem',
-                          border: '1.5px solid var(--color-border)',
-                          borderRadius: 'var(--radius)',
-                          fontSize: '1rem',
-                          background: 'var(--color-input-bg)',
-                          textAlign: 'left',
-                          transition: 'border-color 0.2s, box-shadow 0.2s',
-                        },
-                        labelStyle: {
-                          fontWeight: 600,
-                          color: 'var(--color-primary)',
-                          marginBottom: 4,
-                          display: 'block',
-                          fontSize: '1rem',
-                        },
-                        inputWrapperStyle: {
-                          marginBottom: '0.5rem',
-                        },
-                      };
-                      if (category.hasDisplayOptions) {
-                        const displayOption = displayOptions[imagePath] || { displayOnly: '', displayStandardCasePack: '' };
-                        return (
-                          <DisplayOptionCard
-                            {...cardProps}
-                            displayOption={displayOption}
-                            onDisplayOptionChange={onDisplayOptionChange}
-                          />
-                        );
-                      } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
-                        const comboVersion = shirtColorComboVersions[imagePath] || {};
-                        return (
-                          <ShirtColorVersionCard
-                            {...cardProps}
-                            shirtColorComboVersion={comboVersion}
-                            availableVersions={filteredShirtVersions}
-                            availableColors={category.colorVersions}
-                            onShirtColorComboChange={onShirtColorComboChange}
-                          />
-                        );
-                      } else if (hasColorVersions(img)) {
-                        const colorVersion = colorVersions[imagePath] || { black: '', forest: '', white: '', gray: '' };
-                        return (
-                          <ColorVersionCard
-                            {...cardProps}
-                            colorVersions={colorVersion}
-                            availableColors={category.colorVersions}
-                            onColorVersionChange={onColorVersionChange}
-                          />
-                        );
-                      } else if (category.hasShirtVersions) {
-                        const shirtVersion = shirtVersions[imagePath] || { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' };
-                        return (
-                          <ShirtVersionCard
-                            {...cardProps}
-                            shirtVersions={shirtVersion}
-                            availableVersions={filteredShirtVersions}
-                            onShirtVersionChange={onShirtVersionChange}
-                          />
-                        );
-                      } else {
-                        const quantity = quantities[imagePath] || '';
-                        return (
-                          <ProductCard
-                            {...cardProps}
-                            categoryName={category.name}
-                            quantity={quantity}
-                            onQuantityChange={onQuantityChange}
-                            sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' ? (sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) : undefined}
-                            onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
-                          />
-                        );
-                      }
-                    })()}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Responsive styles */}
-            <style>{`
-              @media (max-width: 800px) {
-                .modal-grid {
-                  grid-template-columns: 1fr !important;
-                  gap: 1.5rem !important;
-                  overflow-x: hidden !important;
-                }
-                .modal-title {
-                  text-align: center !important;
-                  font-size: 1.3rem !important;
-                  position: static !important;
-                  padding: 1rem 0 !important;
-                }
-              }
-              select:focus {
-                border-color: var(--color-primary) !important;
-                box-shadow: 0 0 0 2px rgba(22,101,52,0.15);
-              }
-              select:hover {
-                border-color: var(--color-primary) !important;
-              }
-            `}</style>
-          </div>
-        </div>
-      )}
+
+      {/* Global Styles for Expandable Cards */}
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-20px);
+            padding-top: 0;
+            padding-bottom: 0;
+          }
+          to {
+            opacity: 1;
+            max-height: 800px;
+            transform: translateY(0);
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+          }
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .product-card {
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .product-card.expanded {
+          background: #ffffff; /* keep card white */
+          transform: scale(1.02); /* subtle enlargement */
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* stronger highlight */
+          border: 2px solid #cbd5e1; /* subtle border to show selection */
+          transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+        }
+        
+        .expandable-content {
+          transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .expandable-content > div {
+          animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+          .product-card {
+            margin-bottom: 0.5rem;
+          }
+        }
+        
+        /* Enhanced Focus styles */
+        select:focus,
+        input:focus {
+          border-color: var(--color-primary) !important;
+          box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1) !important;
+          outline: none !important;
+          transform: translateY(-1px);
+        }
+        
+        select:hover,
+        input:hover {
+          border-color: #9ca3af !important;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        /* Smooth transitions for all interactive elements */
+        select,
+        input,
+        button {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        
+        /* Card hover effects */
+        .product-card:not(.expanded):hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        /* Arrow button default */
+        .product-card button {
+          background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+          color: #64748b;
+        }
+
+        /* Arrow when expanded (darker grey) */
+        .product-card.expanded button {
+          background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+          color: #f9fafb !important;
+        }
+
+        /* Button hover effects */
+        button:hover {
+          transform: scale(1.05) !important;
+        }
+        
+        button:active {
+          transform: scale(0.95) !important;
+        }
+        
+        /* Configuration panel polish */
+        .config-panel {
+          background: #ffffff; /* keep panel white */
+          border: none; /* remove border */
+          border-radius: 0; /* remove border radius */
+        }
+
+        /* When expandable-content is also config-panel, keep rounded corners */
+        .expandable-content.config-panel {
+          border-top: none;
+        }
+
+        /* Do not let anything draw outside the card */
+        .product-card,
+        .expandable-content,
+        .config-panel {
+          overflow: hidden;
+        }
+
+        /* Ensure expandable content with config panel styling is visible */
+        .expandable-content.config-panel {
+          display: block;
+        }
+
+
+        /* Columns/controls must never exceed container width */
+        .field,
+        .field-label,
+        .field-control,
+        .field-control > * {
+          box-sizing: border-box;
+          max-width: 100%;
+        }
+
+        /* Title */
+        .config-title {
+          margin: 0 0 clamp(0.75rem, 2vw, 1.25rem) 0;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #1f2937;
+          text-align: center;
+          line-height: 1.2;
+          letter-spacing: -0.01em;
+        }
+
+        /* Each label/control row */
+        .field {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          padding: 8px 0;
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          margin-bottom: 16px;
+        }
+
+
+        /* Label text */
+        .field-label {
+          font-weight: 600;
+          color: #1f2937;
+          font-size: 0.875rem;
+          line-height: 1.2;
+          letter-spacing: -0.01em;
+          white-space: normal;            /* allow wrapping */
+          overflow-wrap: break-word;      /* wrap at word boundaries when possible */
+          word-break: normal;             /* do NOT break inside words/letters */
+        }
+
+        /* Control container: ensure same height and fluid width */
+        .field-control {
+          display: block;
+          width: 100%;
+        }
+
+        .field-control > * {
+          width: 100%;
+          min-width: 0;          /* critical with CSS grid so inputs don't overflow */
+          max-width: 100%;
+          min-height: 44px;
+          border: 2px solid #d1d5db;
+          border-radius: 8px;
+          padding: 8px 12px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          background: #fff;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+          box-sizing: border-box;
+          display: block;
+          visibility: visible;
+          appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+        }
+
+        /* Custom dropdown arrow for select elements */
+        .field-control select {
+          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          background-size: 16px;
+          padding-right: 40px;
+        }
+
+        /* Focus & hover states */
+        .field-control > *:focus {
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1);
+          outline: none;
+          transform: translateY(-1px);
+        }
+
+        .field-control > *:hover {
+          border-color: #9ca3af;
+        }
+
+        /* Tighten small inputs (numeric qty) while keeping height */
+        .field-control input[type="number"],
+        .field-control input[type="text"] {
+          text-align: right;
+        }
+      `}</style>
     </section>
   );
 };
