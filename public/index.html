@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="/orderform/logo/opi-logo-no-bg.png" />
+    <link rel="icon" href="/logo/opi-logo-no-bg.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#166534" />
     <meta
@@ -12,8 +12,21 @@
     />
     <title>College Order Form</title>
     <script type="text/javascript">
-      // No special redirect handling needed for HashRouter
-      // HashRouter manages all routing via hash fragments
+      // Redirect to HashRouter base when accessing root directly
+      (function() {
+        var currentPath = window.location.pathname;
+        var currentHash = window.location.hash;
+        
+        // If we're at root without a hash, redirect to /#/
+        if (currentPath === '/' && !currentHash) {
+          window.location.replace('/#/');
+        }
+        // If we're at a deeper path, convert to hash
+        else if (currentPath !== '/' && !currentHash) {
+          var pathAfterRoot = currentPath.replace(/^\//, '');
+          window.location.replace('/#/' + pathAfterRoot);
+        }
+      })();
     </script>
   </head>
   <body>
