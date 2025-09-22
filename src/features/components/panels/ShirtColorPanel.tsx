@@ -1,6 +1,6 @@
 import React from 'react';
-import { getProductName, getImagePath, getVersionDisplayName, getColorDisplayName, getQuantityMultiples } from '../utils';
-import { ShirtColorComboVersion } from '../types';
+import { getProductName, getImagePath, getVersionDisplayName, getColorDisplayName, getQuantityMultiples } from '../../utils';
+import { ShirtColorComboVersion } from '../../../types';
 
 interface ShirtColorVersionCardProps {
   categoryPath: string;
@@ -127,7 +127,7 @@ const ShirtColorVersionCard: React.FC<ShirtColorVersionCardProps> = ({
             justifyContent: 'space-between'
           }}>
             <span>Total:</span>
-            <span>{Object.values(shirtColorComboVersion).reduce((sum, qty) => sum + Number(qty || 0), 0)}</span>
+            <span>{Object.values(shirtColorComboVersion).reduce((sum: number, qty) => sum + Number(qty || 0), 0) as React.ReactNode}</span>
           </div>
         </div>
       )}

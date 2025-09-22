@@ -9,6 +9,12 @@ export interface Category {
   hasDisplayOptions?: boolean; // New property for display options
 }
 
+export interface College {
+  name: string;
+  logo: string;
+  categories: Category[];
+}
+
 export interface ShirtVersion {
   tshirt: string;
   longsleeve?: string;

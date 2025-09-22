@@ -1,7 +1,7 @@
 import React from 'react';
-import { getProductName, getImagePath, getColorDisplayName, getQuantityMultiples } from '../utils';
-import { ColorVersion } from '../types';
-import { Field } from './ui';
+import { getProductName, getImagePath, getColorDisplayName, getQuantityMultiples } from '../../utils';
+import { ColorVersion } from '../../../types';
+import { Field } from '../../../components/ui';
 
 interface ColorVersionCardProps {
   categoryPath: string;
@@ -26,7 +26,7 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = getProductName(imageName);
-  const totalQuantity = Object.values(colorVersions).reduce((sum, qty) => sum + Number(qty || 0), 0);
+  const totalQuantity = Object.values(colorVersions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
 
   const handleColorChange = (color: keyof ColorVersion, value: string) => {
     onColorVersionChange?.(imagePath, color, value);
@@ -74,7 +74,7 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
                 <Field.Select
                   id={`${color}-${imagePath}`}
                   value={colorVersions[colorKey] || ''}
-                  onChange={(e) => handleColorChange(colorKey, e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleColorChange(colorKey, e.target.value)}
                   disabled={readOnly}
                 >
                   <option value="">Select</option>
@@ -119,7 +119,7 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
             justifyContent: 'space-between'
           }}>
             <span>Total:</span>
-            <span>{totalQuantity}</span>
+            <span>{totalQuantity as React.ReactNode}</span>
           </div>
         </div>
       )}

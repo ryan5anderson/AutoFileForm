@@ -1,6 +1,6 @@
 import React from 'react';
-import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../utils';
-import { SweatpantJoggerOption } from '../types';
+import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../../utils';
+import { SweatpantJoggerOption } from '../../../types';
 
 interface ProductCardProps {
   categoryPath: string;

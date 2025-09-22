@@ -1,6 +1,6 @@
 import React from 'react';
-import { DisplayOption } from '../types';
-import { getImagePath, getRackDisplayName } from '../utils';
+import { DisplayOption } from '../../../types';
+import { getImagePath, getRackDisplayName } from '../../utils';
 
 interface DisplayOptionCardProps {
   categoryPath: string;

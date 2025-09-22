@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, Category } from '../types';
-import { validateFormData, createTemplateParams } from '../utils';
-import { sendOrderEmail } from '../services/emailService';
+import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, Category } from '../../types';
+import { validateFormData, createTemplateParams } from '../utils/index';
+import { sendOrderEmail } from '../../services/emailService';
 
 export const useOrderForm = (categories: Category[]) => {
   const navigate = useNavigate();
@@ -45,11 +45,11 @@ export const useOrderForm = (categories: Category[]) => {
   }, [location.pathname, page]);
 
   const handleFormDataChange = (updates: Partial<FormData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev: FormData) => ({ ...prev, ...updates }));
   };
 
   const handleQuantityChange = (imagePath: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       quantities: {
         ...prev.quantities,
@@ -59,7 +59,7 @@ export const useOrderForm = (categories: Category[]) => {
   };
 
   const handleShirtVersionChange = (imagePath: string, version: keyof ShirtVersion, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       shirtVersions: {
         ...prev.shirtVersions,
@@ -72,7 +72,7 @@ export const useOrderForm = (categories: Category[]) => {
   };
 
   const handleColorVersionChange = (imagePath: string, color: keyof ColorVersion, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       colorVersions: {
         ...prev.colorVersions,
@@ -85,7 +85,7 @@ export const useOrderForm = (categories: Category[]) => {
   };
 
   const handleShirtColorComboChange = (imagePath: string, version: string, color: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       shirtColorComboVersions: {
         ...prev.shirtColorComboVersions,
@@ -98,7 +98,7 @@ export const useOrderForm = (categories: Category[]) => {
   };
 
   const handleDisplayOptionChange = (imagePath: string, option: keyof DisplayOption, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       displayOptions: {
         ...prev.displayOptions,
@@ -111,7 +111,7 @@ export const useOrderForm = (categories: Category[]) => {
   };
 
   const handleSweatpantJoggerOptionChange = (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       sweatpantJoggerOptions: {
         ...prev.sweatpantJoggerOptions,

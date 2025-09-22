@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, ColorVersion } from '../types';
-import { colleges } from '../constants/colleges';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, hasColorVersions, getColorDisplayName } from '../utils';
-import Header from './Header';
-import Footer from './Footer';
-import { useOrderForm } from '../hooks';
-import '../styles/college-pages.css';
+import { FormData, Category, ShirtVersion, ColorVersion } from '../../types';
+import { colleges } from '../../config';
+import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, hasColorVersions, getColorDisplayName } from '../../features/utils';
+import Header from '../layout/Header';
+import Footer from '../layout/Footer';
+import { useOrderForm } from '../../features/hooks';
+import '../../styles/college-pages.css';
 
 interface ReceiptPageProps {
   formData?: FormData;
@@ -383,7 +383,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 // Handle Color Versions
                 if (hasColorVersions(img)) {
                   const colorVersions = formData.colorVersions?.[imagePath];
-                  const totalQty = Object.values(colorVersions || {}).reduce((sum, qty) => sum + Number(qty || 0), 0);
+                  const totalQty = Object.values(colorVersions || {}).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
                   if (totalQty > 0) {
                     return (
                       <div key={img} style={{

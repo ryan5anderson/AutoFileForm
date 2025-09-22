@@ -1,7 +1,7 @@
 import React from 'react';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getQuantityMultiples } from '../utils';
-import { ShirtVersion } from '../types';
-import { Field } from './ui';
+import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getQuantityMultiples } from '../../utils';
+import { ShirtVersion } from '../../../types';
+import { Field } from '../../../components/ui';
 
 interface ShirtVersionCardProps {
   categoryPath: string;
@@ -74,7 +74,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
                 <Field.Select
                   id={`${version}-${imagePath}`}
                   value={shirtVersions[versionKey] || ''}
-                  onChange={(e) => handleVersionChange(versionKey, e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleVersionChange(versionKey, e.target.value)}
                   disabled={readOnly}
                 >
                   <option value="">Select</option>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getImagePath, getShirtVersionTotal, hasColorVersions } from '../utils';
-import { ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../types';
+import { ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
 
 interface OrderSummaryCardProps {
   categoryPath: string;
@@ -43,7 +43,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
     if (tieDyeImages.includes(imageName)) {
       const comboVersions = shirtColorComboVersions[imagePath];
       if (comboVersions) {
-        const totalQty = Object.values(comboVersions).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        const totalQty = Object.values(comboVersions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
         if (totalQty > 0) {
           return { total: totalQty, details: 'Tie-dye variants' };
         }
@@ -74,7 +74,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
     if (categoryName === 'Sweatpants/Joggers') {
       const sjOptions = sweatpantJoggerOptions[imagePath];
       if (sjOptions) {
-        const totalQty = Object.values(sjOptions).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        const totalQty = Object.values(sjOptions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
         if (totalQty > 0) {
           const details = [];
           if (sjOptions.sweatpantSteel && Number(sjOptions.sweatpantSteel) > 0) {
@@ -99,7 +99,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
     if (hasColorVersions(imageName)) {
       const colorVersion = colorVersions[imagePath];
       if (colorVersion) {
-        const totalQty = Object.values(colorVersion).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        const totalQty = Object.values(colorVersion).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
         if (totalQty > 0) {
           const details = [];
           if (colorVersion.black && Number(colorVersion.black) > 0) {
@@ -175,20 +175,22 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
       zIndex: 1,
       opacity: 0.9
     }}>
-      <div style={{ fontWeight: '600', marginBottom: '2px' }}>
-        Qty: {quantityInfo.total}
-      </div>
-      {quantityInfo.details !== 'Quantity' && (
-        <div style={{ 
-          fontSize: '0.65rem', 
-          opacity: 0.9,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}>
-          {quantityInfo.details}
+      <>
+        <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+          Qty: {quantityInfo.total}
         </div>
-      )}
+        {quantityInfo.details !== 'Quantity' && (
+          <div style={{ 
+            fontSize: '0.65rem', 
+            opacity: 0.9,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}>
+            {quantityInfo.details}
+          </div>
+        )}
+      </>
     </div>
   );
 };

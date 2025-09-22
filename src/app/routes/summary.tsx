@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { FormData, Category } from '../types';
-import { colleges } from '../constants/colleges';
-import CategorySection from './CategorySection';
-import Header from './Header';
-import Footer from './Footer';
-import { useOrderForm } from '../hooks';
-import '../styles/college-pages.css';
+import { FormData, Category } from '../../types';
+import { colleges } from '../../config';
+import CategorySection from '../../features/components/CategorySection';
+import Header from '../layout/Header';
+import Footer from '../layout/Footer';
+import { useOrderForm } from '../../features/hooks';
+import '../../styles/college-pages.css';
 
 interface SummaryPageProps {
   formData?: FormData;

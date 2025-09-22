@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Category, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../types';
-import ProductCard from './ProductCard';
-import ShirtVersionCard from './ShirtVersionCard';
-import ColorVersionCard from './ColorVersionCard';
-import ShirtColorVersionCard from './ShirtColorVersionCard';
-import DisplayOptionCard from './DisplayOptionCard';
+import { Category, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
+import ProductCard from './panels/QuantityPanel';
+import ShirtVersionCard from './panels/ShirtVersionPanel';
+import ColorVersionCard from './panels/ColorVersionPanel';
+import ShirtColorVersionCard from './panels/ShirtColorPanel';
+import DisplayOptionCard from './panels/DisplayOptionsPanel';
 import OrderSummaryCard from './OrderSummaryCard';
-import { Card, ButtonIcon } from './ui';
+import { Card, ButtonIcon } from '../../components/ui';
 import { getImagePath, hasColorVersions, getProductName, getRackDisplayName, getShirtVersionTotal } from '../utils';
 
 interface CategorySectionProps {
@@ -73,7 +73,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     if (tieDyeImages.includes(imageName)) {
       const comboVersions = shirtColorComboVersions[imagePath];
       if (comboVersions) {
-        const totalQty = Object.values(comboVersions).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        const totalQty = Object.values(comboVersions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
         return totalQty > 0;
       }
       return false;
@@ -93,7 +93,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     if (category.name === 'Sweatpants/Joggers') {
       const sjOptions = sweatpantJoggerOptions[imagePath];
       if (sjOptions) {
-        const totalQty = Object.values(sjOptions).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        const totalQty = Object.values(sjOptions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
         return totalQty > 0;
       }
       return false;
@@ -103,7 +103,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     if (hasColorVersions(imageName)) {
       const colorVersion = colorVersions[imagePath];
       if (colorVersion) {
-        const totalQty = Object.values(colorVersion).reduce((sum, qty) => sum + Number(qty || 0), 0);
+        const totalQty = Object.values(colorVersion).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
         return totalQty > 0;
       }
       return false;
@@ -125,7 +125,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   };
 
   // Filter images to only show those with quantities in read-only mode
-  const filteredImages = category.images.filter((img) => {
+  const filteredImages = category.images.filter((img: string) => {
     if (!readOnly) return true; // Show all items in form mode
     const imagePath = getImagePath(category.path, img);
     return hasQuantity(imagePath, img);
@@ -164,7 +164,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         </div>
       )}
       <div className="section__grid">
-        {filteredImages.map((img) => {
+        {filteredImages.map((img: string) => {
           const imagePath = getImagePath(category.path, img);
           const isExpanded = expandedCards.has(imagePath);
           
@@ -174,7 +174,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
               expanded={isExpanded}
             >
               <Card.Header
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
                   e.stopPropagation();
                   if (!readOnly) {
@@ -203,7 +203,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 {!readOnly && (
                   <ButtonIcon
                     expanded={isExpanded}
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                       e.preventDefault();
                       e.stopPropagation();
                       toggleCardExpansion(imagePath);
@@ -246,7 +246,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                         ];
                         const isTieDye = tieDyeImages.includes(img);
                         const filteredShirtVersions = isTieDye && category.shirtVersions
-                          ? category.shirtVersions.filter(v => v !== 'crewneck')
+                          ? category.shirtVersions.filter((v: string) => v !== 'crewneck')
                           : category.shirtVersions;
                         const cardProps = {
                           categoryPath: category.path,

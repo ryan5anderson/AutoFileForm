@@ -1,16 +1,2 @@
-export { default as ProductCard } from './ProductCard';
-export { default as CategorySection } from './CategorySection';
-export { default as DisplayOptionCard } from './DisplayOptionCard';
-export { default as StoreInfoForm } from './StoreInfoForm';
-export { default as FormPage } from './FormPage';
-export { default as SummaryPage } from './SummaryPage';
-export { default as ReceiptPage } from './ReceiptPage';
-export { default as ShirtVersionCard } from './ShirtVersionCard';
-export { default as ColorVersionCard } from './ColorVersionCard';
-export { default as ShirtColorVersionCard } from './ShirtColorVersionCard';
-export { default as ThankYouPage } from './ThankYouPage';
-export { default as OrderNotesSection } from './OrderNotesSection';
-export { default as Header } from './Header';
-export { default as Footer } from './Footer';
 export { default as CollegeSelector } from './CollegeSelector';
-export { default as CollapsibleSidebar } from './CollapsibleSidebar'; 
+export { default as OrderFormPage } from './OrderFormPage';

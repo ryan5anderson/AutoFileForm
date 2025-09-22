@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { colleges } from '../constants/colleges';
+import { colleges } from '../config';
 import './CollegeSelector.css';
 
 const CollegeSelector: React.FC = () => {
