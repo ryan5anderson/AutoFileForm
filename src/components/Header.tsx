@@ -2,10 +2,16 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
-  showBackButton?: boolean;
+  showSidebarToggle?: boolean;
+  onSidebarToggle?: () => void;
+  showBackButton?: boolean; // Legacy prop for backward compatibility
 }
 
-const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  showSidebarToggle = false, 
+  onSidebarToggle,
+  showBackButton = false 
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -13,7 +19,8 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
     navigate('/');
   };
 
-  const shouldShowBackButton = showBackButton || (location.pathname !== '/' && location.hash !== '#/');
+  // Show back button if legacy prop is used and no sidebar toggle is provided
+  const shouldShowBackButton = showBackButton && !showSidebarToggle;
   return (
     <header style={{
       background: 'var(--color-bg)',
@@ -35,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
         flexWrap: 'wrap',
         marginBottom: 'var(--space-3)'
       }}>
-        {/* Left side - Back Button and Campus Traditions */}
+        {/* Left side - Sidebar Toggle and Campus Traditions */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -43,6 +50,39 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false }) => {
           minWidth: 0,
           gap: 'var(--space-3)'
         }}>
+          {showSidebarToggle && (
+            <button
+              onClick={onSidebarToggle}
+              style={{
+                background: 'none',
+                border: '1px solid var(--color-border)',
+                borderRadius: '6px',
+                padding: 'var(--space-2) var(--space-3)',
+                cursor: 'pointer',
+                color: 'var(--color-text)',
+                fontSize: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                transition: 'all 0.2s ease',
+                minWidth: '44px',
+                justifyContent: 'center'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--color-primary)';
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.borderColor = 'var(--color-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'none';
+                e.currentTarget.style.color = 'var(--color-text)';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+              }}
+              aria-label="Open navigation menu"
+            >
+              ☰
+            </button>
+          )}
           {shouldShowBackButton && (
             <button
               onClick={handleBackClick}

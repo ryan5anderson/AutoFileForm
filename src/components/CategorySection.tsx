@@ -26,16 +26,6 @@ interface CategorySectionProps {
   college?: string;
 }
 
-// Local layout helper for consistent label/control rows
-const FormField: React.FC<{ 
-  label: React.ReactNode; 
-  children: React.ReactNode; 
-}> = ({ label, children }) => (
-  <div className="field">
-    <div className="field-label">{label}</div>
-    <div className="field-control">{children}</div>
-  </div>
-);
 
 const CategorySection: React.FC<CategorySectionProps> = ({
   category,
@@ -145,8 +135,16 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     return null;
   }
 
+  const getSectionId = (categoryName: string) => {
+    return categoryName.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
+  };
+
   return (
-    <section className="category-section">
+    <section 
+      id={getSectionId(category.name)}
+      className="category-section"
+      style={{ scrollMarginTop: '120px' }}
+    >
       <h3>{category.name}</h3>
       {category.hasDisplayOptions && (
         <div style={{

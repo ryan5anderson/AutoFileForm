@@ -12,4 +12,5 @@ export { default as ThankYouPage } from './ThankYouPage';
 export { default as OrderNotesSection } from './OrderNotesSection';
 export { default as Header } from './Header';
 export { default as Footer } from './Footer';
-export { default as CollegeSelector } from './CollegeSelector'; 
+export { default as CollegeSelector } from './CollegeSelector';
+export { default as CollapsibleSidebar } from './CollapsibleSidebar'; 
