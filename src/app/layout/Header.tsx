@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   showSidebarToggle?: boolean;
@@ -13,7 +13,6 @@ const Header: React.FC<HeaderProps> = ({
   showBackButton = false 
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleBackClick = () => {
     navigate('/');

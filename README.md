@@ -1,18 +1,25 @@
 # AutoFileForm - College Merchandise Order System
 
-A React-based order form system for college retail stores to create and submit product orders with complex product variations.
+A React-based order form system for college retail stores to create and submit product orders with complex product variations. The application has been recently refactored from a monolithic structure into a modular, feature-based architecture.
 
 ## Features
 - Multi-college support (Michigan State, Arizona State)
 - Complex product variations (shirts, colors, display options)
 - Automatic email generation and sending
 - Responsive design with college-specific theming
+- Feature-based modular architecture
+- TypeScript throughout with strong type safety
+- Modern React patterns with hooks and context
 
-## Architecture
-- **State Management**: React useState (considering Zustand migration)
-- **Routing**: React Router with college-based routing
-- **Email**: EmailJS integration
-- **Styling**: CSS custom properties for theming
+## Technology Stack
+- **Frontend Framework**: React 19.1.0 with TypeScript 4.9.5
+- **Routing**: React Router DOM 7.7.0 
+- **State Management**: React useState with custom hooks (Zustand 5.0.6 available)
+- **Email Service**: EmailJS 3.2.0
+- **Styling**: CSS Custom Properties with CSS Modules
+- **Build Tool**: Create React App
+- **Testing**: React Testing Library
+- **Deployment**: GitHub Pages
 
 ## Development
 - `npm start` - Development server
@@ -41,13 +48,70 @@ A React-based order form system for college retail stores to create and submit p
 - **Thank You**: `http://localhost:3000/orderform/#/michiganstate/thankyou`
 
 ## Project Structure
+
+The project has been refactored into a feature-based architecture that promotes maintainability and scalability:
+
 ```
 src/
-├── components/          # React components
-├── constants/           # Configuration and constants
-├── hooks/              # Custom React hooks
+├── app/                 # Application shell and routing
+│   ├── layout/         # Layout components (Header, Footer, Sidebar)
+│   └── routes/         # Route components (form, summary, receipt, thankyou)
+├── components/          # Shared UI components
+│   ├── ui/             # Reusable UI primitives (Card, Field, Button)
+│   ├── CollegeSelector.tsx
+│   └── OrderFormPage.tsx
+├── config/             # Configuration files
+│   ├── colleges/       # College-specific JSON configurations
+│   └── index.ts        # Configuration loader
+├── features/           # Feature-based modules
+│   ├── components/     # Feature-specific components
+│   │   ├── panels/     # Product option panels
+│   │   ├── CategorySection.tsx
+│   │   ├── StoreInfoForm.tsx
+│   │   └── OrderSummaryCard.tsx
+│   ├── hooks/          # Feature-specific hooks
+│   │   └── useOrderForm.ts
+│   └── utils/          # Feature-specific utilities
+│       ├── calculations.ts
+│       ├── imagePath.ts
+│       ├── naming.ts
+│       └── emailTemplate.ts
 ├── services/           # External service integrations
+│   ├── emailService.ts
+│   └── templates/      # Email templates
 ├── types/              # TypeScript type definitions
-├── utils/              # Utility functions
-└── styles/             # CSS and styling
+├── utils/              # Shared utility functions
+│   ├── format.ts
+│   ├── guard.ts
+│   └── index.ts
+├── styles/             # CSS styling
+│   ├── tokens.css      # Design tokens
+│   ├── components.css  # Component styles
+│   ├── global.css      # Global styles
+│   └── college-pages.css
+└── constants/          # Application constants
 ```
+
+## Architecture Highlights
+
+### Feature-Based Organization
+The codebase has been restructured from a monolithic component structure to a feature-based architecture:
+
+- **Separation of Concerns**: Domain logic, UI components, and utilities are properly separated
+- **Modular Design**: Features are self-contained with their own components, hooks, and utilities
+- **Scalability**: Easy to add new colleges, products, or features without affecting existing code
+- **Maintainability**: Clear boundaries between different parts of the application
+
+### Key Architectural Decisions
+
+1. **Configuration-Driven**: College configurations moved to JSON files for easier management
+2. **Type Safety**: Strong TypeScript integration throughout the application
+3. **Reusable Components**: UI primitives in `components/ui/` for consistent design
+4. **Custom Hooks**: Business logic encapsulated in `useOrderForm` hook
+5. **Service Layer**: External integrations isolated in services directory
+6. **CSS Custom Properties**: Dynamic theming based on college selection
+
+### State Management
+- **Primary**: React useState with custom hooks pattern
+- **Benefits**: Simple, predictable state flow without external dependencies
+- **Future**: Zustand available for more complex state needs as the app grows
