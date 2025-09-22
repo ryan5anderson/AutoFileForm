@@ -48,8 +48,17 @@ const OrderFormPage: React.FC = () => {
     handleConfirm
   } = useOrderForm(categories);
 
+  // Debug info - let's see what's happening
+  console.log('OrderFormPage - college:', college, 'collegeConfig:', collegeConfig, 'location:', location.pathname);
+
   if (!collegeConfig) {
-    return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>College not found</div>;
+    return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>
+      College not found: "{college}"
+      <br />
+      Available colleges: arizonastate, michiganstate
+      <br />
+      Current path: {location.pathname}
+    </div>;
   }
 
   if (isSummaryPage) {

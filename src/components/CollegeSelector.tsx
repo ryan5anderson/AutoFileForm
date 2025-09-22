@@ -6,7 +6,11 @@ import './CollegeSelector.css';
 const CollegeSelector: React.FC = () => {
   const navigate = useNavigate();
 
+  // Debug info
+  console.log('CollegeSelector rendering - current URL:', window.location.href);
+
   const handleCollegeSelect = (collegeKey: string) => {
+    console.log('CollegeSelector - navigating to:', collegeKey);
     navigate(`/${collegeKey}`);
   };
 
