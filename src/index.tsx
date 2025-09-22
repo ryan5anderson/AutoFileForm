@@ -7,9 +7,15 @@ import './styles/global.css';
 import './styles/tokens.css';
 import './styles/components.css';
 
-// GitHub Pages SPA script in index.html handles path redirects
+// HashRouter handles all routing via hash fragments, compatible with GitHub Pages
+
+console.log('React app starting...');
+console.log('Current URL:', window.location.href);
+console.log('Hash:', window.location.hash);
 
 const root = document.getElementById('root');
+console.log('Root element found:', !!root);
+
 if (root) {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
@@ -24,4 +30,7 @@ if (root) {
       </HashRouter>
     </React.StrictMode>
   );
+  console.log('React app rendered');
+} else {
+  console.error('Root element not found!');
 }

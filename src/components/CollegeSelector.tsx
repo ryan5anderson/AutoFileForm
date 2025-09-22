@@ -5,8 +5,12 @@ import './CollegeSelector.css';
 
 const CollegeSelector: React.FC = () => {
   const navigate = useNavigate();
+  
+  console.log('CollegeSelector rendering');
+  console.log('Colleges config:', colleges);
 
   const handleCollegeSelect = (collegeKey: string) => {
+    console.log('Navigating to:', collegeKey);
     navigate(`/${collegeKey}`);
   };
 
