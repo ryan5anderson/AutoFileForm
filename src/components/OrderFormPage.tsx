@@ -53,6 +53,7 @@ const OrderFormPage: React.FC = () => {
     handleSizeCountsChange,
     handleColorVersionChange,
     handleShirtColorComboChange,
+    handleShirtColorComboSizeCountsChange,
     handleDisplayOptionChange,
     handleSweatpantJoggerOptionChange,
     handleFormSubmit,
@@ -101,6 +102,7 @@ const OrderFormPage: React.FC = () => {
       onDisplayOptionChange={handleDisplayOptionChange}
       onSweatpantJoggerOptionChange={handleSweatpantJoggerOptionChange}
       onShirtColorComboChange={handleShirtColorComboChange}
+      onShirtColorComboSizeCountsChange={handleShirtColorComboSizeCountsChange}
       onSubmit={handleFormSubmit}
       error={error}
       collegeConfig={collegeConfig}

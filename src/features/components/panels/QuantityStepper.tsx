@@ -5,17 +5,19 @@ interface QuantityStepperProps {
   onChange: (value: number) => void;
   disabled?: boolean;
   ariaLabel?: string;
+  step?: number;
 }
 
-const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disabled = false, ariaLabel }) => {
+const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disabled = false, ariaLabel, step = 1 }) => {
   const handleDelta = (d: number) => {
-    const next = Math.max(0, value + d);
+    const next = Math.max(0, value + d * step);
     onChange(next);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const n = Math.max(0, Number(e.target.value.replace(/[^0-9]/g, '')) || 0);
-    onChange(n);
+    const raw = Math.max(0, Number(e.target.value.replace(/[^0-9]/g, '')) || 0);
+    const adjusted = step > 1 ? Math.floor(raw / step) * step : raw;
+    onChange(adjusted);
   };
 
   return (

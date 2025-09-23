@@ -27,6 +27,7 @@ interface FormPageProps {
   onSubmit: (e: React.FormEvent) => void;
   error: string | null;
   onShirtColorComboChange: (imagePath: string, version: string, color: string, value: string) => void;
+  onShirtColorComboSizeCountsChange?: (imagePath: string, version: string, color: string, counts: SizeCounts) => void;
   collegeConfig?: CollegeConfig;
   college?: string;
 }
@@ -43,6 +44,7 @@ const FormPage: React.FC<FormPageProps> = ({
   onSubmit,
   error,
   onShirtColorComboChange,
+  onShirtColorComboSizeCountsChange,
   collegeConfig,
   college
 }) => {
@@ -153,6 +155,7 @@ const FormPage: React.FC<FormPageProps> = ({
               shirtSizeCounts={formData.shirtSizeCounts}
               colorVersions={formData.colorVersions}
               shirtColorComboVersions={formData.shirtColorComboVersions}
+              shirtColorComboSizeCounts={formData.shirtColorComboSizeCounts}
               displayOptions={formData.displayOptions}
               sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
               onQuantityChange={onQuantityChange}
@@ -160,6 +163,7 @@ const FormPage: React.FC<FormPageProps> = ({
               onSizeCountsChange={onSizeCountsChange}
               onColorVersionChange={onColorVersionChange}
               onShirtColorComboChange={onShirtColorComboChange}
+              onShirtColorComboSizeCountsChange={onShirtColorComboSizeCountsChange}
               onDisplayOptionChange={onDisplayOptionChange}
               onSweatpantJoggerOptionChange={onSweatpantJoggerOptionChange}
               college={college}

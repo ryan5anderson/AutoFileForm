@@ -63,6 +63,8 @@ export interface FormData {
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
   // imagePath -> version -> SizeCounts
   shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>;
+  // imagePath -> (version_color) -> SizeCounts for tie-dye combos
+  shirtColorComboSizeCounts?: Record<string, Record<string, SizeCounts>>;
 }
 
 export interface EmailCategory {

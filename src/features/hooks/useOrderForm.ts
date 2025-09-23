@@ -21,6 +21,7 @@ export const useOrderForm = (categories: Category[]) => {
     displayOptions: {} as Record<string, DisplayOption>,
     sweatpantJoggerOptions: {} as Record<string, SweatpantJoggerOption>,
     shirtSizeCounts: {} as Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>,
+    shirtColorComboSizeCounts: {} as Record<string, Record<string, SizeCounts>>,
   });
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>('form');
@@ -111,6 +112,20 @@ export const useOrderForm = (categories: Category[]) => {
     }));
   };
 
+  const handleShirtColorComboSizeCountsChange = (imagePath: string, version: string, color: string, counts: SizeCounts) => {
+    const comboKey = `${version}_${color}`;
+    setFormData((prev: FormData) => ({
+      ...prev,
+      shirtColorComboSizeCounts: {
+        ...prev.shirtColorComboSizeCounts,
+        [imagePath]: {
+          ...(prev.shirtColorComboSizeCounts?.[imagePath] || {}),
+          [comboKey]: counts,
+        },
+      },
+    }));
+  };
+
   const handleDisplayOptionChange = (imagePath: string, option: keyof DisplayOption, value: string) => {
     setFormData((prev: FormData) => ({
       ...prev,
@@ -142,6 +157,11 @@ export const useOrderForm = (categories: Category[]) => {
     // Pack-of-7 validation for shirt size counts
     const hasInvalidPack = Object.values(formData.shirtSizeCounts || {}).some((byVersion) => {
       return Object.values(byVersion || {}).some((counts) => {
+        const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+        return total > 0 && total % 7 !== 0;
+      });
+    }) || Object.values(formData.shirtColorComboSizeCounts || {}).some((byCombo) => {
+      return Object.values(byCombo || {}).some((counts) => {
         const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
         return total > 0 && total % 7 !== 0;
       });
@@ -220,6 +240,7 @@ export const useOrderForm = (categories: Category[]) => {
     handleSizeCountsChange,
     handleColorVersionChange,
     handleShirtColorComboChange,
+    handleShirtColorComboSizeCountsChange,
     handleDisplayOptionChange,
     handleSweatpantJoggerOptionChange,
     handleFormSubmit,

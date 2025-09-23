@@ -19,20 +19,29 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
       const name = img.replace(/\.(png|jpg)$/, ''); // Full product name
       
       if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
-        // Special case for shirt with both versions and colors (color-major order)
-        const comboVersions = formData.shirtColorComboVersions?.[imagePath];
-        if (comboVersions && cat.colorVersions && cat.shirtVersions) {
+        // Special case for tie-dye with version+color and size counts
+        const byCombo = formData.shirtColorComboSizeCounts?.[imagePath];
+        if (byCombo && cat.colorVersions && cat.shirtVersions) {
           for (const color of cat.colorVersions) {
             for (const version of cat.shirtVersions) {
               const comboKey = `${version}_${color}`;
-              const value = comboVersions[comboKey];
-              if (value && value.trim() !== '' && Number(value) > 0) {
+              const counts = byCombo[comboKey];
+              const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
+              if (vTotal > 0) {
                 const versionName = getVersionDisplayName(version, img);
                 const colorName = getColorDisplayName(color);
+                const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','S/M','L/XL'];
+                const sizePieces = counts ? sizeOrder
+                  .map(sz => {
+                    const val = counts[sz] || 0;
+                    return val > 0 ? `${sz}${val}` : '';
+                  })
+                  .filter(Boolean)
+                  .join(' ') : '';
                 categoryItems.push({
                   sku,
-                  name: `${name} (${versionName} ${colorName})`,
-                  qty: value,
+                  name: `${name} (${versionName} ${colorName}${sizePieces ? ` - ${sizePieces}` : ''})`,
+                  qty: String(vTotal),
                   version
                 });
               }

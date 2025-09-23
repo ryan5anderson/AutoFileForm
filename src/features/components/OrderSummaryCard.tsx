@@ -11,6 +11,8 @@ interface OrderSummaryCardProps {
   shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>;
   colorVersions?: Record<string, ColorVersion>;
   shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
+  // imagePath -> comboKey -> SizeCounts (tie-dye)
+  shirtColorComboSizeCounts?: Record<string, Record<string, SizeCounts>>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
   college?: string;
@@ -26,6 +28,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   shirtSizeCounts = {},
   colorVersions = {},
   shirtColorComboVersions = {},
+  shirtColorComboSizeCounts = {},
   displayOptions = {},
   sweatpantJoggerOptions = {},
   college,
@@ -43,12 +46,11 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
     ];
     
     if (tieDyeImages.includes(imageName)) {
-      const comboVersions = shirtColorComboVersions[imagePath];
-      if (comboVersions) {
-        const totalQty = Object.values(comboVersions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-        if (totalQty > 0) {
-          return { total: totalQty, details: 'Tie-dye variants' };
-        }
+      const byCombo = shirtColorComboSizeCounts[imagePath] || {};
+      const totals = Object.values(byCombo).map((c) => Object.values(c || {}).reduce((a:number,b:number)=>a+b,0));
+      const totalQty = totals.reduce((a,b)=>a+b,0);
+      if (totalQty > 0) {
+        return { total: totalQty, details: 'Tie-dye variants' };
       }
       return null;
     }

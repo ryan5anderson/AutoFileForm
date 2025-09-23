@@ -1,7 +1,9 @@
 import React from 'react';
-import { getProductName, getImagePath, getVersionDisplayName, getColorDisplayName, getQuantityMultiples } from '../../utils';
-import { ShirtColorComboVersion } from '../../../types';
+import { getProductName, getImagePath, getVersionDisplayName, getColorDisplayName } from '../../utils';
+import { ShirtColorComboVersion, SizeCounts, Size } from '../../../types';
 import { asset } from '../../../utils/asset';
+import QuantityStepper from './QuantityStepper';
+import SizePackSelector from './SizePackSelector';
 
 interface ShirtColorVersionCardProps {
   categoryPath: string;
@@ -10,6 +12,7 @@ interface ShirtColorVersionCardProps {
   availableVersions?: string[];
   availableColors?: string[];
   onShirtColorComboChange?: (imagePath: string, version: string, color: string, value: string) => void;
+  onShirtColorComboSizeCountsChange?: (imagePath: string, version: string, color: string, counts: SizeCounts) => void;
   readOnly?: boolean;
   hideImage?: boolean;
   college?: string;
@@ -22,6 +25,7 @@ const ShirtColorVersionCard: React.FC<ShirtColorVersionCardProps> = ({
   availableVersions = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'],
   availableColors = ['black', 'forest'],
   onShirtColorComboChange,
+  onShirtColorComboSizeCountsChange,
   readOnly = false,
   hideImage = false,
   college
@@ -71,24 +75,35 @@ const ShirtColorVersionCard: React.FC<ShirtColorVersionCardProps> = ({
       {availableColors.map(color => (
         availableVersions.map(version => {
           const comboKey = getComboKey(version, color);
+          const counts: SizeCounts = (shirtColorComboVersion[comboKey] as any) as SizeCounts; // legacy value may exist as string; prefer size counts via prop
+          const safeCounts: SizeCounts = counts && typeof counts === 'object' ? counts : ({ S: 0, M: 0, L: 0, XL: 0, XXL: 0 } as Record<Size, number>);
           return (
             <div key={comboKey} className="field">
               <div className="field-label">
                 {getVersionDisplayName(version, imageName)} {getColorDisplayName(color)}
               </div>
-              <div className="field-control">
-                <select
-                  id={`${comboKey}-${imagePath}`}
-                  value={shirtColorComboVersion[comboKey] || ''}
-                  onChange={e => handleComboChange(version, color, e.target.value)}
-                  disabled={readOnly}
-                >
-                  <option value="">Select</option>
-                  {getQuantityMultiples(imageName, categoryPath).map(val => (
-                    <option key={val} value={val}>{val}</option>
-                  ))}
-                </select>
-              </div>
+              {!readOnly && (
+                <SizePackSelector
+                  counts={safeCounts}
+                  onChange={(c) => onShirtColorComboSizeCountsChange?.(imagePath, version, color, c)}
+                />
+              )}
+              {readOnly && (
+                <div style={{ 
+                  fontSize: '0.875rem',
+                  padding: 'var(--space-2)',
+                  background: 'var(--color-bg)',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--color-border)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Sizes</span>
+                    <span style={{ fontWeight: 600 }}>
+                      {Object.values(safeCounts).reduce((a: number, b: number) => a + b, 0)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })

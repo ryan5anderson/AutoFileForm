@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { FormData, Category, ShirtVersion, ColorVersion } from '../../types';
 import { colleges } from '../../config';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, hasColorVersions, getColorDisplayName } from '../../features/utils';
+import { getProductName, getImagePath, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, hasColorVersions, getColorDisplayName } from '../../features/utils';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 import { useOrderForm } from '../../features/hooks';
@@ -218,7 +218,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                   'M102595496 SH2FDC Custom DTF on Maroon .png',
                 ];
                 if (tieDyeImages.includes(img)) {
-                  const comboVersions = formData.shirtColorComboVersions?.[imagePath];
+                  const comboVersions = formData.shirtColorComboSizeCounts?.[imagePath];
                   const categoryShirtVersions = category.shirtVersions || ['tshirt', 'longsleeve', 'hoodie'];
                   const categoryColors = category.colorVersions || ['black', 'forest'];
                   let totalQty = 0;
@@ -226,13 +226,14 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                   for (const version of categoryShirtVersions) {
                     for (const color of categoryColors) {
                       const comboKey = `${version}_${color}`;
-                      const value = comboVersions?.[comboKey];
-                      if (value && Number(value) > 0) {
-                        totalQty += Number(value);
+                      const counts = comboVersions?.[comboKey];
+                      const vTotal = counts ? Object.values(counts).reduce((a:number,b:number)=>a+b,0) : 0;
+                      if (vTotal > 0) {
+                        totalQty += vTotal;
                         rows.push(
                           <div key={comboKey} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
                             <span>{getVersionDisplayName(version, img)} {getColorDisplayName(color)}</span>
-                            <span style={{ fontWeight: '500' }}>Qty: {value}</span>
+                            <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
                           </div>
                         );
                       }

@@ -17,6 +17,7 @@ interface CategorySectionProps {
   shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, import('../../types').SizeCounts>>>;
   colorVersions?: Record<string, ColorVersion>;
   shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
+  shirtColorComboSizeCounts?: Record<string, Record<string, import('../../types').SizeCounts>>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
   onQuantityChange?: (imagePath: string, value: string) => void;
@@ -24,6 +25,7 @@ interface CategorySectionProps {
   onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: import('../../types').SizeCounts) => void;
   onColorVersionChange?: (imagePath: string, color: keyof ColorVersion, value: string) => void;
   onShirtColorComboChange?: (imagePath: string, version: string, color: string, value: string) => void;
+  onShirtColorComboSizeCountsChange?: (imagePath: string, version: string, color: string, counts: import('../../types').SizeCounts) => void;
   onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   readOnly?: boolean;
@@ -38,6 +40,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   shirtSizeCounts = {},
   colorVersions = {},
   shirtColorComboVersions = {},
+  shirtColorComboSizeCounts = {},
   displayOptions = {},
   sweatpantJoggerOptions = {},
   onQuantityChange,
@@ -45,6 +48,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onSizeCountsChange,
   onColorVersionChange,
   onShirtColorComboChange,
+  onShirtColorComboSizeCountsChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
   readOnly = false,
@@ -279,7 +283,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                             />
                           );
                         } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
-                          const comboVersion = shirtColorComboVersions[imagePath] || {};
+                          const comboVersion = (shirtColorComboSizeCounts[imagePath] as any) || {};
                           return (
                             <ShirtColorVersionCard
                               {...cardProps}
@@ -287,6 +291,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                               availableVersions={filteredShirtVersions}
                               availableColors={category.colorVersions}
                               onShirtColorComboChange={onShirtColorComboChange}
+                              onShirtColorComboSizeCountsChange={onShirtColorComboSizeCountsChange}
                             />
                           );
                         } else if (hasColorVersions(img)) {
