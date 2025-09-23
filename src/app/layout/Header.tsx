@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { asset } from '../../utils/asset';
 
 interface HeaderProps {
@@ -13,165 +13,59 @@ const Header: React.FC<HeaderProps> = ({
   onSidebarToggle,
   showBackButton = false 
 }) => {
-  const navigate = useNavigate();
-
-  const handleBackClick = () => {
-    navigate('/');
+  // Root-level header; hamburger toggles global sidebar
+  const handleHamburger = () => {
+    window.dispatchEvent(new CustomEvent('global-sidebar-toggle'));
   };
 
-  // Show back button if legacy prop is used and no sidebar toggle is provided
-  const shouldShowBackButton = showBackButton && !showSidebarToggle;
   return (
     <header style={{
-      background: 'var(--color-bg)',
+      background: 'white',
       borderBottom: '1px solid var(--color-border)',
-      padding: 'var(--space-4)',
-      zIndex: 100,
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+      height: '64px',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 var(--space-4)',
       width: '100%',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 1000
     }}>
-      {/* Logo Section */}
-      <div style={{
-        width: '100%',
-        margin: '0 auto',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: 'var(--space-4)',
-        flexWrap: 'wrap',
-        marginBottom: 'var(--space-3)'
-      }}>
-        {/* Left side - Sidebar Toggle and Campus Traditions */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          flex: '1 1 auto',
-          minWidth: 0,
-          gap: 'var(--space-3)'
-        }}>
-          {showSidebarToggle && (
-            <button
-              onClick={onSidebarToggle}
-              style={{
-                background: 'none',
-                border: '1px solid var(--color-border)',
-                borderRadius: '6px',
-                padding: 'var(--space-2) var(--space-3)',
-                cursor: 'pointer',
-                color: 'var(--color-text)',
-                fontSize: '1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-2)',
-                transition: 'all 0.2s ease',
-                minWidth: '44px',
-                justifyContent: 'center'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--color-primary)';
-                e.currentTarget.style.color = 'white';
-                e.currentTarget.style.borderColor = 'var(--color-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'none';
-                e.currentTarget.style.color = 'var(--color-text)';
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-              }}
-              aria-label="Open navigation menu"
-            >
-              ☰
-            </button>
-          )}
-          {shouldShowBackButton && (
-            <button
-              onClick={handleBackClick}
-              style={{
-                background: 'none',
-                border: '1px solid var(--color-border)',
-                borderRadius: '6px',
-                padding: 'var(--space-2) var(--space-3)',
-                cursor: 'pointer',
-                color: 'var(--color-text)',
-                fontSize: '0.875rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-2)',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--color-primary)';
-                e.currentTarget.style.color = 'white';
-                e.currentTarget.style.borderColor = 'var(--color-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'none';
-                e.currentTarget.style.color = 'var(--color-text)';
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-              }}
-            >
-              ← Back to Colleges
-            </button>
-          )}
-          <img
-            src={asset('logo/campustraditions.png')}
-            alt="Campus Traditions"
-            style={{
-              height: 'clamp(30px, 5vw, 50px)',
-              width: 'auto',
-              objectFit: 'contain'
-            }}
-          />
-        </div>
-
-        {/* Right side - OPI Logo */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          flex: '1 1 auto',
-          minWidth: 0
-        }}>
-          <img
-            src={asset('logo/opi-logo-no-bg.png')}
-            alt="OPI"
-            style={{
-              height: 'clamp(30px, 5vw, 50px)',
-              width: 'auto',
-              objectFit: 'contain'
-            }}
-          />
-        </div>
+      {/* Left: Hamburger */}
+      <div style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
+        <button
+          onClick={handleHamburger}
+          aria-label="Open menu"
+          style={{
+            background: 'transparent',
+            border: '1px solid var(--color-border)',
+            borderRadius: '6px',
+            width: 40,
+            height: 40,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          ☰
+        </button>
       </div>
 
-      {/* Contact Information Section */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 'var(--space-4)',
-        fontSize: '0.875rem',
-        color: 'var(--color-text)',
-        flexWrap: 'wrap',
-        textAlign: 'center'
-      }}>
-        <div style={{ fontWeight: '600' }}>
-          Dana Anderson
-        </div>
-        <div>
-          Collegiate Representative
-        </div>
-        <div>
-          <a href="mailto:Dana@ohiopyleprints.com" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
-            Dana@ohiopyleprints.com
-          </a>
-        </div>
-        <div>
-          <a href="tel:724-562-2764" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
-            724-562-2764
-          </a>
-        </div>
+      {/* Center: Logos */}
+      <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', pointerEvents: 'none' }}>
+        <img src={asset('logo/campustraditions.png')} alt="Campus Traditions" style={{ height: 32, width: 'auto' }} />
+        <img src={asset('logo/opi-logo-no-bg.png')} alt="Ohiopyle Prints" style={{ height: 28, width: 'auto' }} />
       </div>
+
+      {/* Right: Nav links */}
+      <nav aria-label="Primary" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <Link to="/about" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>About Us</Link>
+        <Link to="/contact" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>Contact Us</Link>
+      </nav>
     </header>
   );
 };

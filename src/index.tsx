@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import CollegeSelector from './components/CollegeSelector';
 import OrderFormPage from './components/OrderFormPage';
+import AboutPage from './app/routes/about';
+import ContactPage from './app/routes/contact';
+import Header from './app/layout/Header';
 import './styles/global.css';
 import './styles/tokens.css';
 import './styles/components.css';
@@ -20,8 +23,11 @@ if (root) {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
       <HashRouter>
+        <Header />
         <Routes>
           <Route path='/' element={<CollegeSelector />} />
+          <Route path='/about' element={<AboutPage />} />
+          <Route path='/contact' element={<ContactPage />} />
           <Route path='/:college' element={<OrderFormPage />} />
           <Route path='/:college/summary' element={<OrderFormPage />} />
           <Route path='/:college/receipt' element={<OrderFormPage />} />
