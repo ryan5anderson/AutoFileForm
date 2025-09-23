@@ -20,6 +20,19 @@ const OrderFormPage: React.FC = () => {
 
   // Dynamically set --color-primary for Arizona State
   React.useEffect(() => {
+    const toggleFromHeader = () => {
+      const evt = new CustomEvent('toggle-from-header');
+      // no-op placeholder
+    };
+    const onGlobalToggle = () => {
+      const btn = document.querySelector('[data-sidebar-toggle]') as HTMLElement | null;
+      if (btn) btn.click();
+    };
+    window.addEventListener('global-sidebar-toggle', onGlobalToggle);
+    return () => window.removeEventListener('global-sidebar-toggle', onGlobalToggle);
+  }, []);
+
+  React.useEffect(() => {
     if (college === 'arizonastate') {
       document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
     } else if (college === 'michiganstate') {

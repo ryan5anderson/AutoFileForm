@@ -18,6 +18,12 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 }) => {
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
+  React.useEffect(() => {
+    const handler = () => onToggle();
+    window.addEventListener('global-sidebar-toggle', handler);
+    return () => window.removeEventListener('global-sidebar-toggle', handler);
+  }, [onToggle]);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {

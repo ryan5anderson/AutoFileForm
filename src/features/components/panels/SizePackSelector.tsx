@@ -44,9 +44,10 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   const handleEvenSplit = () => {
     const base = Math.floor(packSize / SIZE_LIST.length);
     const remainder = packSize % SIZE_LIST.length;
+    const distribution = SIZE_LIST.map((_, idx) => base + (idx < remainder ? 1 : 0));
     const next: SizeCounts = { ...counts } as SizeCounts;
     SIZE_LIST.forEach((s: Size, idx: number) => {
-      next[s] = base + (idx < remainder ? 1 : 0);
+      next[s] = (next[s] || 0) + distribution[idx];
     });
     onChange(next);
   };
