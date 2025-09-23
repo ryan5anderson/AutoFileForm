@@ -39,6 +39,8 @@
     {
       "name": "Tshirts (Women)",
       "path": "tshirt/women",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M102074486 SDSORS Jr Socrates DTF on Steel.png",
         "M102073749 SDMAIC Jr Magician DTF on Maroon.png"
@@ -47,6 +49,8 @@
     {
       "name": "Jackets",
       "path": "raincoat",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M102260434 SHE1CJ Custom Logo Charcoal Jacket.png",
         "M102133660 SHE1CJ Custom Logo Maroon Jacket .png"
@@ -55,6 +59,8 @@
     {
       "name": "Flannel lounge pants",
       "path": "pj",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M103092034 SHPHFD Custom Hip DTF Flannels .png",
         "M102076095 SDGMPF Game Master DTF Flannels.png"
@@ -63,6 +69,8 @@
     {
       "name": "Sweatpants/Joggers",
       "path": "sweatpant",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M102332956 SDGMPS Game Master DTF Steel Pants .png",
         "M102310221 SHPHDS Custom DTF Steel Pants.png",
@@ -72,6 +80,8 @@
     {
       "name": "Shorts",
       "path": "short",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M102525019 SDSPSS Custom Side Print Maroon Shorts.png",
         "M102075970 SDEVSS Evocation DTF Oxford Shorts .png"
@@ -102,6 +112,8 @@
     {
       "name": "Socks",
       "path": "sock",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M102076380 SS8052 Custom Logo Socks.png"
       ]

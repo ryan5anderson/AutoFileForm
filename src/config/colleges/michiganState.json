@@ -40,6 +40,8 @@
     {
       "name": "Tshirts (Women)",
       "path": "tshirt/women",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M100966592 SDVGIC Jr Valley Girl DTF on Forest.png",
         "M100438745 SDLOCS Locke DTFN on Steel .png",
@@ -56,6 +58,8 @@
     {
       "name": "Jackets",
       "path": "raincoat",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M100490133 SEASLW Aspire Jacket .png",
         "M100490691 SHE2CJ Custom Forest Green Jacket.png",
@@ -65,6 +69,8 @@
     {
       "name": "Flannel lounge pants",
       "path": "pj",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M100445564 SDBOPF Bondi DTF Flannels .png",
         "M100446076 SHFDDF Force down DTF Flannels .png",
@@ -74,6 +80,8 @@
     {
       "name": "Sweatpants/Joggers",
       "path": "sweatpant",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M100447223 SHVSCD Value DTF Gray Pants .png",
         "M100448649 SHFDDS Force Down DTF Gray Pants.png",
@@ -83,6 +91,8 @@
     {
       "name": "Shorts",
       "path": "short",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M100453813 SHSHDS Custom DTF Gray Shorts .png",
         "M100453381 SHCCDS Carbon Copy DTF Gray Shorts.png"
@@ -115,6 +125,8 @@
     {
       "name": "Socks",
       "path": "sock",
+      "hasShirtVersions": true,
+      "shirtVersions": ["tshirt"],
       "images": [
         "M100415850 SS8052 Custom Logo Socks .png",
         "M100497935 SS8052 Custom Michigan State Socks.png"

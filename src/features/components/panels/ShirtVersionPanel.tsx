@@ -1,15 +1,17 @@
 import React from 'react';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getQuantityMultiples } from '../../utils';
-import { ShirtVersion } from '../../../types';
+import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName } from '../../utils';
+import { ShirtVersion, SizeCounts } from '../../../types';
 import { Field } from '../../../components/ui';
 import { asset } from '../../../utils/asset';
+import SizePackSelector from './SizePackSelector';
 
 interface ShirtVersionCardProps {
   categoryPath: string;
   imageName: string;
-  shirtVersions?: ShirtVersion;
+  sizeCountsByVersion?: Partial<Record<keyof ShirtVersion, SizeCounts>>;
   availableVersions?: string[];
   onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
+  onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: SizeCounts) => void;
   readOnly?: boolean;
   hideImage?: boolean;
   college?: string;
@@ -18,16 +20,21 @@ interface ShirtVersionCardProps {
 const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
   categoryPath,
   imageName,
-  shirtVersions = { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' },
+  sizeCountsByVersion = {},
   availableVersions = ['tshirt'],
   onShirtVersionChange,
+  onSizeCountsChange,
   readOnly = false,
   hideImage = false,
   college
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = getProductName(imageName);
-  const totalQuantity = getShirtVersionTotal(shirtVersions, availableVersions);
+  const totalQuantity = availableVersions.reduce((sum, v) => {
+    const vc = sizeCountsByVersion[v as keyof ShirtVersion];
+    const vTotal = vc ? Object.values(vc).reduce((a, b) => a + b, 0) : 0;
+    return sum + vTotal;
+  }, 0);
 
   const handleVersionChange = (version: keyof ShirtVersion, value: string) => {
     onShirtVersionChange?.(imagePath, version, value);
@@ -38,7 +45,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
       background: 'var(--color-bg)',
       border: '1px solid var(--color-border)',
       borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-3)',
+      padding: 'var(--space-2)',
       display: 'flex',
       flexDirection: 'column',
       gap: 'var(--space-2)'
@@ -69,22 +76,24 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
       {availableVersions.map((version) => {
         const versionKey = version as keyof ShirtVersion;
         const displayName = getVersionDisplayName(version, imageName);
-        
-            return (
-              <Field key={version} label={displayName} htmlFor={`${version}-${imagePath}`}>
-                <Field.Select
-                  id={`${version}-${imagePath}`}
-                  value={shirtVersions[versionKey] || ''}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleVersionChange(versionKey, e.target.value)}
-                  disabled={readOnly}
-                >
-                  <option value="">Select</option>
-                  {getQuantityMultiples(imageName, version).map(val => (
-                    <option key={val} value={val}>{val}</option>
-                  ))}
-                </Field.Select>
+        const counts: SizeCounts = sizeCountsByVersion?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, 'S/M': 0, 'L/XL': 0 } as SizeCounts;
+
+        return (
+          <div key={version}>
+            {availableVersions.length > 1 && (
+              <Field label={displayName} htmlFor={`${version}-${imagePath}`}>
+                {null}
               </Field>
-            );
+            )}
+            {!readOnly && (
+              <SizePackSelector
+                counts={counts}
+                sizes={categoryPath.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
+                onChange={(c) => onSizeCountsChange?.(imagePath, versionKey, c)}
+              />
+            )}
+          </div>
+        );
       })}
       {readOnly && (
         <div style={{ 
@@ -97,16 +106,12 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
           {availableVersions.map((version) => {
             const versionKey = version as keyof ShirtVersion;
             const displayName = getVersionDisplayName(version, imageName);
-            const quantity = shirtVersions[versionKey] || '';
-            
+            const counts = sizeCountsByVersion?.[versionKey];
+            const quantity = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
             return (
-              <div key={version} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--space-1)'
-              }}>
+              <div key={version} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }}>
                 <span>{displayName}:</span>
-                <span style={{ fontWeight: '500' }}>{quantity || '0'}</span>
+                <span style={{ fontWeight: '500' }}>{quantity}</span>
               </div>
             );
           })}

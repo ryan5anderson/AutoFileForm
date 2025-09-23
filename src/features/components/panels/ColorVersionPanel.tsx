@@ -2,6 +2,7 @@ import React from 'react';
 import { getProductName, getImagePath, getColorDisplayName, getQuantityMultiples } from '../../utils';
 import { ColorVersion } from '../../../types';
 import { Field } from '../../../components/ui';
+import QuantityStepper from './QuantityStepper';
 import { asset } from '../../../utils/asset';
 
 interface ColorVersionCardProps {
@@ -72,17 +73,12 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
         
             return (
               <Field key={color} label={displayName} htmlFor={`${color}-${imagePath}`}>
-                <Field.Select
-                  id={`${color}-${imagePath}`}
-                  value={colorVersions[colorKey] || ''}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleColorChange(colorKey, e.target.value)}
+                <QuantityStepper
+                  value={Number(colorVersions[colorKey] || 0)}
+                  onChange={(v) => handleColorChange(colorKey, String(v))}
+                  ariaLabel={displayName}
                   disabled={readOnly}
-                >
-                  <option value="">Select</option>
-                  {getQuantityMultiples(imageName, categoryPath).map(val => (
-                    <option key={val} value={val}>{val}</option>
-                  ))}
-                </Field.Select>
+                />
               </Field>
             );
       })}

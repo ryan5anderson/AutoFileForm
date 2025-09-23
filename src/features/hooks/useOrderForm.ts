@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, Category } from '../../types';
+import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, Category, SizeCounts } from '../../types';
 import { validateFormData, createTemplateParams } from '../utils/index';
 import { sendOrderEmail } from '../../services/emailService';
 
@@ -20,6 +20,7 @@ export const useOrderForm = (categories: Category[]) => {
     shirtColorComboVersions: {} as Record<string, ShirtColorComboVersion>,
     displayOptions: {} as Record<string, DisplayOption>,
     sweatpantJoggerOptions: {} as Record<string, SweatpantJoggerOption>,
+    shirtSizeCounts: {} as Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>,
   });
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>('form');
@@ -68,6 +69,19 @@ export const useOrderForm = (categories: Category[]) => {
           [version]: value
         } as ShirtVersion
       }
+    }));
+  };
+
+  const handleSizeCountsChange = (imagePath: string, version: keyof ShirtVersion, counts: SizeCounts) => {
+    setFormData((prev: FormData) => ({
+      ...prev,
+      shirtSizeCounts: {
+        ...prev.shirtSizeCounts,
+        [imagePath]: {
+          ...(prev.shirtSizeCounts?.[imagePath] || {}),
+          [version]: counts,
+        },
+      },
     }));
   };
 
@@ -125,6 +139,19 @@ export const useOrderForm = (categories: Category[]) => {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Pack-of-7 validation for shirt size counts
+    const hasInvalidPack = Object.values(formData.shirtSizeCounts || {}).some((byVersion) => {
+      return Object.values(byVersion || {}).some((counts) => {
+        const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+        return total > 0 && total % 7 !== 0;
+      });
+    });
+
+    if (hasInvalidPack) {
+      setError('Please ensure all selected garment sizes total to multiples of 7.');
+      return;
+    }
+
     const validationError = validateFormData(formData);
     if (validationError) {
       setError(validationError);
@@ -190,6 +217,7 @@ export const useOrderForm = (categories: Category[]) => {
     handleFormDataChange,
     handleQuantityChange,
     handleShirtVersionChange,
+    handleSizeCountsChange,
     handleColorVersionChange,
     handleShirtColorComboChange,
     handleDisplayOptionChange,

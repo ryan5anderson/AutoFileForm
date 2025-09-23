@@ -45,6 +45,10 @@ export interface SweatpantJoggerOption {
   joggerOxford: string;
 }
 
+// Size-based ordering for shirt versions
+export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'S/M' | 'L/XL';
+export type SizeCounts = Record<Size, number>;
+
 export interface FormData {
   company: string;
   storeNumber: string;
@@ -57,6 +61,8 @@ export interface FormData {
   shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
+  // imagePath -> version -> SizeCounts
+  shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>;
 }
 
 export interface EmailCategory {
