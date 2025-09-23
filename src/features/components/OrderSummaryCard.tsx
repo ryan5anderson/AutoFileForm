@@ -1,6 +1,6 @@
 import React from 'react';
 import { getImagePath, getShirtVersionTotal, hasColorVersions } from '../utils';
-import { ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
+import { ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, SizeCounts, Size } from '../../types';
 
 interface OrderSummaryCardProps {
   categoryPath: string;
@@ -8,6 +8,7 @@ interface OrderSummaryCardProps {
   categoryName: string;
   quantities: Record<string, string>;
   shirtVersions?: Record<string, ShirtVersion>;
+  shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>;
   colorVersions?: Record<string, ColorVersion>;
   shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
   displayOptions?: Record<string, DisplayOption>;
@@ -22,6 +23,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   categoryName,
   quantities,
   shirtVersions = {},
+  shirtSizeCounts = {},
   colorVersions = {},
   shirtColorComboVersions = {},
   displayOptions = {},
@@ -120,27 +122,34 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
       return null;
     }
 
-    // Handle shirt versions
+    // Handle shirt versions (size breakdown)
     if (hasShirtVersions) {
-      const shirtVersion = shirtVersions[imagePath];
-      if (shirtVersion) {
-        const totalQty = getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
-        if (totalQty > 0) {
-          const details = [];
-          if (shirtVersion.tshirt && Number(shirtVersion.tshirt) > 0) {
-            details.push(`T-Shirt: ${shirtVersion.tshirt}`);
+      const sizeByVersion = shirtSizeCounts[imagePath] || {};
+      const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+      const totalsByVersion = versionOrder.map((vk) => {
+        const c = sizeByVersion[vk];
+        return c ? Object.values(c).reduce((a,b)=>a+b,0) : 0;
+      });
+      const totalQty = totalsByVersion.reduce((a,b)=>a+b,0);
+      if (totalQty > 0) {
+        const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
+        const details: string[] = [];
+        versionOrder.forEach((vk, i) => {
+          const vTotal = totalsByVersion[i];
+          if (vTotal > 0) {
+            const c = sizeByVersion[vk];
+            const sizeOrder: Size[] = ['S','M','L','XL','XXL','S/M','L/XL'];
+            const sizePieces = c ? sizeOrder
+              .map((sz: Size) => {
+                const val = c[sz] || 0;
+                return val > 0 ? `${sz}${val}` : '';
+              })
+              .filter(Boolean)
+              .join(' ') : '';
+            details.push(`${labels[vk as keyof typeof labels]}: ${vTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
           }
-          if (shirtVersion.longsleeve && Number(shirtVersion.longsleeve) > 0) {
-            details.push(`Long Sleeve: ${shirtVersion.longsleeve}`);
-          }
-          if (shirtVersion.hoodie && Number(shirtVersion.hoodie) > 0) {
-            details.push(`Hoodie: ${shirtVersion.hoodie}`);
-          }
-          if (shirtVersion.crewneck && Number(shirtVersion.crewneck) > 0) {
-            details.push(`Crew: ${shirtVersion.crewneck}`);
-          }
-          return { total: totalQty, details: details.join(', ') };
-        }
+        });
+        return { total: totalQty, details: details.join('; ') };
       }
       return null;
     }

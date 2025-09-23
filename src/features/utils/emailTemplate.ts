@@ -57,17 +57,26 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           }
         }
       } else if (cat.hasShirtVersions && cat.shirtVersions) {
-        // For shirt categories, create separate items for each version
-        const shirtVersions = formData.shirtVersions?.[imagePath];
-        
+        // For shirt categories, create separate items for each version using size counts totals
+        const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
         for (const version of cat.shirtVersions) {
-          const versionValue = shirtVersions?.[version as keyof ShirtVersion];
-          if (versionValue && versionValue.trim() !== '') {
+          const counts = sizeByVersion[version as keyof ShirtVersion];
+          const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
+          if (vTotal > 0) {
             const versionName = getVersionDisplayName(version, img);
+            // Build size detail like S7 M7 XL7
+            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','S/M','L/XL'];
+            const sizePieces = counts ? sizeOrder
+              .map(sz => {
+                const val = counts[sz] || 0;
+                return val > 0 ? `${sz}${val}` : '';
+              })
+              .filter(Boolean)
+              .join(' ') : '';
             categoryItems.push({
               sku,
-              name: `${name} (${versionName})`,
-              qty: versionValue,
+              name: `${name} (${versionName}${sizePieces ? ` - ${sizePieces}` : ''})`,
+              qty: String(vTotal),
               version
             });
           }

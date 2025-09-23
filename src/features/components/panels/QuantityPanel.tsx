@@ -2,6 +2,7 @@ import React from 'react';
 import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../../utils';
 import { SweatpantJoggerOption } from '../../../types';
 import { asset } from '../../../utils/asset';
+import QuantityStepper from './QuantityStepper';
 
 interface ProductCardProps {
   categoryPath: string;
@@ -65,36 +66,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   </div>
                 ))}
               </>
-            ) : (categoryName === 'Display Options' || categoryName === 'Water Bottle') ? (
-              <div className="field">
-                <div className="field-label">Quantity</div>
-                <div className="field-control">
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    id={`qty-${imagePath}`}
-                    min="0"
-                    value={quantity || ''}
-                    onChange={(e) => onQuantityChange?.(imagePath, e.target.value)}
-                    disabled={readOnly}
-                  />
-                </div>
-              </div>
             ) : (
               <div className="field">
                 <div className="field-label">Quantity</div>
-                <div className="field-control">
-                  <select
-                    id={`qty-${imagePath}`}
-                    value={quantity}
-                    onChange={(e) => onQuantityChange?.(imagePath, e.target.value)}
+                <div className="field-control" style={{ maxWidth: '260px' }}>
+                  <QuantityStepper
+                    value={Number(quantity || 0)}
+                    onChange={(v) => onQuantityChange?.(imagePath, String(v))}
                     disabled={readOnly}
-                  >
-                    <option value="">Select</option>
-                    {getQuantityMultiples(imageName, categoryName).map(val => (
-                      <option key={val} value={val}>{val}</option>
-                    ))}
-                  </select>
+                    ariaLabel={productName}
+                  />
                 </div>
               </div>
             )}
@@ -161,36 +142,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </div>
               ))}
             </>
-          ) : (categoryName === 'Display Options' || categoryName === 'Water Bottle') ? (
-            <div className="field">
-              <div className="field-label">Quantity</div>
-              <div className="field-control">
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  id={`qty-${imagePath}`}
-                  min="0"
-                  value={quantity || ''}
-                  onChange={(e) => onQuantityChange?.(imagePath, e.target.value)}
-                  disabled={readOnly}
-                />
-              </div>
-            </div>
           ) : (
             <div className="field">
               <div className="field-label">Quantity</div>
-              <div className="field-control">
-                <select
-                  id={`qty-${imagePath}`}
-                  value={quantity}
-                  onChange={(e) => onQuantityChange?.(imagePath, e.target.value)}
+              <div className="field-control" style={{ maxWidth: '260px' }}>
+                <QuantityStepper
+                  value={Number(quantity || 0)}
+                  onChange={(v) => onQuantityChange?.(imagePath, String(v))}
                   disabled={readOnly}
-                >
-                  <option value="">Select</option>
-                  {getQuantityMultiples(imageName, categoryName).map(val => (
-                    <option key={val} value={val}>{val}</option>
-                  ))}
-                </select>
+                  ariaLabel={productName}
+                />
               </div>
             </div>
           )}

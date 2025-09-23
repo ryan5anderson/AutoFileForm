@@ -13,6 +13,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   position: relative;
   transform: translateY(0);
+  align-self: start; /* prevent grid stretching so collapsed cards don't fill tall rows */
 }
 
 .card:not(.card--expanded):not(.card--active):hover {
@@ -100,9 +101,10 @@
 }
 
 .card__body--expanded {
-  max-height: 800px;
+  max-height: none;
   opacity: 1;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2);
+  background: transparent; /* keep row background consistent */
 }
 
 .card__body-title {
@@ -402,4 +404,80 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* =================================
+   Size Pack Selector (modern look)
+   ================================= */
+.size-pack { 
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.size-pack__grid {
+  width: 100%;
+}
+
+.size-pack__cell {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.size-pack__cell:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.size-pack__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(180deg,#f8fafc,#eef2f7);
+  border-radius: 8px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.size-pack__btn:hover { 
+  background: linear-gradient(180deg,#eef2f7,#e5e9f0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.size-pack__btn:active { 
+  transform: translateY(1px);
+}
+
+.size-pack__input {
+  text-align: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  border-radius: 8px;
+  font-weight: 600;
+  width: 100%;
+  max-width: 100%;
+}
+
+.size-pack__helper { 
+  font-size: 0.8rem; 
+  color: #6b7280;
+}
+
+.btn-ghost-sm {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-ghost-sm:hover {
+  border-color: #9ca3af;
 }

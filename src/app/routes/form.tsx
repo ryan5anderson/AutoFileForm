@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, ColorVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
+import { FormData, Category, ShirtVersion, ColorVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
 import CategorySection from '../../features/components/CategorySection';
 import OrderNotesSection from '../../features/components/OrderNotesSection';
@@ -20,6 +20,7 @@ interface FormPageProps {
   onFormDataChange: (updates: Partial<FormData>) => void;
   onQuantityChange: (imagePath: string, value: string) => void;
   onShirtVersionChange: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
+  onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: SizeCounts) => void;
   onColorVersionChange: (imagePath: string, color: keyof ColorVersion, value: string) => void;
   onDisplayOptionChange: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   onSweatpantJoggerOptionChange: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
@@ -35,6 +36,7 @@ const FormPage: React.FC<FormPageProps> = ({
   onFormDataChange,
   onQuantityChange,
   onShirtVersionChange,
+  onSizeCountsChange,
   onColorVersionChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
@@ -45,10 +47,17 @@ const FormPage: React.FC<FormPageProps> = ({
   college
 }) => {
   const navigate = useNavigate();
-  const categories = useMemo(() => 
-    collegeConfig ? collegeConfig.categories : [], 
-    [collegeConfig]
-  );
+  const categories = useMemo(() => {
+    const list = collegeConfig ? [...collegeConfig.categories] : [];
+    // Move display options to the bottom if present
+    return list.sort((a, b) => {
+      const aIsDisplay = a.hasDisplayOptions || a.name.toLowerCase().includes('display options');
+      const bIsDisplay = b.hasDisplayOptions || b.name.toLowerCase().includes('display options');
+      if (aIsDisplay && !bIsDisplay) return 1;
+      if (!aIsDisplay && bIsDisplay) return -1;
+      return 0;
+    });
+  }, [collegeConfig]);
   const collegeName = collegeConfig ? collegeConfig.name : 'College';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
@@ -111,7 +120,28 @@ const FormPage: React.FC<FormPageProps> = ({
           <p>Select your merchandise and quantities below</p>
         </div>
         
-        <form onSubmit={onSubmit}>
+        <form onSubmit={(e) => {
+          // Intercept to scroll to first invalid size pack if present
+          const helpers = Array.from(document.querySelectorAll('.size-pack__helper')) as HTMLElement[];
+          const firstInvalid = helpers.find(el => el.getAttribute('data-positive') === 'true' && el.getAttribute('data-valid') === 'false');
+          if (firstInvalid) {
+            e.preventDefault();
+            // If the card is collapsed, click its header toggle
+            const cardBody = firstInvalid.closest('.card__body') as HTMLElement | null;
+            const card = cardBody ? (cardBody.parentElement as HTMLElement | null) : null;
+            if (card) {
+              const header = card.querySelector('.card__header') as HTMLElement | null;
+              if (header && !cardBody?.classList.contains('card__body--expanded')) {
+                header.click();
+              }
+              card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+              firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          } else {
+            onSubmit(e);
+          }
+        }}>
           <StoreInfoForm formData={formData} onFormDataChange={onFormDataChange} />
           
           {categories.map((category: Category) => (
@@ -120,12 +150,14 @@ const FormPage: React.FC<FormPageProps> = ({
               category={category}
               quantities={formData.quantities}
               shirtVersions={formData.shirtVersions}
+              shirtSizeCounts={formData.shirtSizeCounts}
               colorVersions={formData.colorVersions}
               shirtColorComboVersions={formData.shirtColorComboVersions}
               displayOptions={formData.displayOptions}
               sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
               onQuantityChange={onQuantityChange}
               onShirtVersionChange={onShirtVersionChange}
+              onSizeCountsChange={onSizeCountsChange}
               onColorVersionChange={onColorVersionChange}
               onShirtColorComboChange={onShirtColorComboChange}
               onDisplayOptionChange={onDisplayOptionChange}

@@ -14,12 +14,14 @@ interface CategorySectionProps {
   category: Category;
   quantities: Record<string, string>;
   shirtVersions?: Record<string, ShirtVersion>;
+  shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, import('../../types').SizeCounts>>>;
   colorVersions?: Record<string, ColorVersion>;
   shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
   onQuantityChange?: (imagePath: string, value: string) => void;
   onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
+  onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: import('../../types').SizeCounts) => void;
   onColorVersionChange?: (imagePath: string, color: keyof ColorVersion, value: string) => void;
   onShirtColorComboChange?: (imagePath: string, version: string, color: string, value: string) => void;
   onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
@@ -33,12 +35,14 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   category,
   quantities,
   shirtVersions = {},
+  shirtSizeCounts = {},
   colorVersions = {},
   shirtColorComboVersions = {},
   displayOptions = {},
   sweatpantJoggerOptions = {},
   onQuantityChange,
   onShirtVersionChange,
+  onSizeCountsChange,
   onColorVersionChange,
   onShirtColorComboChange,
   onDisplayOptionChange,
@@ -110,8 +114,17 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle shirt versions
+    // Handle shirt versions (prefer size counts if present)
     if (category.hasShirtVersions) {
+      const sizeCountsByVersion = shirtSizeCounts[imagePath];
+      if (sizeCountsByVersion) {
+        const totalQty = Object.values(sizeCountsByVersion).reduce((sum, counts) => {
+          if (!counts) return sum;
+          const versionTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
+          return sum + versionTotal;
+        }, 0);
+        if (totalQty > 0) return true;
+      }
       const shirtVersion = shirtVersions[imagePath];
       if (shirtVersion) {
         const totalQty = getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
@@ -164,7 +177,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           <strong>Display Standard Case Pack:</strong> Display unit includes garments.
         </div>
       )}
-      <div className="section__grid">
+      <div className="section__grid" style={{ alignItems: 'start' }}>
         {filteredImages.map((img: string) => {
           const imagePath = getImagePath(category.path, img);
           const isExpanded = expandedCards.has(imagePath);
@@ -222,6 +235,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     categoryName={category.name}
                     quantities={quantities}
                     shirtVersions={shirtVersions}
+                    shirtSizeCounts={shirtSizeCounts}
                     colorVersions={colorVersions}
                     shirtColorComboVersions={shirtColorComboVersions}
                     displayOptions={displayOptions}
@@ -286,13 +300,14 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                             />
                           );
                         } else if (category.hasShirtVersions) {
-                          const shirtVersion = shirtVersions[imagePath] || { tshirt: '', longsleeve: '', hoodie: '', crewneck: '' };
+                          const sizeCounts = shirtSizeCounts[imagePath] || {};
                           return (
                             <ShirtVersionCard
                               {...cardProps}
-                              shirtVersions={shirtVersion}
+                              sizeCountsByVersion={sizeCounts}
                               availableVersions={filteredShirtVersions}
                               onShirtVersionChange={onShirtVersionChange}
+                              onSizeCountsChange={onSizeCountsChange}
                             />
                           );
                         } else {

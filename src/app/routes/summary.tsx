@@ -110,12 +110,19 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
           </div>
         </div>
         
-        {categories.map((category: Category) => (
+        {[...categories].sort((a: Category, b: Category) => {
+          const aIsDisplay = a.hasDisplayOptions || a.name.toLowerCase().includes('display options');
+          const bIsDisplay = b.hasDisplayOptions || b.name.toLowerCase().includes('display options');
+          if (aIsDisplay && !bIsDisplay) return 1;
+          if (!aIsDisplay && bIsDisplay) return -1;
+          return 0;
+        }).map((category: Category) => (
           <CategorySection
             key={category.name}
             category={category}
             quantities={formData.quantities}
             shirtVersions={formData.shirtVersions}
+            shirtSizeCounts={formData.shirtSizeCounts}
             colorVersions={formData.colorVersions}
             shirtColorComboVersions={formData.shirtColorComboVersions}
             displayOptions={formData.displayOptions}

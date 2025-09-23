@@ -144,7 +144,13 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
             </div>
           </div>
           
-          {categories.filter(category => {
+          {[...categories].sort((a: Category, b: Category) => {
+            const aIsDisplay = a.hasDisplayOptions || a.name.toLowerCase().includes('display options');
+            const bIsDisplay = b.hasDisplayOptions || b.name.toLowerCase().includes('display options');
+            if (aIsDisplay && !bIsDisplay) return 1;
+            if (!aIsDisplay && bIsDisplay) return -1;
+            return 0;
+          }).filter(category => {
             // Check if any image in the category has a nonzero quantity or selection
             return category.images.some(img => {
               const imagePath = getImagePath(category.path, img);
@@ -178,8 +184,10 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 const colorVersions = formData.colorVersions?.[imagePath];
                 if (colorVersions && Object.values(colorVersions).some(val => Number(val) > 0)) return true;
               }
-              // Shirt Versions
+              // Shirt Versions - prefer size counts
               if (category.hasShirtVersions && category.shirtVersions) {
+                const sizeByVersion = formData.shirtSizeCounts?.[imagePath];
+                if (sizeByVersion && Object.values(sizeByVersion).some(counts => counts && Object.values(counts).some(v => Number(v) > 0))) return true;
                 const shirtVersions = formData.shirtVersions?.[imagePath];
                 if (shirtVersions && Object.values(shirtVersions).some(val => Number(val) > 0)) return true;
               }
@@ -430,10 +438,14 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                   }
                   return null;
                 }
-                // Handle Shirt Versions
+                // Handle Shirt Versions (size breakdown)
                 if (category.hasShirtVersions && category.shirtVersions) {
-                  const shirtVersions = formData.shirtVersions?.[imagePath];
-                  const totalQty = getShirtVersionTotal(shirtVersions, category.shirtVersions);
+                  const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
+                  const totalsByVersion = category.shirtVersions.map((version) => {
+                    const counts = sizeByVersion[version as keyof ShirtVersion];
+                    return counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
+                  });
+                  const totalQty = totalsByVersion.reduce((a,b)=>a+b,0);
                   if (totalQty > 0) {
                     return (
                       <div key={img} style={{
@@ -449,16 +461,25 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           marginBottom: 'var(--space-2)',
                           color: 'var(--color-text)'
                         }}>{productName}</div>
-                        {category.shirtVersions.map((version) => {
-                          const versionKey = version as keyof ShirtVersion;
-                          const versionValue = shirtVersions?.[versionKey];
+                        {category.shirtVersions.map((version, idx) => {
+                          const counts = sizeByVersion[version as keyof ShirtVersion];
+                          const vTotal = totalsByVersion[idx];
                           const displayName = getVersionDisplayName(version);
-                          return (Number(versionValue) > 0 ? (
+                          if (vTotal <= 0) return null;
+                          const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','S/M','L/XL'];
+                          const sizePieces = counts ? sizeOrder
+                            .map((sz) => {
+                              const val = counts[sz] || 0;
+                              return val > 0 ? `${sz}${val}` : '';
+                            })
+                            .filter(Boolean)
+                            .join(' ') : '';
+                          return (
                             <div key={version} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
-                              <span>{displayName}</span>
-                              <span style={{ fontWeight: '500' }}>Qty: {versionValue}</span>
+                              <span>{displayName}{sizePieces ? ` (${sizePieces})` : ''}</span>
+                              <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
                             </div>
-                          ) : null);
+                          );
                         })}
                         <div style={{
                           display: 'flex',

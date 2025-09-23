@@ -1,4 +1,4 @@
-import { FormData, EmailCategory, ShirtVersion } from '../../types';
+import { FormData, EmailCategory, ShirtVersion, SizeCounts } from '../../types';
 
 export const validateFormData = (formData: FormData): string | null => {
   // Check all required fields
@@ -25,6 +25,25 @@ export const getShirtVersionTotal = (shirtVersions: ShirtVersion | undefined, av
     return sum + Number(versionValue || 0);
   }, 0);
 };
+
+export type Totals = {
+  total: number;
+  packs: number;
+  remainder: number;
+  needed: number;
+  isValid: boolean;
+};
+
+export function calcTotals(counts: SizeCounts, packSize: number = 7): Totals {
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  return {
+    total,
+    packs: Math.floor(total / packSize),
+    remainder: total % packSize,
+    needed: (packSize - (total % packSize)) % packSize,
+    isValid: total > 0 && total % packSize === 0,
+  };
+}
 
 export function getQuantityMultiples(imageName: string, categoryName: string): number[] {
   // Lowercase helpers
