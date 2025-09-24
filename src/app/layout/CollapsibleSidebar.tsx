@@ -7,6 +7,7 @@ interface CollapsibleSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   onBackToColleges: () => void;
+  showCategories?: boolean;
 }
 
 const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ 
@@ -14,7 +15,8 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
   activeSection, 
   isOpen, 
   onToggle, 
-  onBackToColleges 
+  onBackToColleges,
+  showCategories = true
 }) => {
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
@@ -79,38 +81,40 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             <span className="nav-text">Back to Colleges</span>
           </button>
 
-          {/* Categories Dropdown */}
-          <div className="sidebar-section">
-            <button
-              className={`sidebar-nav-item dropdown-toggle ${categoriesExpanded ? 'expanded' : ''}`}
-              onClick={toggleCategories}
-            >
-              <span className="nav-icon">📋</span>
-              <span className="nav-text">Categories</span>
-              <span className="dropdown-arrow">
-                {categoriesExpanded ? '▼' : '▶'}
-              </span>
-            </button>
+          {/* Categories Dropdown - Only show on form and summary pages */}
+          {showCategories && categories.length > 0 && (
+            <div className="sidebar-section">
+              <button
+                className={`sidebar-nav-item dropdown-toggle ${categoriesExpanded ? 'expanded' : ''}`}
+                onClick={toggleCategories}
+              >
+                <span className="nav-icon">📋</span>
+                <span className="nav-text">Categories</span>
+                <span className="dropdown-arrow">
+                  {categoriesExpanded ? '▼' : '▶'}
+                </span>
+              </button>
 
-            {categoriesExpanded && (
-              <div className="dropdown-content">
-                {categories.map((category) => {
-                  const sectionId = getSectionId(category.name);
-                  const isActive = activeSection === sectionId;
-                  
-                  return (
-                    <button
-                      key={category.name}
-                      className={`dropdown-item ${isActive ? 'active' : ''}`}
-                      onClick={() => scrollToSection(sectionId)}
-                    >
-                      {category.name}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+              {categoriesExpanded && (
+                <div className="dropdown-content">
+                  {categories.map((category) => {
+                    const sectionId = getSectionId(category.name);
+                    const isActive = activeSection === sectionId;
+                    
+                    return (
+                      <button
+                        key={category.name}
+                        className={`dropdown-item ${isActive ? 'active' : ''}`}
+                        onClick={() => scrollToSection(sectionId)}
+                      >
+                        {category.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         <style>{`
@@ -287,12 +291,12 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           }
 
           .dropdown-item.active {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
           }
 
           .dropdown-item.active:hover {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
           }
 
           .sidebar-section {

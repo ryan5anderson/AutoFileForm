@@ -114,6 +114,7 @@ const FormPage: React.FC<FormPageProps> = ({
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
         onBackToColleges={handleBackToColleges}
+        showCategories={true}
       />
       
       <main className="college-page-main">
