@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Category, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
 import ProductCard from './panels/QuantityPanel';
 import ShirtVersionCard from './panels/ShirtVersionPanel';
@@ -54,20 +55,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   readOnly = false,
   college
 }) => {
-  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
-
-  // Helper function to toggle card expansion
-  const toggleCardExpansion = (imagePath: string) => {
-    setExpandedCards(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(imagePath)) {
-        newSet.delete(imagePath);
-      } else {
-        newSet.add(imagePath);
-      }
-      return newSet;
-    });
-  };
+  const navigate = useNavigate();
 
   // Helper function to check if an item has any quantity
   const hasQuantity = (imagePath: string, imageName: string) => {
@@ -184,21 +172,23 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <div className="section__grid" style={{ alignItems: 'start' }}>
         {filteredImages.map((img: string) => {
           const imagePath = getImagePath(category.path, img);
-          const isExpanded = expandedCards.has(imagePath);
+          
+          const handleCardClick = () => {
+            if (!readOnly) {
+              // Navigate to product detail page
+              const encodedCategory = encodeURIComponent(category.path);
+              const encodedProductId = encodeURIComponent(img);
+              navigate(`/${college}/product/${encodedCategory}/${encodedProductId}`);
+            }
+          };
           
           return (
             <Card
               key={img}
-              expanded={isExpanded}
+              className={!readOnly ? 'card--clickable' : ''}
             >
               <Card.Header
-                onClick={(e: React.MouseEvent) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (!readOnly) {
-                    toggleCardExpansion(imagePath);
-                  }
-                }}
+                onClick={handleCardClick}
               >
                 <h3 className="card__title">
                   {category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img)}
@@ -214,22 +204,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
                 {!readOnly && (
                   <p className="card__action-text">
-                    {isExpanded ? 'Tap to minimize' : 'Tap to configure options'}
+                    Tap to configure options
                   </p>
-                )}
-
-                {!readOnly && (
-                  <ButtonIcon
-                    expanded={isExpanded}
-                    onClick={(e: React.MouseEvent) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleCardExpansion(imagePath);
-                    }}
-                    aria-label={isExpanded ? 'Minimize options' : 'Expand options'}
-                    aria-expanded={isExpanded}
-                    aria-controls={`card-content-${imagePath}`}
-                  />
                 )}
 
                 {readOnly && (
@@ -249,88 +225,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   />
                 )}
               </Card.Header>
-
-              {!readOnly && (
-                <Card.Body
-                  expanded={isExpanded}
-                  title="Options"
-                >
-                      {(() => {
-                        // Tie-dye special case
-                        const tieDyeImages = [
-                          'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-                          'M100482538 SHHODC Hover DTF on Black or Forest .png',
-                          'M100437896 SHOUDC Over Under DTF on Forest.png',
-                          'M102595496 SH2FDC Custom DTF on Maroon .png',
-                        ];
-                        const isTieDye = tieDyeImages.includes(img);
-                        const filteredShirtVersions = isTieDye && category.shirtVersions
-                          ? category.shirtVersions.filter((v: string) => v !== 'crewneck')
-                          : category.shirtVersions;
-                        const cardProps = {
-                          categoryPath: category.path,
-                          imageName: img,
-                          hideImage: true,
-                          college,
-                        };
-                        if (category.hasDisplayOptions) {
-                          const displayOption = displayOptions[imagePath] || { displayOnly: '', displayStandardCasePack: '' };
-                          return (
-                            <DisplayOptionCard
-                              {...cardProps}
-                              displayOption={displayOption}
-                              onDisplayOptionChange={onDisplayOptionChange}
-                            />
-                          );
-                        } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
-                          const comboVersion = (shirtColorComboSizeCounts[imagePath] as any) || {};
-                          return (
-                            <ShirtColorVersionCard
-                              {...cardProps}
-                              shirtColorComboVersion={comboVersion}
-                              availableVersions={filteredShirtVersions}
-                              availableColors={category.colorVersions}
-                              onShirtColorComboChange={onShirtColorComboChange}
-                              onShirtColorComboSizeCountsChange={onShirtColorComboSizeCountsChange}
-                            />
-                          );
-                        } else if (hasColorVersions(img)) {
-                          const colorVersion = colorVersions[imagePath] || { black: '', forest: '', white: '', gray: '' };
-                          return (
-                            <ColorVersionCard
-                              {...cardProps}
-                              colorVersions={colorVersion}
-                              availableColors={category.colorVersions}
-                              onColorVersionChange={onColorVersionChange}
-                            />
-                          );
-                        } else if (category.hasShirtVersions) {
-                          const sizeCounts = shirtSizeCounts[imagePath] || {};
-                          return (
-                            <ShirtVersionCard
-                              {...cardProps}
-                              sizeCountsByVersion={sizeCounts}
-                              availableVersions={filteredShirtVersions}
-                              onShirtVersionChange={onShirtVersionChange}
-                              onSizeCountsChange={onSizeCountsChange}
-                            />
-                          );
-                        } else {
-                          const quantity = quantities[imagePath] || '';
-                          return (
-                            <ProductCard
-                              {...cardProps}
-                              categoryName={category.name}
-                              quantity={quantity}
-                              onQuantityChange={onQuantityChange}
-                              sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' ? (sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) : undefined}
-                              onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
-                            />
-                          );
-                        }
-                      })()}
-                </Card.Body>
-              )}
             </Card>
           );
         })}

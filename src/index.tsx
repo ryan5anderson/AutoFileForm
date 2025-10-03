@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import CollegeSelector from './components/CollegeSelector';
-import OrderFormPage from './components/OrderFormPage';
+import CollegeRouteWrapper from './components/CollegeRouteWrapper';
 import AboutPage from './app/routes/about';
 import ContactPage from './app/routes/contact';
 import Header from './app/layout/Header';
@@ -59,7 +59,6 @@ function AppShell() {
 
   // Avoid rendering global sidebar on the form root where the page has its own sidebar
   const segments = location.pathname.split('/').filter(Boolean);
-  const subRoute = segments[1];
   const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact');
   
   // Determine if we should show categories in sidebar
@@ -85,10 +84,7 @@ function AppShell() {
         <Route path='/' element={<CollegeSelector />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
-        <Route path='/:college' element={<OrderFormPage />} />
-        <Route path='/:college/summary' element={<OrderFormPage />} />
-        <Route path='/:college/receipt' element={<OrderFormPage />} />
-        <Route path='/:college/thankyou' element={<OrderFormPage />} />
+        <Route path='/:college/*' element={<CollegeRouteWrapper />} />
       </Routes>
     </>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FormData, Category, ShirtVersion, ColorVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
 import CategorySection from '../../features/components/CategorySection';
@@ -49,6 +49,7 @@ const FormPage: React.FC<FormPageProps> = ({
   college
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const categories = useMemo(() => {
     const list = collegeConfig ? [...collegeConfig.categories] : [];
     // Move display options to the bottom if present
@@ -63,6 +64,22 @@ const FormPage: React.FC<FormPageProps> = ({
   const collegeName = collegeConfig ? collegeConfig.name : 'College';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
+
+  // Scroll to category when returning from product detail page
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.returnFromProduct && state?.scrollToCategory) {
+      const categoryId = state.scrollToCategory.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
+      setTimeout(() => {
+        const element = document.getElementById(categoryId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      // Clear the state after scrolling
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
