@@ -6,137 +6,144 @@
       "name": "Display Options",
       "path": "rack",
       "hasDisplayOptions": true,
-      "images": [
-        "Michigan_state_University_Premium Floor Display 2.0_500px.jpg",
-        "Michigan_State_University_Tier2_Display_Floor_500px.jpg",
-        "Michigan_State_University_3FT_Inline_500px.jpg"
-      ]
+      "images": []
     },
     {
       "name": "Tshirts (Unisex)",
       "path": "tshirt/men",
       "hasShirtVersions": true,
-      "shirtVersions": ["tshirt", "longsleeve", "hoodie", "crewneck"],
+      "shirtVersions": [
+        "tshirt",
+        "longsleeve",
+        "hoodie",
+        "crewneck"
+      ],
       "hasColorVersions": true,
-      "colorVersions": ["black", "forest"],
+      "colorVersions": [
+        "black",
+        "forest"
+      ],
       "images": [
-        "M100444086 SH2FDS Custom School DTF on Steel .png",
-        "M100435370 SDVECS Vector DTF on Steel .png",
-        "M100438285 SDARMS Aristotle DTF on Steel.png",
-        "M101005933 SDOLAS Overlay DTF on Steel .png",
-        "M100435821 SH2FDS Custom State DTF on Steel.png",
-        "M100965141 SHDCDW Dad Club DTF on Forest .png",
-        "M100965024 SHDCDS Dad Club DTF on Steel.png",
-        "M100965414 SHOUDC OU Go Green DTF on Forest.png",
-        "M100482538 SHHODC Hover DTF on Black or Forest .png",
-        "M100437896 SHOUDC Over Under DTF on Forest.png",
-        "M101010777 SH2FDC Custom Go Green DTF of Forest .png",
-        "M100431261 SDRENC Renown Mascot DTF on Forest.png",
-        "M100432187 SDFREG Frege DTF on Forest .png",
-        "M100430821 SH2FDW Custom S DTFN on Forest.png",
-        "M100430257 SH2FDW Custom Spartan DTFN on Forest .png"
+        "M100430257_SH2FDW_Custom_Spartan_DTFN_on_Forest.png",
+        "M100430821_SH2FDW_Custom_S_DTFN_on_Forest.png",
+        "M100431261_SDRENC_Renown_Mascot_DTF_on_Forest.png",
+        "M100432187_SDFREG_Frege_DTF_on_Forest.png",
+        "M100435370_SDVECS_Vector_DTF_on_Steel.png",
+        "M100435821_SH2FDS_Custom_State_DTF_on_Steel.png",
+        "M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png",
+        "M100437896_SHOUDC_Over_Under_DTF_on_Forest.png",
+        "M100438285_SDARMS_Aristotle_DTF_on_Steel.png",
+        "M100438383_SH2FDW_Custom_DTFN_on_Forest.png",
+        "M100438745_SDLOCS_Locke_DTFN_on_Steel.png",
+        "M100439889_SDABSC_Absent_DTF_on_Forest.png",
+        "M100444086_SH2FDS_Custom_School_DTF_on_Steel.png",
+        "M100482538_SHHODC_Hover_DTF_on_Black_or_Forest.png",
+        "M100485992_SHE2CH_Custom_Spartan_on_Green.png",
+        "M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png",
+        "M100965024_SHDCDS_Dad_Club_DTF_on_Steel.png",
+        "M100965141_SHDCDW_Dad_Club_DTF_on_Forest.png",
+        "M100965414_SHOUDC_OU_Go_Green_DTF_on_Forest.png",
+        "M101005933_SDOLAS_Overlay_DTF_on_Steel.png",
+        "M101010777_SH2FDC_Custom_Go_Green_DTF_of_Forest.png"
       ]
     },
     {
       "name": "Tshirts (Women)",
       "path": "tshirt/women",
       "hasShirtVersions": true,
-      "shirtVersions": ["tshirt"],
+      "shirtVersions": [
+        "tshirt"
+      ],
       "images": [
-        "M100966592 SDVGIC Jr Valley Girl DTF on Forest.png",
-        "M100438745 SDLOCS Locke DTFN on Steel .png",
-        "M100965923 SDVGIS Jr Valley Girl DTF on Steel .png",
-        "M100964847 SHMCDS Jr Mom Club DTF on Steel.png",
-        "M100964663 SDFAMS Jr Family DTF on Steel .png",
-        "M100436060 SH2FDS Custom Spartan DTFN on Steel.png",
-        "M100439889 SDABSC Absent DTF on Forest.png",
-        "M100963545 SHMCDW Jr Mom Club DTF on Green .png",
-        "M100963714 SDFAMW Jr Family DTF on Forest.png",
-        "M100438383 SH2FDW Custom DTFN on Forest.png"
-      ]
-    },
-    {
-      "name": "Jackets",
-      "path": "raincoat",
-      "hasShirtVersions": true,
-      "shirtVersions": ["tshirt"],
-      "images": [
-        "M100490133 SEASLW Aspire Jacket .png",
-        "M100490691 SHE2CJ Custom Forest Green Jacket.png",
-        "M100490842 SDLCJA Custom Logo Gray Jacket.png"
-      ]
-    },
-    {
-      "name": "Flannel lounge pants",
-      "path": "pj",
-      "hasShirtVersions": true,
-      "shirtVersions": ["tshirt"],
-      "images": [
-        "M100445564 SDBOPF Bondi DTF Flannels .png",
-        "M100446076 SHFDDF Force down DTF Flannels .png",
-        "M100445359 SHPHFD Custom DTF Flannels.png"
-      ]
-    },
-    {
-      "name": "Sweatpants/Joggers",
-      "path": "sweatpant",
-      "hasShirtVersions": true,
-      "shirtVersions": ["tshirt"],
-      "images": [
-        "M100447223 SHVSCD Value DTF Gray Pants .png",
-        "M100448649 SHFDDS Force Down DTF Gray Pants.png",
-        "M100446293 SHPSDS Shake it DTF Gray Pants.png"
-      ]
-    },
-    {
-      "name": "Shorts",
-      "path": "short",
-      "hasShirtVersions": true,
-      "shirtVersions": ["tshirt"],
-      "images": [
-        "M100453813 SHSHDS Custom DTF Gray Shorts .png",
-        "M100453381 SHCCDS Carbon Copy DTF Gray Shorts.png"
+        "M100963545_SHMCDW_Jr_Mom_Club_DTF_on_Green.png",
+        "M100963714_SDFAMW_Jr_Family_DTF_on_Forest.png",
+        "M100964663_SDFAMS_Jr_Family_DTF_on_Steel.png",
+        "M100964847_SHMCDS_Jr_Mom_Club_DTF_on_Steel.png",
+        "M100965923_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png",
+        "M100966592_SDVGIC_Jr_Valley_Girl_DTF_on_Forest.png"
       ]
     },
     {
       "name": "Caps",
       "path": "hat",
       "hasColorVersions": true,
-      "colorVersions": ["white", "gray"],
+      "colorVersions": [
+        "white",
+        "gray"
+      ],
       "images": [
-        "M100489153 SHE1CH Custom Hat on White or Grays .png",
-        "M100488283 SHE1CH Custom Logo on White or Gray.png",
-        "M100485992 SHE2CH Custom Spartan on Green .png",
-        "M100487428 SECHHC Chirp Gray Hat.png",
-        "M100489250 SHE1CH Custom Hat on Forest .png",
-        "M100490059 SHEHFL Front Line Forest Green Hat.png"
+        "M100487428_SECHHC_Chirp_Gray_Hat.png",
+        "M100489153_SHE1CH_Custom_Hat_on_White_or_Grays.png",
+        "M100489250_SHE1CH_Custom_Hat_on_Forest.png",
+        "M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png"
       ]
     },
     {
       "name": "Knit Caps",
       "path": "beanie",
       "images": [
-        "M100494173 SHE1CB Custom Spartan Gray Beanie .png",
-        "M101011832 SHERBE Rugby Forest Beanie.png",
-        "M100494213 SHE2CB Custom Green Beanie .png",
-        "M100492686 SHETMB Talisman Green Beanie.png"
-      ]
-    },
-    {
-      "name": "Socks",
-      "path": "sock",
-      "hasShirtVersions": true,
-      "shirtVersions": ["tshirt"],
-      "images": [
-        "M100415850 SS8052 Custom Logo Socks .png",
-        "M100497935 SS8052 Custom Michigan State Socks.png"
+        "M100492686_SHETMB_Talisman_Green_Beanie.png",
+        "M100494173_SHE1CB_Custom_Spartan_Gray_Beanie.png",
+        "M100494213_SHE2CB_Custom_Green_Beanie.png",
+        "M101011832_SHERBE_Rugby_Forest_Beanie.png"
       ]
     },
     {
       "name": "Water Bottle",
       "path": "bottle",
       "images": [
-        "M100454089 SHWBOT Custom Water Bottle .png"
+        "M100454089_SHWBOT_Custom_Water_Bottle.png"
+      ]
+    },
+    {
+      "name": "Jacket",
+      "path": "jacket",
+      "images": [
+        "M100490133_SEASLW_Aspire_Jacket.png",
+        "M100490691_SHE2CJ_Custom_Forest_Green_Jacket.png",
+        "M100490842_SDLCJA_Custom_Logo_Gray_Jacket.png"
+      ]
+    },
+    {
+      "name": "Flannels",
+      "path": "flannels",
+      "images": [
+        "M100445359_SHPHFD_Custom_DTF_Flannels.png",
+        "M100445564_SDBOPF_Bondi_DTF_Flannels.png",
+        "M100446076_SHFDDF_Force_down_DTF_Flannels.png"
+      ]
+    },
+    {
+      "name": "Pants",
+      "path": "pants",
+      "images": [
+        "M100446293_SHPSDS_Shake_it_DTF_Gray_Pants.png",
+        "M100447223_SHVSCD_Value_DTF_Gray_Pants.png",
+        "M100448649_SHFDDS_Force_Down_DTF_Gray_Pants.png"
+      ]
+    },
+    {
+      "name": "Shorts",
+      "path": "shorts",
+      "images": [
+        "M100453381_SHCCDS_Carbon_Copy_DTF_Gray_Shorts.png",
+        "M100453813_SHSHDS_Custom_DTF_Gray_Shorts.png"
+      ]
+    },
+    {
+      "name": "Socks",
+      "path": "socks",
+      "images": [
+        "M100415850_SS8052_Custom_Logo_Socks.png",
+        "M100497935_SS8052_Custom_Michigan_State_Socks.png"
+      ]
+    },
+    {
+      "name": "Card",
+      "path": "card",
+      "images": [
+        "M100516533_SHWGCS_Spinner_Header_Card.png",
+        "M100516676_SHWGCH_PFD_Header_Card.png"
       ]
     }
   ]

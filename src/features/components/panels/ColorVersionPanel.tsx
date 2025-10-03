@@ -3,7 +3,7 @@ import { getProductName, getImagePath, getColorDisplayName, getQuantityMultiples
 import { ColorVersion } from '../../../types';
 import { Field } from '../../../components/ui';
 import QuantityStepper from './QuantityStepper';
-import { asset } from '../../../utils/asset';
+import { asset, getCollegeFolderName } from '../../../utils/asset';
 
 interface ColorVersionCardProps {
   categoryPath: string;
@@ -46,7 +46,7 @@ const ColorVersionCard: React.FC<ColorVersionCardProps> = ({
     }}>
       {!hideImage && (
         <img
-          src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
+          src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
           alt={imageName}
           style={{ 
             width: '100%', 

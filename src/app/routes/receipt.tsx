@@ -38,6 +38,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
       document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
     } else if (urlCollege === 'michiganstate') {
       document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else if (urlCollege === 'westvirginiauniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }

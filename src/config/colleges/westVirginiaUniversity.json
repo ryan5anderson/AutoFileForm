@@ -1,0 +1,188 @@
+{
+  "name": "West Virginia University",
+  "logo": "/logo/wvulogo.png",
+  "categories": [
+    {
+      "name": "Tshirts (Unisex)",
+      "path": "tshirt/men",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt",
+        "longsleeve",
+        "hoodie",
+        "crewneck"
+      ],
+      "hasColorVersions": true,
+      "colorVersions": [
+        "gold",
+        "blue",
+        "white"
+      ],
+      "images": [
+        "M100474172_SDFRES_Frege_DTF_on_Steel.png",
+        "M100474382_SDNIES_Nietzsche_DTF_on_Steel.png",
+        "M101307170_CM6999_Full_Front_Applique_on_Steel.png",
+        "M102609618_SDFRES_Frege_DTF_on_White.png",
+        "M102612120_SH2FDS_Custom_DTF_on_White.png",
+        "M103575514_SH2FDC_Custom_Logo_DTF_on_Black.png",
+        "M103575853_SDNIEB_Nietzsche_DTF_on_Black.png",
+        "M103581810_SH2FDC_Custom_Coal_Days_on_Black.png",
+        "M89672118_SH2FDC_Custom_WV_DTF_Logo_on_Navy.png",
+        "M89672286_SH2FDC_Custom_DTF_Logo_on_Navy.png",
+        "M89686053_SDSOCR_Socrates_DTF_on_Navy.png",
+        "M89690963_SH2FDS_WVU_DTF_on_Steel_or_White.png",
+        "M89692248_SDNIET_Nietzsche_DTF_on_Navy.png",
+        "M89692348_SDKIER_Kierkegaard_DTF_on_Navy.png",
+        "M89692642_SDFREG_Frege_DTF_on_Navy.png",
+        "M89692983_SDLOCK_Locke_DTF_on_Navy.png",
+        "M89755583_SH2FDC_WV_DTF_State_Outline_on_Navy.png",
+        "M89755682_SH2FDC_Country_Roads_DTF_Logo_on_Navy.png",
+        "M90635085_SH2FDC_Custom_DTF_Logo_on_Gold.png",
+        "M90637743_SH2FDC_Custom_WV_DTF_Logo_on_Gold.png",
+        "M90688296_SDCNAC_Nation_Mascot_DTF_on_Navy.png",
+        "M90688655_SDCPLS_Pride_Lives_DTF_on_Steel.png",
+        "M90689127_SDCOCC_Open_Country_DTF_on_Navy.png"
+      ]
+    },
+    {
+      "name": "Tshirts (Women)",
+      "path": "tshirt/women",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M103079843_SH2FDC_Jr_Custom_DTF_on_Navy.png",
+        "M103087849_SDBIOC_Jr_Bionic_DTF_on_Navy.png",
+        "M103088167_SDDLAC_Jr_Dreamland_DTF_on_Navy.png",
+        "M103095627_SH2FDS_Jr_Custom_DTF_on_Steel.png",
+        "M103096156_SDTILS_Jr_Tilting_DTF_on_Steel.png"
+      ]
+    },
+    {
+      "name": "Caps",
+      "path": "hat",
+      "hasColorVersions": true,
+      "colorVersions": [
+        "gold",
+        "blue",
+        "white"
+      ],
+      "images": [
+        "M102610896_SHE1CH_Custom_WV_White_Hat.png",
+        "M102610969_SESCRH_Scrap_WhiteGrayor_Navy_Hat.png",
+        "M103282092_CM6982_Custom_WVU_Navy_Hat.png",
+        "M103282163_CM6983_Custom_WV_Logo_Navy_Hat.png",
+        "M103327838_CM7069_Custom_WV_Logo_Navy_Hat.png",
+        "M89676992_SHE1CH_Custom_WV_Logo_Navy_Hat.png",
+        "M89677078_SHE1CH_Custom_WV_Logo_Gold_Hat.png"
+      ]
+    },
+    {
+      "name": "Knit Caps",
+      "path": "beanie",
+      "images": [
+        "M89686154_SHE1CB_Custom_WV_Navy_Beanie.png"
+      ]
+    },
+    {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M101866926_SHSSUV_Custom_Logo_Steel_Bottle.png",
+        "M102068212_SHWBOT_Custom_Logo_Water_Bottle.png",
+        "M102105119_SHSSUV_Custom_Logo_Steel_Bottle.png",
+        "M89676743_SHWBOT_Custom_Logo_Water_Bottle.png"
+      ]
+    },
+    {
+      "name": "Jackets",
+      "path": "jacket",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M100330126_SHE1CJ_Custom_Logo_Navy_Jacket.png",
+        "M103273278_SHE1CJ_Custom_WV_Navy_Fleece_FZ.png"
+      ]
+    },
+    {
+      "name": "Shorts",
+      "path": "shorts",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M100729952_SHSHDS_Custom_Logo_DTF_Gray_Shorts.png",
+        "M100729649_SHSHDS_Custom_WVU_Logo_DTF_Gray_Shorts.png",
+        "M100730047_SHSHDS_Jr_Custom_DTF_Shorts.png",
+        "M100735267_SDSPSC_Custom_Side_DTF_on_Navy_Shorts.png",
+        "M102318426_SDSPSS_Custom_Side_Print_DTF_Gray_Stripe.png",
+        "M103097917_SDSHES_Jr_Sheared_DTF_Shorts.png"
+      ]
+    },
+    {
+      "name": "Pants",
+      "path": "pants",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M100997846_SH2DPC_Custom_DTF_Navy_Pants.png",
+        "M100998197_SH2DPS_Custom_WV_Joggers.png",
+        "M101415110_SHPHDS_Flying_WV_Hip_DTF_Gray_Pants.png",
+        "M101421643_SHPHDS_Custom_WVU_DTF_Gray_Pants.png",
+        "M101781446_SHPHDC_Custom_WV_DTF_Navy_Pants.png",
+        "M89677170_SHPHDS_Custom_WV_DTF_Steel_Joggers.png"
+      ]
+    },
+    {
+      "name": "Socks",
+      "path": "socks",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M89676826_SS8052_Custom_Logo_Socks.png"
+      ]
+    },
+    {
+      "name": "Stickers",
+      "path": "sticker",
+      "images": [
+        "M101434138_SHSTPK_Custom_Mascot_Sticker_Pack.png",
+        "M101434457_SHUPIS_Umpire_Sticker_Pack.png",
+        "M101434630_SHPG3P_Pre_Game_Sticker_Pack.png",
+        "M101435449_SHMFIS_Midfielder_Stickers.png",
+        "M101435998_SHRIOS_Riot_Mascot_Stickers.png"
+      ]
+    },
+    {
+      "name": "Flannels",
+      "path": "flannels",
+      "images": [
+        "M89677268_SHPHFD_Custom_WV_DTF_Flannels.png"
+      ]
+    },
+    {
+      "name": "Banner",
+      "path": "banner",
+      "images": [
+        "M90446092_SHMH23_Custom_3ft_Shelf_Magnet.png",
+        "M90446346_SHMH24_Custom_4ft_Shelf_Magnet.png"
+      ]
+    },
+    {
+      "name": "Card",
+      "path": "card",
+      "images": [
+        "M90445414_SHWGCS_Custom_Spinner_Header.png",
+        "M90445689_SHWGCH_Custom_PFD_Header.png"
+      ]
+    }
+  ]
+}

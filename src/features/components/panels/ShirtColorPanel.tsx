@@ -1,7 +1,7 @@
 import React from 'react';
 import { getProductName, getImagePath, getVersionDisplayName, getColorDisplayName } from '../../utils';
 import { ShirtColorComboVersion, SizeCounts, Size } from '../../../types';
-import { asset } from '../../../utils/asset';
+import { asset, getCollegeFolderName } from '../../../utils/asset';
 import QuantityStepper from './QuantityStepper';
 import SizePackSelector from './SizePackSelector';
 
@@ -51,7 +51,7 @@ const ShirtColorVersionCard: React.FC<ShirtColorVersionCardProps> = ({
     }}>
       {!hideImage && (
         <img
-          src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
+          src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
           alt={imageName}
           style={{ 
             width: '100%', 
