@@ -4,9 +4,13 @@
   "categories": [
     {
       "name": "Display Options",
-      "path": "rack",
+      "path": "displays",
       "hasDisplayOptions": true,
-      "images": []
+      "images": [
+        "Michigan_State_University_3FT_Inline_500px.jpg",
+        "Michigan_state_University_Premium Floor Display 2.0_500px.jpg",
+        "Michigan_State_University_Tier2_Display_Floor_500px.jpg"
+      ]
     },
     {
       "name": "Tshirts (Unisex)",
@@ -18,11 +22,6 @@
         "hoodie",
         "crewneck"
       ],
-      "hasColorVersions": true,
-      "colorVersions": [
-        "black",
-        "forest"
-      ],
       "images": [
         "M100430257_SH2FDW_Custom_Spartan_DTFN_on_Forest.png",
         "M100430821_SH2FDW_Custom_S_DTFN_on_Forest.png",
@@ -30,16 +29,10 @@
         "M100432187_SDFREG_Frege_DTF_on_Forest.png",
         "M100435370_SDVECS_Vector_DTF_on_Steel.png",
         "M100435821_SH2FDS_Custom_State_DTF_on_Steel.png",
-        "M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png",
         "M100437896_SHOUDC_Over_Under_DTF_on_Forest.png",
         "M100438285_SDARMS_Aristotle_DTF_on_Steel.png",
-        "M100438383_SH2FDW_Custom_DTFN_on_Forest.png",
-        "M100438745_SDLOCS_Locke_DTFN_on_Steel.png",
-        "M100439889_SDABSC_Absent_DTF_on_Forest.png",
         "M100444086_SH2FDS_Custom_School_DTF_on_Steel.png",
         "M100482538_SHHODC_Hover_DTF_on_Black_or_Forest.png",
-        "M100485992_SHE2CH_Custom_Spartan_on_Green.png",
-        "M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png",
         "M100965024_SHDCDS_Dad_Club_DTF_on_Steel.png",
         "M100965141_SHDCDW_Dad_Club_DTF_on_Forest.png",
         "M100965414_SHOUDC_OU_Go_Green_DTF_on_Forest.png",
@@ -60,22 +53,23 @@
         "M100964663_SDFAMS_Jr_Family_DTF_on_Steel.png",
         "M100964847_SHMCDS_Jr_Mom_Club_DTF_on_Steel.png",
         "M100965923_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png",
-        "M100966592_SDVGIC_Jr_Valley_Girl_DTF_on_Forest.png"
+        "M100966592_SDVGIC_Jr_Valley_Girl_DTF_on_Forest.png",
+        "M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png",
+        "M100438383_SH2FDW_Custom_DTFN_on_Forest.png",
+        "M100438745_SDLOCS_Locke_DTFN_on_Steel.png",
+        "M100439889_SDABSC_Absent_DTF_on_Forest.png"
       ]
     },
     {
       "name": "Caps",
       "path": "hat",
-      "hasColorVersions": true,
-      "colorVersions": [
-        "white",
-        "gray"
-      ],
       "images": [
         "M100487428_SECHHC_Chirp_Gray_Hat.png",
         "M100489153_SHE1CH_Custom_Hat_on_White_or_Grays.png",
         "M100489250_SHE1CH_Custom_Hat_on_Forest.png",
-        "M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png"
+        "M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png",
+        "M100485992_SHE2CH_Custom_Spartan_on_Green.png",
+        "M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png"
       ]
     },
     {
@@ -98,6 +92,10 @@
     {
       "name": "Jacket",
       "path": "jacket",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
       "images": [
         "M100490133_SEASLW_Aspire_Jacket.png",
         "M100490691_SHE2CJ_Custom_Forest_Green_Jacket.png",
@@ -107,6 +105,10 @@
     {
       "name": "Flannels",
       "path": "flannels",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
       "images": [
         "M100445359_SHPHFD_Custom_DTF_Flannels.png",
         "M100445564_SDBOPF_Bondi_DTF_Flannels.png",
@@ -116,6 +118,11 @@
     {
       "name": "Pants",
       "path": "pants",
+      "hasPantOptions": true,
+      "pantStyles": [
+        "sweatpants",
+        "joggers"
+      ],
       "images": [
         "M100446293_SHPSDS_Shake_it_DTF_Gray_Pants.png",
         "M100447223_SHVSCD_Value_DTF_Gray_Pants.png",
@@ -125,6 +132,10 @@
     {
       "name": "Shorts",
       "path": "shorts",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
       "images": [
         "M100453381_SHCCDS_Carbon_Copy_DTF_Gray_Shorts.png",
         "M100453813_SHSHDS_Custom_DTF_Gray_Shorts.png"
@@ -133,6 +144,10 @@
     {
       "name": "Socks",
       "path": "socks",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
       "images": [
         "M100415850_SS8052_Custom_Logo_Socks.png",
         "M100497935_SS8052_Custom_Michigan_State_Socks.png"

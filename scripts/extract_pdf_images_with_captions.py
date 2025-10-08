@@ -13,7 +13,7 @@ the build pipeline.
 Extract images from a PDF, categorize them, and update college configs.
 
 This script:
-1. Prompts user to select a college (Arizona State, Michigan State, or West Virginia University)
+1. Prompts user to select a college (Arizona State, Michigan State, West Virginia University, or University of Pittsburgh)
 2. Extracts images from PDF and names them using captions
 3. Categorizes images into subfolders (beanie, tshirt/men, etc.)
 4. Cleans existing images in the target college's public folder
@@ -30,7 +30,8 @@ Usage:
     #   1. Arizona State
     #   2. Michigan State
     #   3. West Virginia University
-    # Enter your choice (1, 2, or 3): 1
+    #   4. University of Pittsburgh
+    # Enter your choice (1, 2, 3, or 4): 1
     
     # Then extracts to public/ArizonaState/ and updates arizonastate.json
 
@@ -75,18 +76,21 @@ def prompt_college_selection() -> Tuple[str, str]:
     print("  1. Arizona State")
     print("  2. Michigan State")
     print("  3. West Virginia University")
+    print("  4. University of Pittsburgh")
     print()
     
     while True:
-        choice = input("Enter your choice (1, 2, or 3): ").strip()
+        choice = input("Enter your choice (1, 2, 3, or 4): ").strip()
         if choice == "1":
             return ("ArizonaState", "arizonastate")
         elif choice == "2":
             return ("MichiganState", "michiganstate")
         elif choice == "3":
             return ("WestVirginiaUniversity", "westvirginiauniversity")
+        elif choice == "4":
+            return ("PittsburghUniversity", "pittsburghuniversity")
         else:
-            print("Invalid choice. Please enter 1, 2, or 3.")
+            print("Invalid choice. Please enter 1, 2, 3, or 4.")
 
 def clean_existing_images(college_dir: Path) -> int:
     """

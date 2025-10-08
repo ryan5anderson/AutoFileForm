@@ -2,6 +2,7 @@ import React from 'react';
 import { DisplayOption } from '../../../types';
 import { getImagePath, getRackDisplayName } from '../../utils';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
+import QuantityStepper from './QuantityStepper';
 
 interface DisplayOptionCardProps {
   categoryPath: string;
@@ -11,6 +12,7 @@ interface DisplayOptionCardProps {
   readOnly?: boolean;
   hideImage?: boolean;
   college?: string;
+  activeOption?: 'displayOnly' | 'displayStandardCasePack';
 }
 
 const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
@@ -20,7 +22,8 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
   onDisplayOptionChange,
   readOnly = false,
   hideImage = false,
-  college
+  college,
+  activeOption = 'displayOnly'
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = getRackDisplayName(imageName);
@@ -34,30 +37,13 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
     return (
       <>
         <div className="field">
-          <div className="field-label">Display Only</div>
+          <div className="field-label">Quantity</div>
           <div className="field-control">
-            <input
-              type="number"
-              inputMode="numeric"
-              id={`displayOnly-${imagePath}`}
-              min="0"
-              value={displayOption.displayOnly || ''}
-              onChange={(e) => handleOptionChange('displayOnly', e.target.value)}
+            <QuantityStepper
+              value={Number(displayOption[activeOption] || 0)}
+              onChange={(v) => handleOptionChange(activeOption, String(v))}
               disabled={readOnly}
-            />
-          </div>
-        </div>
-        <div className="field">
-          <div className="field-label">Standard Case Pack</div>
-          <div className="field-control">
-            <input
-              type="number"
-              inputMode="numeric"
-              id={`displayStandardCasePack-${imagePath}`}
-              min="0"
-              value={displayOption.displayStandardCasePack || ''}
-              onChange={(e) => handleOptionChange('displayStandardCasePack', e.target.value)}
-              disabled={readOnly}
+              ariaLabel={`${activeOption === 'displayOnly' ? 'Display Only' : 'Display Standard Case Pack'} Quantity`}
             />
           </div>
         </div>

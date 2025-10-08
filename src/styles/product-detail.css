@@ -229,7 +229,7 @@
   flex: 1;
   overflow-y: auto;
   max-height: calc(100vh - 400px);
-  padding-right: clamp(0.5rem, 1.5vw, 1rem);
+  padding: 0 clamp(0.5rem, 2vw, 1rem);
   margin-right: -0.5rem;
 }
 
@@ -438,6 +438,36 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Single Option Panel - for items with only one variant */
+.single-option-panel {
+  padding: 0 clamp(0.5rem, 2vw, 1rem);
+}
+
+.single-option-panel .field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.single-option-panel .field-label {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-2);
+}
+
+.single-option-panel .field-control {
+  display: block;
+  width: 100%;
 }
 
 /* Responsive Design - Extra Small Mobile */

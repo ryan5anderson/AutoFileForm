@@ -14,16 +14,16 @@ page,image_index_on_page,filename,caption,category_subfolder,output_path
 4,1,M100435370_SDVECS_Vector_DTF_on_Steel.png,M100435370 SDVECS Vector DTF on Steel,tshirt/men,tshirt\men\M100435370_SDVECS_Vector_DTF_on_Steel.png
 4,2,M100438285_SDARMS_Aristotle_DTF_on_Steel.png,M100438285 SDARMS Aristotle DTF on Steel,tshirt/men,tshirt\men\M100438285_SDARMS_Aristotle_DTF_on_Steel.png
 4,3,M100444086_SH2FDS_Custom_School_DTF_on_Steel.png,M100444086 SH2FDS Custom School DTF on Steel,tshirt/men,tshirt\men\M100444086_SH2FDS_Custom_School_DTF_on_Steel.png
-4,4,M100438383_SH2FDW_Custom_DTFN_on_Forest.png,M100438383 SH2FDW Custom DTFN on Forest,tshirt/men,tshirt\men\M100438383_SH2FDW_Custom_DTFN_on_Forest.png
-5,1,M100439889_SDABSC_Absent_DTF_on_Forest.png,M100439889 SDABSC Absent DTF on Forest,tshirt/men,tshirt\men\M100439889_SDABSC_Absent_DTF_on_Forest.png
+4,4,M100438383_SH2FDW_Custom_DTFN_on_Forest.png,M100438383 SH2FDW Custom DTFN on Forest,tshirt/women,tshirt\women\M100438383_SH2FDW_Custom_DTFN_on_Forest.png
+5,1,M100439889_SDABSC_Absent_DTF_on_Forest.png,M100439889 SDABSC Absent DTF on Forest,tshirt/women,tshirt\women\M100439889_SDABSC_Absent_DTF_on_Forest.png
 5,2,M100966592_SDVGIC_Jr_Valley_Girl_DTF_on_Forest.png,M100966592 SDVGIC Jr Valley Girl DTF on Forest,tshirt/women,tshirt\women\M100966592_SDVGIC_Jr_Valley_Girl_DTF_on_Forest.png
 5,3,M100963545_SHMCDW_Jr_Mom_Club_DTF_on_Green.png,M100963545 SHMCDW Jr Mom Club DTF on Green,tshirt/women,tshirt\women\M100963545_SHMCDW_Jr_Mom_Club_DTF_on_Green.png
 5,4,M100963714_SDFAMW_Jr_Family_DTF_on_Forest.png,M100963714 SDFAMW Jr Family DTF on Forest,tshirt/women,tshirt\women\M100963714_SDFAMW_Jr_Family_DTF_on_Forest.png
 6,1,M100965923_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png,M100965923 SDVGIS Jr Valley Girl DTF on Steel,tshirt/women,tshirt\women\M100965923_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png
 6,2,M100964847_SHMCDS_Jr_Mom_Club_DTF_on_Steel.png,M100964847 SHMCDS Jr Mom Club DTF on Steel,tshirt/women,tshirt\women\M100964847_SHMCDS_Jr_Mom_Club_DTF_on_Steel.png
 6,3,M100964663_SDFAMS_Jr_Family_DTF_on_Steel.png,M100964663 SDFAMS Jr Family DTF on Steel,tshirt/women,tshirt\women\M100964663_SDFAMS_Jr_Family_DTF_on_Steel.png
-6,4,M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png,M100436060 SH2FDS Custom Spartan DTFN on Steel,tshirt/men,tshirt\men\M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png
-7,1,M100438745_SDLOCS_Locke_DTFN_on_Steel.png,M100438745 SDLOCS Locke DTFN on Steel,tshirt/men,tshirt\men\M100438745_SDLOCS_Locke_DTFN_on_Steel.png
+6,4,M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png,M100436060 SH2FDS Custom Spartan DTFN on Steel,tshirt/women,tshirt\women\M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png
+7,1,M100438745_SDLOCS_Locke_DTFN_on_Steel.png,M100438745 SDLOCS Locke DTFN on Steel,tshirt/women,tshirt\women\M100438745_SDLOCS_Locke_DTFN_on_Steel.png
 7,2,M100490691_SHE2CJ_Custom_Forest_Green_Jacket.png,M100490691 SHE2CJ Custom Forest Green Jacket,jacket,jacket\M100490691_SHE2CJ_Custom_Forest_Green_Jacket.png
 7,3,M100490133_SEASLW_Aspire_Jacket.png,M100490133 SEASLW Aspire Jacket,jacket,jacket\M100490133_SEASLW_Aspire_Jacket.png
 7,4,M100490842_SDLCJA_Custom_Logo_Gray_Jacket.png,M100490842 SDLCJA Custom Logo Gray Jacket,jacket,jacket\M100490842_SDLCJA_Custom_Logo_Gray_Jacket.png
@@ -37,10 +37,10 @@ page,image_index_on_page,filename,caption,category_subfolder,output_path
 9,4,M100453381_SHCCDS_Carbon_Copy_DTF_Gray_Shorts.png,M100453381 SHCCDS Carbon Copy DTF Gray Shorts,shorts,shorts\M100453381_SHCCDS_Carbon_Copy_DTF_Gray_Shorts.png
 10,1,M100489250_SHE1CH_Custom_Hat_on_Forest.png,M100489250 SHE1CH Custom Hat on Forest,hat,hat\M100489250_SHE1CH_Custom_Hat_on_Forest.png
 10,2,M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png,M100490059 SHEHFL Front Line Forest Green Hat,hat,hat\M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png
-10,3,M100485992_SHE2CH_Custom_Spartan_on_Green.png,M100485992 SHE2CH Custom Spartan on Green,tshirt/men,tshirt\men\M100485992_SHE2CH_Custom_Spartan_on_Green.png
+10,3,M100485992_SHE2CH_Custom_Spartan_on_Green.png,M100485992 SHE2CH Custom Spartan on Green,hat,hat\M100485992_SHE2CH_Custom_Spartan_on_Green.png
 10,4,M100487428_SECHHC_Chirp_Gray_Hat.png,M100487428 SECHHC Chirp Gray Hat,hat,hat\M100487428_SECHHC_Chirp_Gray_Hat.png
 11,1,M100489153_SHE1CH_Custom_Hat_on_White_or_Grays.png,M100489153 SHE1CH Custom Hat on White or Grays,hat,hat\M100489153_SHE1CH_Custom_Hat_on_White_or_Grays.png
-11,2,M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png,M100488283 SHE1CH Custom Logo on White or Gray,tshirt/men,tshirt\men\M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png
+11,2,M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png,M100488283 SHE1CH Custom Logo on White or Gray,hat,hat\M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png
 11,3,M100494213_SHE2CB_Custom_Green_Beanie.png,M100494213 SHE2CB Custom Green Beanie,beanie,beanie\M100494213_SHE2CB_Custom_Green_Beanie.png
 11,4,M100492686_SHETMB_Talisman_Green_Beanie.png,M100492686 SHETMB Talisman Green Beanie,beanie,beanie\M100492686_SHETMB_Talisman_Green_Beanie.png
 12,1,M100494173_SHE1CB_Custom_Spartan_Gray_Beanie.png,M100494173 SHE1CB Custom Spartan Gray Beanie,beanie,beanie\M100494173_SHE1CB_Custom_Spartan_Gray_Beanie.png

@@ -25,14 +25,6 @@ export const getRackDisplayName = (imageName: string): string => {
 };
 
 export const getVersionDisplayName = (version: string, imageName?: string): string => {
-  // List of images that should use 'Tie-dye' prefix
-  const tieDyeImages = [
-    'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-    'M100482538 SHHODC Hover DTF on Black or Forest .png',
-    'M100437896 SHOUDC Over Under DTF on Forest.png',
-    'M102595496 SH2FDC Custom DTF on Maroon .png',
-  ];
-
   let display = '';
   switch (version) {
     case 'tshirt': display = 'T-Shirt'; break;
@@ -41,28 +33,31 @@ export const getVersionDisplayName = (version: string, imageName?: string): stri
     case 'crewneck': display = 'Crew Sweatshirt'; break;
     default: display = version;
   }
-
-  if (imageName && tieDyeImages.includes(imageName)) {
-    return `Tie-dye ${display}`;
-  }
   return display;
 };
 
-export const hasColorVersions = (imageName: string): boolean => {
-  const itemsWithColorVersions = [
-    'M100482538 SHHODC Hover DTF on Black or Forest .png',
-    'M100489153 SHE1CH Custom Hat on White or Grays .png',
-    'M100488283 SHE1CH Custom Logo on White or Gray.png'
-  ];
-  return itemsWithColorVersions.includes(imageName);
+// Check if a product has multiple color options
+export const hasColorOptions = (imageName: string): boolean => {
+  return imageName.includes('_or_');
 };
 
-export const getColorDisplayName = (color: string): string => {
-  switch (color) {
-    case 'black': return 'Black';
-    case 'forest': return 'Forest';
-    case 'white': return 'White Quantity';
-    case 'gray': return 'Gray Quantity';
-    default: return color;
+// Extract color options from filename
+// e.g., "Custom_DTF_on_White_or_Steel.png" -> ["White", "Steel"]
+// e.g., "Custom_Logo_on_White_or_Gray.png" -> ["White", "Gray"]
+export const getColorOptions = (imageName: string): string[] => {
+  if (!hasColorOptions(imageName)) return [];
+  
+  // Match pattern: "on_Color1_or_Color2"
+  const match = imageName.match(/on_(\w+)_or_(\w+)/i);
+  if (match) {
+    return [match[1], match[2]];
   }
+  
+  return [];
+};
+
+// Get display name for a color
+export const getColorDisplayName = (color: string): string => {
+  // Capitalize first letter
+  return color.charAt(0).toUpperCase() + color.slice(1).toLowerCase();
 };

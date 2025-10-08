@@ -21,14 +21,14 @@ const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disa
   };
 
   return (
-    <div className="size-pack" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', maxWidth: '260px' }}>
+    <div className="size-pack" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', maxWidth: '100%' }}>
       <button
         type="button"
         className="size-pack__btn"
         aria-label={ariaLabel ? `Decrease ${ariaLabel}` : 'Decrease quantity'}
         onClick={() => handleDelta(-1)}
         disabled={disabled}
-        style={{ height: '1.75rem', width: '1.75rem' }}
+        style={{ height: '2rem', width: '2rem', fontSize: '1rem' }}
       >
         -
       </button>
@@ -40,7 +40,7 @@ const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disa
         value={value}
         onChange={handleInput}
         disabled={disabled}
-        style={{ height: '1.75rem', width: '4rem' }}
+        style={{ height: '2rem', flex: '1', minWidth: '60px' }}
       />
       <button
         type="button"
@@ -48,7 +48,7 @@ const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disa
         aria-label={ariaLabel ? `Increase ${ariaLabel}` : 'Increase quantity'}
         onClick={() => handleDelta(+1)}
         disabled={disabled}
-        style={{ height: '1.75rem', width: '1.75rem' }}
+        style={{ height: '2rem', width: '2rem', fontSize: '1rem' }}
       >
         +
       </button>

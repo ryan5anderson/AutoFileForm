@@ -1,7 +1,7 @@
-import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion, ColorVersion } from '../../types';
+import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion } from '../../types';
 import { PROVIDER_EMAIL } from '../../constants';
 import { getRackToCardMapping } from './imagePath';
-import { getVersionDisplayName, getColorDisplayName, hasColorVersions } from './naming';
+import { getVersionDisplayName } from './naming';
 import { calculateTotalUnits } from './calculations';
 
 export const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {
@@ -18,54 +18,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
       const sku = img.split(' ')[0]; // Extract SKU (first part before space)
       const name = img.replace(/\.(png|jpg)$/, ''); // Full product name
       
-      if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
-        // Special case for tie-dye with version+color and size counts
-        const byCombo = formData.shirtColorComboSizeCounts?.[imagePath];
-        if (byCombo && cat.colorVersions && cat.shirtVersions) {
-          for (const color of cat.colorVersions) {
-            for (const version of cat.shirtVersions) {
-              const comboKey = `${version}_${color}`;
-              const counts = byCombo[comboKey];
-              const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
-              if (vTotal > 0) {
-                const versionName = getVersionDisplayName(version, img);
-                const colorName = getColorDisplayName(color);
-                const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','S/M','L/XL'];
-                const sizePieces = counts ? sizeOrder
-                  .map(sz => {
-                    const val = counts[sz] || 0;
-                    return val > 0 ? `${sz}${val}` : '';
-                  })
-                  .filter(Boolean)
-                  .join(' ') : '';
-                categoryItems.push({
-                  sku,
-                  name: `${name} (${versionName} ${colorName}${sizePieces ? ` - ${sizePieces}` : ''})`,
-                  qty: String(vTotal),
-                  version
-                });
-              }
-            }
-          }
-        }
-      } else if (hasColorVersions(img)) {
-        // For color categories, create separate items for each color
-        const colorVersions = formData.colorVersions?.[imagePath];
-        
-        if (colorVersions) {
-          for (const color of cat.colorVersions || []) {
-            const colorValue = colorVersions[color as keyof ColorVersion];
-            if (colorValue && colorValue.trim() !== '') {
-              const colorName = getColorDisplayName(color);
-              categoryItems.push({
-                sku,
-                name: `${name} (${colorName})`,
-                qty: colorValue
-              });
-            }
-          }
-        }
-      } else if (cat.hasShirtVersions && cat.shirtVersions) {
+      if (cat.hasShirtVersions && cat.shirtVersions) {
         // For shirt categories, create separate items for each version using size counts totals
         const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
         for (const version of cat.shirtVersions) {
@@ -111,8 +64,43 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
             });
           }
         }
+      } else if (cat.hasPantOptions && formData.pantOptions) {
+        // For pants with style/color options
+        const pOptions = formData.pantOptions[imagePath];
+        if (pOptions) {
+          // Sweatpants
+          if (pOptions.sweatpants?.steel && Number(pOptions.sweatpants.steel) > 0) {
+            categoryItems.push({
+              sku,
+              name: `${name} (Sweatpants - Steel)`,
+              qty: pOptions.sweatpants.steel
+            });
+          }
+          if (pOptions.sweatpants?.oxford && Number(pOptions.sweatpants.oxford) > 0) {
+            categoryItems.push({
+              sku,
+              name: `${name} (Sweatpants - Oxford)`,
+              qty: pOptions.sweatpants.oxford
+            });
+          }
+          // Joggers
+          if (pOptions.joggers?.steel && Number(pOptions.joggers.steel) > 0) {
+            categoryItems.push({
+              sku,
+              name: `${name} (Joggers - Steel)`,
+              qty: pOptions.joggers.steel
+            });
+          }
+          if (pOptions.joggers?.oxford && Number(pOptions.joggers.oxford) > 0) {
+            categoryItems.push({
+              sku,
+              name: `${name} (Joggers - Oxford)`,
+              qty: pOptions.joggers.oxford
+            });
+          }
+        }
       } else if (cat.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
-        // For sweatpant/jogger, add each of the four options as a line item
+        // For sweatpant/jogger (legacy), add each of the four options as a line item
         const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: '' };
         const options = [
           { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },

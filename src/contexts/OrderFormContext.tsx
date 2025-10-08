@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useOrderForm } from '../features/hooks';
-import { Category, FormData } from '../types';
+import { Category, FormData, PantOption } from '../types';
 
 interface OrderFormContextType {
   formData: FormData;
@@ -11,11 +11,11 @@ interface OrderFormContextType {
   handleQuantityChange: (imagePath: string, value: string) => void;
   handleShirtVersionChange: (imagePath: string, version: any, value: string) => void;
   handleSizeCountsChange: (imagePath: string, version: any, counts: any) => void;
-  handleColorVersionChange: (imagePath: string, color: any, value: string) => void;
-  handleShirtColorComboChange: (imagePath: string, version: string, color: string, value: string) => void;
-  handleShirtColorComboSizeCountsChange: (imagePath: string, version: string, color: string, counts: any) => void;
   handleDisplayOptionChange: (imagePath: string, option: any, value: string) => void;
   handleSweatpantJoggerOptionChange: (imagePath: string, option: any, value: string) => void;
+  handlePantOptionChange: (imagePath: string, option: PantOption) => void;
+  handleColorOptionChange: (imagePath: string, color: string, value: string) => void;
+  handleShirtColorSizeCountsChange: (imagePath: string, version: any, color: string, counts: any) => void;
   handleFormSubmit: (e: React.FormEvent) => void;
   handleBack: () => void;
   handleBackToSummary: () => void;

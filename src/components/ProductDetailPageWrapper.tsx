@@ -17,11 +17,11 @@ const ProductDetailPageWrapper: React.FC = () => {
     handleQuantityChange,
     handleShirtVersionChange,
     handleSizeCountsChange,
-    handleColorVersionChange,
-    handleShirtColorComboChange,
-    handleShirtColorComboSizeCountsChange,
     handleDisplayOptionChange,
     handleSweatpantJoggerOptionChange,
+    handlePantOptionChange,
+    handleColorOptionChange,
+    handleShirtColorSizeCountsChange,
   } = useOrderFormContext();
 
   if (!collegeConfig) {
@@ -35,11 +35,11 @@ const ProductDetailPageWrapper: React.FC = () => {
       onQuantityChange={handleQuantityChange}
       onShirtVersionChange={handleShirtVersionChange}
       onSizeCountsChange={handleSizeCountsChange}
-      onColorVersionChange={handleColorVersionChange}
-      onShirtColorComboChange={handleShirtColorComboChange}
-      onShirtColorComboSizeCountsChange={handleShirtColorComboSizeCountsChange}
       onDisplayOptionChange={handleDisplayOptionChange}
       onSweatpantJoggerOptionChange={handleSweatpantJoggerOptionChange}
+      onPantOptionChange={handlePantOptionChange}
+      onColorOptionChange={handleColorOptionChange}
+      onShirtColorSizeCountsChange={handleShirtColorSizeCountsChange}
     />
   );
 };

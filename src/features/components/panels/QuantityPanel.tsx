@@ -69,7 +69,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ) : (
               <div className="field">
                 <div className="field-label">Quantity</div>
-                <div className="field-control" style={{ maxWidth: '260px' }}>
+                <div className="field-control">
                   <QuantityStepper
                     value={Number(quantity || 0)}
                     onChange={(v) => onQuantityChange?.(imagePath, String(v))}
@@ -145,7 +145,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           ) : (
             <div className="field">
               <div className="field-label">Quantity</div>
-              <div className="field-control" style={{ maxWidth: '260px' }}>
+              <div className="field-control">
                 <QuantityStepper
                   value={Number(quantity || 0)}
                   onChange={(v) => onQuantityChange?.(imagePath, String(v))}

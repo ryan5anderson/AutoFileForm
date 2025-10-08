@@ -125,11 +125,11 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             quantities={formData.quantities}
             shirtVersions={formData.shirtVersions}
             shirtSizeCounts={formData.shirtSizeCounts}
-            colorVersions={formData.colorVersions}
-            shirtColorComboVersions={formData.shirtColorComboVersions}
-            shirtColorComboSizeCounts={formData.shirtColorComboSizeCounts}
             displayOptions={formData.displayOptions}
             sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
+            pantOptions={formData.pantOptions}
+            colorOptions={formData.colorOptions}
+            shirtColorSizeCounts={formData.shirtColorSizeCounts}
             readOnly={true}
             college={college}
           />

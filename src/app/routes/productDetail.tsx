@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Category, SizeCounts, ShirtVersion } from '../../types';
+import { Category, SizeCounts, ShirtVersion, PantOption } from '../../types';
 import ProductCard from '../../features/components/panels/QuantityPanel';
-import ColorVersionCard from '../../features/components/panels/ColorVersionPanel';
-import ShirtColorVersionCard from '../../features/components/panels/ShirtColorPanel';
 import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
-import { getProductName, getRackDisplayName, getImagePath, hasColorVersions, getVersionDisplayName } from '../../features/utils';
+import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
+import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
+import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
+import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions } from '../../features/utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
+import { getPackSize } from '../../config/packSizes';
 import '../../styles/product-detail.css';
 
 interface ProductDetailPageProps {
@@ -16,11 +18,11 @@ interface ProductDetailPageProps {
   onQuantityChange?: (imagePath: string, value: string) => void;
   onShirtVersionChange?: (imagePath: string, version: any, value: string) => void;
   onSizeCountsChange?: (imagePath: string, version: any, counts: any) => void;
-  onColorVersionChange?: (imagePath: string, color: any, value: string) => void;
-  onShirtColorComboChange?: (imagePath: string, version: string, color: string, value: string) => void;
-  onShirtColorComboSizeCountsChange?: (imagePath: string, version: string, color: string, counts: any) => void;
   onDisplayOptionChange?: (imagePath: string, option: any, value: string) => void;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: any, value: string) => void;
+  onPantOptionChange?: (imagePath: string, option: PantOption) => void;
+  onColorOptionChange?: (imagePath: string, color: string, value: string) => void;
+  onShirtColorSizeCountsChange?: (imagePath: string, version: any, color: string, counts: any) => void;
 }
 
 const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
@@ -29,11 +31,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   onQuantityChange,
   onShirtVersionChange,
   onSizeCountsChange,
-  onColorVersionChange,
-  onShirtColorComboChange,
-  onShirtColorComboSizeCountsChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
+  onPantOptionChange,
+  onColorOptionChange,
+  onShirtColorSizeCountsChange,
 }) => {
   const { college, category: categoryPath, productId } = useParams();
   const navigate = useNavigate();
@@ -45,22 +47,16 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   // Find the category from the categories list
   const category = categories.find(cat => cat.path === decodedCategoryPath);
 
-  // Tie-dye special case - calculate before hooks
-  const tieDyeImages = [
-    'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-    'M100482538 SHHODC Hover DTF on Black or Forest .png',
-    'M100437896 SHOUDC Over Under DTF on Forest.png',
-    'M102595496 SH2FDC Custom DTF on Maroon .png',
-  ];
-  const isTieDye = imageName ? tieDyeImages.includes(imageName) : false;
-  const filteredShirtVersions = isTieDye && category?.shirtVersions
-    ? category.shirtVersions.filter((v: string) => v !== 'crewneck')
-    : category?.shirtVersions;
-
-  // State for active tab (for shirt versions) - MUST be before any early returns
-  const [activeTab, setActiveTab] = useState<string>(
-    category?.hasShirtVersions && filteredShirtVersions ? filteredShirtVersions[0] : ''
-  );
+  // State for active tab (for shirt versions and display options) - MUST be before any early returns
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    if (category?.hasDisplayOptions) {
+      return 'displayOnly';
+    }
+    if (category?.hasShirtVersions && category.shirtVersions) {
+      return category.shirtVersions[0];
+    }
+    return '';
+  });
 
   // Early return AFTER all hooks
   if (!category || !imageName) {
@@ -78,6 +74,9 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const productName = category.name === 'Display Options' 
     ? getRackDisplayName(imageName) 
     : getProductName(imageName);
+
+  // Check if this is an applique product (should use simple quantity, not tabs)
+  const isApplique = imageName.toLowerCase().includes('applique');
 
   const handleDone = () => {
     // Navigate back and pass state to restore scroll position
@@ -98,43 +97,66 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   // Determine which configuration panel to render
   const renderConfigurationPanel = () => {
-    if (category.hasDisplayOptions) {
+    if (category.hasPantOptions) {
+      // Pants with sweatpants/joggers and steel/oxford options
+      const pantOption = formData.pantOptions?.[imagePath] || { 
+        sweatpants: { steel: '0', oxford: '0' }, 
+        joggers: { steel: '0', oxford: '0' } 
+      };
+      
+      return (
+        <PantOptionsPanel
+          pantOption={pantOption}
+          onChange={(option) => onPantOptionChange?.(imagePath, option)}
+          pantStyles={category.pantStyles}
+          categoryPath={category.path}
+        />
+      );
+    } else if (category.hasDisplayOptions) {
       const displayOption = formData.displayOptions?.[imagePath] || { displayOnly: '', displayStandardCasePack: '' };
-      return (
-        <DisplayOptionCard
-          {...cardProps}
-          displayOption={displayOption}
-          onDisplayOptionChange={onDisplayOptionChange}
-        />
-      );
-    } else if (imageName === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || imageName === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
-      const comboVersion = (formData.shirtColorComboSizeCounts?.[imagePath] as any) || {};
-      return (
-        <ShirtColorVersionCard
-          {...cardProps}
-          shirtColorComboVersion={comboVersion}
-          availableVersions={filteredShirtVersions}
-          availableColors={category.colorVersions}
-          onShirtColorComboChange={onShirtColorComboChange}
-          onShirtColorComboSizeCountsChange={onShirtColorComboSizeCountsChange}
-        />
-      );
-    } else if (hasColorVersions(imageName)) {
-      const colorVersion = formData.colorVersions?.[imagePath] || { black: '', forest: '', white: '', gray: '' };
-      return (
-        <ColorVersionCard
-          {...cardProps}
-          colorVersions={colorVersion}
-          availableColors={category.colorVersions}
-          onColorVersionChange={onColorVersionChange}
-        />
-      );
-    } else if (category.hasShirtVersions && filteredShirtVersions && filteredShirtVersions.length > 0) {
-      // Render with tabs - each tab shows its own content when active
+      const displayTabs = ['displayOnly', 'displayStandardCasePack'];
+      
       return (
         <>
           <div className="product-detail-tabs">
-            {filteredShirtVersions.map((version: string) => (
+            {displayTabs.map((tab) => (
+              <button
+                key={tab}
+                className={`product-detail-tab ${activeTab === tab ? 'product-detail-tab--active' : ''}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab === 'displayOnly' ? 'Display Only' : 'Display Standard Case Pack'}
+              </button>
+            ))}
+          </div>
+          <div className="product-detail-tab-content">
+            {displayTabs.map((tab) => (
+              <div 
+                key={tab}
+                className="product-detail-tab-panel"
+                style={{ display: activeTab === tab ? 'block' : 'none' }}
+              >
+                <DisplayOptionCard
+                  {...cardProps}
+                  displayOption={displayOption}
+                  onDisplayOptionChange={onDisplayOptionChange}
+                  activeOption={tab as 'displayOnly' | 'displayStandardCasePack'}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      );
+    } else if (category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length > 1 && !isApplique) {
+      // Check if this product has color options
+      const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
+      const hasColors = colors.length > 0;
+      
+      // Render with tabs - each tab shows its own content when active (only if more than 1 version)
+      return (
+        <>
+          <div className="product-detail-tabs">
+            {category.shirtVersions.map((version: string) => (
               <button
                 key={version}
                 className={`product-detail-tab ${activeTab === version ? 'product-detail-tab--active' : ''}`}
@@ -145,41 +167,104 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             ))}
           </div>
           <div className="product-detail-tab-content">
-            {filteredShirtVersions.map((version: string) => {
+            {category.shirtVersions.map((version: string) => {
               const versionKey = version as keyof ShirtVersion;
-              const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 };
+              const packSize = getPackSize(category.path, version, imageName);
               
-              return (
-                <div 
-                  key={version}
-                  className="product-detail-tab-panel"
-                  style={{ display: activeTab === version ? 'block' : 'none' }}
-                >
-                  <SizePackSelector
-                    counts={counts}
+              if (hasColors) {
+                // For products with colors, show ColorSizeSelector
+                const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey] || {};
+                return (
+                  <div 
+                    key={version}
+                    className="product-detail-tab-panel"
+                    style={{ display: activeTab === version ? 'block' : 'none' }}
+                  >
+                  <ColorSizeSelector
+                    colors={colors}
+                    colorSizeCounts={colorSizeCounts}
+                    onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey, color, counts)}
                     sizes={category.path.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
-                    onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                    packSize={packSize}
                   />
-                </div>
-              );
+                  </div>
+                );
+              } else {
+                // For single-color products, show regular SizePackSelector
+                const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 };
+                const packSize = getPackSize(category.path, version, imageName);
+                return (
+                  <div 
+                    key={version}
+                    className="product-detail-tab-panel"
+                    style={{ display: activeTab === version ? 'block' : 'none' }}
+                  >
+                    <SizePackSelector
+                      counts={counts}
+                      sizes={category.path.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
+                      onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                      packSize={packSize}
+                    />
+                  </div>
+                );
+              }
             })}
           </div>
         </>
       );
-    } else {
-      const quantity = formData.quantities?.[imagePath] || '';
+    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || isApplique) {
+      // Single shirt version OR applique - render without tabs, show "Quantity" label with size selector
+      const version = category.shirtVersions ? category.shirtVersions[0] : 'tshirt';
+      const versionKey = version as keyof ShirtVersion;
+      const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 };
+      const packSize = getPackSize(category.path, version, imageName);
+      
       return (
-        <ProductCard
-          {...cardProps}
-          categoryName={category.name}
-          quantity={quantity}
-          onQuantityChange={onQuantityChange}
-          sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' 
-            ? (formData.sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) 
-            : undefined}
-          onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
-        />
+        <div className="single-option-panel">
+          <div className="field">
+            <div className="field-label">Quantity</div>
+            <div className="field-control">
+              <SizePackSelector
+                counts={counts}
+                sizes={category.path.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
+                onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                packSize={packSize}
+              />
+            </div>
+          </div>
+        </div>
       );
+    } else {
+      // Check if this product has color options (for non-shirt items like hats)
+      const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
+      const hasColors = colors.length > 0;
+      
+      if (hasColors) {
+        // For non-shirt items with colors (like hats), show ColorQuantitySelector
+        const colorQuantities = formData.colorOptions?.[imagePath] || {};
+        return (
+          <ColorQuantitySelector
+            colors={colors}
+            colorQuantities={colorQuantities}
+            onChange={(color, value) => onColorOptionChange?.(imagePath, color, value)}
+          />
+        );
+      } else {
+        // Regular quantity selector
+        const quantity = formData.quantities?.[imagePath] || '';
+        return (
+          <ProductCard
+            {...cardProps}
+            categoryName={category.name}
+            quantity={quantity}
+            onQuantityChange={onQuantityChange}
+            sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' 
+              ? (formData.sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) 
+              : undefined}
+            onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
+          />
+        );
+      }
     }
   };
 
@@ -213,6 +298,21 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           <div className="product-detail-options-header">
             <h3>Configure Options</h3>
           </div>
+          {category.hasDisplayOptions && (
+            <div style={{
+              marginBottom: 'var(--space-4)',
+              padding: 'var(--space-3)',
+              background: 'var(--color-bg)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius)',
+              fontSize: '0.875rem',
+              color: 'var(--color-text)',
+              lineHeight: '1.5'
+            }}>
+              <strong>Display Only:</strong> Just the display unit without garments.<br />
+              <strong>Display Standard Case Pack:</strong> Display unit includes garments.
+            </div>
+          )}
           <div className="product-detail-options-content">
             {renderConfigurationPanel()}
           </div>

@@ -3,6 +3,16 @@
   "logo": "/logo/asulogo.png",
   "categories": [
     {
+      "name": "Display Options",
+      "path": "displays",
+      "hasDisplayOptions": true,
+      "images": [
+        "Arizona_State_3FT_Inline_500.jpg",
+        "Arizona_State_Premium Floor Display 2.0_500.jpg",
+        "Arizona_State_Tier2_Display_Floor_500.jpg"
+      ]
+    },
+    {
       "name": "Tshirts (Unisex)",
       "path": "tshirt/men",
       "hasShirtVersions": true,
@@ -11,13 +21,6 @@
         "longsleeve",
         "hoodie",
         "crewneck"
-      ],
-      "hasColorVersions": true,
-      "colorVersions": [
-        "maroon",
-        "steel",
-        "gold",
-        "black"
       ],
       "images": [
         "M102035313_SDARTC_Artificer_DTF_on_Maroon.png",
@@ -157,9 +160,10 @@
     {
       "name": "Pants",
       "path": "pants",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
+      "hasPantOptions": true,
+      "pantStyles": [
+        "sweatpants",
+        "joggers"
       ],
       "images": [
         "M102076247_SDINPC_Initiative_DTF_Black_Pants.png",

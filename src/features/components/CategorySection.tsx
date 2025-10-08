@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Category, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
-import ProductCard from './panels/QuantityPanel';
-import ShirtVersionCard from './panels/ShirtVersionPanel';
-import ColorVersionCard from './panels/ColorVersionPanel';
-import ShirtColorVersionCard from './panels/ShirtColorPanel';
-import DisplayOptionCard from './panels/DisplayOptionsPanel';
+import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts } from '../../types';
 import OrderSummaryCard from './OrderSummaryCard';
-import { Card, ButtonIcon } from '../../components/ui';
-import { getImagePath, hasColorVersions, getProductName, getRackDisplayName, getShirtVersionTotal } from '../utils';
+import { Card } from '../../components/ui';
+import { getImagePath, getProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 
 interface CategorySectionProps {
@@ -16,17 +11,14 @@ interface CategorySectionProps {
   quantities: Record<string, string>;
   shirtVersions?: Record<string, ShirtVersion>;
   shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, import('../../types').SizeCounts>>>;
-  colorVersions?: Record<string, ColorVersion>;
-  shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
-  shirtColorComboSizeCounts?: Record<string, Record<string, import('../../types').SizeCounts>>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
+  pantOptions?: Record<string, PantOption>;
+  colorOptions?: Record<string, ColorOption>;
+  shirtColorSizeCounts?: ShirtColorSizeCounts;
   onQuantityChange?: (imagePath: string, value: string) => void;
   onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
   onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: import('../../types').SizeCounts) => void;
-  onColorVersionChange?: (imagePath: string, color: keyof ColorVersion, value: string) => void;
-  onShirtColorComboChange?: (imagePath: string, version: string, color: string, value: string) => void;
-  onShirtColorComboSizeCountsChange?: (imagePath: string, version: string, color: string, counts: import('../../types').SizeCounts) => void;
   onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   readOnly?: boolean;
@@ -39,17 +31,14 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   quantities,
   shirtVersions = {},
   shirtSizeCounts = {},
-  colorVersions = {},
-  shirtColorComboVersions = {},
-  shirtColorComboSizeCounts = {},
   displayOptions = {},
   sweatpantJoggerOptions = {},
+  pantOptions = {},
+  colorOptions = {},
+  shirtColorSizeCounts = {},
   onQuantityChange,
   onShirtVersionChange,
   onSizeCountsChange,
-  onColorVersionChange,
-  onShirtColorComboChange,
-  onShirtColorComboSizeCountsChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
   readOnly = false,
@@ -59,23 +48,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
   // Helper function to check if an item has any quantity
   const hasQuantity = (imagePath: string, imageName: string) => {
-    // Handle tie-dye special case
-    const tieDyeImages = [
-      'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-      'M100482538 SHHODC Hover DTF on Black or Forest .png',
-      'M100437896 SHOUDC Over Under DTF on Forest.png',
-      'M102595496 SH2FDC Custom DTF on Maroon .png',
-    ];
-    
-    if (tieDyeImages.includes(imageName)) {
-      const comboVersions = shirtColorComboVersions[imagePath];
-      if (comboVersions) {
-        const totalQty = Object.values(comboVersions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-        return totalQty > 0;
-      }
-      return false;
-    }
-
     // Handle display options
     if (category.name === 'Display Options') {
       const displayOption = displayOptions[imagePath];
@@ -86,7 +58,18 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle sweatpants/joggers
+    // Handle pants with style/color options
+    if (category.hasPantOptions) {
+      const pOptions = pantOptions[imagePath];
+      if (pOptions) {
+        const sweatpantsTotal = Number(pOptions.sweatpants?.steel || 0) + Number(pOptions.sweatpants?.oxford || 0);
+        const joggersTotal = Number(pOptions.joggers?.steel || 0) + Number(pOptions.joggers?.oxford || 0);
+        return (sweatpantsTotal + joggersTotal) > 0;
+      }
+      return false;
+    }
+
+    // Handle sweatpants/joggers (legacy)
     if (category.name === 'Sweatpants/Joggers') {
       const sjOptions = sweatpantJoggerOptions[imagePath];
       if (sjOptions) {
@@ -96,18 +79,26 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle color versions
-    if (hasColorVersions(imageName)) {
-      const colorVersion = colorVersions[imagePath];
-      if (colorVersion) {
-        const totalQty = Object.values(colorVersion).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-        return totalQty > 0;
-      }
-      return false;
-    }
-
     // Handle shirt versions (prefer size counts if present)
     if (category.hasShirtVersions) {
+      // Check for color-based size counts first
+      if (hasColorOptions(imageName)) {
+        const colorSizeCountsByVersion = shirtColorSizeCounts[imagePath];
+        if (colorSizeCountsByVersion) {
+          const totalQty = Object.values(colorSizeCountsByVersion).reduce((sum, byColor) => {
+            if (!byColor) return sum;
+            const colorTotal = Object.values(byColor).reduce((colorSum, counts) => {
+              if (!counts) return colorSum;
+              const sizeTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
+              return colorSum + sizeTotal;
+            }, 0);
+            return sum + colorTotal;
+          }, 0);
+          if (totalQty > 0) return true;
+        }
+      }
+      
+      // Regular size counts
       const sizeCountsByVersion = shirtSizeCounts[imagePath];
       if (sizeCountsByVersion) {
         const totalQty = Object.values(sizeCountsByVersion).reduce((sum, counts) => {
@@ -120,6 +111,16 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       const shirtVersion = shirtVersions[imagePath];
       if (shirtVersion) {
         const totalQty = getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
+    // Handle non-shirt items with color options (like hats)
+    if (hasColorOptions(imageName)) {
+      const colorQty = colorOptions[imagePath];
+      if (colorQty) {
+        const totalQty = Object.values(colorQty).reduce((sum, qty) => sum + Number(qty || 0), 0);
         return totalQty > 0;
       }
       return false;
@@ -216,12 +217,12 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     quantities={quantities}
                     shirtVersions={shirtVersions}
                     shirtSizeCounts={shirtSizeCounts}
-                    colorVersions={colorVersions}
-                    shirtColorComboVersions={shirtColorComboVersions}
                     displayOptions={displayOptions}
                     sweatpantJoggerOptions={sweatpantJoggerOptions}
+                    pantOptions={pantOptions}
                     college={college}
                     hasShirtVersions={category.hasShirtVersions}
+                    hasPantOptions={category.hasPantOptions}
                   />
                 )}
               </Card.Header>

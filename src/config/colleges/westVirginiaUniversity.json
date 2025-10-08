@@ -3,6 +3,23 @@
   "logo": "/logo/wvulogo.png",
   "categories": [
     {
+      "name": "Display Options",
+      "path": "displays",
+      "hasDisplayOptions": true,
+      "images": [
+        "SHZ-WVU- Mimi Tower-500.jpg",
+        "WVU-Mini_Tower-500.jpg",
+        "WVU_3ft Inline_500PX.jpg",
+        "WVU_Mini Tower_IMG_3567_500PX.jpg",
+        "WVU_Mini_Tower_500PX.jpg",
+        "WVU_Mini_Tower_HatsOnly_500PX.jpg",
+        "WVU_Premium Floor Display 2.0_500PX.jpg",
+        "WVU_Tier2_Display_Floor_500PX.jpg",
+        "WVU_Tier3_Display_Floor_500PX.jpg",
+        "WVU_Tier3_Display_Floor_V2_PlushOnly_500PX.jpg"
+      ]
+    },
+    {
       "name": "Tshirts (Unisex)",
       "path": "tshirt/men",
       "hasShirtVersions": true,
@@ -11,12 +28,6 @@
         "longsleeve",
         "hoodie",
         "crewneck"
-      ],
-      "hasColorVersions": true,
-      "colorVersions": [
-        "gold",
-        "blue",
-        "white"
       ],
       "images": [
         "M100474172_SDFRES_Frege_DTF_on_Steel.png",
@@ -62,12 +73,6 @@
     {
       "name": "Caps",
       "path": "hat",
-      "hasColorVersions": true,
-      "colorVersions": [
-        "gold",
-        "blue",
-        "white"
-      ],
       "images": [
         "M102610896_SHE1CH_Custom_WV_White_Hat.png",
         "M102610969_SESCRH_Scrap_WhiteGrayor_Navy_Hat.png",
@@ -126,9 +131,10 @@
     {
       "name": "Pants",
       "path": "pants",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
+      "hasPantOptions": true,
+      "pantStyles": [
+        "sweatpants",
+        "joggers"
       ],
       "images": [
         "M100997846_SH2DPC_Custom_DTF_Navy_Pants.png",

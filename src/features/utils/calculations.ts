@@ -50,18 +50,6 @@ export function getQuantityMultiples(imageName: string, categoryName: string): n
   const name = imageName.toLowerCase();
   const cat = categoryName.toLowerCase();
 
-  // Explicit override for three specific tie-dye images
-  const tieDyeSKUs = [
-    'm100965414 shoudc ou go green dtf on forest.png',
-    'm100482538 shhodc hover dtf on black or forest .png',
-    'm100437896 shoudc over under dtf on forest.png',
-    'm102595496 sh2fdc custom dtf on maroon .png',
-  ];
-  if (tieDyeSKUs.includes(name)) return [8, 16, 24, 32, 40, 48];
-
-  // Tie-dye (always takes precedence)
-  if (name.includes('tie-dye') || cat.includes('tie-dye')) return [8, 16, 24, 32, 40, 48];
-
   // Women (force 8)
   if (cat.includes('women')) return [8, 16, 24, 32, 40, 48];
 

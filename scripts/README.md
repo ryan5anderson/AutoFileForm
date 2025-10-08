@@ -6,7 +6,7 @@ The `extract_pdf_images_with_captions.py` script extracts images from PDF art ap
 
 ## Features
 
-- ✅ Interactive college selection (Arizona State or Michigan State)
+- ✅ Interactive college selection (Arizona State, Michigan State, West Virginia University, or University of Pittsburgh)
 - ✅ Automatic image extraction with caption detection
 - ✅ Smart categorization (beanies, hats, shirts, etc.)
 - ✅ Clean slate approach (removes existing images before extraction)
@@ -30,7 +30,7 @@ python scripts/extract_pdf_images_with_captions.py path/to/artwork.pdf
 ```
 
 The script will:
-1. Prompt you to select a college (1 for Arizona State, 2 for Michigan State)
+1. Prompt you to select a college (1 for Arizona State, 2 for Michigan State, 3 for West Virginia University, 4 for University of Pittsburgh)
 2. Clean existing images in the selected college folder
 3. Extract images from the PDF
 4. Categorize images based on product type
@@ -163,8 +163,10 @@ python scripts/extract_pdf_images_with_captions.py "Art Approval Flyer_Email.pdf
 Select target college:
   1. Arizona State
   2. Michigan State
+  3. West Virginia University
+  4. University of Pittsburgh
 
-Enter your choice (1 or 2): 1
+Enter your choice (1, 2, 3, or 4): 1
 
 # 4. Script processes and displays progress
 ✓ Selected: ArizonaState
