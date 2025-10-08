@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FormData, Page, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, Category, SizeCounts } from '../../types';
+import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
 import { validateFormData, createTemplateParams } from '../utils/index';
 import { sendOrderEmail } from '../../services/emailService';
+import { getPackSize } from '../../config/packSizes';
 
 export const useOrderForm = (categories: Category[]) => {
   const navigate = useNavigate();
@@ -16,12 +17,12 @@ export const useOrderForm = (categories: Category[]) => {
     orderNotes: '',
     quantities: {} as Record<string, string>,
     shirtVersions: {} as Record<string, ShirtVersion>,
-    colorVersions: {} as Record<string, ColorVersion>,
-    shirtColorComboVersions: {} as Record<string, ShirtColorComboVersion>,
     displayOptions: {} as Record<string, DisplayOption>,
     sweatpantJoggerOptions: {} as Record<string, SweatpantJoggerOption>,
+    pantOptions: {} as Record<string, PantOption>,
     shirtSizeCounts: {} as Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>,
-    shirtColorComboSizeCounts: {} as Record<string, Record<string, SizeCounts>>,
+    colorOptions: {} as Record<string, ColorOption>,
+    shirtColorSizeCounts: {} as ShirtColorSizeCounts,
   });
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>('form');
@@ -86,46 +87,6 @@ export const useOrderForm = (categories: Category[]) => {
     }));
   };
 
-  const handleColorVersionChange = (imagePath: string, color: keyof ColorVersion, value: string) => {
-    setFormData((prev: FormData) => ({
-      ...prev,
-      colorVersions: {
-        ...prev.colorVersions,
-        [imagePath]: {
-          ...prev.colorVersions?.[imagePath],
-          [color]: value
-        } as ColorVersion
-      }
-    }));
-  };
-
-  const handleShirtColorComboChange = (imagePath: string, version: string, color: string, value: string) => {
-    setFormData((prev: FormData) => ({
-      ...prev,
-      shirtColorComboVersions: {
-        ...prev.shirtColorComboVersions,
-        [imagePath]: {
-          ...prev.shirtColorComboVersions?.[imagePath],
-          [`${version}_${color}`]: value
-        } as ShirtColorComboVersion
-      }
-    }));
-  };
-
-  const handleShirtColorComboSizeCountsChange = (imagePath: string, version: string, color: string, counts: SizeCounts) => {
-    const comboKey = `${version}_${color}`;
-    setFormData((prev: FormData) => ({
-      ...prev,
-      shirtColorComboSizeCounts: {
-        ...prev.shirtColorComboSizeCounts,
-        [imagePath]: {
-          ...(prev.shirtColorComboSizeCounts?.[imagePath] || {}),
-          [comboKey]: counts,
-        },
-      },
-    }));
-  };
-
   const handleDisplayOptionChange = (imagePath: string, option: keyof DisplayOption, value: string) => {
     setFormData((prev: FormData) => ({
       ...prev,
@@ -152,29 +113,73 @@ export const useOrderForm = (categories: Category[]) => {
     }));
   };
 
+  const handlePantOptionChange = (imagePath: string, option: PantOption) => {
+    setFormData((prev: FormData) => ({
+      ...prev,
+      pantOptions: {
+        ...prev.pantOptions,
+        [imagePath]: option
+      }
+    }));
+  };
+
+  const handleColorOptionChange = (imagePath: string, color: string, value: string) => {
+    setFormData((prev: FormData) => ({
+      ...prev,
+      colorOptions: {
+        ...prev.colorOptions,
+        [imagePath]: {
+          ...(prev.colorOptions?.[imagePath] || {}),
+          [color]: value
+        }
+      }
+    }));
+  };
+
+  const handleShirtColorSizeCountsChange = (imagePath: string, version: keyof ShirtVersion, color: string, counts: SizeCounts) => {
+    setFormData((prev: FormData) => ({
+      ...prev,
+      shirtColorSizeCounts: {
+        ...prev.shirtColorSizeCounts,
+        [imagePath]: {
+          ...(prev.shirtColorSizeCounts?.[imagePath] || {}),
+          [version]: {
+            ...(prev.shirtColorSizeCounts?.[imagePath]?.[version] || {}),
+            [color]: counts
+          }
+        }
+      }
+    }));
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Pack-of-7 validation for shirt size counts
-    const hasInvalidPack = Object.values(formData.shirtSizeCounts || {}).some((byVersion) => {
-      return Object.values(byVersion || {}).some((counts) => {
+    // Dynamic pack size validation for shirt size counts
+    let validationError: string | null = null;
+    
+    Object.entries(formData.shirtSizeCounts || {}).forEach(([imagePath, byVersion]) => {
+      // Extract category path and product name from imagePath
+      const pathParts = imagePath.split('/');
+      const categoryPath = pathParts.length > 1 ? pathParts.slice(0, -1).join('/') : pathParts[0];
+      const productName = pathParts[pathParts.length - 1];
+      
+      Object.entries(byVersion || {}).forEach(([version, counts]) => {
+        const packSize = getPackSize(categoryPath, version, productName);
         const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
-        return total > 0 && total % 7 !== 0;
-      });
-    }) || Object.values(formData.shirtColorComboSizeCounts || {}).some((byCombo) => {
-      return Object.values(byCombo || {}).some((counts) => {
-        const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
-        return total > 0 && total % 7 !== 0;
+        if (total > 0 && total % packSize !== 0) {
+          validationError = `Please ensure all selected garment sizes total to multiples of ${packSize}.`;
+        }
       });
     });
 
-    if (hasInvalidPack) {
-      setError('Please ensure all selected garment sizes total to multiples of 7.');
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
-    const validationError = validateFormData(formData);
-    if (validationError) {
-      setError(validationError);
+    const formValidationError = validateFormData(formData);
+    if (formValidationError) {
+      setError(formValidationError);
       return;
     }
     setError(null);
@@ -238,11 +243,11 @@ export const useOrderForm = (categories: Category[]) => {
     handleQuantityChange,
     handleShirtVersionChange,
     handleSizeCountsChange,
-    handleColorVersionChange,
-    handleShirtColorComboChange,
-    handleShirtColorComboSizeCountsChange,
     handleDisplayOptionChange,
     handleSweatpantJoggerOptionChange,
+    handlePantOptionChange,
+    handleColorOptionChange,
+    handleShirtColorSizeCountsChange,
     handleFormSubmit,
     handleBack,
     handleBackToSummary,

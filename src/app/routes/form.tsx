@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, ColorVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
 import CategorySection from '../../features/components/CategorySection';
 import OrderNotesSection from '../../features/components/OrderNotesSection';
@@ -21,13 +21,10 @@ interface FormPageProps {
   onQuantityChange: (imagePath: string, value: string) => void;
   onShirtVersionChange: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
   onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: SizeCounts) => void;
-  onColorVersionChange: (imagePath: string, color: keyof ColorVersion, value: string) => void;
   onDisplayOptionChange: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   onSweatpantJoggerOptionChange: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   error: string | null;
-  onShirtColorComboChange: (imagePath: string, version: string, color: string, value: string) => void;
-  onShirtColorComboSizeCountsChange?: (imagePath: string, version: string, color: string, counts: SizeCounts) => void;
   collegeConfig?: CollegeConfig;
   college?: string;
 }
@@ -38,17 +35,15 @@ const FormPage: React.FC<FormPageProps> = ({
   onQuantityChange,
   onShirtVersionChange,
   onSizeCountsChange,
-  onColorVersionChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
   onSubmit,
   error,
-  onShirtColorComboChange,
-  onShirtColorComboSizeCountsChange,
   collegeConfig,
   college
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const categories = useMemo(() => {
     const list = collegeConfig ? [...collegeConfig.categories] : [];
     // Move display options to the bottom if present
@@ -63,6 +58,22 @@ const FormPage: React.FC<FormPageProps> = ({
   const collegeName = collegeConfig ? collegeConfig.name : 'College';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
+
+  // Scroll to category when returning from product detail page
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.returnFromProduct && state?.scrollToCategory) {
+      const categoryId = state.scrollToCategory.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
+      setTimeout(() => {
+        const element = document.getElementById(categoryId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      // Clear the state after scrolling
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -154,17 +165,14 @@ const FormPage: React.FC<FormPageProps> = ({
               quantities={formData.quantities}
               shirtVersions={formData.shirtVersions}
               shirtSizeCounts={formData.shirtSizeCounts}
-              colorVersions={formData.colorVersions}
-              shirtColorComboVersions={formData.shirtColorComboVersions}
-              shirtColorComboSizeCounts={formData.shirtColorComboSizeCounts}
               displayOptions={formData.displayOptions}
               sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
+              pantOptions={formData.pantOptions}
+              colorOptions={formData.colorOptions}
+              shirtColorSizeCounts={formData.shirtColorSizeCounts}
               onQuantityChange={onQuantityChange}
               onShirtVersionChange={onShirtVersionChange}
               onSizeCountsChange={onSizeCountsChange}
-              onColorVersionChange={onColorVersionChange}
-              onShirtColorComboChange={onShirtColorComboChange}
-              onShirtColorComboSizeCountsChange={onShirtColorComboSizeCountsChange}
               onDisplayOptionChange={onDisplayOptionChange}
               onSweatpantJoggerOptionChange={onSweatpantJoggerOptionChange}
               college={college}

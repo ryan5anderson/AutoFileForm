@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, ColorVersion } from '../../types';
+import { FormData, Category, ShirtVersion } from '../../types';
 import { colleges } from '../../config';
-import { getProductName, getImagePath, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, hasColorVersions, getColorDisplayName } from '../../features/utils';
+import { getProductName, getImagePath, getVersionDisplayName, getRackToCardMapping, getRackDisplayName } from '../../features/utils';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 import { useOrderForm } from '../../features/hooks';
@@ -38,6 +38,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
       document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
     } else if (urlCollege === 'michiganstate') {
       document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else if (urlCollege === 'westvirginiauniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }
@@ -154,21 +156,6 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
             // Check if any image in the category has a nonzero quantity or selection
             return category.images.some(img => {
               const imagePath = getImagePath(category.path, img);
-              // Tie-dye
-              const tieDyeImages = [
-                'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-                'M100482538 SHHODC Hover DTF on Black or Forest .png',
-                'M100437896 SHOUDC Over Under DTF on Forest.png',
-                'M102595496 SH2FDC Custom DTF on Maroon .png',
-              ];
-              if (tieDyeImages.includes(img)) {
-                const comboVersions = formData.shirtColorComboVersions?.[imagePath];
-                if (comboVersions) {
-                  for (const value of Object.values(comboVersions)) {
-                    if (value && Number(value) > 0) return true;
-                  }
-                }
-              }
               // Display Options
               if (category.hasDisplayOptions) {
                 const displayOption = formData.displayOptions?.[imagePath];
@@ -178,11 +165,6 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               if (category.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
                 const sj = formData.sweatpantJoggerOptions[imagePath];
                 if (sj && Object.values(sj).some(val => Number(val) > 0)) return true;
-              }
-              // Color Versions
-              if (hasColorVersions(img)) {
-                const colorVersions = formData.colorVersions?.[imagePath];
-                if (colorVersions && Object.values(colorVersions).some(val => Number(val) > 0)) return true;
               }
               // Shirt Versions - prefer size counts
               if (category.hasShirtVersions && category.shirtVersions) {
@@ -210,67 +192,6 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               {category.images.map((img) => {
                 const imagePath = getImagePath(category.path, img);
                 const productName = category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img);
-                // --- BEGIN TIE-DYE FIRST ---
-                const tieDyeImages = [
-                  'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-                  'M100482538 SHHODC Hover DTF on Black or Forest .png',
-                  'M100437896 SHOUDC Over Under DTF on Forest.png',
-                  'M102595496 SH2FDC Custom DTF on Maroon .png',
-                ];
-                if (tieDyeImages.includes(img)) {
-                  const comboVersions = formData.shirtColorComboSizeCounts?.[imagePath];
-                  const categoryShirtVersions = category.shirtVersions || ['tshirt', 'longsleeve', 'hoodie'];
-                  const categoryColors = category.colorVersions || ['black', 'forest'];
-                  let totalQty = 0;
-                  const rows = [];
-                  for (const version of categoryShirtVersions) {
-                    for (const color of categoryColors) {
-                      const comboKey = `${version}_${color}`;
-                      const counts = comboVersions?.[comboKey];
-                      const vTotal = counts ? Object.values(counts).reduce((a:number,b:number)=>a+b,0) : 0;
-                      if (vTotal > 0) {
-                        totalQty += vTotal;
-                        rows.push(
-                          <div key={comboKey} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
-                            <span>{getVersionDisplayName(version, img)} {getColorDisplayName(color)}</span>
-                            <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
-                          </div>
-                        );
-                      }
-                    }
-                  }
-                  if (totalQty > 0) {
-                    return (
-                      <div key={img} style={{
-                        marginBottom: 'var(--space-3)',
-                        padding: 'var(--space-3)',
-                        background: 'var(--color-bg)',
-                        borderRadius: 'var(--radius)',
-                        border: '1px solid var(--color-border)'
-                      }}>
-                        <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)' }}>{productName}</div>
-                        {rows}
-                        <div style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          padding: 'var(--space-1) 0',
-                          fontSize: '0.875rem',
-                          marginLeft: 'var(--space-3)',
-                          fontWeight: '600',
-                          color: 'var(--color-primary)',
-                          borderTop: '1px solid var(--color-border)',
-                          marginTop: 'var(--space-2)',
-                          paddingTop: 'var(--space-2)'
-                        }}>
-                          <span>Total</span>
-                          <span>Qty: {totalQty}</span>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                }
-                // --- END TIE-DYE FIRST ---
                 // Handle Display Options
                 if (category.hasDisplayOptions) {
                   const displayOption = formData.displayOptions?.[imagePath];
@@ -383,56 +304,6 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                         }}>
                           <span>Total</span>
                           <span>Qty: {total}</span>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                }
-                // Handle Color Versions
-                if (hasColorVersions(img)) {
-                  const colorVersions = formData.colorVersions?.[imagePath];
-                  const totalQty = Object.values(colorVersions || {}).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-                  if (totalQty > 0) {
-                    return (
-                      <div key={img} style={{
-                        marginBottom: 'var(--space-3)',
-                        padding: 'var(--space-3)',
-                        background: 'var(--color-bg)',
-                        borderRadius: 'var(--radius)',
-                        border: '1px solid var(--color-border)'
-                      }}>
-                        <div style={{
-                          fontWeight: '600',
-                          fontSize: '1rem',
-                          marginBottom: 'var(--space-2)',
-                          color: 'var(--color-text)'
-                        }}>{productName}</div>
-                        {category.colorVersions?.map((color) => {
-                          const colorKey = color as keyof ColorVersion;
-                          const colorValue = colorVersions?.[colorKey];
-                          const displayName = getColorDisplayName(color);
-                          return (Number(colorValue) > 0 ? (
-                            <div key={color} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
-                              <span>{displayName}</span>
-                              <span style={{ fontWeight: '500' }}>Qty: {colorValue}</span>
-                            </div>
-                          ) : null);
-                        })}
-                        <div style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          padding: 'var(--space-1) 0',
-                          fontSize: '0.875rem',
-                          marginLeft: 'var(--space-3)',
-                          fontWeight: '600',
-                          color: 'var(--color-primary)',
-                          borderTop: '1px solid var(--color-border)',
-                          marginTop: 'var(--space-2)',
-                          paddingTop: 'var(--space-2)'
-                        }}>
-                          <span>Total</span>
-                          <span>Qty: {totalQty}</span>
                         </div>
                       </div>
                     );

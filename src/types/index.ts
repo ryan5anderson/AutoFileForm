@@ -4,9 +4,9 @@ export interface Category {
   images: string[];
   hasShirtVersions?: boolean;
   shirtVersions?: string[]; // Array of available versions for this category
-  hasColorVersions?: boolean;
-  colorVersions?: string[]; // Array of available colors for this category
   hasDisplayOptions?: boolean; // New property for display options
+  hasPantOptions?: boolean; // Property for pants with style/color options
+  pantStyles?: string[]; // Array of available pant styles (e.g., ['sweatpants', 'joggers'])
 }
 
 export interface College {
@@ -22,17 +22,6 @@ export interface ShirtVersion {
   crewneck?: string;
 }
 
-export interface ColorVersion {
-  black?: string;
-  forest?: string;
-  white?: string;
-  gray?: string;
-}
-
-export interface ShirtColorComboVersion {
-  [versionColor: string]: string; // e.g. 'tshirt_black', 'hoodie_forest'
-}
-
 export interface DisplayOption {
   displayOnly: string;
   displayStandardCasePack: string;
@@ -45,9 +34,29 @@ export interface SweatpantJoggerOption {
   joggerOxford: string;
 }
 
+// New interface for pant options with style and color structure
+export interface PantOption {
+  sweatpants?: {
+    steel: string;
+    oxford: string;
+  };
+  joggers?: {
+    steel: string;
+    oxford: string;
+  };
+}
+
 // Size-based ordering for shirt versions
 export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'S/M' | 'L/XL';
 export type SizeCounts = Record<Size, number>;
+
+// Color options for products with multiple colors
+export interface ColorOption {
+  [colorName: string]: string; // colorName -> quantity
+}
+
+// For shirt versions with colors: imagePath -> version -> color -> SizeCounts
+export type ShirtColorSizeCounts = Record<string, Partial<Record<keyof ShirtVersion, Record<string, SizeCounts>>>>;
 
 export interface FormData {
   company: string;
@@ -57,14 +66,15 @@ export interface FormData {
   orderNotes: string;
   quantities: Record<string, string>;
   shirtVersions?: Record<string, ShirtVersion>;
-  colorVersions?: Record<string, ColorVersion>;
-  shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
-  // imagePath -> version -> SizeCounts
+  pantOptions?: Record<string, PantOption>; // New: imagePath -> PantOption
+  // imagePath -> version -> SizeCounts (for single-color shirts)
   shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>;
-  // imagePath -> (version_color) -> SizeCounts for tie-dye combos
-  shirtColorComboSizeCounts?: Record<string, Record<string, SizeCounts>>;
+  // imagePath -> version -> color -> SizeCounts (for multi-color shirts)
+  shirtColorSizeCounts?: ShirtColorSizeCounts;
+  // imagePath -> colorName -> quantity (for non-shirt items with colors like hats)
+  colorOptions?: Record<string, ColorOption>;
 }
 
 export interface EmailCategory {

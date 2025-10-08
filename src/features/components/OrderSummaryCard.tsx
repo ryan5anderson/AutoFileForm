@@ -1,6 +1,6 @@
 import React from 'react';
-import { getImagePath, getShirtVersionTotal, hasColorVersions } from '../utils';
-import { ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption, SizeCounts, Size } from '../../types';
+import { getImagePath, getShirtVersionTotal } from '../utils';
+import { ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, SizeCounts, Size } from '../../types';
 
 interface OrderSummaryCardProps {
   categoryPath: string;
@@ -9,14 +9,12 @@ interface OrderSummaryCardProps {
   quantities: Record<string, string>;
   shirtVersions?: Record<string, ShirtVersion>;
   shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>;
-  colorVersions?: Record<string, ColorVersion>;
-  shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
-  // imagePath -> comboKey -> SizeCounts (tie-dye)
-  shirtColorComboSizeCounts?: Record<string, Record<string, SizeCounts>>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
+  pantOptions?: Record<string, PantOption>;
   college?: string;
   hasShirtVersions?: boolean;
+  hasPantOptions?: boolean;
 }
 
 const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
@@ -26,35 +24,16 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   quantities,
   shirtVersions = {},
   shirtSizeCounts = {},
-  colorVersions = {},
-  shirtColorComboVersions = {},
-  shirtColorComboSizeCounts = {},
   displayOptions = {},
   sweatpantJoggerOptions = {},
+  pantOptions = {},
   college,
-  hasShirtVersions = false
+  hasShirtVersions = false,
+  hasPantOptions = false
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
 
   const getQuantityInfo = () => {
-    // Handle tie-dye special case
-    const tieDyeImages = [
-      'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-      'M100482538 SHHODC Hover DTF on Black or Forest .png',
-      'M100437896 SHOUDC Over Under DTF on Forest.png',
-      'M102595496 SH2FDC Custom DTF on Maroon .png',
-    ];
-    
-    if (tieDyeImages.includes(imageName)) {
-      const byCombo = shirtColorComboSizeCounts[imagePath] || {};
-      const totals = Object.values(byCombo).map((c) => Object.values(c || {}).reduce((a:number,b:number)=>a+b,0));
-      const totalQty = totals.reduce((a,b)=>a+b,0);
-      if (totalQty > 0) {
-        return { total: totalQty, details: 'Tie-dye variants' };
-      }
-      return null;
-    }
-
     // Handle display options
     if (categoryName === 'Display Options') {
       const displayOption = displayOptions[imagePath];
@@ -74,7 +53,34 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
       return null;
     }
 
-    // Handle sweatpants/joggers
+    // Handle pants with style/color options
+    if (hasPantOptions) {
+      const pOptions = pantOptions[imagePath];
+      if (pOptions) {
+        const sweatpantsTotal = Number(pOptions.sweatpants?.steel || 0) + Number(pOptions.sweatpants?.oxford || 0);
+        const joggersTotal = Number(pOptions.joggers?.steel || 0) + Number(pOptions.joggers?.oxford || 0);
+        const totalQty = sweatpantsTotal + joggersTotal;
+        if (totalQty > 0) {
+          const details = [];
+          if (pOptions.sweatpants?.steel && Number(pOptions.sweatpants.steel) > 0) {
+            details.push(`Sweatpants Steel: ${pOptions.sweatpants.steel}`);
+          }
+          if (pOptions.sweatpants?.oxford && Number(pOptions.sweatpants.oxford) > 0) {
+            details.push(`Sweatpants Oxford: ${pOptions.sweatpants.oxford}`);
+          }
+          if (pOptions.joggers?.steel && Number(pOptions.joggers.steel) > 0) {
+            details.push(`Joggers Steel: ${pOptions.joggers.steel}`);
+          }
+          if (pOptions.joggers?.oxford && Number(pOptions.joggers.oxford) > 0) {
+            details.push(`Joggers Oxford: ${pOptions.joggers.oxford}`);
+          }
+          return { total: totalQty, details: details.join(', ') };
+        }
+      }
+      return null;
+    }
+
+    // Handle sweatpants/joggers (legacy)
     if (categoryName === 'Sweatpants/Joggers') {
       const sjOptions = sweatpantJoggerOptions[imagePath];
       if (sjOptions) {
@@ -92,31 +98,6 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
           }
           if (sjOptions.joggerOxford && Number(sjOptions.joggerOxford) > 0) {
             details.push(`Jogger Oxford: ${sjOptions.joggerOxford}`);
-          }
-          return { total: totalQty, details: details.join(', ') };
-        }
-      }
-      return null;
-    }
-
-    // Handle color versions
-    if (hasColorVersions(imageName)) {
-      const colorVersion = colorVersions[imagePath];
-      if (colorVersion) {
-        const totalQty = Object.values(colorVersion).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-        if (totalQty > 0) {
-          const details = [];
-          if (colorVersion.black && Number(colorVersion.black) > 0) {
-            details.push(`Black: ${colorVersion.black}`);
-          }
-          if (colorVersion.forest && Number(colorVersion.forest) > 0) {
-            details.push(`Forest: ${colorVersion.forest}`);
-          }
-          if (colorVersion.white && Number(colorVersion.white) > 0) {
-            details.push(`White: ${colorVersion.white}`);
-          }
-          if (colorVersion.gray && Number(colorVersion.gray) > 0) {
-            details.push(`Gray: ${colorVersion.gray}`);
           }
           return { total: totalQty, details: details.join(', ') };
         }

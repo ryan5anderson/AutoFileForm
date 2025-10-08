@@ -44,6 +44,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
       document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
     } else if (college === 'michiganstate') {
       document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else if (college === 'westvirginiauniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }
@@ -123,11 +125,11 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             quantities={formData.quantities}
             shirtVersions={formData.shirtVersions}
             shirtSizeCounts={formData.shirtSizeCounts}
-            colorVersions={formData.colorVersions}
-            shirtColorComboVersions={formData.shirtColorComboVersions}
-            shirtColorComboSizeCounts={formData.shirtColorComboSizeCounts}
             displayOptions={formData.displayOptions}
             sweatpantJoggerOptions={formData.sweatpantJoggerOptions}
+            pantOptions={formData.pantOptions}
+            colorOptions={formData.colorOptions}
+            shirtColorSizeCounts={formData.shirtColorSizeCounts}
             readOnly={true}
             college={college}
           />

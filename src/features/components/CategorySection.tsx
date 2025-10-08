@@ -1,31 +1,24 @@
-import React, { useState } from 'react';
-import { Category, ShirtVersion, ColorVersion, ShirtColorComboVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
-import ProductCard from './panels/QuantityPanel';
-import ShirtVersionCard from './panels/ShirtVersionPanel';
-import ColorVersionCard from './panels/ColorVersionPanel';
-import ShirtColorVersionCard from './panels/ShirtColorPanel';
-import DisplayOptionCard from './panels/DisplayOptionsPanel';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts } from '../../types';
 import OrderSummaryCard from './OrderSummaryCard';
-import { Card, ButtonIcon } from '../../components/ui';
-import { getImagePath, hasColorVersions, getProductName, getRackDisplayName, getShirtVersionTotal } from '../utils';
-import { asset } from '../../utils/asset';
+import { Card } from '../../components/ui';
+import { getImagePath, getProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+import { asset, getCollegeFolderName } from '../../utils/asset';
 
 interface CategorySectionProps {
   category: Category;
   quantities: Record<string, string>;
   shirtVersions?: Record<string, ShirtVersion>;
   shirtSizeCounts?: Record<string, Partial<Record<keyof ShirtVersion, import('../../types').SizeCounts>>>;
-  colorVersions?: Record<string, ColorVersion>;
-  shirtColorComboVersions?: Record<string, ShirtColorComboVersion>;
-  shirtColorComboSizeCounts?: Record<string, Record<string, import('../../types').SizeCounts>>;
   displayOptions?: Record<string, DisplayOption>;
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
+  pantOptions?: Record<string, PantOption>;
+  colorOptions?: Record<string, ColorOption>;
+  shirtColorSizeCounts?: ShirtColorSizeCounts;
   onQuantityChange?: (imagePath: string, value: string) => void;
   onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
   onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: import('../../types').SizeCounts) => void;
-  onColorVersionChange?: (imagePath: string, color: keyof ColorVersion, value: string) => void;
-  onShirtColorComboChange?: (imagePath: string, version: string, color: string, value: string) => void;
-  onShirtColorComboSizeCountsChange?: (imagePath: string, version: string, color: string, counts: import('../../types').SizeCounts) => void;
   onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   readOnly?: boolean;
@@ -38,56 +31,23 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   quantities,
   shirtVersions = {},
   shirtSizeCounts = {},
-  colorVersions = {},
-  shirtColorComboVersions = {},
-  shirtColorComboSizeCounts = {},
   displayOptions = {},
   sweatpantJoggerOptions = {},
+  pantOptions = {},
+  colorOptions = {},
+  shirtColorSizeCounts = {},
   onQuantityChange,
   onShirtVersionChange,
   onSizeCountsChange,
-  onColorVersionChange,
-  onShirtColorComboChange,
-  onShirtColorComboSizeCountsChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
   readOnly = false,
   college
 }) => {
-  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
-
-  // Helper function to toggle card expansion
-  const toggleCardExpansion = (imagePath: string) => {
-    setExpandedCards(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(imagePath)) {
-        newSet.delete(imagePath);
-      } else {
-        newSet.add(imagePath);
-      }
-      return newSet;
-    });
-  };
+  const navigate = useNavigate();
 
   // Helper function to check if an item has any quantity
   const hasQuantity = (imagePath: string, imageName: string) => {
-    // Handle tie-dye special case
-    const tieDyeImages = [
-      'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-      'M100482538 SHHODC Hover DTF on Black or Forest .png',
-      'M100437896 SHOUDC Over Under DTF on Forest.png',
-      'M102595496 SH2FDC Custom DTF on Maroon .png',
-    ];
-    
-    if (tieDyeImages.includes(imageName)) {
-      const comboVersions = shirtColorComboVersions[imagePath];
-      if (comboVersions) {
-        const totalQty = Object.values(comboVersions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-        return totalQty > 0;
-      }
-      return false;
-    }
-
     // Handle display options
     if (category.name === 'Display Options') {
       const displayOption = displayOptions[imagePath];
@@ -98,7 +58,18 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle sweatpants/joggers
+    // Handle pants with style/color options
+    if (category.hasPantOptions) {
+      const pOptions = pantOptions[imagePath];
+      if (pOptions) {
+        const sweatpantsTotal = Number(pOptions.sweatpants?.steel || 0) + Number(pOptions.sweatpants?.oxford || 0);
+        const joggersTotal = Number(pOptions.joggers?.steel || 0) + Number(pOptions.joggers?.oxford || 0);
+        return (sweatpantsTotal + joggersTotal) > 0;
+      }
+      return false;
+    }
+
+    // Handle sweatpants/joggers (legacy)
     if (category.name === 'Sweatpants/Joggers') {
       const sjOptions = sweatpantJoggerOptions[imagePath];
       if (sjOptions) {
@@ -108,18 +79,26 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle color versions
-    if (hasColorVersions(imageName)) {
-      const colorVersion = colorVersions[imagePath];
-      if (colorVersion) {
-        const totalQty = Object.values(colorVersion).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-        return totalQty > 0;
-      }
-      return false;
-    }
-
     // Handle shirt versions (prefer size counts if present)
     if (category.hasShirtVersions) {
+      // Check for color-based size counts first
+      if (hasColorOptions(imageName)) {
+        const colorSizeCountsByVersion = shirtColorSizeCounts[imagePath];
+        if (colorSizeCountsByVersion) {
+          const totalQty = Object.values(colorSizeCountsByVersion).reduce((sum, byColor) => {
+            if (!byColor) return sum;
+            const colorTotal = Object.values(byColor).reduce((colorSum, counts) => {
+              if (!counts) return colorSum;
+              const sizeTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
+              return colorSum + sizeTotal;
+            }, 0);
+            return sum + colorTotal;
+          }, 0);
+          if (totalQty > 0) return true;
+        }
+      }
+      
+      // Regular size counts
       const sizeCountsByVersion = shirtSizeCounts[imagePath];
       if (sizeCountsByVersion) {
         const totalQty = Object.values(sizeCountsByVersion).reduce((sum, counts) => {
@@ -132,6 +111,16 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       const shirtVersion = shirtVersions[imagePath];
       if (shirtVersion) {
         const totalQty = getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
+    // Handle non-shirt items with color options (like hats)
+    if (hasColorOptions(imageName)) {
+      const colorQty = colorOptions[imagePath];
+      if (colorQty) {
+        const totalQty = Object.values(colorQty).reduce((sum, qty) => sum + Number(qty || 0), 0);
         return totalQty > 0;
       }
       return false;
@@ -184,21 +173,23 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <div className="section__grid" style={{ alignItems: 'start' }}>
         {filteredImages.map((img: string) => {
           const imagePath = getImagePath(category.path, img);
-          const isExpanded = expandedCards.has(imagePath);
+          
+          const handleCardClick = () => {
+            if (!readOnly) {
+              // Navigate to product detail page
+              const encodedCategory = encodeURIComponent(category.path);
+              const encodedProductId = encodeURIComponent(img);
+              navigate(`/${college}/product/${encodedCategory}/${encodedProductId}`);
+            }
+          };
           
           return (
             <Card
               key={img}
-              expanded={isExpanded}
+              className={!readOnly ? 'card--clickable' : ''}
             >
               <Card.Header
-                onClick={(e: React.MouseEvent) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (!readOnly) {
-                    toggleCardExpansion(imagePath);
-                  }
-                }}
+                onClick={handleCardClick}
               >
                 <h3 className="card__title">
                   {category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img)}
@@ -206,7 +197,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
                 <div className="card__image-container">
                   <img
-                    src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
+                    src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
                     alt={img}
                     className="card__image"
                   />
@@ -214,22 +205,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
                 {!readOnly && (
                   <p className="card__action-text">
-                    {isExpanded ? 'Tap to minimize' : 'Tap to configure options'}
+                    Tap to configure options
                   </p>
-                )}
-
-                {!readOnly && (
-                  <ButtonIcon
-                    expanded={isExpanded}
-                    onClick={(e: React.MouseEvent) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleCardExpansion(imagePath);
-                    }}
-                    aria-label={isExpanded ? 'Minimize options' : 'Expand options'}
-                    aria-expanded={isExpanded}
-                    aria-controls={`card-content-${imagePath}`}
-                  />
                 )}
 
                 {readOnly && (
@@ -240,97 +217,15 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     quantities={quantities}
                     shirtVersions={shirtVersions}
                     shirtSizeCounts={shirtSizeCounts}
-                    colorVersions={colorVersions}
-                    shirtColorComboVersions={shirtColorComboVersions}
                     displayOptions={displayOptions}
                     sweatpantJoggerOptions={sweatpantJoggerOptions}
+                    pantOptions={pantOptions}
                     college={college}
                     hasShirtVersions={category.hasShirtVersions}
+                    hasPantOptions={category.hasPantOptions}
                   />
                 )}
               </Card.Header>
-
-              {!readOnly && (
-                <Card.Body
-                  expanded={isExpanded}
-                  title="Options"
-                >
-                      {(() => {
-                        // Tie-dye special case
-                        const tieDyeImages = [
-                          'M100965414 SHOUDC OU Go Green DTF on Forest.png',
-                          'M100482538 SHHODC Hover DTF on Black or Forest .png',
-                          'M100437896 SHOUDC Over Under DTF on Forest.png',
-                          'M102595496 SH2FDC Custom DTF on Maroon .png',
-                        ];
-                        const isTieDye = tieDyeImages.includes(img);
-                        const filteredShirtVersions = isTieDye && category.shirtVersions
-                          ? category.shirtVersions.filter((v: string) => v !== 'crewneck')
-                          : category.shirtVersions;
-                        const cardProps = {
-                          categoryPath: category.path,
-                          imageName: img,
-                          hideImage: true,
-                          college,
-                        };
-                        if (category.hasDisplayOptions) {
-                          const displayOption = displayOptions[imagePath] || { displayOnly: '', displayStandardCasePack: '' };
-                          return (
-                            <DisplayOptionCard
-                              {...cardProps}
-                              displayOption={displayOption}
-                              onDisplayOptionChange={onDisplayOptionChange}
-                            />
-                          );
-                        } else if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png' || img === 'M102595496 SH2FDC Custom DTF on Maroon .png') {
-                          const comboVersion = (shirtColorComboSizeCounts[imagePath] as any) || {};
-                          return (
-                            <ShirtColorVersionCard
-                              {...cardProps}
-                              shirtColorComboVersion={comboVersion}
-                              availableVersions={filteredShirtVersions}
-                              availableColors={category.colorVersions}
-                              onShirtColorComboChange={onShirtColorComboChange}
-                              onShirtColorComboSizeCountsChange={onShirtColorComboSizeCountsChange}
-                            />
-                          );
-                        } else if (hasColorVersions(img)) {
-                          const colorVersion = colorVersions[imagePath] || { black: '', forest: '', white: '', gray: '' };
-                          return (
-                            <ColorVersionCard
-                              {...cardProps}
-                              colorVersions={colorVersion}
-                              availableColors={category.colorVersions}
-                              onColorVersionChange={onColorVersionChange}
-                            />
-                          );
-                        } else if (category.hasShirtVersions) {
-                          const sizeCounts = shirtSizeCounts[imagePath] || {};
-                          return (
-                            <ShirtVersionCard
-                              {...cardProps}
-                              sizeCountsByVersion={sizeCounts}
-                              availableVersions={filteredShirtVersions}
-                              onShirtVersionChange={onShirtVersionChange}
-                              onSizeCountsChange={onSizeCountsChange}
-                            />
-                          );
-                        } else {
-                          const quantity = quantities[imagePath] || '';
-                          return (
-                            <ProductCard
-                              {...cardProps}
-                              categoryName={category.name}
-                              quantity={quantity}
-                              onQuantityChange={onQuantityChange}
-                              sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' ? (sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) : undefined}
-                              onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
-                            />
-                          );
-                        }
-                      })()}
-                </Card.Body>
-              )}
             </Card>
           );
         })}

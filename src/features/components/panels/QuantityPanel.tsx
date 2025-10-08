@@ -1,7 +1,7 @@
 import React from 'react';
 import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../../utils';
 import { SweatpantJoggerOption } from '../../../types';
-import { asset } from '../../../utils/asset';
+import { asset, getCollegeFolderName } from '../../../utils/asset';
 import QuantityStepper from './QuantityStepper';
 
 interface ProductCardProps {
@@ -69,7 +69,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ) : (
               <div className="field">
                 <div className="field-label">Quantity</div>
-                <div className="field-control" style={{ maxWidth: '260px' }}>
+                <div className="field-control">
                   <QuantityStepper
                     value={Number(quantity || 0)}
                     onChange={(v) => onQuantityChange?.(imagePath, String(v))}
@@ -97,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       gap: 'var(--space-2)'
     }}>
       <img
-        src={asset(`${college === 'arizonastate' ? 'ArizonaState' : 'MichiganState'}/${imagePath}`)}
+        src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
         alt={imageName}
         style={{ 
           width: '100%', 
@@ -145,7 +145,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           ) : (
             <div className="field">
               <div className="field-label">Quantity</div>
-              <div className="field-control" style={{ maxWidth: '260px' }}>
+              <div className="field-control">
                 <QuantityStepper
                   value={Number(quantity || 0)}
                   onChange={(v) => onQuantityChange?.(imagePath, String(v))}

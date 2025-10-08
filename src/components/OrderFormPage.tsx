@@ -5,7 +5,7 @@ import FormPage from '../app/routes/form';
 import SummaryPage from '../app/routes/summary';
 import ReceiptPage from '../app/routes/receipt';
 import ThankYouPage from '../app/routes/thankyou';
-import { useOrderForm } from '../features/hooks';
+import { useOrderFormContext } from '../contexts/OrderFormContext';
 
 const OrderFormPage: React.FC = () => {
   const { college } = useParams();
@@ -18,12 +18,8 @@ const OrderFormPage: React.FC = () => {
   const isReceiptPage = location.pathname.endsWith('/receipt');
   const isThankYouPage = location.pathname.endsWith('/thankyou');
 
-  // Dynamically set --color-primary for Arizona State
+  // Handle global sidebar toggle events
   React.useEffect(() => {
-    const toggleFromHeader = () => {
-      const evt = new CustomEvent('toggle-from-header');
-      // no-op placeholder
-    };
     const onGlobalToggle = () => {
       const btn = document.querySelector('[data-sidebar-toggle]') as HTMLElement | null;
       if (btn) btn.click();
@@ -32,28 +28,16 @@ const OrderFormPage: React.FC = () => {
     return () => window.removeEventListener('global-sidebar-toggle', onGlobalToggle);
   }, []);
 
-  React.useEffect(() => {
-    if (college === 'arizonastate') {
-      document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
-    } else if (college === 'michiganstate') {
-      document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
-    } else {
-      document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
-    }
-  }, [college]);
-
+  // Get shared state from context
+  const context = useOrderFormContext();
   const {
     formData,
     error,
     page,
     sending,
-    handleFormDataChange,
     handleQuantityChange,
     handleShirtVersionChange,
     handleSizeCountsChange,
-    handleColorVersionChange,
-    handleShirtColorComboChange,
-    handleShirtColorComboSizeCountsChange,
     handleDisplayOptionChange,
     handleSweatpantJoggerOptionChange,
     handleFormSubmit,
@@ -61,7 +45,8 @@ const OrderFormPage: React.FC = () => {
     handleBackToSummary,
     handleExit,
     handleConfirm
-  } = useOrderForm(categories);
+  } = context;
+  const handleFormDataChange = context.handleFormDataChange;
 
   if (!collegeConfig) {
     return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>College not found</div>;
@@ -98,11 +83,8 @@ const OrderFormPage: React.FC = () => {
       onQuantityChange={handleQuantityChange}
       onShirtVersionChange={handleShirtVersionChange}
       onSizeCountsChange={handleSizeCountsChange}
-      onColorVersionChange={handleColorVersionChange}
       onDisplayOptionChange={handleDisplayOptionChange}
       onSweatpantJoggerOptionChange={handleSweatpantJoggerOptionChange}
-      onShirtColorComboChange={handleShirtColorComboChange}
-      onShirtColorComboSizeCountsChange={handleShirtColorComboSizeCountsChange}
       onSubmit={handleFormSubmit}
       error={error}
       collegeConfig={collegeConfig}

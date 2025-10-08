@@ -1,0 +1,186 @@
+{
+  "name": "University of Pittsburgh",
+  "logo": "/logo/pittlogo.png",
+  "categories": [
+    {
+      "name": "Display Options",
+      "path": "displays",
+      "hasDisplayOptions": true,
+      "images": [
+        "University-of-Pittsburgh_Mini_Tower_500PX.jpg",
+        "University-of-Pittsburgh_Mini_Tower_HatsOnly_500PX.jpg",
+        "University-of-Pittsburgh_Premium Floor Display 2.0_500PX.jpg",
+        "University-of-Pittsburgh_Tier2_Display_Floor_500PX.jpg",
+        "University-of-Pittsburgh_Tier3_Display_Floor_V2_PlushOnly_500PX.jpg",
+        "University_of_Pittsburgh_3ft Inline_500PX.jpg"
+      ]
+    },
+    {
+      "name": "Tshirts (Unisex)",
+      "path": "tshirt/men",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt",
+        "longsleeve",
+        "hoodie",
+        "crewneck"
+      ],
+      "images": [
+        "M101003415_SH2FDC_Custom_DTF_Logo_on_Royal.png",
+        "M102886126_CM6988_Applique_Full_Front_on_Steel.png",
+        "M90390881_SH2FDC_Custom_DTF_Logo_on_Royal.png",
+        "M90390996_SDNIET_Nietzsche_DTF_on_Royal.png",
+        "M90409693_SDREMC_Represent_DTF_on_Royal.png",
+        "M90474751_SH2FDS_Custom_DTF_Logo_on_Steel.png",
+        "M90475038_SDSOCR_Socrates_DTF_on_Royal.png",
+        "M90475299_SHABSS_Absorb_DTF_on_Steel.png",
+        "M90493238_SHABSC_Absorb_DTF_on_Royal.png",
+        "M90530215_SDLOCK_Locke_DTF_on_Steel.png",
+        "M90531469_SDNIET_Nietzsche_DTF_on_Steel.png",
+        "M90648820_SHOUDC_Over_Under_DTF_on_Royal.png",
+        "M90740087_SDCNAC_Nation_Mascot_DTF_on_Royal.png",
+        "M90740283_SDCPLS_Pride_Lives_DTFon_Steel.png"
+      ]
+    },
+    {
+      "name": "Tshirts (Women)",
+      "path": "tshirt/women",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M90409994_SH2FDC_Jr_Custom_DTF_Logo_on_Royal.png",
+        "M90410571_SHBMDC_Jr_Backer_DTF_on_Royal.png",
+        "M90474836_SH2FDS_Jr_Custom_DTF_on_Steel.png",
+        "M90474935_SDATIS_Jr_A_Tiempo_on_Steel.png",
+        "M90487355_SDBEBC_Jr_Bebop_DTF_on_Royal.png",
+        "M90489396_SDBIOS_Jr_Bionic_DTF_on_Steel.png",
+        "M90489637_SDBIOC_Jr_Bionic_DTF_on_Royal.png",
+        "M90490096_SHBMDS_Jr_Backer_DTF_on_Steel.png",
+        "M90493636_SHDADS_Jr_Dasher_DTF_on_Steel.png"
+      ]
+    },
+    {
+      "name": "Caps",
+      "path": "hat",
+      "images": [
+        "M100333382_SHE2CH_Custom_Logo_Royal_Hat.png",
+        "M100333571_SHE2CH_Custom_Logo_Gray_Hat.png",
+        "M100333981_SHE2CH_Custom_Logo_Royal_Hat.png",
+        "M100334040_SHE2CH_Custom_Logo_Gray_Hat.png"
+      ]
+    },
+    {
+      "name": "Knit Caps",
+      "path": "beanie",
+      "images": [
+        "M100334148_SHE2CB_Custom_Logo_Royal_Beanie.png",
+        "M100334278_SHE2CB_Custom_Logo_Gray_Beanie.png",
+        "M100334330_SHE2CB_Custom_Logo_Royal_Beanie.png",
+        "M100334468_SHE2CB_Custom_Logo_Gray_Beanie.png"
+      ]
+    },
+    {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M101255759_SHWBUV_Custom_Logo_Water_Bottle.png",
+        "M101857496_SHWBUV_Custom_Logo_Water_Bottle.png",
+        "M101867058_SHSSUV_Custom_Logo_Water_Bottle.png"
+      ]
+    },
+    {
+      "name": "Jackets",
+      "path": "jacket",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M102986071_SHE2CJ_Custom_Logo_Royal_Jacket.png",
+        "M90385710_SDLCJA_Custom_DTF_on_Royal_Jacket.png",
+        "M90493367_SDLCJA_Custom_DTF_on_Black_Jacket.png"
+      ]
+    },
+    {
+      "name": "Flannels",
+      "path": "flannels",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M101002922_SH2BWF_Custom_DTF_Flannels.png",
+        "M90490525_SHPHFD_Custom_DTF_Flannels.png",
+        "M90491248_SDOCPF_Octane_DTF_Flannels.png"
+      ]
+    },
+    {
+      "name": "Shorts",
+      "path": "shorts",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M102060456_SDAVSS_Avery_DTF_Steel_Side_Shorts.png",
+        "M90492230_SHSHDC_Custom_DTF_Royal_Shorts.png",
+        "M90528160_SHSIDS_Similar_DTF_Charcoal_Shorts.png",
+        "M90528568_SHSHDS_Custom_DTF_Charcoal_Shorts.png",
+        "M90528863_SHPSDC_Power_Hitter_DTF_Royal_Shorts.png",
+        "M90529945_SDBUMS_Jr_Buinton_DTF_Ash_Shorts.png",
+        "M90530099_SDSTMS_Jr_Strelka_DTF_Ash_Shorts.png"
+      ]
+    },
+    {
+      "name": "Pants",
+      "path": "pants",
+      "hasPantOptions": true,
+      "pantStyles": [
+        "sweatpants",
+        "joggers"
+      ],
+      "images": [
+        "M101004082_SH2DPS_Custom_DTF_Joggers.png",
+        "M90491430_SHPHDS_Custom_DTF_Joggers.png",
+        "M90492074_SDOCPS_Octane_DTF_Joggers.png"
+      ]
+    },
+    {
+      "name": "Socks",
+      "path": "socks",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M90386189_SS8052_Custom_Logo_Socks.png",
+        "M90475568_SHOCMS_Octane_Logo_Socks.png"
+      ]
+    },
+    {
+      "name": "Plush",
+      "path": "plush",
+      "images": [
+        "M101255673_SHPLUD_Custom_DTF_Logo_Plush.png"
+      ]
+    },
+    {
+      "name": "Display Cards",
+      "path": "card",
+      "images": [
+        "M11000288_SHWGCS_Custom_Spinner_Header.png",
+        "M11000381_SHWGCH_Custom_PFD_Header.png"
+      ]
+    },
+    {
+      "name": "Banners",
+      "path": "banner",
+      "images": [
+        "M100845983_SHMH24_Custom_4FT_Shelf_Magnet.png",
+        "M100846268_SHMH23_Custom_3FT_Shelf_Magnet.png"
+      ]
+    }
+  ]
+}
