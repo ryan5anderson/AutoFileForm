@@ -13,8 +13,6 @@ export const sendOrderEmail = async (templateParams: TemplateParams): Promise<vo
       templateParams,
       EMAILJS_USER_ID
     );
-    
-    alert('Order receipt sent to provider');
   } catch (err) {
     console.error('EmailJS error:', err);
     throw new Error('Failed to send email. Please check your EmailJS configuration and try again.');

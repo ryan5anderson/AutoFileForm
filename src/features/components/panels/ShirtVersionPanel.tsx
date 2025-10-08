@@ -1,6 +1,6 @@
 import React from 'react';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName } from '../../utils';
-import { ShirtVersion, SizeCounts } from '../../../types';
+import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getSizeOptions } from '../../utils';
+import { ShirtVersion, SizeCounts, Size } from '../../../types';
 import { Field } from '../../../components/ui';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
 import SizePackSelector from './SizePackSelector';
@@ -76,7 +76,8 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
       {availableVersions.map((version) => {
         const versionKey = version as keyof ShirtVersion;
         const displayName = getVersionDisplayName(version, imageName);
-        const counts: SizeCounts = sizeCountsByVersion?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, 'S/M': 0, 'L/XL': 0 } as SizeCounts;
+        const counts: SizeCounts = sizeCountsByVersion?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } as SizeCounts;
+        const sizesArray = getSizeOptions(categoryPath, version);
 
         return (
           <div key={version}>
@@ -88,7 +89,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
             {!readOnly && (
               <SizePackSelector
                 counts={counts}
-                sizes={categoryPath.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
+                sizes={sizesArray}
                 onChange={(c) => onSizeCountsChange?.(imagePath, versionKey, c)}
               />
             )}

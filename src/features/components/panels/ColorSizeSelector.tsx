@@ -48,7 +48,7 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
             {getColorDisplayName(color)}
           </div>
           <SizePackSelector
-            counts={colorSizeCounts[color] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 }}
+            counts={colorSizeCounts[color] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 }}
             onChange={(counts) => onChange(color, counts)}
             sizes={sizes}
             disabled={disabled}

@@ -107,6 +107,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
       <main style={{
         flex: 1,
         padding: 'var(--space-4)',
+        paddingTop: 'calc(64px + var(--space-4))', // Account for fixed header
         maxWidth: '800px',
         margin: '0 auto',
         width: '100%'
@@ -338,7 +339,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           const vTotal = totalsByVersion[idx];
                           const displayName = getVersionDisplayName(version);
                           if (vTotal <= 0) return null;
-                          const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','S/M','L/XL'];
+                          const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
                           const sizePieces = counts ? sizeOrder
                             .map((sz) => {
                               const val = counts[sz] || 0;

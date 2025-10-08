@@ -27,7 +27,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           if (vTotal > 0) {
             const versionName = getVersionDisplayName(version, img);
             // Build size detail like S7 M7 XL7
-            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','S/M','L/XL'];
+            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
             const sizePieces = counts ? sizeOrder
               .map(sz => {
                 const val = counts[sz] || 0;
@@ -65,38 +65,44 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           }
         }
       } else if (cat.hasPantOptions && formData.pantOptions) {
-        // For pants with style/color options
+        // For pants with style/color/size options
         const pOptions = formData.pantOptions[imagePath];
         if (pOptions) {
-          // Sweatpants
-          if (pOptions.sweatpants?.steel && Number(pOptions.sweatpants.steel) > 0) {
-            categoryItems.push({
-              sku,
-              name: `${name} (Sweatpants - Steel)`,
-              qty: pOptions.sweatpants.steel
-            });
+          // Helper function to process size counts for a specific style and color
+          const processSizeCounts = (styleName: string, colorName: string, sizeCounts: any) => {
+            if (!sizeCounts || typeof sizeCounts !== 'object') return;
+
+            // Build size detail like S7 M7 XL7
+            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+            const sizePieces = sizeOrder
+              .map(sz => {
+                const val = sizeCounts[sz] || 0;
+                return val > 0 ? `${sz}${val}` : '';
+              })
+              .filter(Boolean)
+              .join(' ');
+
+            const totalQty = Object.values(sizeCounts).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0);
+
+            if (totalQty > 0) {
+              categoryItems.push({
+                sku,
+                name: `${name} (${styleName} - ${colorName}${sizePieces ? ` - ${sizePieces}` : ''})`,
+                qty: String(totalQty)
+              });
+            }
+          };
+
+          // Process Sweatpants
+          if (pOptions.sweatpants) {
+            processSizeCounts('Sweatpants', 'Steel', pOptions.sweatpants.steel);
+            processSizeCounts('Sweatpants', 'Oxford', pOptions.sweatpants.oxford);
           }
-          if (pOptions.sweatpants?.oxford && Number(pOptions.sweatpants.oxford) > 0) {
-            categoryItems.push({
-              sku,
-              name: `${name} (Sweatpants - Oxford)`,
-              qty: pOptions.sweatpants.oxford
-            });
-          }
-          // Joggers
-          if (pOptions.joggers?.steel && Number(pOptions.joggers.steel) > 0) {
-            categoryItems.push({
-              sku,
-              name: `${name} (Joggers - Steel)`,
-              qty: pOptions.joggers.steel
-            });
-          }
-          if (pOptions.joggers?.oxford && Number(pOptions.joggers.oxford) > 0) {
-            categoryItems.push({
-              sku,
-              name: `${name} (Joggers - Oxford)`,
-              qty: pOptions.joggers.oxford
-            });
+
+          // Process Joggers
+          if (pOptions.joggers) {
+            processSizeCounts('Joggers', 'Steel', pOptions.joggers.steel);
+            processSizeCounts('Joggers', 'Oxford', pOptions.joggers.oxford);
           }
         }
       } else if (cat.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {

@@ -1,4 +1,4 @@
-import { FormData, EmailCategory, ShirtVersion, SizeCounts } from '../../types';
+import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size } from '../../types';
 
 export const validateFormData = (formData: FormData): string | null => {
   // Check all required fields
@@ -85,4 +85,19 @@ export function getQuantityMultiples(imageName: string, categoryName: string): n
 
   // Default
   return [6, 12, 18, 24, 30, 36];
+}
+
+export function getSizeOptions(categoryPath: string, version?: string): Size[] {
+  // Socks use different sizing
+  if (categoryPath.includes('sock')) {
+    return ['S/M', 'L/XL'] as any;
+  }
+
+  // T-shirts get XXXL option, but only for men's/unisex, not women's
+  if (version === 'tshirt' && categoryPath.includes('tshirt') && !categoryPath.includes('women')) {
+    return ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+  }
+
+  // Default sizes for all other items (including women's t-shirts)
+  return ['S', 'M', 'L', 'XL', 'XXL'];
 }

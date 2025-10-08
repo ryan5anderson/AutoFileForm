@@ -7,7 +7,7 @@ import SizePackSelector from '../../features/components/panels/SizePackSelector'
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
-import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions } from '../../features/utils';
+import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions } from '../../features/utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import { getPackSize } from '../../config/packSizes';
 import '../../styles/product-detail.css';
@@ -98,10 +98,10 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   // Determine which configuration panel to render
   const renderConfigurationPanel = () => {
     if (category.hasPantOptions) {
-      // Pants with sweatpants/joggers and steel/oxford options
-      const pantOption = formData.pantOptions?.[imagePath] || { 
-        sweatpants: { steel: '0', oxford: '0' }, 
-        joggers: { steel: '0', oxford: '0' } 
+      // Pants with sweatpants/joggers and steel/oxford options with size selection
+      const pantOption = formData.pantOptions?.[imagePath] || {
+        sweatpants: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, oxford: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } },
+        joggers: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, oxford: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } }
       };
       
       return (
@@ -174,8 +174,9 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               if (hasColors) {
                 // For products with colors, show ColorSizeSelector
                 const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey] || {};
+                const sizesArray = getSizeOptions(category.path, version);
                 return (
-                  <div 
+                  <div
                     key={version}
                     className="product-detail-tab-panel"
                     style={{ display: activeTab === version ? 'block' : 'none' }}
@@ -184,24 +185,25 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     colors={colors}
                     colorSizeCounts={colorSizeCounts}
                     onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey, color, counts)}
-                    sizes={category.path.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
+                    sizes={sizesArray}
                     packSize={packSize}
                   />
                   </div>
                 );
               } else {
                 // For single-color products, show regular SizePackSelector
-                const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 };
+                const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
                 const packSize = getPackSize(category.path, version, imageName);
+                const sizesArray = getSizeOptions(category.path, version);
                 return (
-                  <div 
+                  <div
                     key={version}
                     className="product-detail-tab-panel"
                     style={{ display: activeTab === version ? 'block' : 'none' }}
                   >
                     <SizePackSelector
                       counts={counts}
-                      sizes={category.path.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
+                      sizes={sizesArray}
                       onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
                       packSize={packSize}
                     />
@@ -216,9 +218,10 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       // Single shirt version OR applique - render without tabs, show "Quantity" label with size selector
       const version = category.shirtVersions ? category.shirtVersions[0] : 'tshirt';
       const versionKey = version as keyof ShirtVersion;
-      const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0 };
+      const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
       const packSize = getPackSize(category.path, version, imageName);
-      
+      const sizesArray = getSizeOptions(category.path, version);
+
       return (
         <div className="single-option-panel">
           <div className="field">
@@ -226,7 +229,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <div className="field-control">
               <SizePackSelector
                 counts={counts}
-                sizes={category.path.includes('sock') ? (['S/M','L/XL'] as any) : undefined}
+                sizes={sizesArray}
                 onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
                 packSize={packSize}
               />

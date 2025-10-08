@@ -77,14 +77,7 @@
         "M103092526_SHSSUV_Custom_UV_Water_Bottle.png"
       ]
     },
-    {
-      "name": "Display Cards",
-      "path": "card",
-      "images": [
-        "M102313692_SHWGCH_Custom_PFD_Header_Card.png",
-        "M102313972_SHWGCS_Custom_Spinner_Header_Card.png"
-      ]
-    },
+
     {
       "name": "Flannels",
       "path": "flannels",
@@ -152,9 +145,7 @@
         "M103006622_SHMEMS_Mesh_Stripe_Sticker.png",
         "M103006734_SHSWMS_Swoosh_Mascot_Sticker_Pack.png",
         "M103006839_SHSTPK_Custom_Sticker_Pack.png",
-        "M103006972_SHAVES_Advenger_Mascot_Sticker.png",
-        "M103209294_CM7062_Sun_Devils_Shelf_Sticker_48x5.png",
-        "M103209417_CM7063_Arizona_State_Shelf_Sticker_48x5.png"
+        "M103006972_SHAVES_Advenger_Mascot_Sticker.png"
       ]
     },
     {
@@ -172,14 +163,18 @@
       ]
     },
     {
-      "name": "Banners",
+      "name": "Display Cards",
+      "path": "card",
+      "images": [
+        "M102313692_SHWGCH_Custom_PFD_Header_Card.png",
+        "M102313972_SHWGCS_Custom_Spinner_Header_Card.png"
+      ]
+    },
+    {
+      "name": "Shelf Magnet",
       "path": "banner",
       "images": [
-        "M102630540_SHMH24_Custom_4ft_Shelf_Magnet.png",
-        "M103209595_CM7064_ASU_Sundevil_Banner_30x6.png",
-        "M103209844_CM7065_Forks_Up_Banner_30x35.png",
-        "M103209946_CM7066_ASU_Trident_Banner_30x44.png",
-        "M103212392_CM7067_ASU_Gear_Here_Banner_30x44.png"
+        "M102630540_SHMH24_Custom_4ft_Shelf_Magnet.png"
       ]
     }
   ]

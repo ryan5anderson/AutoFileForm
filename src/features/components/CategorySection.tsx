@@ -58,12 +58,20 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle pants with style/color options
+    // Handle pants with style/color/size options
     if (category.hasPantOptions) {
       const pOptions = pantOptions[imagePath];
       if (pOptions) {
-        const sweatpantsTotal = Number(pOptions.sweatpants?.steel || 0) + Number(pOptions.sweatpants?.oxford || 0);
-        const joggersTotal = Number(pOptions.joggers?.steel || 0) + Number(pOptions.joggers?.oxford || 0);
+        const calculateTotal = (styleOptions: any) => {
+          if (!styleOptions) return 0;
+          return Object.values(styleOptions).reduce((styleTotal: number, colorOptions: any) => {
+            if (!colorOptions || typeof colorOptions !== 'object') return styleTotal;
+            return styleTotal + Object.values(colorOptions).reduce((colorTotal: number, sizeCount: unknown) => colorTotal + (typeof sizeCount === 'number' ? sizeCount : 0), 0);
+          }, 0);
+        };
+
+        const sweatpantsTotal = calculateTotal(pOptions.sweatpants);
+        const joggersTotal = calculateTotal(pOptions.joggers);
         return (sweatpantsTotal + joggersTotal) > 0;
       }
       return false;
