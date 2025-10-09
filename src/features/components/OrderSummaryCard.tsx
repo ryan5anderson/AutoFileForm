@@ -14,6 +14,7 @@ interface OrderSummaryCardProps {
   pantOptions?: Record<string, PantOption>;
   college?: string;
   hasShirtVersions?: boolean;
+  hasSizeOptions?: boolean;
   hasPantOptions?: boolean;
 }
 
@@ -29,6 +30,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   pantOptions = {},
   college,
   hasShirtVersions = false,
+  hasSizeOptions = false,
   hasPantOptions = false
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
@@ -125,7 +127,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
       return null;
     }
 
-    // Handle shirt versions (size breakdown)
+    // Handle shirt versions or size options (size breakdown)
     if (hasShirtVersions) {
       const sizeByVersion = shirtSizeCounts[imagePath] || {};
       const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
@@ -150,6 +152,38 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
               .filter(Boolean)
               .join(' ') : '';
             details.push(`${labels[vk as keyof typeof labels]}: ${vTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
+          }
+        });
+        return { total: totalQty, details: details.join('; ') };
+      }
+      return null;
+    }
+
+    // Handle size options for non-shirt categories (flannels, jackets, shorts, socks)
+    // Check if this category has size options but not shirt versions
+    if (hasSizeOptions && shirtSizeCounts[imagePath]) {
+      const sizeByVersion = shirtSizeCounts[imagePath] || {};
+      const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+      const totalsByVersion = versionOrder.map((vk) => {
+        const c = sizeByVersion[vk];
+        return c ? Object.values(c).reduce((a,b)=>a+b,0) : 0;
+      });
+      const totalQty = totalsByVersion.reduce((a,b)=>a+b,0);
+      if (totalQty > 0) {
+        const details: string[] = [];
+        versionOrder.forEach((vk, i) => {
+          const vTotal = totalsByVersion[i];
+          if (vTotal > 0) {
+            const c = sizeByVersion[vk];
+            const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+            const sizePieces = c ? sizeOrder
+              .map((sz: Size) => {
+                const val = c[sz] || 0;
+                return val > 0 ? `${sz}${val}` : '';
+              })
+              .filter(Boolean)
+              .join(' ') : '';
+            details.push(`${categoryName}: ${vTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
           }
         });
         return { total: totalQty, details: details.join('; ') };

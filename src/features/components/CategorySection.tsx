@@ -87,8 +87,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle shirt versions (prefer size counts if present)
-    if (category.hasShirtVersions) {
+    // Handle shirt versions or size options (prefer size counts if present)
+    if (category.hasShirtVersions || category.hasSizeOptions) {
       // Check for color-based size counts first
       if (hasColorOptions(imageName)) {
         const colorSizeCountsByVersion = shirtColorSizeCounts[imagePath];
@@ -230,6 +230,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     pantOptions={pantOptions}
                     college={college}
                     hasShirtVersions={category.hasShirtVersions}
+                    hasSizeOptions={category.hasSizeOptions}
                     hasPantOptions={category.hasPantOptions}
                   />
                 )}

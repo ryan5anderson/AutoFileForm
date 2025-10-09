@@ -4,6 +4,7 @@ export interface Category {
   images: string[];
   hasShirtVersions?: boolean;
   shirtVersions?: string[]; // Array of available versions for this category
+  hasSizeOptions?: boolean; // Property for categories that need size options but not shirt versions
   hasDisplayOptions?: boolean; // New property for display options
   hasPantOptions?: boolean; // Property for pants with style/color options
   pantStyles?: string[]; // Array of available pant styles (e.g., ['sweatpants', 'joggers'])

@@ -49,7 +49,9 @@ export const PACK_SIZES: PackSizeConfig = {
   'bottle': 1,       // Any quantity allowed
   'sticker': 20,
   'plush': 6,
-  
+  'card': 1,         // Display cards - any quantity allowed
+  'shelf magnets': 1, // Shelf magnets - any quantity allowed
+
   // Default fallback
   'default': 7,
 };

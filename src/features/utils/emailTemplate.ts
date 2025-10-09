@@ -43,6 +43,30 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
             });
           }
         }
+      } else if (cat.hasSizeOptions) {
+        // For size options categories (flannels, jackets, etc.), create items using size counts
+        const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
+        const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+        for (const version of versionOrder) {
+          const counts = sizeByVersion[version];
+          const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
+          if (vTotal > 0) {
+            // Build size detail like S7 M7 XL7
+            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+            const sizePieces = counts ? sizeOrder
+              .map(sz => {
+                const val = counts[sz] || 0;
+                return val > 0 ? `${sz}${val}` : '';
+              })
+              .filter(Boolean)
+              .join(' ') : '';
+            categoryItems.push({
+              sku,
+              name: `${name} (${cat.name}${sizePieces ? ` - ${sizePieces}` : ''})`,
+              qty: String(vTotal)
+            });
+          }
+        }
       } else if (cat.hasDisplayOptions) {
         // For display options, create separate items for each option
         const displayOption = formData.displayOptions?.[imagePath];

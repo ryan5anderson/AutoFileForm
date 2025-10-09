@@ -16,7 +16,7 @@ const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disa
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = Math.max(0, Number(e.target.value.replace(/[^0-9]/g, '')) || 0);
-    const adjusted = step > 1 ? Math.floor(raw / step) * step : raw;
+    const adjusted = step > 1 ? Math.ceil(raw / step) * step : raw;
     onChange(adjusted);
   };
 

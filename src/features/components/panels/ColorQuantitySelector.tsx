@@ -7,13 +7,15 @@ interface ColorQuantitySelectorProps {
   colorQuantities: Record<string, string>;
   onChange: (color: string, value: string) => void;
   disabled?: boolean;
+  packSize?: number;
 }
 
 const ColorQuantitySelector: React.FC<ColorQuantitySelectorProps> = ({
   colors,
   colorQuantities,
   onChange,
-  disabled = false
+  disabled = false,
+  packSize = 1
 }) => {
   // Use side-by-side layout for 2 colors, stacked for more
   const useSideBySide = colors.length === 2;
@@ -42,7 +44,17 @@ const ColorQuantitySelector: React.FC<ColorQuantitySelectorProps> = ({
               onChange={(v) => onChange(color, String(v))}
               disabled={disabled}
               ariaLabel={`${getColorDisplayName(color)} Quantity`}
+              step={packSize}
             />
+            {packSize > 1 && (
+              <div style={{
+                fontSize: '0.75rem',
+                color: 'var(--color-text-muted)',
+                marginTop: '0.25rem'
+              }}>
+                Sold in packs of {packSize}
+              </div>
+            )}
           </div>
         </div>
       ))}

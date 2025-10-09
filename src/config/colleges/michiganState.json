@@ -92,10 +92,7 @@
     {
       "name": "Jacket",
       "path": "jacket",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M100490133_SEASLW_Aspire_Jacket.png",
         "M100490691_SHE2CJ_Custom_Forest_Green_Jacket.png",
@@ -105,10 +102,7 @@
     {
       "name": "Flannels",
       "path": "flannels",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M100445359_SHPHFD_Custom_DTF_Flannels.png",
         "M100445564_SDBOPF_Bondi_DTF_Flannels.png",
@@ -132,10 +126,7 @@
     {
       "name": "Shorts",
       "path": "shorts",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M100453381_SHCCDS_Carbon_Copy_DTF_Gray_Shorts.png",
         "M100453813_SHSHDS_Custom_DTF_Gray_Shorts.png"
@@ -144,10 +135,7 @@
     {
       "name": "Socks",
       "path": "socks",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M100415850_SS8052_Custom_Logo_Socks.png",
         "M100497935_SS8052_Custom_Michigan_State_Socks.png"

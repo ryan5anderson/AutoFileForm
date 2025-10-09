@@ -156,13 +156,13 @@ export const useOrderForm = (categories: Category[]) => {
     e.preventDefault();
     // Dynamic pack size validation for shirt size counts
     let validationError: string | null = null;
-    
+
     Object.entries(formData.shirtSizeCounts || {}).forEach(([imagePath, byVersion]) => {
       // Extract category path and product name from imagePath
       const pathParts = imagePath.split('/');
       const categoryPath = pathParts.length > 1 ? pathParts.slice(0, -1).join('/') : pathParts[0];
       const productName = pathParts[pathParts.length - 1];
-      
+
       Object.entries(byVersion || {}).forEach(([version, counts]) => {
         const packSize = getPackSize(categoryPath, version, productName);
         const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
@@ -170,6 +170,40 @@ export const useOrderForm = (categories: Category[]) => {
           validationError = `Please ensure all selected garment sizes total to multiples of ${packSize}.`;
         }
       });
+    });
+
+    // Pack size validation for simple quantities
+    Object.entries(formData.quantities || {}).forEach(([imagePath, quantity]) => {
+      if (quantity && Number(quantity) > 0) {
+        // Extract category path and product name from imagePath
+        const pathParts = imagePath.split('/');
+        const categoryPath = pathParts.length > 1 ? pathParts.slice(0, -1).join('/') : pathParts[0];
+        const productName = pathParts[pathParts.length - 1];
+
+        const packSize = getPackSize(categoryPath, undefined, productName);
+        if (Number(quantity) % packSize !== 0) {
+          validationError = `Please ensure quantities are multiples of ${packSize} for this product.`;
+        }
+      }
+    });
+
+    // Pack size validation for color options
+    Object.entries(formData.colorOptions || {}).forEach(([imagePath, colorOption]) => {
+      if (colorOption) {
+        Object.entries(colorOption).forEach(([colorName, quantity]) => {
+          if (quantity && Number(quantity) > 0) {
+            // Extract category path and product name from imagePath
+            const pathParts = imagePath.split('/');
+            const categoryPath = pathParts.length > 1 ? pathParts.slice(0, -1).join('/') : pathParts[0];
+            const productName = pathParts[pathParts.length - 1];
+
+            const packSize = getPackSize(categoryPath, undefined, productName);
+            if (Number(quantity) % packSize !== 0) {
+              validationError = `Please ensure ${colorName} quantities are multiples of ${packSize} for this product.`;
+            }
+          }
+        });
+      }
     });
 
     if (validationError) {

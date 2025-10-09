@@ -167,12 +167,17 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 const sj = formData.sweatpantJoggerOptions[imagePath];
                 if (sj && Object.values(sj).some(val => Number(val) > 0)) return true;
               }
-              // Shirt Versions - prefer size counts
+              // Shirt Versions or Size Options - prefer size counts
               if (category.hasShirtVersions && category.shirtVersions) {
                 const sizeByVersion = formData.shirtSizeCounts?.[imagePath];
                 if (sizeByVersion && Object.values(sizeByVersion).some(counts => counts && Object.values(counts).some(v => Number(v) > 0))) return true;
                 const shirtVersions = formData.shirtVersions?.[imagePath];
                 if (shirtVersions && Object.values(shirtVersions).some(val => Number(val) > 0)) return true;
+              }
+              // Size Options (for non-shirt categories like flannels, jackets, etc.)
+              if (category.hasSizeOptions) {
+                const sizeByVersion = formData.shirtSizeCounts?.[imagePath];
+                if (sizeByVersion && Object.values(sizeByVersion).some(counts => counts && Object.values(counts).some(v => Number(v) > 0))) return true;
               }
               // Simple quantity
               if (Number(formData.quantities[imagePath] || 0) > 0) return true;
@@ -353,6 +358,72 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                               <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
                             </div>
                           );
+                        })}
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: 'var(--space-1) 0',
+                          fontSize: '0.875rem',
+                          marginLeft: 'var(--space-3)',
+                          fontWeight: '600',
+                          color: 'var(--color-primary)',
+                          borderTop: '1px solid var(--color-border)',
+                          marginTop: 'var(--space-2)',
+                          paddingTop: 'var(--space-2)'
+                        }}>
+                          <span>Total</span>
+                          <span>Qty: {totalQty}</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }
+
+                // Handle Size Options (for non-shirt categories like flannels, jackets, etc.)
+                if (category.hasSizeOptions) {
+                  const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
+                  const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+                  const totalsByVersion = versionOrder.map((vk) => {
+                    const c = sizeByVersion[vk];
+                    return c ? Object.values(c).reduce((a,b)=>a+b,0) : 0;
+                  });
+                  const totalQty = totalsByVersion.reduce((a,b)=>a+b,0);
+                  if (totalQty > 0) {
+                    return (
+                      <div key={img} style={{
+                        marginBottom: 'var(--space-3)',
+                        padding: 'var(--space-3)',
+                        background: 'var(--color-bg)',
+                        borderRadius: 'var(--radius)',
+                        border: '1px solid var(--color-border)'
+                      }}>
+                        <div style={{
+                          fontWeight: '600',
+                          fontSize: '1rem',
+                          marginBottom: 'var(--space-2)',
+                          color: 'var(--color-text)'
+                        }}>{productName}</div>
+                        {versionOrder.map((vk, i) => {
+                          const vTotal = totalsByVersion[i];
+                          if (vTotal > 0) {
+                            const c = sizeByVersion[vk];
+                            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                            const sizePieces = c ? sizeOrder
+                              .map((sz) => {
+                                const val = c[sz] || 0;
+                                return val > 0 ? `${sz}${val}` : '';
+                              })
+                              .filter(Boolean)
+                              .join(' ') : '';
+                            return (
+                              <div key={vk} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                                <span>{category.name}{sizePieces ? ` (${sizePieces})` : ''}</span>
+                                <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
+                              </div>
+                            );
+                          }
+                          return null;
                         })}
                         <div style={{
                           display: 'flex',

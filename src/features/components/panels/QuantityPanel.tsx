@@ -2,6 +2,7 @@ import React from 'react';
 import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../../utils';
 import { SweatpantJoggerOption } from '../../../types';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
+import { getPackSize } from '../../../config/packSizes';
 import QuantityStepper from './QuantityStepper';
 
 interface ProductCardProps {
@@ -33,6 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const imagePath = getImagePath(categoryPath, imageName);
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
+  const packSize = getPackSize(categoryPath, undefined, imageName);
 
   // When hideImage is true (used in configuration panel), return just the field structure
   if (hideImage) {
@@ -75,7 +77,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     onChange={(v) => onQuantityChange?.(imagePath, String(v))}
                     disabled={readOnly}
                     ariaLabel={productName}
+                    step={packSize}
                   />
+                  {packSize > 1 && (
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--color-text-muted)',
+                      marginTop: '0.25rem'
+                    }}>
+                      Sold in packs of {packSize}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -151,7 +163,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   onChange={(v) => onQuantityChange?.(imagePath, String(v))}
                   disabled={readOnly}
                   ariaLabel={productName}
+                  step={packSize}
                 />
+                {packSize > 1 && (
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: 'var(--color-text-muted)',
+                    marginTop: '0.25rem'
+                  }}>
+                    Sold in packs of {packSize}
+                  </div>
+                )}
               </div>
             </div>
           )}

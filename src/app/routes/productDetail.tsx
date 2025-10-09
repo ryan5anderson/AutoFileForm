@@ -214,8 +214,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || isApplique) {
-      // Single shirt version OR applique - render without tabs, show "Quantity" label with size selector
+    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || isApplique || category.hasSizeOptions) {
+      // Single shirt version OR applique OR size options - render without tabs, show "Quantity" label with size selector
       const version = category.shirtVersions ? category.shirtVersions[0] : 'tshirt';
       const versionKey = version as keyof ShirtVersion;
       const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
@@ -245,11 +245,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       if (hasColors) {
         // For non-shirt items with colors (like hats), show ColorQuantitySelector
         const colorQuantities = formData.colorOptions?.[imagePath] || {};
+        const packSize = getPackSize(category.path, undefined, imageName);
         return (
           <ColorQuantitySelector
             colors={colors}
             colorQuantities={colorQuantities}
             onChange={(color, value) => onColorOptionChange?.(imagePath, color, value)}
+            packSize={packSize}
           />
         );
       } else {

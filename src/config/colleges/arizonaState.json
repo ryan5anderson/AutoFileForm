@@ -81,10 +81,7 @@
     {
       "name": "Flannels",
       "path": "flannels",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M102076095_SDGMPF_Game_Master_DTF_Flannels.png",
         "M103092034_SHPHFD_Custom_Hip_DTF_Flannels.png"
@@ -105,10 +102,7 @@
     {
       "name": "Jackets",
       "path": "jacket",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M102133660_SHE1CJ_Custom_Logo_Maroon_Jacket.png",
         "M102260434_SHE1CJ_Custom_Logo_Charcoal_Jacket.png"
@@ -117,10 +111,7 @@
     {
       "name": "Shorts",
       "path": "shorts",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M102075970_SDEVSS_Evocation_DTF_Oxford_Shorts.png",
         "M102525019_SDSPSS_DTF_Side_Print_Maroon_Shorts.png",
@@ -130,10 +121,7 @@
     {
       "name": "Socks",
       "path": "socks",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M102076380_SS8052_Custom_Logo_Socks.png"
       ]

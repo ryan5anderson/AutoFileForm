@@ -93,10 +93,7 @@
     {
       "name": "Jackets",
       "path": "jacket",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M102986071_SHE2CJ_Custom_Logo_Royal_Jacket.png",
         "M90385710_SDLCJA_Custom_DTF_on_Royal_Jacket.png",
@@ -106,10 +103,7 @@
     {
       "name": "Flannels",
       "path": "flannels",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M101002922_SH2BWF_Custom_DTF_Flannels.png",
         "M90490525_SHPHFD_Custom_DTF_Flannels.png",
@@ -119,10 +113,7 @@
     {
       "name": "Shorts",
       "path": "shorts",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M102060456_SDAVSS_Avery_DTF_Steel_Side_Shorts.png",
         "M90492230_SHSHDC_Custom_DTF_Royal_Shorts.png",
@@ -150,10 +141,7 @@
     {
       "name": "Socks",
       "path": "socks",
-      "hasShirtVersions": true,
-      "shirtVersions": [
-        "tshirt"
-      ],
+      "hasSizeOptions": true,
       "images": [
         "M90386189_SS8052_Custom_Logo_Socks.png",
         "M90475568_SHOCMS_Octane_Logo_Socks.png"
