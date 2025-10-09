@@ -60,7 +60,7 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
       <div className="size-pack__grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+          gridTemplateColumns: `repeat(${SIZE_LIST.length}, minmax(0, 1fr))`,
           gap: '0.4rem',
           alignItems: 'stretch',
           width: '100%',

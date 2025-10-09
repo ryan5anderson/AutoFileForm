@@ -1,5 +1,5 @@
 import React from 'react';
-import { getImagePath, getShirtVersionTotal } from '../utils';
+import { getImagePath } from '../utils';
 import { ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, SizeCounts, Size } from '../../types';
 
 interface OrderSummaryCardProps {
@@ -53,28 +53,48 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
       return null;
     }
 
-    // Handle pants with style/color options
+    // Handle pants with style/color/size options
     if (hasPantOptions) {
       const pOptions = pantOptions[imagePath];
       if (pOptions) {
-        const sweatpantsTotal = Number(pOptions.sweatpants?.steel || 0) + Number(pOptions.sweatpants?.oxford || 0);
-        const joggersTotal = Number(pOptions.joggers?.steel || 0) + Number(pOptions.joggers?.oxford || 0);
-        const totalQty = sweatpantsTotal + joggersTotal;
+        const processStyleCounts = (styleOptions: any, styleName: string) => {
+          if (!styleOptions) return { total: 0, details: [] };
+
+          let styleTotal = 0;
+          const details: string[] = [];
+
+          Object.entries(styleOptions).forEach(([colorName, sizeCounts]: [string, any]) => {
+            if (sizeCounts && typeof sizeCounts === 'object') {
+              const colorTotal = Object.values(sizeCounts).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0);
+              if (colorTotal > 0) {
+                styleTotal += colorTotal;
+
+                // Build size detail like S7 M7 XL7
+                const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                const sizePieces = sizeOrder
+                  .map(sz => {
+                    const val = sizeCounts[sz] || 0;
+                    return val > 0 ? `${sz}${val}` : '';
+                  })
+                  .filter(Boolean)
+                  .join(' ');
+
+                details.push(`${styleName} ${colorName}: ${colorTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
+              }
+            }
+          });
+
+          return { total: styleTotal, details };
+        };
+
+        const sweatpantsInfo = processStyleCounts(pOptions.sweatpants, 'Sweatpants');
+        const joggersInfo = processStyleCounts(pOptions.joggers, 'Joggers');
+
+        const totalQty = sweatpantsInfo.total + joggersInfo.total;
+        const allDetails = [...sweatpantsInfo.details, ...joggersInfo.details];
+
         if (totalQty > 0) {
-          const details = [];
-          if (pOptions.sweatpants?.steel && Number(pOptions.sweatpants.steel) > 0) {
-            details.push(`Sweatpants Steel: ${pOptions.sweatpants.steel}`);
-          }
-          if (pOptions.sweatpants?.oxford && Number(pOptions.sweatpants.oxford) > 0) {
-            details.push(`Sweatpants Oxford: ${pOptions.sweatpants.oxford}`);
-          }
-          if (pOptions.joggers?.steel && Number(pOptions.joggers.steel) > 0) {
-            details.push(`Joggers Steel: ${pOptions.joggers.steel}`);
-          }
-          if (pOptions.joggers?.oxford && Number(pOptions.joggers.oxford) > 0) {
-            details.push(`Joggers Oxford: ${pOptions.joggers.oxford}`);
-          }
-          return { total: totalQty, details: details.join(', ') };
+          return { total: totalQty, details: allDetails.join(', ') };
         }
       }
       return null;
@@ -121,7 +141,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
           const vTotal = totalsByVersion[i];
           if (vTotal > 0) {
             const c = sizeByVersion[vk];
-            const sizeOrder: Size[] = ['S','M','L','XL','XXL','S/M','L/XL'];
+            const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
             const sizePieces = c ? sizeOrder
               .map((sz: Size) => {
                 const val = c[sz] || 0;

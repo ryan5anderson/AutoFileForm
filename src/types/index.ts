@@ -34,20 +34,20 @@ export interface SweatpantJoggerOption {
   joggerOxford: string;
 }
 
-// New interface for pant options with style and color structure
+// New interface for pant options with style, color, and size structure
 export interface PantOption {
   sweatpants?: {
-    steel: string;
-    oxford: string;
+    steel?: SizeCounts;
+    oxford?: SizeCounts;
   };
   joggers?: {
-    steel: string;
-    oxford: string;
+    steel?: SizeCounts;
+    oxford?: SizeCounts;
   };
 }
 
 // Size-based ordering for shirt versions
-export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'S/M' | 'L/XL';
+export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL' | 'S/M' | 'L/XL';
 export type SizeCounts = Record<Size, number>;
 
 // Color options for products with multiple colors

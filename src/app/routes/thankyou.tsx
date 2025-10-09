@@ -6,9 +6,7 @@ import '../../styles/college-pages.css';
 const ThankYouPage: React.FC = () => {
   return (
     <div className="thank-you-container">
-      <div className="college-page-header">
-        <Header showBackButton={false} />
-      </div>
+      <Header showBackButton={false} />
       
       <div className="thank-you-card">
         <div style={{

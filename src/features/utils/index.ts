@@ -3,3 +3,4 @@ export * from './calculations';
 export * from './imagePath';
 export * from './naming';
 export * from './emailTemplate';
+export { getSizeOptions } from './calculations';

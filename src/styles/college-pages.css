@@ -195,6 +195,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-6);
+  padding-top: calc(64px + var(--space-6)); /* Account for fixed header */
 }
 
 .thank-you-card {
@@ -231,7 +232,7 @@
   .college-page-main,
   .summary-page-main,
   .receipt-page-main {
-    padding: var(--space-4);
+    padding: calc(64px + var(--space-4)) var(--space-4) var(--space-4) var(--space-4);
   }
   
   .college-page-title h1 {

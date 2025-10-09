@@ -175,19 +175,19 @@
       ]
     },
     {
-      "name": "Banner",
-      "path": "banner",
-      "images": [
-        "M90446092_SHMH23_Custom_3ft_Shelf_Magnet.png",
-        "M90446346_SHMH24_Custom_4ft_Shelf_Magnet.png"
-      ]
-    },
-    {
-      "name": "Card",
+      "name": "Display Cards",
       "path": "card",
       "images": [
         "M90445414_SHWGCS_Custom_Spinner_Header.png",
         "M90445689_SHWGCH_Custom_PFD_Header.png"
+      ]
+    },
+    {
+      "name": "Shelf Magnet",
+      "path": "banner",
+      "images": [
+        "M90446092_SHMH23_Custom_3ft_Shelf_Magnet.png",
+        "M90446346_SHMH24_Custom_4ft_Shelf_Magnet.png"
       ]
     }
   ]
