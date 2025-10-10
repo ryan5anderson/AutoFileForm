@@ -10,6 +10,7 @@ interface ColorSizeSelectorProps {
   sizes?: Size[];
   disabled?: boolean;
   packSize?: number;
+  allowAnyQuantity?: boolean;
 }
 
 const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
@@ -18,7 +19,8 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
   onChange,
   sizes,
   disabled = false,
-  packSize = 7
+  packSize = 7,
+  allowAnyQuantity = false,
 }) => {
   // Use side-by-side layout for 2 colors, stacked for more
   const useSideBySide = colors.length === 2;
@@ -53,6 +55,7 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
             sizes={sizes}
             disabled={disabled}
             packSize={packSize}
+            allowAnyQuantity={allowAnyQuantity}
           />
         </div>
       ))}

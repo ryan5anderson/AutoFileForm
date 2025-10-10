@@ -44,13 +44,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <>
             {categoryName === 'Sweatpants/Joggers' ? (
               <>
-                {['sweatpantSteel', 'sweatpantOxford', 'joggerSteel', 'joggerOxford'].map((optionKey) => (
+                {['sweatpantSteel', 'sweatpantOxford', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
                   <div key={optionKey} className="field">
                     <div className="field-label">
                       {optionKey === 'sweatpantSteel' && 'Straight-Leg Steel'}
                       {optionKey === 'sweatpantOxford' && 'Straight-Leg Oxford'}
                       {optionKey === 'joggerSteel' && 'Jogger Steel'}
-                      {optionKey === 'joggerOxford' && 'Jogger Oxford'}
+                      {optionKey === 'joggerDarkHeather' && 'Jogger Dark Heather'}
                     </div>
                     <div className="field-control">
                       <select
@@ -60,7 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                         disabled={readOnly}
                       >
                         <option value="">Select</option>
-                        {getQuantityMultiples(imageName, 'Sweatpants/Joggers').map(val => (
+                        {getQuantityMultiples(imageName, 'Sweatpants/Joggers', categoryPath, undefined).map(val => (
                           <option key={val} value={val}>{val}</option>
                         ))}
                       </select>
@@ -130,13 +130,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <>
           {categoryName === 'Sweatpants/Joggers' ? (
             <>
-              {['sweatpantSteel', 'sweatpantOxford', 'joggerSteel', 'joggerOxford'].map((optionKey) => (
+              {['sweatpantSteel', 'sweatpantOxford', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
                 <div key={optionKey} className="field">
                   <div className="field-label">
                     {optionKey === 'sweatpantSteel' && 'Straight-Leg Steel'}
                     {optionKey === 'sweatpantOxford' && 'Straight-Leg Oxford'}
                     {optionKey === 'joggerSteel' && 'Jogger Steel'}
-                    {optionKey === 'joggerOxford' && 'Jogger Oxford'}
+                    {optionKey === 'joggerDarkHeather' && 'Jogger Dark Heather'}
                   </div>
                   <div className="field-control">
                     <select
@@ -146,7 +146,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                       disabled={readOnly}
                     >
                       <option value="">Select</option>
-                      {getQuantityMultiples(imageName, 'Sweatpants/Joggers').map(val => (
+                      {getQuantityMultiples(imageName, 'Sweatpants/Joggers', categoryPath, undefined).map(val => (
                         <option key={val} value={val}>{val}</option>
                       ))}
                     </select>

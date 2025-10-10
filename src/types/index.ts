@@ -32,7 +32,7 @@ export interface SweatpantJoggerOption {
   sweatpantSteel: string;
   sweatpantOxford: string;
   joggerSteel: string;
-  joggerOxford: string;
+  joggerDarkHeather: string;
 }
 
 // New interface for pant options with style, color, and size structure
@@ -43,7 +43,7 @@ export interface PantOption {
   };
   joggers?: {
     steel?: SizeCounts;
-    oxford?: SizeCounts;
+    darkHeather?: SizeCounts;
   };
 }
 

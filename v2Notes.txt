@@ -7,3 +7,18 @@ Notes section for each item
 Size scale
 
 Order by size
+
+v3 Notes
+    To-do
+        No crew neck for tiedye products
+        Sweatpant colors are steel, black, and dark navy
+        Jogger colors are steal and dark heather
+        Only 4 display options max, no min. 1 mini, 1 premium, 1 inline, 1 spinner
+        Remove display options text box from summary page
+        Add error icon for unfinished items
+        Ensure user can see all sizes in summary page
+        Combine Display Card and Magnets sections in one labeled Signage
+        optimize for the phone
+    
+    Done
+        Applique only crew and hoodie

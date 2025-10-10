@@ -118,8 +118,8 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
           if (sjOptions.joggerSteel && Number(sjOptions.joggerSteel) > 0) {
             details.push(`Jogger Steel: ${sjOptions.joggerSteel}`);
           }
-          if (sjOptions.joggerOxford && Number(sjOptions.joggerOxford) > 0) {
-            details.push(`Jogger Oxford: ${sjOptions.joggerOxford}`);
+          if (sjOptions.joggerDarkHeather && Number(sjOptions.joggerDarkHeather) > 0) {
+            details.push(`Jogger Dark Heather: ${sjOptions.joggerDarkHeather}`);
           }
           return { total: totalQty, details: details.join(', ') };
         }

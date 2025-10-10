@@ -3,6 +3,7 @@ import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayNa
 import { ShirtVersion, SizeCounts, Size } from '../../../types';
 import { Field } from '../../../components/ui';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
+import { getPackSize, allowsAnyQuantity } from '../../../config/packSizes';
 import SizePackSelector from './SizePackSelector';
 
 interface ShirtVersionCardProps {
@@ -78,6 +79,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
         const displayName = getVersionDisplayName(version, imageName);
         const counts: SizeCounts = sizeCountsByVersion?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } as SizeCounts;
         const sizesArray = getSizeOptions(categoryPath, version);
+        const packSize = getPackSize(categoryPath, version, imageName);
 
         return (
           <div key={version}>
@@ -91,6 +93,8 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
                 counts={counts}
                 sizes={sizesArray}
                 onChange={(c) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                packSize={packSize}
+                allowAnyQuantity={allowsAnyQuantity(categoryPath, version, imageName)}
               />
             )}
           </div>

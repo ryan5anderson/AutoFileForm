@@ -10,6 +10,7 @@ interface PantOptionsPanelProps {
   pantStyles?: string[];
   disabled?: boolean;
   categoryPath?: string;
+  allowAnyQuantity?: boolean;
 }
 
 const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
@@ -17,29 +18,40 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
   onChange,
   pantStyles = ['sweatpants', 'joggers'],
   disabled = false,
-  categoryPath = 'pants'
+  categoryPath = 'pants',
+  allowAnyQuantity = false,
 }) => {
   const [activeTab, setActiveTab] = useState<string>(pantStyles[0] || 'sweatpants');
   const packSize = getPackSize(categoryPath);
   const sizes = getSizeOptions(categoryPath);
 
-  const handleSizeCountsChange = (style: 'sweatpants' | 'joggers', color: 'steel' | 'oxford', counts: SizeCounts) => {
+  const handleSizeCountsChange = (style: 'sweatpants' | 'joggers', color: 'steel' | 'oxford' | 'darkHeather', counts: SizeCounts) => {
     const newOption = { ...pantOption };
 
     if (!newOption[style]) {
       newOption[style] = {};
     }
 
-    newOption[style]![color] = counts;
+    // Use type assertion to handle the different color structures for each style
+    if (style === 'sweatpants') {
+      (newOption[style] as { steel?: SizeCounts; oxford?: SizeCounts })[color as 'steel' | 'oxford'] = counts;
+    } else {
+      (newOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })[color as 'steel' | 'darkHeather'] = counts;
+    }
+
     onChange(newOption);
   };
 
-  const getSizeCounts = (style: 'sweatpants' | 'joggers', color: 'steel' | 'oxford'): SizeCounts => {
-    return pantOption[style]?.[color] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 };
+  const getSizeCounts = (style: 'sweatpants' | 'joggers', color: 'steel' | 'oxford' | 'darkHeather'): SizeCounts => {
+    if (style === 'sweatpants') {
+      return (pantOption[style] as { steel?: SizeCounts; oxford?: SizeCounts })?.[color as 'steel' | 'oxford'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 };
+    } else {
+      return (pantOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })?.[color as 'steel' | 'darkHeather'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 };
+    }
   };
 
   const renderColorOptions = (style: 'sweatpants' | 'joggers') => {
-    const colors: Array<'steel' | 'oxford'> = ['steel', 'oxford'];
+    const colors: Array<'steel' | 'oxford' | 'darkHeather'> = style === 'joggers' ? ['steel', 'darkHeather'] : ['steel', 'oxford'];
 
     return (
       <div style={{
@@ -63,7 +75,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
               marginBottom: '0.35rem',
               color: 'var(--color-text)'
             }}>
-              {color === 'steel' ? 'Steel' : 'Oxford'}
+              {color === 'steel' ? 'Steel' : (color === 'oxford' ? 'Oxford' : 'Dark Heather')}
             </div>
             <SizePackSelector
               counts={getSizeCounts(style, color)}
@@ -71,6 +83,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
               packSize={packSize}
               sizes={sizes}
               disabled={disabled}
+              allowAnyQuantity={allowAnyQuantity}
             />
           </div>
         ))}

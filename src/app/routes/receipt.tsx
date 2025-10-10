@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { FormData, Category, ShirtVersion } from '../../types';
 import { colleges } from '../../config';
-import { getProductName, getImagePath, getVersionDisplayName, getRackToCardMapping, getRackDisplayName } from '../../features/utils';
+import { getProductName, getImagePath, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 import { useOrderForm } from '../../features/hooks';
@@ -265,12 +265,12 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 }
                 // Handle Sweatpants/Joggers
                 if (category.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
-                  const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: '' };
+                  const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerDarkHeather: '' };
                   const options = [
                     { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
                     { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
                     { key: 'joggerSteel', label: 'Jogger Steel' },
-                    { key: 'joggerOxford', label: 'Jogger Oxford' },
+                    { key: 'joggerDarkHeather', label: 'Jogger Dark Heather' },
                   ];
                   const total = options.reduce((sum, opt) => sum + Number(sj[opt.key as keyof typeof sj] || 0), 0);
                   if (total > 0) {
@@ -319,7 +319,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 // Handle Shirt Versions (size breakdown)
                 if (category.hasShirtVersions && category.shirtVersions) {
                   const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
-                  const totalsByVersion = category.shirtVersions.map((version) => {
+                  const filteredVersions = getFilteredShirtVersions(img, category.shirtVersions);
+                  const totalsByVersion = filteredVersions.map((version) => {
                     const counts = sizeByVersion[version as keyof ShirtVersion];
                     return counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
                   });
@@ -339,7 +340,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           marginBottom: 'var(--space-2)',
                           color: 'var(--color-text)'
                         }}>{productName}</div>
-                        {category.shirtVersions.map((version, idx) => {
+                        {filteredVersions.map((version, idx) => {
                           const counts = sizeByVersion[version as keyof ShirtVersion];
                           const vTotal = totalsByVersion[idx];
                           const displayName = getVersionDisplayName(version);

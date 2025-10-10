@@ -3,6 +3,7 @@ import { PROVIDER_EMAIL } from '../../constants';
 import { getRackToCardMapping } from './imagePath';
 import { getVersionDisplayName } from './naming';
 import { calculateTotalUnits } from './calculations';
+import { getFilteredShirtVersions } from './index';
 
 export const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {
   const emailCategories: EmailCategory[] = [];
@@ -21,7 +22,8 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
       if (cat.hasShirtVersions && cat.shirtVersions) {
         // For shirt categories, create separate items for each version using size counts totals
         const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
-        for (const version of cat.shirtVersions) {
+        const filteredVersions = getFilteredShirtVersions(img, cat.shirtVersions);
+        for (const version of filteredVersions) {
           const counts = sizeByVersion[version as keyof ShirtVersion];
           const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
           if (vTotal > 0) {
@@ -126,17 +128,17 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           // Process Joggers
           if (pOptions.joggers) {
             processSizeCounts('Joggers', 'Steel', pOptions.joggers.steel);
-            processSizeCounts('Joggers', 'Oxford', pOptions.joggers.oxford);
+            processSizeCounts('Joggers', 'Dark Heather', pOptions.joggers.darkHeather);
           }
         }
       } else if (cat.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
         // For sweatpant/jogger (legacy), add each of the four options as a line item
-        const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: '' };
+        const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerDarkHeather: '' };
         const options = [
           { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
           { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
           { key: 'joggerSteel', label: 'Jogger Steel' },
-          { key: 'joggerOxford', label: 'Jogger Oxford' },
+          { key: 'joggerDarkHeather', label: 'Jogger Dark Heather' },
         ];
         options.forEach(opt => {
           const qty = sj[opt.key as keyof typeof sj];

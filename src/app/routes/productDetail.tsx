@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Category, SizeCounts, ShirtVersion, PantOption } from '../../types';
+import { Category, SizeCounts, PantOption } from '../../types';
 import ProductCard from '../../features/components/panels/QuantityPanel';
 import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
-import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions } from '../../features/utils';
+import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
-import { getPackSize } from '../../config/packSizes';
+import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
 import '../../styles/product-detail.css';
 
 interface ProductDetailPageProps {
@@ -47,12 +47,19 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   // Find the category from the categories list
   const category = categories.find(cat => cat.path === decodedCategoryPath);
 
+  // Check if this is an applique product (should use simple quantity, not tabs)
+  const isApplique = imageName.toLowerCase().includes('applique');
+
   // State for active tab (for shirt versions and display options) - MUST be before any early returns
   const [activeTab, setActiveTab] = useState<string>(() => {
     if (category?.hasDisplayOptions) {
       return 'displayOnly';
     }
     if (category?.hasShirtVersions && category.shirtVersions) {
+      // For applique products, default to hoodie. For others, use first available version
+      if (isApplique) {
+        return 'hoodie';
+      }
       return category.shirtVersions[0];
     }
     return '';
@@ -71,20 +78,17 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }
 
   const imagePath = getImagePath(category.path, imageName);
-  const productName = category.name === 'Display Options' 
-    ? getRackDisplayName(imageName) 
+  const productName = category.name === 'Display Options'
+    ? getRackDisplayName(imageName)
     : getProductName(imageName);
-
-  // Check if this is an applique product (should use simple quantity, not tabs)
-  const isApplique = imageName.toLowerCase().includes('applique');
 
   const handleDone = () => {
     // Navigate back and pass state to restore scroll position
-    navigate(`/${college}`, { 
-      state: { 
+    navigate(`/${college}`, {
+      state: {
         scrollToCategory: category.name,
-        returnFromProduct: true 
-      } 
+        returnFromProduct: true
+      }
     });
   };
 
@@ -101,7 +105,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       // Pants with sweatpants/joggers and steel/oxford options with size selection
       const pantOption = formData.pantOptions?.[imagePath] || {
         sweatpants: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, oxford: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } },
-        joggers: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, oxford: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } }
+        joggers: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, darkHeather: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } }
       };
       
       return (
@@ -147,7 +151,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if (category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length > 1 && !isApplique) {
+    } else if (category.hasShirtVersions && category.shirtVersions && (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions).length > 1 : false)) {
       // Check if this product has color options
       const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
       const hasColors = colors.length > 0;
@@ -156,7 +160,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       return (
         <>
           <div className="product-detail-tabs">
-            {category.shirtVersions.map((version: string) => (
+            {getFilteredShirtVersions(imageName, category.shirtVersions).map((version: string) => (
               <button
                 key={version}
                 className={`product-detail-tab ${activeTab === version ? 'product-detail-tab--active' : ''}`}
@@ -167,13 +171,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             ))}
           </div>
           <div className="product-detail-tab-content">
-            {category.shirtVersions.map((version: string) => {
-              const versionKey = version as keyof ShirtVersion;
+            {getFilteredShirtVersions(imageName, category.shirtVersions).map((version: string) => {
+              const versionKey = version;
               const packSize = getPackSize(category.path, version, imageName);
-              
+
               if (hasColors) {
                 // For products with colors, show ColorSizeSelector
-                const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey] || {};
+                const colorSizeCounts = (formData.shirtColorSizeCounts?.[imagePath] as any)?.[versionKey] || {};
                 const sizesArray = getSizeOptions(category.path, version);
                 return (
                   <div
@@ -192,7 +196,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 );
               } else {
                 // For single-color products, show regular SizePackSelector
-                const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
+                const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
                 const packSize = getPackSize(category.path, version, imageName);
                 const sizesArray = getSizeOptions(category.path, version);
                 return (
@@ -206,6 +210,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       sizes={sizesArray}
                       onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
                       packSize={packSize}
+                      allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
                     />
                   </div>
                 );
@@ -214,28 +219,44 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || isApplique || category.hasSizeOptions) {
+    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions).length <= 1 : false) || category.hasSizeOptions) {
       // Single shirt version OR applique OR size options - render without tabs, show "Quantity" label with size selector
-      const version = category.shirtVersions ? category.shirtVersions[0] : 'tshirt';
-      const versionKey = version as keyof ShirtVersion;
-      const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
+      let version = 'tshirt'; // default fallback
+
+      if (category.shirtVersions && category.shirtVersions.length > 0) {
+        const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions);
+        version = filteredVersions.length > 0 ? filteredVersions[0] : category.shirtVersions[0];
+      } else if (category.path.includes('jacket')) {
+        version = 'jacket';
+      } else if (category.path.includes('sweatpant')) {
+        version = 'sweatpants';
+      } else if (category.path.includes('short')) {
+        version = 'shorts';
+      } else if (category.path.includes('flannel')) {
+        version = 'flannels';
+      }
+      const versionKey = version;
+      const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
       const packSize = getPackSize(category.path, version, imageName);
       const sizesArray = getSizeOptions(category.path, version);
 
       return (
-        <div className="single-option-panel">
-          <div className="field">
-            <div className="field-label">Quantity</div>
-            <div className="field-control">
-              <SizePackSelector
-                counts={counts}
-                sizes={sizesArray}
-                onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
-                packSize={packSize}
-              />
+        <>
+          <div className="single-option-panel">
+            <div className="field">
+              <div className="field-label">Quantity</div>
+              <div className="field-control">
+                <SizePackSelector
+                  counts={counts}
+                  sizes={sizesArray}
+                  onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                  packSize={packSize}
+                  allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       );
     } else {
       // Check if this product has color options (for non-shirt items like hats)
@@ -263,8 +284,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             categoryName={category.name}
             quantity={quantity}
             onQuantityChange={onQuantityChange}
-            sweatpantJoggerOption={category.name === 'Sweatpants/Joggers' 
-              ? (formData.sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: ''}) 
+            sweatpantJoggerOption={category.name === 'Sweatpants/Joggers'
+              ? (formData.sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerDarkHeather: ''})
               : undefined}
             onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
           />

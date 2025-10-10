@@ -11,6 +11,8 @@ interface SizePackSelectorProps {
   packSize?: number;
   disabled?: boolean;
   sizes?: Size[];
+  allowAnyQuantity?: boolean;
+  hideTotal?: boolean;
 }
 
 export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
@@ -20,19 +22,26 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   packSize = 7,
   disabled = false,
   sizes,
+  allowAnyQuantity = false,
+  hideTotal = false,
 }) => {
-  const totals = calcTotals(counts, packSize);
+  const totals = calcTotals(counts, packSize, allowAnyQuantity);
   const SIZE_LIST: Size[] = sizes && sizes.length > 0 ? sizes : ALL_SIZES_DEFAULT;
 
   const handleDelta = (size: Size, delta: number) => {
     if (disabled) return;
+    // Use single unit increment/decrement for better UX, validation happens in input
     const next: SizeCounts = { ...counts, [size]: Math.max(0, (counts[size] || 0) + delta) } as SizeCounts;
     onChange(next);
   };
 
   const handleInput = (size: Size, value: string) => {
     const numeric = Math.max(0, Number(value.replace(/[^0-9]/g, '')) || 0);
-    const next: SizeCounts = { ...counts, [size]: numeric } as SizeCounts;
+
+    // If allowAnyQuantity is true, allow any quantity. Otherwise, round to nearest multiple of packSize.
+    const adjustedValue = allowAnyQuantity ? numeric : Math.round(numeric / packSize) * packSize;
+
+    const next: SizeCounts = { ...counts, [size]: adjustedValue } as SizeCounts;
     onChange(next);
   };
 
@@ -90,28 +99,32 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
         ))}
       </div>
 
-      <div
-        className="size-pack__helper"
-        style={{
-          width: '100%',
-          maxWidth: '100%',
-          color: totals.total > 0 && !totals.isValid ? 'var(--color-danger)' : totals.isValid ? 'var(--color-success)' : undefined
-        }}
-        role="status"
-        aria-live="polite"
-        data-valid={totals.isValid ? 'true' : 'false'}
-        data-positive={totals.total > 0 ? 'true' : 'false'}
-      >
-        {totals.isValid ? (
-          <>Total: {totals.total} items • Packs: {totals.packs}</>
-        ) : (
-          <>Add {totals.needed} more to complete a pack of {packSize}.</>
-        )}
-      </div>
+      {!hideTotal && (
+        <div
+          className="size-pack__helper"
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            color: allowAnyQuantity ? 'var(--color-text)' : (totals.total > 0 && !totals.isValid ? 'var(--color-danger)' : totals.isValid ? 'var(--color-success)' : undefined)
+          }}
+          role="status"
+          aria-live="polite"
+          data-valid={allowAnyQuantity ? 'true' : (totals.isValid ? 'true' : 'false')}
+          data-positive={totals.total > 0 ? 'true' : 'false'}
+        >
+          {allowAnyQuantity ? (
+            <>Total: {totals.total} items</>
+          ) : totals.total === 0 ? (
+            <>Add {packSize} more to complete a pack of {packSize}.</>
+          ) : (
+            <>Total: {totals.total} items • Add {totals.isValid ? packSize : totals.needed} more to complete a pack of {packSize}.</>
+          )}
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '100%' }}>
         <button type="button" className="btn-ghost-sm" onClick={handleClear}>Clear</button>
-        <button type="button" className="btn-ghost-sm" onClick={handleEvenSplit}>Split evenly</button>
+        <button type="button" className="btn-ghost-sm" onClick={handleEvenSplit}>Pack of {packSize}</button>
       </div>
     </div>
   );

@@ -12,6 +12,10 @@ export interface VersionPackSizes {
   longsleeve?: number;
   crewneck?: number;
   hoodie?: number;
+  jacket?: number;
+  sweatpants?: number;
+  shorts?: number;
+  flannels?: number;
   default?: number;
 }
 
@@ -20,34 +24,34 @@ export interface VersionPackSizes {
  * You can customize these values as needed for your business requirements
  */
 export const PACK_SIZES: PackSizeConfig = {
-  // T-Shirts (Unisex) - different sizes by version
+  // T-Shirts (Unisex) - 6 or any quantity allowed
   'tshirt/men': {
-    tshirt: 7,
-    longsleeve: 7,
-    crewneck: 6,
-    hoodie: 8,
-    default: 7,
+    tshirt: 6,        // 6 or any quantity allowed
+    longsleeve: 6,    // 6 or any quantity allowed
+    crewneck: 6,      // 6 or any quantity allowed
+    hoodie: 6,        // 6 or any quantity allowed
+    default: 6,       // 6 or any quantity allowed
   },
-  
-  // Women's T-Shirts - all multiples of 8
-  'tshirt/women': 8,
-  
+
+  // Women's T-Shirts - multiples of 4
+  'tshirt/women': 4,
+
   // Outerwear
-  'jacket': 6,
-  'flannels': 8,
-  
+  'jacket': 6,       // Multiples of 6
+  'flannels': 8,     // Multiples of 8
+
   // Bottoms
-  'pants': 6,        // Sweatpants/Joggers handled via pantOptions
-  'shorts': 8,
-  
+  'pants': 4,        // Sweatpants - multiples of 4
+  'shorts': 4,       // Shorts - multiples of 4
+
   // Caps
   'hat': 6,
   'beanie': 6,
-  
+
   // Accessories
-  'socks': 6,
+  'socks': 1,       // Any quantity allowed for now
   'bottle': 1,       // Any quantity allowed
-  'sticker': 20,
+  'sticker': 6,
   'plush': 6,
   'card': 1,         // Display cards - any quantity allowed
   'shelf magnets': 1, // Shelf magnets - any quantity allowed
@@ -102,11 +106,31 @@ export const getPackSize = (categoryPath: string, version?: string, productName?
 };
 
 /**
+ * Check if a category/version allows "pack size or any" (i.e., any quantity OR multiples of pack size)
+ * @param categoryPath - The category path (e.g., 'shorts', 'tshirt/men')
+ * @param version - Optional shirt version (e.g., 'tshirt', 'hoodie')
+ * @param productName - Optional product name to check for special types
+ * @returns true if the category/version allows any quantity OR multiples of pack size
+ */
+export const allowsAnyQuantity = (categoryPath: string, version?: string, productName?: string): boolean => {
+  // Unisex t-shirts, longsleeve, crewneck, and hoodies allow any quantity OR multiples of 6
+  if (categoryPath === 'tshirt/men') {
+    return true;
+  }
+
+  return false;
+};
+
+/**
  * Get pack size validation message
  * @param packSize - The pack size to validate against
+ * @param allowsAny - Whether any quantity is also allowed
  * @returns Formatted message for validation errors
  */
-export const getPackSizeMessage = (packSize: number): string => {
+export const getPackSizeMessage = (packSize: number, allowsAny = false): string => {
+  if (allowsAny) {
+    return `Please ensure all selected garment sizes total to multiples of ${packSize} or any quantity.`;
+  }
   return `Please ensure all selected garment sizes total to multiples of ${packSize}.`;
 };
 
