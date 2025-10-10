@@ -122,7 +122,8 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           // Process Sweatpants
           if (pOptions.sweatpants) {
             processSizeCounts('Sweatpants', 'Steel', pOptions.sweatpants.steel);
-            processSizeCounts('Sweatpants', 'Oxford', pOptions.sweatpants.oxford);
+            processSizeCounts('Sweatpants', 'Black', pOptions.sweatpants.black);
+            processSizeCounts('Sweatpants', 'Dark Navy', pOptions.sweatpants.darkNavy);
           }
 
           // Process Joggers
@@ -133,10 +134,11 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
         }
       } else if (cat.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
         // For sweatpant/jogger (legacy), add each of the four options as a line item
-        const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerDarkHeather: '' };
+        const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantBlack: '', sweatpantDarkNavy: '', joggerSteel: '', joggerDarkHeather: '' };
         const options = [
           { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
-          { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
+          { key: 'sweatpantBlack', label: 'Straight-Leg Black' },
+          { key: 'sweatpantDarkNavy', label: 'Straight-Leg Dark Navy' },
           { key: 'joggerSteel', label: 'Jogger Steel' },
           { key: 'joggerDarkHeather', label: 'Jogger Dark Heather' },
         ];

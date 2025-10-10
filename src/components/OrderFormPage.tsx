@@ -89,6 +89,7 @@ const OrderFormPage: React.FC = () => {
       error={error}
       collegeConfig={collegeConfig}
       college={college}
+      categories={categories}
     />
   );
 };

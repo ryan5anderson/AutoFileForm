@@ -27,6 +27,7 @@ interface FormPageProps {
   error: string | null;
   collegeConfig?: CollegeConfig;
   college?: string;
+  categories?: Category[];
 }
 
 const FormPage: React.FC<FormPageProps> = ({
@@ -40,12 +41,13 @@ const FormPage: React.FC<FormPageProps> = ({
   onSubmit,
   error,
   collegeConfig,
-  college
+  college,
+  categories
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const categories = useMemo(() => {
-    const list = collegeConfig ? [...collegeConfig.categories] : [];
+  const sortedCategories = useMemo(() => {
+    const list = categories || (collegeConfig ? [...collegeConfig.categories] : []);
     // Move display options to the bottom if present
     return list.sort((a, b) => {
       const aIsDisplay = a.hasDisplayOptions || a.name.toLowerCase().includes('display options');
@@ -54,7 +56,7 @@ const FormPage: React.FC<FormPageProps> = ({
       if (!aIsDisplay && bIsDisplay) return -1;
       return 0;
     });
-  }, [collegeConfig]);
+  }, [categories, collegeConfig]);
   const collegeName = collegeConfig ? collegeConfig.name : 'College';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
@@ -85,7 +87,7 @@ const FormPage: React.FC<FormPageProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = categories.map(cat => {
+      const sections = sortedCategories.map(cat => {
         const id = cat.name.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
         return { id, element: document.getElementById(id) };
       }).filter(section => section.element);
@@ -109,7 +111,7 @@ const FormPage: React.FC<FormPageProps> = ({
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [categories]);
+  }, [sortedCategories]);
   return (
     <div className="college-page-container">
       <div className="college-page-header">
@@ -120,7 +122,7 @@ const FormPage: React.FC<FormPageProps> = ({
       </div>
       
       <CollapsibleSidebar
-        categories={categories}
+        categories={sortedCategories}
         activeSection={activeSection}
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
@@ -158,7 +160,7 @@ const FormPage: React.FC<FormPageProps> = ({
         }}>
           <StoreInfoForm formData={formData} onFormDataChange={onFormDataChange} />
           
-          {categories.map((category: Category) => (
+          {sortedCategories.map((category: Category) => (
             <CategorySection
               key={category.name}
               category={category}

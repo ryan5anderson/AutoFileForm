@@ -30,7 +30,8 @@ export interface DisplayOption {
 
 export interface SweatpantJoggerOption {
   sweatpantSteel: string;
-  sweatpantOxford: string;
+  sweatpantBlack: string;
+  sweatpantDarkNavy: string;
   joggerSteel: string;
   joggerDarkHeather: string;
 }
@@ -39,7 +40,8 @@ export interface SweatpantJoggerOption {
 export interface PantOption {
   sweatpants?: {
     steel?: SizeCounts;
-    oxford?: SizeCounts;
+    black?: SizeCounts;
+    darkNavy?: SizeCounts;
   };
   joggers?: {
     steel?: SizeCounts;

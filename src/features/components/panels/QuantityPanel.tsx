@@ -44,11 +44,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <>
             {categoryName === 'Sweatpants/Joggers' ? (
               <>
-                {['sweatpantSteel', 'sweatpantOxford', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
+                {['sweatpantSteel', 'sweatpantBlack', 'sweatpantDarkNavy', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
                   <div key={optionKey} className="field">
                     <div className="field-label">
                       {optionKey === 'sweatpantSteel' && 'Straight-Leg Steel'}
-                      {optionKey === 'sweatpantOxford' && 'Straight-Leg Oxford'}
+                      {optionKey === 'sweatpantBlack' && 'Straight-Leg Black'}
+                      {optionKey === 'sweatpantDarkNavy' && 'Straight-Leg Dark Navy'}
                       {optionKey === 'joggerSteel' && 'Jogger Steel'}
                       {optionKey === 'joggerDarkHeather' && 'Jogger Dark Heather'}
                     </div>
@@ -130,11 +131,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <>
           {categoryName === 'Sweatpants/Joggers' ? (
             <>
-              {['sweatpantSteel', 'sweatpantOxford', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
+              {['sweatpantSteel', 'sweatpantBlack', 'sweatpantDarkNavy', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
                 <div key={optionKey} className="field">
                   <div className="field-label">
                     {optionKey === 'sweatpantSteel' && 'Straight-Leg Steel'}
-                    {optionKey === 'sweatpantOxford' && 'Straight-Leg Oxford'}
+                    {optionKey === 'sweatpantBlack' && 'Straight-Leg Black'}
+                    {optionKey === 'sweatpantDarkNavy' && 'Straight-Leg Dark Navy'}
                     {optionKey === 'joggerSteel' && 'Jogger Steel'}
                     {optionKey === 'joggerDarkHeather' && 'Jogger Dark Heather'}
                   </div>

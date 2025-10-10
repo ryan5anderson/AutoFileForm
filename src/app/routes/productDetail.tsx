@@ -102,9 +102,9 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   // Determine which configuration panel to render
   const renderConfigurationPanel = () => {
     if (category.hasPantOptions) {
-      // Pants with sweatpants/joggers and steel/oxford options with size selection
+      // Pants with sweatpants/joggers and steel/black/dark navy options with size selection
       const pantOption = formData.pantOptions?.[imagePath] || {
-        sweatpants: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, oxford: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } },
+        sweatpants: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, black: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, darkNavy: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } },
         joggers: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, darkHeather: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } }
       };
       
@@ -285,7 +285,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             quantity={quantity}
             onQuantityChange={onQuantityChange}
             sweatpantJoggerOption={category.name === 'Sweatpants/Joggers'
-              ? (formData.sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerDarkHeather: ''})
+              ? (formData.sweatpantJoggerOptions?.[imagePath] || {sweatpantSteel: '', sweatpantBlack: '', sweatpantDarkNavy: '', joggerSteel: '', joggerDarkHeather: ''})
               : undefined}
             onSweatpantJoggerOptionChange={category.name === 'Sweatpants/Joggers' ? onSweatpantJoggerOptionChange : undefined}
           />
@@ -339,7 +339,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               <strong>Display Standard Case Pack:</strong> Display unit includes garments.
             </div>
           )}
-          <div className="product-detail-options-content">
+          <div className="product-detail-options-content" style={{
+            overflowY: category.hasPantOptions ? 'hidden' : 'auto',
+            paddingBottom: '2rem',
+            maxHeight: category.hasPantOptions ? 'none' : 'calc(100vh - 400px)'
+          }}>
             {renderConfigurationPanel()}
           </div>
           <div className="product-detail-actions">

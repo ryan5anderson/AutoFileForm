@@ -25,7 +25,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
   const packSize = getPackSize(categoryPath);
   const sizes = getSizeOptions(categoryPath);
 
-  const handleSizeCountsChange = (style: 'sweatpants' | 'joggers', color: 'steel' | 'oxford' | 'darkHeather', counts: SizeCounts) => {
+  const handleSizeCountsChange = (style: 'sweatpants' | 'joggers', color: 'steel' | 'black' | 'darkHeather' | 'darkNavy', counts: SizeCounts) => {
     const newOption = { ...pantOption };
 
     if (!newOption[style]) {
@@ -34,7 +34,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
 
     // Use type assertion to handle the different color structures for each style
     if (style === 'sweatpants') {
-      (newOption[style] as { steel?: SizeCounts; oxford?: SizeCounts })[color as 'steel' | 'oxford'] = counts;
+      (newOption[style] as { steel?: SizeCounts; black?: SizeCounts; darkNavy?: SizeCounts })[color as 'steel' | 'black' | 'darkNavy'] = counts;
     } else {
       (newOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })[color as 'steel' | 'darkHeather'] = counts;
     }
@@ -42,53 +42,135 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
     onChange(newOption);
   };
 
-  const getSizeCounts = (style: 'sweatpants' | 'joggers', color: 'steel' | 'oxford' | 'darkHeather'): SizeCounts => {
+  const getSizeCounts = (style: 'sweatpants' | 'joggers', color: 'steel' | 'black' | 'darkHeather' | 'darkNavy'): SizeCounts => {
     if (style === 'sweatpants') {
-      return (pantOption[style] as { steel?: SizeCounts; oxford?: SizeCounts })?.[color as 'steel' | 'oxford'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 };
+      return (pantOption[style] as { steel?: SizeCounts; black?: SizeCounts; darkNavy?: SizeCounts })?.[color as 'steel' | 'black' | 'darkNavy'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 };
     } else {
       return (pantOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })?.[color as 'steel' | 'darkHeather'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 };
     }
   };
 
   const renderColorOptions = (style: 'sweatpants' | 'joggers') => {
-    const colors: Array<'steel' | 'oxford' | 'darkHeather'> = style === 'joggers' ? ['steel', 'darkHeather'] : ['steel', 'oxford'];
-
-    return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        gap: 'var(--space-3)',
-        width: '100%'
-      }}>
-        {colors.map((color) => (
-          <div key={color} style={{
-            background: 'var(--color-bg)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius)',
-            padding: 'var(--space-2)',
-            flex: '1',
-            minWidth: 0
-          }}>
-            <div style={{
-              fontSize: '0.8rem',
-              fontWeight: '600',
-              marginBottom: '0.35rem',
-              color: 'var(--color-text)'
+    if (style === 'joggers') {
+      // Joggers only have 2 colors - keep in one row
+      const colors: Array<'steel' | 'darkHeather'> = ['steel', 'darkHeather'];
+      return (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 'var(--space-3)',
+          width: '100%'
+        }}>
+          {colors.map((color) => (
+            <div key={color} style={{
+              background: 'var(--color-bg)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius)',
+              padding: 'var(--space-2)',
+              flex: '1',
+              minWidth: 0
             }}>
-              {color === 'steel' ? 'Steel' : (color === 'oxford' ? 'Oxford' : 'Dark Heather')}
+              <div style={{
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                marginBottom: '0.35rem',
+                color: 'var(--color-text)'
+              }}>
+                {color === 'steel' ? 'Steel' : 'Dark Heather'}
+              </div>
+              <SizePackSelector
+                counts={getSizeCounts(style, color)}
+                onChange={(counts) => handleSizeCountsChange(style, color, counts)}
+                packSize={packSize}
+                sizes={sizes}
+                disabled={disabled}
+                allowAnyQuantity={allowAnyQuantity}
+              />
             </div>
-            <SizePackSelector
-              counts={getSizeCounts(style, color)}
-              onChange={(counts) => handleSizeCountsChange(style, color, counts)}
-              packSize={packSize}
-              sizes={sizes}
-              disabled={disabled}
-              allowAnyQuantity={allowAnyQuantity}
-            />
+          ))}
+        </div>
+      );
+    } else {
+      // Sweatpants have 3 colors - split into two rows
+      const firstRowColors: Array<'steel' | 'black'> = ['steel', 'black'];
+      const secondRowColors: Array<'darkNavy'> = ['darkNavy'];
+
+      return (
+        <div style={{ width: '100%' }}>
+          {/* First row with Steel and Black */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 'var(--space-3)',
+            width: '100%',
+            marginBottom: 'var(--space-3)'
+          }}>
+            {firstRowColors.map((color) => (
+              <div key={color} style={{
+                background: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius)',
+                padding: 'var(--space-2)',
+                flex: '1',
+                minWidth: 0
+              }}>
+                <div style={{
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  marginBottom: '0.35rem',
+                  color: 'var(--color-text)'
+                }}>
+                  {color === 'steel' ? 'Steel' : 'Black'}
+                </div>
+                <SizePackSelector
+                  counts={getSizeCounts(style, color)}
+                  onChange={(counts) => handleSizeCountsChange(style, color, counts)}
+                  packSize={packSize}
+                  sizes={sizes}
+                  disabled={disabled}
+                  allowAnyQuantity={allowAnyQuantity}
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    );
+
+          {/* Second row with Dark Navy centered */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%'
+          }}>
+            {secondRowColors.map((color) => (
+              <div key={color} style={{
+                background: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius)',
+                padding: 'var(--space-2)',
+                width: '50%',
+                maxWidth: '300px'
+              }}>
+                <div style={{
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  marginBottom: '0.35rem',
+                  color: 'var(--color-text)'
+                }}>
+                  Dark Navy
+                </div>
+                <SizePackSelector
+                  counts={getSizeCounts(style, color)}
+                  onChange={(counts) => handleSizeCountsChange(style, color, counts)}
+                  packSize={packSize}
+                  sizes={sizes}
+                  disabled={disabled}
+                  allowAnyQuantity={allowAnyQuantity}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
   };
 
   return (

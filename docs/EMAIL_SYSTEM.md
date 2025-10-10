@@ -159,13 +159,14 @@ if (img === 'M100482538 SHHODC Hover DTF on Black or Forest .png') {
 ```typescript
 if (cat.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
   const sj = formData.sweatpantJoggerOptions[imagePath] || { 
-    sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerOxford: '' 
+    sweatpantSteel: '', sweatpantBlack: '', sweatpantDarkNavy: '', joggerSteel: '', joggerDarkHeather: '' 
   };
   const options = [
     { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
-    { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
+    { key: 'sweatpantBlack', label: 'Straight-Leg Black' },
+    { key: 'sweatpantDarkNavy', label: 'Straight-Leg Dark Navy' },
     { key: 'joggerSteel', label: 'Jogger Steel' },
-    { key: 'joggerOxford', label: 'Jogger Oxford' },
+    { key: 'joggerDarkHeather', label: 'Jogger Dark Heather' },
   ];
   options.forEach(opt => {
     const qty = sj[opt.key as keyof typeof sj];

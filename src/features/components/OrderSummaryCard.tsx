@@ -112,8 +112,11 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
           if (sjOptions.sweatpantSteel && Number(sjOptions.sweatpantSteel) > 0) {
             details.push(`Steel: ${sjOptions.sweatpantSteel}`);
           }
-          if (sjOptions.sweatpantOxford && Number(sjOptions.sweatpantOxford) > 0) {
-            details.push(`Oxford: ${sjOptions.sweatpantOxford}`);
+          if (sjOptions.sweatpantBlack && Number(sjOptions.sweatpantBlack) > 0) {
+            details.push(`Black: ${sjOptions.sweatpantBlack}`);
+          }
+          if (sjOptions.sweatpantDarkNavy && Number(sjOptions.sweatpantDarkNavy) > 0) {
+            details.push(`Dark Navy: ${sjOptions.sweatpantDarkNavy}`);
           }
           if (sjOptions.joggerSteel && Number(sjOptions.joggerSteel) > 0) {
             details.push(`Jogger Steel: ${sjOptions.joggerSteel}`);

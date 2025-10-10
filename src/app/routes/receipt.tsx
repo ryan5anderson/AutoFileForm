@@ -265,10 +265,11 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 }
                 // Handle Sweatpants/Joggers
                 if (category.name === 'Sweatpants/Joggers' && formData.sweatpantJoggerOptions) {
-                  const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantOxford: '', joggerSteel: '', joggerDarkHeather: '' };
+                  const sj = formData.sweatpantJoggerOptions[imagePath] || { sweatpantSteel: '', sweatpantBlack: '', sweatpantDarkNavy: '', joggerSteel: '', joggerDarkHeather: '' };
                   const options = [
                     { key: 'sweatpantSteel', label: 'Straight-Leg Steel' },
-                    { key: 'sweatpantOxford', label: 'Straight-Leg Oxford' },
+                    { key: 'sweatpantBlack', label: 'Straight-Leg Black' },
+                    { key: 'sweatpantDarkNavy', label: 'Straight-Leg Dark Navy' },
                     { key: 'joggerSteel', label: 'Jogger Steel' },
                     { key: 'joggerDarkHeather', label: 'Jogger Dark Heather' },
                   ];
