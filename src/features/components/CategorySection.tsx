@@ -16,6 +16,8 @@ interface CategorySectionProps {
   pantOptions?: Record<string, PantOption>;
   colorOptions?: Record<string, ColorOption>;
   shirtColorSizeCounts?: ShirtColorSizeCounts;
+  invalidProductPaths?: string[];
+  validProductPaths?: string[];
   onQuantityChange?: (imagePath: string, value: string) => void;
   onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
   onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: import('../../types').SizeCounts) => void;
@@ -36,6 +38,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   pantOptions = {},
   colorOptions = {},
   shirtColorSizeCounts = {},
+  invalidProductPaths = [],
+  validProductPaths = [],
   onQuantityChange,
   onShirtVersionChange,
   onSizeCountsChange,
@@ -87,8 +91,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
-    // Handle shirt versions or size options (prefer size counts if present)
-    if (category.hasShirtVersions || category.hasSizeOptions) {
+    // Handle shirt versions (tshirt, longsleeve, hoodie, crewneck)
+    if (category.hasShirtVersions) {
       // Check for color-based size counts first
       if (hasColorOptions(imageName)) {
         const colorSizeCountsByVersion = shirtColorSizeCounts[imagePath];
@@ -105,7 +109,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           if (totalQty > 0) return true;
         }
       }
-      
+
       // Regular size counts
       const sizeCountsByVersion = shirtSizeCounts[imagePath];
       if (sizeCountsByVersion) {
@@ -121,6 +125,56 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         const totalQty = getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
         return totalQty > 0;
       }
+      return false;
+    }
+
+    // Handle products with size options (check shirtSizeCounts first for all products with size options)
+    if (category.hasSizeOptions) {
+      // Check for color-based size counts first
+      if (hasColorOptions(imageName)) {
+        const colorSizeCountsByVersion = shirtColorSizeCounts[imagePath];
+        if (colorSizeCountsByVersion) {
+          const totalQty = Object.values(colorSizeCountsByVersion).reduce((sum, byColor) => {
+            if (!byColor) return sum;
+            const colorTotal = Object.values(byColor).reduce((colorSum, counts) => {
+              if (!counts) return colorSum;
+              const sizeTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
+              return colorSum + sizeTotal;
+            }, 0);
+            return sum + colorTotal;
+          }, 0);
+          if (totalQty > 0) return true;
+        }
+      }
+
+      // For products with size options, check if they have data in shirtSizeCounts
+      const sizeCountsByVersion = shirtSizeCounts[imagePath];
+      if (sizeCountsByVersion) {
+        const totalQty = Object.values(sizeCountsByVersion).reduce((sum, counts) => {
+          if (!counts) return sum;
+          const versionTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
+          return sum + versionTotal;
+        }, 0);
+        if (totalQty > 0) return true;
+      }
+
+      // For products with size options but no shirt versions, also check regular quantities
+      if (!category.hasShirtVersions) {
+        const quantity = quantities[imagePath];
+        if (quantity && Number(quantity) > 0) {
+          return true;
+        }
+
+        // Also check for color-based quantities
+        if (hasColorOptions(imageName)) {
+          const colorQty = colorOptions[imagePath];
+          if (colorQty) {
+            const totalQty = Object.values(colorQty).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
+            if (totalQty > 0) return true;
+          }
+        }
+      }
+
       return false;
     }
 
@@ -163,7 +217,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <div className="section__header">
         <h3 className="section__title">{category.name}</h3>
       </div>
-      {category.hasDisplayOptions && (
+      {category.hasDisplayOptions && !readOnly && (
         <div style={{
           marginBottom: 'var(--space-4)',
           padding: 'var(--space-3)',
@@ -191,11 +245,87 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             }
           };
           
+          // Check if this product has validation errors or valid quantities
+          const hasValidationError = invalidProductPaths.includes(imagePath);
+          const hasValidQuantity = validProductPaths.includes(imagePath);
+          const shouldHighlight = hasValidationError;
+
           return (
             <Card
               key={img}
-              className={!readOnly ? 'card--clickable' : ''}
+              className={`${!readOnly ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''}`}
+              style={shouldHighlight ? {
+                position: 'relative',
+                overflow: 'hidden'
+              } : undefined}
+              onClick={handleCardClick}
             >
+              {/* Red exclamation icon for invalid quantities */}
+              {shouldHighlight && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    zIndex: 20,
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: '#dc2626',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    pointerEvents: 'none'
+                  }}
+                >
+                  !
+                </div>
+              )}
+
+              {/* Blue cart icon for valid quantities */}
+              {hasValidQuantity && !shouldHighlight && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: shouldHighlight ? '52px' : '8px',
+                    zIndex: 20,
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: '#2563eb',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    pointerEvents: 'none'
+                  }}
+                >
+                  🛒
+                </div>
+              )}
+
+              {/* Red overlay for invalid quantities */}
+              {shouldHighlight && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(220, 38, 38, 0.15)',
+                    zIndex: 10,
+                    pointerEvents: 'none',
+                    borderRadius: 'var(--radius-lg)'
+                  }}
+                />
+              )}
               <Card.Header
                 onClick={handleCardClick}
               >
@@ -225,13 +355,16 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     quantities={quantities}
                     shirtVersions={shirtVersions}
                     shirtSizeCounts={shirtSizeCounts}
+                    shirtColorSizeCounts={shirtColorSizeCounts}
                     displayOptions={displayOptions}
                     sweatpantJoggerOptions={sweatpantJoggerOptions}
                     pantOptions={pantOptions}
+                    colorOptions={colorOptions}
                     college={college}
                     hasShirtVersions={category.hasShirtVersions}
                     hasSizeOptions={category.hasSizeOptions}
                     hasPantOptions={category.hasPantOptions}
+                    invalidProductPaths={invalidProductPaths}
                   />
                 )}
               </Card.Header>

@@ -142,8 +142,8 @@
       ]
     },
     {
-      "name": "Display Cards",
-      "path": "card",
+      "name": "Signage",
+      "path": "signage",
       "images": [
         "M100516533_SHWGCS_Spinner_Header_Card.png",
         "M100516676_SHWGCH_PFD_Header_Card.png"

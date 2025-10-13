@@ -151,17 +151,11 @@
       ]
     },
     {
-      "name": "Display Cards",
-      "path": "card",
+      "name": "Signage",
+      "path": "signage",
       "images": [
         "M102313692_SHWGCH_Custom_PFD_Header_Card.png",
-        "M102313972_SHWGCS_Custom_Spinner_Header_Card.png"
-      ]
-    },
-    {
-      "name": "Shelf Magnet",
-      "path": "banner",
-      "images": [
+        "M102313972_SHWGCS_Custom_Spinner_Header_Card.png",
         "M102630540_SHMH24_Custom_4ft_Shelf_Magnet.png"
       ]
     }

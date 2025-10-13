@@ -1,4 +1,4 @@
-import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion } from '../../types';
+import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion, SizeCounts } from '../../types';
 import { PROVIDER_EMAIL } from '../../constants';
 import { getRackToCardMapping } from './imagePath';
 import { getVersionDisplayName } from './naming';
@@ -20,37 +20,104 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
       const name = img.replace(/\.(png|jpg)$/, ''); // Full product name
       
       if (cat.hasShirtVersions && cat.shirtVersions) {
-        // For shirt categories, create separate items for each version using size counts totals
+        // For shirt categories, check for color-based size counts first, then regular size counts
+        const colorSizeCountsByVersion = formData.shirtColorSizeCounts?.[imagePath];
         const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
         const filteredVersions = getFilteredShirtVersions(img, cat.shirtVersions);
-        for (const version of filteredVersions) {
-          const counts = sizeByVersion[version as keyof ShirtVersion];
-          const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
-          if (vTotal > 0) {
-            const versionName = getVersionDisplayName(version, img);
-            // Build size detail like S7 M7 XL7
-            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
-            const sizePieces = counts ? sizeOrder
-              .map(sz => {
-                const val = counts[sz] || 0;
-                return val > 0 ? `${sz}${val}` : '';
-              })
-              .filter(Boolean)
-              .join(' ') : '';
+
+        // Check for color-based size counts first
+        if (colorSizeCountsByVersion) {
+          // Combine all colors and sizes for this product version
+          const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+          const combinedBreakdown: string[] = [];
+
+          for (const version of filteredVersions) {
+            const byColor = colorSizeCountsByVersion[version as keyof ShirtVersion];
+            if (byColor) {
+              const colorBreakdown = Object.entries(byColor)
+                .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
+                .map(([colorName, counts]) => {
+                  if (!counts) return '';
+                  const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                  const sizePieces = sizeOrder
+                    .map(sz => {
+                      const val = counts[sz] || 0;
+                      return val > 0 ? `${sz}${val}` : '';
+                    })
+                    .filter(Boolean)
+                    .join(' ');
+
+                  const totalForColor = Object.values(counts).reduce((a, b) => a + b, 0);
+                  return `${colorName}: ${totalForColor}${sizePieces ? ` (${sizePieces})` : ''}`;
+                })
+                .filter(Boolean)
+                .join(', ');
+
+              if (colorBreakdown) {
+                const versionName = getVersionDisplayName(version, img);
+                const totalForVersion = Object.values(byColor).reduce((sum, counts) =>
+                  sum + Object.values(counts || {}).reduce((a, b) => a + b, 0), 0);
+
+                if (totalForVersion > 0) {
+                  combinedBreakdown.push(`${versionName}: ${totalForVersion} (${colorBreakdown})`);
+                }
+              }
+            }
+          }
+
+          if (combinedBreakdown.length > 0) {
+            const totalQty = combinedBreakdown.reduce((sum, item) => {
+              const match = item.match(/: (\d+)/);
+              return sum + (match ? parseInt(match[1]) : 0);
+            }, 0);
+
             categoryItems.push({
               sku,
-              name: `${name} (${versionName}${sizePieces ? ` - ${sizePieces}` : ''})`,
-              qty: String(vTotal),
-              version
+              name: `${name} (${combinedBreakdown.join('; ')})`,
+              qty: String(totalQty)
             });
+          }
+        } else {
+          // Fall back to regular size counts (no colors)
+          for (const version of filteredVersions) {
+            const counts = sizeByVersion[version as keyof ShirtVersion];
+            const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
+            if (vTotal > 0) {
+              const versionName = getVersionDisplayName(version, img);
+              // Build size detail like S7 M7 XL7
+              const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+              const sizePieces = counts ? sizeOrder
+                .map(sz => {
+                  const val = counts[sz] || 0;
+                  return val > 0 ? `${sz}${val}` : '';
+                })
+                .filter(Boolean)
+                .join(' ') : '';
+              categoryItems.push({
+                sku,
+                name: `${name} (${versionName}${sizePieces ? ` - ${sizePieces}` : ''})`,
+                qty: String(vTotal),
+                version
+              });
+            }
           }
         }
       } else if (cat.hasSizeOptions) {
         // For size options categories (flannels, jackets, etc.), create items using size counts
-        const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
-        const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+        const sizeByVersion = (formData.shirtSizeCounts?.[imagePath] || {}) as Record<string, SizeCounts>;
+
+        // Determine which version keys to look for based on product type
+        let versionOrder: string[];
+        if (cat.hasShirtVersions) {
+          // For T-shirts and similar products with shirt versions
+          versionOrder = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+        } else {
+          // For products like jackets, flannels, etc. - use whatever keys are actually present
+          versionOrder = Object.keys(sizeByVersion);
+        }
+
         for (const version of versionOrder) {
-          const counts = sizeByVersion[version];
+          const counts = sizeByVersion[version] as SizeCounts;
           const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
           if (vTotal > 0) {
             // Build size detail like S7 M7 XL7
@@ -62,9 +129,17 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
               })
               .filter(Boolean)
               .join(' ') : '';
+
+            // For shirt versions, use the standard labels
+            let versionLabel = version;
+            if (cat.hasShirtVersions) {
+              const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
+              versionLabel = labels[version as keyof typeof labels] || version;
+            }
+
             categoryItems.push({
               sku,
-              name: `${name} (${cat.name}${sizePieces ? ` - ${sizePieces}` : ''})`,
+              name: `${name} (${versionLabel}${sizePieces ? ` - ${sizePieces}` : ''})`,
               qty: String(vTotal)
             });
           }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
-import { validateFormData, createTemplateParams } from '../utils/index';
+import { validateFormData, validateQuantities, createTemplateParams } from '../utils/index';
 import { sendOrderEmail } from '../../services/emailService';
 
 export const useOrderForm = (categories: Category[]) => {
@@ -26,6 +26,8 @@ export const useOrderForm = (categories: Category[]) => {
     shirtColorSizeCounts: {} as ShirtColorSizeCounts,
   });
   const [error, setError] = useState<string | null>(null);
+  const [invalidProductPaths, setInvalidProductPaths] = useState<string[]>([]);
+  const [validProductPaths, setValidProductPaths] = useState<string[]>([]);
   const [page, setPage] = useState<Page>('form');
   const [sending, setSending] = useState(false);
 
@@ -34,19 +36,57 @@ export const useOrderForm = (categories: Category[]) => {
     const isSummaryPage = location.pathname.endsWith('/summary');
     const isReceiptPage = location.pathname.endsWith('/receipt');
     const isThankYouPage = location.pathname.endsWith('/thankyou');
-    
+
     if (!isSummaryPage && page === 'summary') {
       setPage('form');
     }
-    
+
     if (isReceiptPage && page !== 'receipt') {
       setPage('receipt');
     }
-    
+
     if (isThankYouPage && page !== 'thankyou') {
       setPage('thankyou');
     }
   }, [location.pathname, page]);
+
+  // Update validation in real-time when form data changes
+  useEffect(() => {
+    const validationResult = validateQuantities(formData, categoriesRef);
+    setInvalidProductPaths(validationResult.invalidProductPaths);
+    setError(validationResult.errorMessage);
+
+    // Track products with valid quantities
+    const validPaths: string[] = [];
+    const allProductPaths = new Set([
+      ...Object.keys(formData.quantities || {}),
+      ...Object.keys(formData.shirtSizeCounts || {}),
+      ...Object.keys(formData.colorOptions || {}),
+      ...Object.keys(formData.shirtColorSizeCounts || {}),
+      ...Object.keys(formData.pantOptions || {}),
+      ...Object.keys(formData.sweatpantJoggerOptions || {})
+    ]);
+
+    allProductPaths.forEach(imagePath => {
+      const hasQuantity = (
+        (formData.quantities?.[imagePath] && parseInt(formData.quantities[imagePath]) > 0) ||
+        (formData.shirtSizeCounts?.[imagePath] && Object.values(formData.shirtSizeCounts[imagePath]).some(counts => Object.values(counts).some(count => count > 0))) ||
+        (formData.colorOptions?.[imagePath] && Object.values(formData.colorOptions[imagePath]).some(qty => parseInt(qty) > 0)) ||
+        (formData.shirtColorSizeCounts?.[imagePath] && Object.values(formData.shirtColorSizeCounts[imagePath]).some(colorData => Object.values(colorData).some(counts => Object.values(counts).some(count => count > 0)))) ||
+        (formData.pantOptions?.[imagePath] && (
+          (formData.pantOptions[imagePath].sweatpants && Object.values(formData.pantOptions[imagePath].sweatpants!).some(counts => Object.values(counts).some(count => count > 0))) ||
+          (formData.pantOptions[imagePath].joggers && Object.values(formData.pantOptions[imagePath].joggers!).some(counts => Object.values(counts).some(count => count > 0)))
+        )) ||
+        (formData.sweatpantJoggerOptions?.[imagePath] && Object.values(formData.sweatpantJoggerOptions[imagePath]).some(qty => parseInt(qty) > 0))
+      );
+
+      if (hasQuantity && !validationResult.invalidProductPaths.includes(imagePath)) {
+        validPaths.push(imagePath);
+      }
+    });
+
+    setValidProductPaths(validPaths);
+  }, [formData, categoriesRef]);
 
   const handleFormDataChange = (updates: Partial<FormData>) => {
     setFormData((prev: FormData) => ({ ...prev, ...updates }));
@@ -153,15 +193,18 @@ export const useOrderForm = (categories: Category[]) => {
     }));
   };
 
+
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Removed all pack size validation - rely on product configuration instead
     // Only check basic form requirements
 
-    const formValidationError = validateFormData(formData, categoriesRef);
-    if (formValidationError) {
-      setError(formValidationError);
+    const formValidationResult = validateFormData(formData, categoriesRef);
+    setInvalidProductPaths(formValidationResult.invalidProductPaths);
+    if (!formValidationResult.isValid) {
+      setError(formValidationResult.errorMessage);
       return;
     }
     setError(null);
@@ -174,6 +217,7 @@ export const useOrderForm = (categories: Category[]) => {
 
   const handleBack = () => {
     setPage('form');
+    // Keep validation state when going back to form
     // Navigate back to form URL
     if (college) {
       navigate(`/${college}`);
@@ -219,6 +263,8 @@ export const useOrderForm = (categories: Category[]) => {
   return {
     formData,
     error,
+    invalidProductPaths,
+    validProductPaths,
     page,
     sending,
     handleFormDataChange,

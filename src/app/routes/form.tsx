@@ -25,6 +25,8 @@ interface FormPageProps {
   onSweatpantJoggerOptionChange: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   error: string | null;
+  invalidProductPaths: string[];
+  validProductPaths: string[];
   collegeConfig?: CollegeConfig;
   college?: string;
   categories?: Category[];
@@ -40,6 +42,8 @@ const FormPage: React.FC<FormPageProps> = ({
   onSweatpantJoggerOptionChange,
   onSubmit,
   error,
+  invalidProductPaths,
+  validProductPaths,
   collegeConfig,
   college,
   categories
@@ -172,6 +176,8 @@ const FormPage: React.FC<FormPageProps> = ({
               pantOptions={formData.pantOptions}
               colorOptions={formData.colorOptions}
               shirtColorSizeCounts={formData.shirtColorSizeCounts}
+              invalidProductPaths={invalidProductPaths}
+              validProductPaths={validProductPaths}
               onQuantityChange={onQuantityChange}
               onShirtVersionChange={onShirtVersionChange}
               onSizeCountsChange={onSizeCountsChange}

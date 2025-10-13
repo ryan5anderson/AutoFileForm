@@ -5,6 +5,8 @@ import { Category, FormData, PantOption } from '../types';
 interface OrderFormContextType {
   formData: FormData;
   error: string | null;
+  invalidProductPaths: string[];
+  validProductPaths: string[];
   page: string;
   sending: boolean;
   handleFormDataChange: (updates: Partial<FormData>) => void;

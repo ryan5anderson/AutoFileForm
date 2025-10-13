@@ -7,16 +7,11 @@
       "path": "displays",
       "hasDisplayOptions": true,
       "images": [
-        "SHZ-WVU- Mimi Tower-500.jpg",
-        "WVU-Mini_Tower-500.jpg",
         "WVU_3ft Inline_500PX.jpg",
-        "WVU_Mini Tower_IMG_3567_500PX.jpg",
         "WVU_Mini_Tower_500PX.jpg",
-        "WVU_Mini_Tower_HatsOnly_500PX.jpg",
         "WVU_Premium Floor Display 2.0_500PX.jpg",
         "WVU_Tier2_Display_Floor_500PX.jpg",
-        "WVU_Tier3_Display_Floor_500PX.jpg",
-        "WVU_Tier3_Display_Floor_V2_PlushOnly_500PX.jpg"
+        "WVU_Tier3_Display_Floor_500PX.jpg"
       ]
     },
     {
@@ -161,22 +156,17 @@
     {
       "name": "Flannels",
       "path": "flannels",
+      "hasSizeOptions": true,
       "images": [
         "M89677268_SHPHFD_Custom_WV_DTF_Flannels.png"
       ]
     },
     {
-      "name": "Display Cards",
-      "path": "card",
+      "name": "Signage",
+      "path": "signage",
       "images": [
         "M90445414_SHWGCS_Custom_Spinner_Header.png",
-        "M90445689_SHWGCH_Custom_PFD_Header.png"
-      ]
-    },
-    {
-      "name": "Shelf Magnet",
-      "path": "banner",
-      "images": [
+        "M90445689_SHWGCH_Custom_PFD_Header.png",
         "M90446092_SHMH23_Custom_3ft_Shelf_Magnet.png",
         "M90446346_SHMH24_Custom_4ft_Shelf_Magnet.png"
       ]

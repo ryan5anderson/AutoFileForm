@@ -8,7 +8,6 @@
       "hasDisplayOptions": true,
       "images": [
         "University-of-Pittsburgh_Mini_Tower_500PX.jpg",
-        "University-of-Pittsburgh_Mini_Tower_HatsOnly_500PX.jpg",
         "University-of-Pittsburgh_Premium Floor Display 2.0_500PX.jpg",
         "University-of-Pittsburgh_Tier2_Display_Floor_500PX.jpg",
         "University-of-Pittsburgh_Tier3_Display_Floor_V2_PlushOnly_500PX.jpg",
@@ -155,17 +154,11 @@
       ]
     },
     {
-      "name": "Display Cards",
-      "path": "card",
+      "name": "Signage",
+      "path": "signage",
       "images": [
         "M11000288_SHWGCS_Custom_Spinner_Header.png",
-        "M11000381_SHWGCH_Custom_PFD_Header.png"
-      ]
-    },
-    {
-      "name": "Shelf Magnet",
-      "path": "banner",
-      "images": [
+        "M11000381_SHWGCH_Custom_PFD_Header.png",
         "M100845983_SHMH24_Custom_4FT_Shelf_Magnet.png",
         "M100846268_SHMH23_Custom_3FT_Shelf_Magnet.png"
       ]

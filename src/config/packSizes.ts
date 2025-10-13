@@ -28,8 +28,8 @@ export const PACK_SIZES: PackSizeConfig = {
   'tshirt/men': {
     tshirt: 6,        // 6 or any quantity allowed
     longsleeve: 6,    // 6 or any quantity allowed
-    crewneck: 6,      // multiples of 6
-    hoodie: 8,        // multiples of 8
+    crewneck: 6,      // 6 or any quantity allowed
+    hoodie: 6,        // 6 or any quantity allowed
     default: 6,       // 6 or any quantity allowed
   },
 
@@ -53,8 +53,7 @@ export const PACK_SIZES: PackSizeConfig = {
   'bottle': 1,       // Any quantity allowed
   'sticker': 6,
   'plush': 6,
-  'card': 1,         // Display cards - any quantity allowed
-  'shelf magnets': 1, // Shelf magnets - any quantity allowed
+  'signage': 1,      // Signage items - any quantity allowed
 
   // Default fallback
   'default': 7,
@@ -114,7 +113,7 @@ export const getPackSize = (categoryPath: string, version?: string, productName?
  */
 export const allowsAnyQuantity = (categoryPath: string, version?: string, productName?: string): boolean => {
   // Unisex t-shirts and longsleeve allow any quantity OR multiples of 6
-  if (categoryPath === 'tshirt/men' && (version === 'tshirt' || version === 'longsleeve')) {
+  if (categoryPath === 'tshirt/men' && (version === 'tshirt' || version === 'longsleeve' || version === 'hoodie' || version === 'crewneck')) {
     return true;
   }
 

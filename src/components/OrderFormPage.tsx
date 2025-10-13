@@ -33,6 +33,8 @@ const OrderFormPage: React.FC = () => {
   const {
     formData,
     error,
+    invalidProductPaths,
+    validProductPaths,
     page,
     sending,
     handleQuantityChange,
@@ -87,6 +89,8 @@ const OrderFormPage: React.FC = () => {
       onSweatpantJoggerOptionChange={handleSweatpantJoggerOptionChange}
       onSubmit={handleFormSubmit}
       error={error}
+      invalidProductPaths={invalidProductPaths}
+      validProductPaths={validProductPaths}
       collegeConfig={collegeConfig}
       college={college}
       categories={categories}

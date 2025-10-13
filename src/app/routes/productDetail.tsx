@@ -191,6 +191,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey, color, counts)}
                     sizes={sizesArray}
                     packSize={packSize}
+                    allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
                   />
                   </div>
                 );
@@ -234,6 +235,10 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         version = 'shorts';
       } else if (category.path.includes('flannel')) {
         version = 'flannels';
+      } else if (category.path.includes('sock')) {
+        version = 'socks';
+      } else if (category.path.includes('sticker')) {
+        version = 'stickers';
       }
       const versionKey = version;
       const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };

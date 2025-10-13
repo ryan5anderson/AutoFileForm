@@ -6,6 +6,7 @@ interface CardProps {
   expanded?: boolean;
   onClick?: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 interface CardHeaderProps {
@@ -27,7 +28,7 @@ const Card: React.FC<CardProps> & {
   Header: React.FC<CardHeaderProps>;
   Body: React.FC<CardBodyProps>;
   Footer: React.FC<CardFooterProps>;
-} = ({ children, active = false, expanded = false, onClick, className = '' }) => {
+} = ({ children, active = false, expanded = false, onClick, className = '', style }) => {
   const cardClasses = [
     'card',
     expanded && 'card--expanded',
@@ -36,9 +37,10 @@ const Card: React.FC<CardProps> & {
   ].filter(Boolean).join(' ');
 
   return (
-    <div 
+    <div
       className={cardClasses}
       onClick={onClick}
+      style={style}
     >
       {children}
     </div>

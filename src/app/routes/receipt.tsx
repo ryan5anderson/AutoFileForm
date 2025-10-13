@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { FormData, Category, ShirtVersion } from '../../types';
+import { FormData, Category, ShirtVersion, SizeCounts } from '../../types';
 import { colleges } from '../../config';
 import { getProductName, getImagePath, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
 import Header from '../layout/Header';
@@ -385,9 +385,19 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 // Handle Size Options (for non-shirt categories like flannels, jackets, etc.)
                 if (category.hasSizeOptions) {
                   const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
-                  const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+
+                  // Determine which version keys to look for based on product type
+                  let versionOrder: string[];
+                  if (category.hasShirtVersions) {
+                    // For T-shirts and similar products with shirt versions
+                    versionOrder = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+                  } else {
+                    // For products like socks, jackets, flannels, etc. - use whatever keys are actually present
+                    versionOrder = Object.keys(sizeByVersion);
+                  }
+
                   const totalsByVersion = versionOrder.map((vk) => {
-                    const c = sizeByVersion[vk];
+                    const c = sizeByVersion[vk as keyof typeof sizeByVersion] as SizeCounts;
                     return c ? Object.values(c).reduce((a,b)=>a+b,0) : 0;
                   });
                   const totalQty = totalsByVersion.reduce((a,b)=>a+b,0);
@@ -409,7 +419,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                         {versionOrder.map((vk, i) => {
                           const vTotal = totalsByVersion[i];
                           if (vTotal > 0) {
-                            const c = sizeByVersion[vk];
+                            const c = sizeByVersion[vk as keyof typeof sizeByVersion] as SizeCounts;
                             const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
                             const sizePieces = c ? sizeOrder
                               .map((sz) => {
@@ -418,9 +428,17 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                               })
                               .filter(Boolean)
                               .join(' ') : '';
+
+                            // For shirt versions, use the standard labels
+                            let versionLabel = vk;
+                            if (category.hasShirtVersions) {
+                              const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
+                              versionLabel = labels[vk as keyof typeof labels] || vk;
+                            }
+
                             return (
                               <div key={vk} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
-                                <span>{category.name}{sizePieces ? ` (${sizePieces})` : ''}</span>
+                                <span>{versionLabel}{sizePieces ? ` (${sizePieces})` : ''}</span>
                                 <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
                               </div>
                             );

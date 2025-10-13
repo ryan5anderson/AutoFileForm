@@ -114,8 +114,6 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
         >
           {allowAnyQuantity ? (
             <>Total: {totals.total} items</>
-          ) : totals.total === 0 ? (
-            <>Add {packSize} more to complete a pack of {packSize}.</>
           ) : (
             <>Total: {totals.total} items • Add {totals.isValid ? packSize : totals.needed} more to complete a pack of {packSize}.</>
           )}

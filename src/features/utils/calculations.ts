@@ -8,8 +8,11 @@ import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } fro
  */
 const getCategoryPathForImage = (imagePath: string, categories?: Category[]): string => {
   if (!categories) {
+    console.log(`DEBUG: getCategoryPathForImage - no categories provided for ${imagePath}`);
     return '';
   }
+
+  console.log(`DEBUG: getCategoryPathForImage called with imagePath=${imagePath}, categories=${categories.length}`);
 
   // Handle image paths that might include category prefixes
   // e.g., "tshirt/women/M102074486_SDSORS_Jr_Socrates_DTF_on_Steel.png"
@@ -20,6 +23,8 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
     const parts = imagePath.split('/');
     if (parts.length >= 2) {
       const potentialCategory = parts[0];
+      console.log(`DEBUG: Checking potential category: ${potentialCategory} for image: ${imagePath}`);
+
       // Check if this is a valid category path
       if (potentialCategory === 'tshirt/men' || potentialCategory === 'tshirt/women' ||
           potentialCategory === 'jacket' || potentialCategory === 'flannels' ||
@@ -27,23 +32,42 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
           potentialCategory === 'hat' || potentialCategory === 'beanie' ||
           potentialCategory === 'socks' || potentialCategory === 'bottle' ||
           potentialCategory === 'sticker' || potentialCategory === 'plush' ||
-          potentialCategory === 'card' || potentialCategory === 'shelf magnets' ||
+          potentialCategory === 'signage' ||
           potentialCategory === 'displays') {
+        console.log(`DEBUG: Found matching category path: ${potentialCategory}`);
         return potentialCategory;
       } else {
+        console.log(`DEBUG: ${potentialCategory} is not a recognized category path`);
         // If the first part is not a category path, assume the whole thing is the filename
         searchImagePath = imagePath;
       }
     }
   }
 
+  console.log(`DEBUG: Searching for image ${searchImagePath} in categories`);
+
   // Search through categories for the image
   for (const category of categories) {
+    console.log(`DEBUG: Checking category: ${category.path}, images: ${category.images?.length || 0}`);
     if (category.images && category.images.includes(searchImagePath)) {
+      console.log(`DEBUG: Found image in category: ${category.path}`);
       return category.path;
     }
   }
 
+  // Fallback: try searching for just the filename part
+  const filename = searchImagePath.split('/').pop() || searchImagePath;
+  console.log(`DEBUG: Trying to find just filename: ${filename}`);
+
+  for (const category of categories) {
+    console.log(`DEBUG: Checking category: ${category.path} for filename ${filename}`);
+    if (category.images && category.images.includes(filename)) {
+      console.log(`DEBUG: Found filename in category: ${category.path}`);
+      return category.path;
+    }
+  }
+
+  console.log(`DEBUG: Image ${imagePath} not found in any category, returning empty string`);
   return '';
 };
 
@@ -60,6 +84,8 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
   // Normalize inputs
   const normalizedCategory = categoryPath.trim().toLowerCase();
   const normalizedVersion = version?.trim().toLowerCase();
+
+  console.log(`DEBUG: Normalized category: '${normalizedCategory}', version: '${normalizedVersion}'`);
 
   // Handle special product types first
   if (productName) {
@@ -86,17 +112,9 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
   switch (normalizedCategory) {
     case 'tshirt/men':
       console.log(`DEBUG: tshirt/men with version ${normalizedVersion}, returning pack size`);
-      if (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve') {
+      if (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck') {
         console.log(`DEBUG: tshirt/men ${normalizedVersion} allows any quantity, returning 6`);
         return 6; // allowsAny = true
-      }
-      if (normalizedVersion === 'crewneck') {
-        console.log(`DEBUG: tshirt/men crewneck, returning 6`);
-        return 6;
-      }
-      if (normalizedVersion === 'hoodie') {
-        console.log(`DEBUG: tshirt/men hoodie, returning 8`);
-        return 8;
       }
       console.log(`DEBUG: tshirt/men unknown version ${normalizedVersion}, returning default 6`);
       return 6; // default
@@ -116,8 +134,7 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
       return 6;
     case 'socks':
     case 'bottle':
-    case 'card':
-    case 'shelf magnets':
+    case 'signage':
       return 1;
     case 'sticker':
     case 'plush':
@@ -143,13 +160,13 @@ const getAllowsAnyQuantity = (categoryPath: string, version?: string, productNam
   const normalizedVersion = version?.trim().toLowerCase();
 
   // Only T-Shirt (Unisex) tshirt and longsleeve allow any quantity
-  if (normalizedCategory === 'tshirt/men' && (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve')) {
+  if (normalizedCategory === 'tshirt/men' && (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck')) {
     console.log(`DEBUG: T-Shirt (Unisex) ${normalizedVersion} allows any quantity`);
     return true;
   }
 
   // Also check for accessories that allow any quantity
-  if (normalizedCategory === 'socks' || normalizedCategory === 'bottle' || normalizedCategory === 'card' || normalizedCategory === 'shelf magnets') {
+  if (normalizedCategory === 'socks' || normalizedCategory === 'bottle' || normalizedCategory === 'signage') {
     console.log(`DEBUG: Accessory ${normalizedCategory} allows any quantity`);
     return true;
   }
@@ -159,29 +176,44 @@ const getAllowsAnyQuantity = (categoryPath: string, version?: string, productNam
 };
 
 
-export const validateFormData = (formData: FormData, categories?: Category[]): string | null => {
+export interface ValidationResult {
+  isValid: boolean;
+  errorMessage: string | null;
+  invalidProductPaths: string[];
+}
+
+export const validateFormData = (formData: FormData, categories?: Category[]): ValidationResult => {
   // Check all required fields
   if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.date.trim()) {
-    return 'Please fill out all store information fields.';
+    return {
+      isValid: false,
+      errorMessage: 'Please fill out all store information fields.',
+      invalidProductPaths: []
+    };
   }
 
   // Validate quantities against pack size requirements
-  const quantityValidationError = validateQuantities(formData, categories);
-  if (quantityValidationError) {
-    return quantityValidationError;
+  const quantityValidationResult = validateQuantities(formData, categories);
+  if (!quantityValidationResult.isValid) {
+    return quantityValidationResult;
   }
 
-  return null;
+  return {
+    isValid: true,
+    errorMessage: null,
+    invalidProductPaths: []
+  };
 };
 
 /**
  * Validate all product quantities in the form data against pack size requirements
  * @param formData - The form data containing all product selections
  * @param categories - Array of categories to help identify product types
- * @returns Error message if validation fails, null if all quantities are valid
+ * @returns ValidationResult with error details and list of invalid product paths
  */
-export const validateQuantities = (formData: FormData, categories?: Category[]): string | null => {
+export const validateQuantities = (formData: FormData, categories?: Category[]): ValidationResult => {
   const errors: string[] = [];
+  const invalidProductPaths: string[] = [];
 
   // Validate simple quantities (for products like bottles, stickers, etc.)
   Object.entries(formData.quantities || {}).forEach(([imagePath, quantityStr]) => {
@@ -195,11 +227,13 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
         // For categories that allow any quantity, only check minimum
         if (quantity < 1) {
           errors.push(`${imagePath}: Minimum quantity is 1`);
+          invalidProductPaths.push(imagePath);
         }
       } else {
         // For categories that require pack size multiples
         if (quantity % packSize !== 0) {
           errors.push(`${imagePath}: Quantity must be a multiple of ${packSize}`);
+          invalidProductPaths.push(imagePath);
         }
       }
     }
@@ -222,11 +256,13 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
               // For categories that allow any quantity, only check minimum
               if (total < 1) {
                 errors.push(`${imagePath} (${version}): Minimum quantity is 1`);
+                invalidProductPaths.push(imagePath);
               }
             } else {
               // For categories that require pack size multiples
               if (total % packSize !== 0) {
                 errors.push(`${imagePath} (${version}): Total must be a multiple of ${packSize}`);
+                invalidProductPaths.push(imagePath);
               }
             }
           }
@@ -248,10 +284,12 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
           if (allowsAny) {
             if (quantity < 1) {
               errors.push(`${imagePath} (${color}): Minimum quantity is 1`);
+              invalidProductPaths.push(imagePath);
             }
           } else {
             if (quantity % packSize !== 0) {
               errors.push(`${imagePath} (${color}): Quantity must be a multiple of ${packSize}`);
+              invalidProductPaths.push(imagePath);
             }
           }
         }
@@ -275,10 +313,12 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
                 if (allowsAny) {
                   if (total < 1) {
                     errors.push(`${imagePath} (${version}, ${color}): Minimum quantity is 1`);
+                    invalidProductPaths.push(imagePath);
                   }
                 } else {
                   if (total % packSize !== 0) {
                     errors.push(`${imagePath} (${version}, ${color}): Total must be a multiple of ${packSize}`);
+                    invalidProductPaths.push(imagePath);
                   }
                 }
               }
@@ -305,10 +345,12 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
               if (allowsAny) {
                 if (total < 1) {
                   errors.push(`${imagePath} (Sweatpants ${color}): Minimum quantity is 1`);
+                  invalidProductPaths.push(imagePath);
                 }
               } else {
                 if (total % packSize !== 0) {
                   errors.push(`${imagePath} (Sweatpants ${color}): Total must be a multiple of ${packSize}`);
+                  invalidProductPaths.push(imagePath);
                 }
               }
             }
@@ -329,10 +371,12 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
               if (allowsAny) {
                 if (total < 1) {
                   errors.push(`${imagePath} (Joggers ${color}): Minimum quantity is 1`);
+                  invalidProductPaths.push(imagePath);
                 }
               } else {
                 if (total % packSize !== 0) {
                   errors.push(`${imagePath} (Joggers ${color}): Total must be a multiple of ${packSize}`);
+                  invalidProductPaths.push(imagePath);
                 }
               }
             }
@@ -369,10 +413,12 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
             if (allowsAny) {
               if (quantity < 1) {
                 errors.push(`${imagePath} (${optionType}): Minimum quantity is 1`);
+                invalidProductPaths.push(imagePath);
               }
             } else {
               if (quantity % packSize !== 0) {
                 errors.push(`${imagePath} (${optionType}): Quantity must be a multiple of ${packSize}`);
+                invalidProductPaths.push(imagePath);
               }
             }
           }
@@ -382,10 +428,25 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
   });
 
   if (errors.length > 0) {
-    return `Quantity validation errors:\n${errors.join('\n')}`;
+    // Remove duplicates from invalidProductPaths
+    const uniquePaths: string[] = [];
+    invalidProductPaths.forEach(path => {
+      if (!uniquePaths.includes(path)) {
+        uniquePaths.push(path);
+      }
+    });
+    return {
+      isValid: false,
+      errorMessage: `Quantity validation errors:\n${errors.join('\n')}`,
+      invalidProductPaths: uniquePaths
+    };
   }
 
-  return null;
+  return {
+    isValid: true,
+    errorMessage: null,
+    invalidProductPaths: []
+  };
 };
 
 export const calculateTotalUnits = (emailCategories: EmailCategory[]): number => {
