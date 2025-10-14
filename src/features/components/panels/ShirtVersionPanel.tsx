@@ -77,7 +77,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
       {availableVersions.map((version) => {
         const versionKey = version as keyof ShirtVersion;
         const displayName = getVersionDisplayName(version, imageName);
-        const counts: SizeCounts = sizeCountsByVersion?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } as SizeCounts;
+        const counts: SizeCounts = sizeCountsByVersion?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 } as SizeCounts;
         const sizesArray = getSizeOptions(categoryPath, version);
         const packSize = getPackSize(categoryPath, version, imageName);
 

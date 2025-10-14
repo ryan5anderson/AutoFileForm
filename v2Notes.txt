@@ -16,6 +16,7 @@ v3 Notes
         cant send empty order
         Pack size distrution logic
         Socks come in pack of 2, fixed sizing issue
+        Nice looking title linked to M# title
 
     Done
         Applique only crew and hoodie

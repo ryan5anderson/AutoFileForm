@@ -41,7 +41,7 @@ Edit `src/config/packSizes.ts` to customize pack sizes for your products.
   'beanie': 6,
   
   // Accessories
-  'socks': 6,
+  'socks': 6,        // Packs of 6
   'bottle': 1,       // Any quantity
   'sticker': 20,
   'plush': 6,

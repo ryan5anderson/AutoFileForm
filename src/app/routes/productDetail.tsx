@@ -104,8 +104,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     if (category.hasPantOptions) {
       // Pants with sweatpants/joggers and steel/black/dark navy options with size selection
       const pantOption = formData.pantOptions?.[imagePath] || {
-        sweatpants: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, black: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, darkNavy: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } },
-        joggers: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 }, darkHeather: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0 } }
+        sweatpants: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, black: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, darkNavy: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 } },
+        joggers: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, darkHeather: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 } }
       };
       
       return (
@@ -197,7 +197,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 );
               } else {
                 // For single-color products, show regular SizePackSelector
-                const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
+                const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
                 const packSize = getPackSize(category.path, version, imageName);
                 const sizesArray = getSizeOptions(category.path, version);
                 return (
@@ -241,7 +241,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         version = 'stickers';
       }
       const versionKey = version;
-      const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
+      const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
       const packSize = getPackSize(category.path, version, imageName);
       const sizesArray = getSizeOptions(category.path, version);
 

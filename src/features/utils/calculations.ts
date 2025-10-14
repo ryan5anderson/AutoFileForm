@@ -133,6 +133,7 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     case 'beanie':
       return 6;
     case 'socks':
+      return 6;
     case 'bottle':
     case 'signage':
       return 1;
@@ -166,7 +167,7 @@ const getAllowsAnyQuantity = (categoryPath: string, version?: string, productNam
   }
 
   // Also check for accessories that allow any quantity
-  if (normalizedCategory === 'socks' || normalizedCategory === 'bottle' || normalizedCategory === 'signage') {
+  if (normalizedCategory === 'bottle' || normalizedCategory === 'signage') {
     console.log(`DEBUG: Accessory ${normalizedCategory} allows any quantity`);
     return true;
   }

@@ -346,17 +346,24 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           const vTotal = totalsByVersion[idx];
                           const displayName = getVersionDisplayName(version);
                           if (vTotal <= 0) return null;
-                          const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                          // Include sock sizes in the size order
+                          const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
                           const sizePieces = counts ? sizeOrder
                             .map((sz) => {
                               const val = counts[sz] || 0;
-                              return val > 0 ? `${sz}${val}` : '';
+                              return val > 0 ? `${sz} ${val}` : '';
                             })
                             .filter(Boolean)
                             .join(' ') : '';
+                          
+                          // Special handling for socks - show just the size breakdown
+                          const displayText = img.toLowerCase().includes('sock') && sizePieces 
+                            ? sizePieces 
+                            : `${displayName}${sizePieces ? ` (${sizePieces})` : ''}`;
+                          
                           return (
                             <div key={version} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
-                              <span>{displayName}{sizePieces ? ` (${sizePieces})` : ''}</span>
+                              <span>{displayText}</span>
                               <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
                             </div>
                           );
@@ -420,11 +427,12 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           const vTotal = totalsByVersion[i];
                           if (vTotal > 0) {
                             const c = sizeByVersion[vk as keyof typeof sizeByVersion] as SizeCounts;
-                            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                            // Include sock sizes in the size order
+                            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
                             const sizePieces = c ? sizeOrder
                               .map((sz) => {
                                 const val = c[sz] || 0;
-                                return val > 0 ? `${sz}${val}` : '';
+                                return val > 0 ? `${sz} ${val}` : '';
                               })
                               .filter(Boolean)
                               .join(' ') : '';
@@ -436,9 +444,14 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                               versionLabel = labels[vk as keyof typeof labels] || vk;
                             }
 
+                            // Special handling for socks - show just the size breakdown
+                            const displayText = img.toLowerCase().includes('sock') && sizePieces 
+                              ? sizePieces 
+                              : `${versionLabel}${sizePieces ? ` (${sizePieces})` : ''}`;
+
                             return (
                               <div key={vk} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
-                                <span>{versionLabel}{sizePieces ? ` (${sizePieces})` : ''}</span>
+                                <span>{displayText}</span>
                                 <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
                               </div>
                             );

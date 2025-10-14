@@ -28,7 +28,6 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
         // Check for color-based size counts first
         if (colorSizeCountsByVersion) {
           // Combine all colors and sizes for this product version
-          const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
           const combinedBreakdown: string[] = [];
 
           for (const version of filteredVersions) {
@@ -38,7 +37,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
                 .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
                 .map(([colorName, counts]) => {
                   if (!counts) return '';
-                  const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                  const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
                   const sizePieces = sizeOrder
                     .map(sz => {
                       const val = counts[sz] || 0;
@@ -85,7 +84,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
             if (vTotal > 0) {
               const versionName = getVersionDisplayName(version, img);
               // Build size detail like S7 M7 XL7
-              const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+              const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
               const sizePieces = counts ? sizeOrder
                 .map(sz => {
                   const val = counts[sz] || 0;
@@ -121,7 +120,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
           if (vTotal > 0) {
             // Build size detail like S7 M7 XL7
-            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
             const sizePieces = counts ? sizeOrder
               .map(sz => {
                 const val = counts[sz] || 0;
@@ -174,7 +173,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
             if (!sizeCounts || typeof sizeCounts !== 'object') return;
 
             // Build size detail like S7 M7 XL7
-            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
             const sizePieces = sizeOrder
               .map(sz => {
                 const val = sizeCounts[sz] || 0;

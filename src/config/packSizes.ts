@@ -49,7 +49,7 @@ export const PACK_SIZES: PackSizeConfig = {
   'beanie': 6,
 
   // Accessories
-  'socks': 1,       // Any quantity allowed for now
+  'socks': 6,       // Packs of 6
   'bottle': 1,       // Any quantity allowed
   'sticker': 6,
   'plush': 6,
@@ -84,14 +84,14 @@ export const getPackSize = (categoryPath: string, version?: string, productName?
     if (lowerName.includes('fleece short')) return 4; // Fleece shorts are special case
     if (lowerName.includes('fleece zip') || lowerName.includes('fleece_zip')) return 6;
   }
-  
+
   const config = PACK_SIZES[categoryPath];
-  
+
   // If config is a number, return it directly
   if (typeof config === 'number') {
     return config;
   }
-  
+
   // If config is an object with version-specific sizes
   if (config && typeof config === 'object') {
     if (version && version in config) {
@@ -99,7 +99,7 @@ export const getPackSize = (categoryPath: string, version?: string, productName?
     }
     return config.default ?? PACK_SIZES['default'] as number;
   }
-  
+
   // Fallback to default
   return PACK_SIZES['default'] as number;
 };

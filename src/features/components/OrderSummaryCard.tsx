@@ -287,11 +287,12 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
             const vTotal = totalsByVersion[i];
             if (vTotal > 0) {
               const c = sizeByVersion[vk];
-              const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+              // Include sock sizes in the size order
+              const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
               const sizePieces = c ? sizeOrder
                 .map((sz: Size) => {
                   const val = c[sz] || 0;
-                  return val > 0 ? `${sz}${val}` : '';
+                  return val > 0 ? `${sz} ${val}` : '';
                 })
                 .filter(Boolean)
                 .join(' ') : '';
@@ -303,7 +304,12 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
                 versionLabel = labels[vk as keyof typeof labels] || vk;
               }
 
-              details.push(`${versionLabel}: ${vTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
+              // Special handling for socks - show just the size breakdown
+              if (imageName.toLowerCase().includes('sock') && sizePieces) {
+                details.push(sizePieces);
+              } else {
+                details.push(`${versionLabel}: ${vTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
+              }
             }
           });
           return { total: totalQty, details: details.join('; ') };
