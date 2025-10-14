@@ -11,12 +11,10 @@ Order by size
 v3 Notes
     To-do
         No crew neck for tiedye products
-        Combine Display Card and Magnets sections in one labeled Signage
         optimize for the phone
-        cant send empty order
         Pack size distrution logic
-        Socks come in pack of 2, fixed sizing issue
         Nice looking title linked to M# title
+        Order summary, reciept and email have a uniform way of tracking quantites and size quantites
 
     Done
         Applique only crew and hoodie
@@ -32,4 +30,6 @@ v3 Notes
         Size option tshirt men doesn't show "add more to complete pack"
         Only 4 display options max, no min. 1 mini, 1 premium, 1 inline, 1 spinner
         Everything ordered shows on Summary Page and then to Recipet Page and Email
-        
+        Socks come in pack of 6, fixed sizing issue
+        cant send empty order
+        Combine Display Card and Magnets sections in one labeled Signage   

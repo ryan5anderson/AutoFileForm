@@ -183,12 +183,76 @@ export interface ValidationResult {
   invalidProductPaths: string[];
 }
 
+/**
+ * Check if the order form data contains any products (non-empty order)
+ * @param formData - The form data to check
+ * @returns true if the order contains at least one product, false otherwise
+ */
+export const hasOrderProducts = (formData: FormData): boolean => {
+  return !!(
+    // Check simple quantities
+    (formData.quantities && Object.values(formData.quantities).some(q => parseInt(q) > 0)) ||
+
+    // Check shirt size counts
+    (formData.shirtSizeCounts && Object.values(formData.shirtSizeCounts).some(versionCounts =>
+      versionCounts && Object.values(versionCounts).some(counts =>
+        counts && Object.values(counts).some(count => count > 0)
+      )
+    )) ||
+
+    // Check color options
+    (formData.colorOptions && Object.values(formData.colorOptions).some(colorOption =>
+      colorOption && Object.values(colorOption).some(q => parseInt(q) > 0)
+    )) ||
+
+    // Check shirt color size counts
+    (formData.shirtColorSizeCounts && Object.values(formData.shirtColorSizeCounts).some(versionData =>
+      versionData && Object.values(versionData).some(colorData =>
+        colorData && Object.values(colorData).some(counts =>
+          counts && Object.values(counts).some(count => count > 0)
+        )
+      )
+    )) ||
+
+    // Check pant options (sweatpants and joggers)
+    (formData.pantOptions && Object.values(formData.pantOptions).some(pantOption =>
+      pantOption && (
+        (pantOption.sweatpants && Object.values(pantOption.sweatpants).some(counts =>
+          counts && Object.values(counts).some(count => count > 0)
+        )) ||
+        (pantOption.joggers && Object.values(pantOption.joggers).some(counts =>
+          counts && Object.values(counts).some(count => count > 0)
+        ))
+      )
+    )) ||
+
+    // Check sweatpant/jogger options
+    (formData.sweatpantJoggerOptions && Object.values(formData.sweatpantJoggerOptions).some(option =>
+      option && Object.values(option).some(value => value && parseInt(value) > 0)
+    )) ||
+
+    // Check display options
+    (formData.displayOptions && Object.values(formData.displayOptions).some(displayOption =>
+      displayOption && (parseInt(displayOption.displayOnly || '0') > 0 || parseInt(displayOption.displayStandardCasePack || '0') > 0)
+    ))
+  );
+};
+
 export const validateFormData = (formData: FormData, categories?: Category[]): ValidationResult => {
   // Check all required fields
   if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.date.trim()) {
     return {
       isValid: false,
       errorMessage: 'Please fill out all store information fields.',
+      invalidProductPaths: []
+    };
+  }
+
+  // Check if order is empty (no products selected)
+  if (!hasOrderProducts(formData)) {
+    return {
+      isValid: false,
+      errorMessage: 'Please select at least one product before submitting your order.',
       invalidProductPaths: []
     };
   }

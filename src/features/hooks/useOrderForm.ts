@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
-import { validateFormData, validateQuantities, createTemplateParams } from '../utils/index';
+import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts } from '../utils/index';
 import { sendOrderEmail } from '../../services/emailService';
 
 export const useOrderForm = (categories: Category[]) => {
@@ -242,8 +242,15 @@ export const useOrderForm = (categories: Category[]) => {
 
   const handleConfirm = async () => {
     if (!window.confirm('Are you sure you want to submit this order?')) return;
+
+    // Final check to ensure order is not empty
+    if (!hasOrderProducts(formData)) {
+      alert('Cannot submit an empty order. Please select at least one product before submitting.');
+      return;
+    }
+
     setSending(true);
-    
+
     try {
       const templateParams = createTemplateParams(formData, categories);
       await sendOrderEmail(templateParams);
