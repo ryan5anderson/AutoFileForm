@@ -8,6 +8,7 @@
     padding: var(--card-padding);
     transition: all var(--motion-fast) var(--motion-ease);
     box-shadow: var(--elevation-1);
+    position: relative;
   }
 
   /* Card variants */

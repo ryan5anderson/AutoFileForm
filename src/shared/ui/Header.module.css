@@ -118,10 +118,16 @@
   outline-offset: 2px;
 }
 
-/* Hide navigation on mobile */
-@media (--bp-md) and (max-width: 768px) {
+/* Hide navigation on mobile, show on desktop */
+@media (max-width: 767px) {
   .rightSection {
     display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .rightSection {
+    display: flex;
   }
 }
 
@@ -131,15 +137,15 @@
     padding-left: var(--space-2);
     padding-right: var(--space-2);
   }
-  
+
   .centerSection {
     gap: var(--space-1);
   }
-  
+
   .logo {
     height: 28px;
   }
-  
+
   .logoSecondary {
     height: 24px;
   }

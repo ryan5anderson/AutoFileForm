@@ -46,19 +46,23 @@
 
 .successIcon {
   position: absolute;
-  inset-block-start: var(--space-2);
-  inset-inline-end: var(--space-2);
-  inline-size: 24px;
-  block-size: 24px;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
   background: var(--color-success);
   color: white;
   border-radius: 50%;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
   font-weight: 600;
-  z-index: 2;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 999 !important;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .validationOverlay {
@@ -76,13 +80,13 @@
   .categorySection {
     max-width: var(--container-sm);
   }
-  
+
   .displayOptionsSection {
     padding: var(--space-2);
     margin-block-end: var(--space-3);
     font-size: var(--font-0);
   }
-  
+
   .validationIcon,
   .successIcon {
     inline-size: clamp(18px, 3vw, 20px);
@@ -124,12 +128,12 @@
   .categorySection {
     max-width: var(--container-sm);
   }
-  
+
   .displayOptionsSection {
     padding: var(--space-2);
     margin-block-end: var(--space-3);
   }
-  
+
   .validationIcon,
   .successIcon {
     inline-size: 20px;
@@ -153,17 +157,18 @@
 
 /* High contrast mode support */
 @media (forced-colors: active) {
+
   .validationIcon,
   .successIcon {
     border: 1px solid;
     forced-color-adjust: none;
   }
-  
+
   .validationOverlay {
     border-width: 3px;
     background: transparent;
   }
-  
+
   .displayOptionsSection {
     border-width: 2px;
   }
@@ -171,6 +176,7 @@
 
 /* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
+
   .validationIcon,
   .successIcon,
   .validationOverlay {
@@ -184,17 +190,17 @@
     background: var(--color-danger-high-contrast, var(--color-danger));
     border: 2px solid var(--color-text);
   }
-  
+
   .successIcon {
     background: var(--color-success-high-contrast, var(--color-success));
     border: 2px solid var(--color-text);
   }
-  
+
   .validationOverlay {
     border-width: 3px;
     background: rgba(220, 38, 38, 0.2);
   }
-  
+
   .displayOptionsSection {
     border-width: 2px;
     border-color: var(--color-border-high-contrast, var(--color-border));
