@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Category, SizeCounts, PantOption } from '../../types';
-import ProductCard from '../../features/components/panels/QuantityPanel';
-import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
-import SizePackSelector from '../../features/components/panels/SizePackSelector';
-import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
-import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
-import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
-import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
-import { asset, getCollegeFolderName } from '../../utils/asset';
+import clsx from 'clsx';
+import { Category, SizeCounts, PantOption } from '../../shared/types';
+import ProductCard from '../../features/order-form/components/panels/QuantityPanel';
+import DisplayOptionCard from '../../features/order-form/components/panels/DisplayOptionsPanel';
+import SizePackSelector from '../../features/order-form/components/panels/SizePackSelector';
+import ColorSizeSelector from '../../features/order-form/components/panels/ColorSizeSelector';
+import ColorQuantitySelector from '../../features/order-form/components/panels/ColorQuantitySelector';
+import PantOptionsPanel from '../../features/order-form/components/panels/PantOptionsPanel';
+import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/order-form/utils';
+import { asset, getCollegeFolderName } from '../../shared/utils/asset';
 import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
-import '../../styles/product-detail.css';
+import '../../shared/styles/product-detail.css';
 
 interface ProductDetailPageProps {
   categories: Category[];
@@ -126,7 +127,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             {displayTabs.map((tab) => (
               <button
                 key={tab}
-                className={`product-detail-tab ${activeTab === tab ? 'product-detail-tab--active' : ''}`}
+                className={clsx('product-detail-tab', activeTab === tab && 'product-detail-tab--active')}
                 onClick={() => setActiveTab(tab)}
               >
                 {tab === 'displayOnly' ? 'Display Only' : 'Display Standard Case Pack'}
@@ -163,7 +164,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             {getFilteredShirtVersions(imageName, category.shirtVersions).map((version: string) => (
               <button
                 key={version}
-                className={`product-detail-tab ${activeTab === version ? 'product-detail-tab--active' : ''}`}
+                className={clsx('product-detail-tab', activeTab === version && 'product-detail-tab--active')}
                 onClick={() => setActiveTab(version)}
               >
                 {getVersionDisplayName(version, imageName)}

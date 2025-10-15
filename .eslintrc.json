@@ -1,0 +1,70 @@
+{
+  "extends": [
+    "react-app",
+    "react-app/jest"
+  ],
+  "plugins": ["react"],
+  "rules": {
+    "react/forbid-dom-props": [
+      "error", 
+      { 
+        "forbid": [
+          {
+            "propName": "style",
+            "message": "Use CSS Modules instead of inline styles. For dynamic styling, pass CSS custom properties through the style prop."
+          }
+        ]
+      }
+    ],
+    "react/forbid-component-props": [
+      "error", 
+      { 
+        "forbid": [
+          {
+            "propName": "style",
+            "message": "Use CSS Modules instead of inline styles. For dynamic styling, pass CSS custom properties through the style prop."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "JSXAttribute[name.name='style'] > JSXExpressionContainer > ObjectExpression > Property:not([key.name=/^--/])",
+        "message": "Only CSS custom properties (--*) are allowed in inline styles. Use CSS Modules for static styles."
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'] > JSXExpressionContainer > TemplateLiteral",
+        "message": "Use clsx() or classnames() utility for dynamic className construction instead of template literals."
+      },
+      {
+        "selector": "ImportDeclaration[source.value='styled-components']",
+        "message": "Use CSS Modules instead of styled-components for new components."
+      }
+    ],
+    "react/style-prop-object": [
+      "error",
+      {
+        "allow": ["--*"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/third_party/**/*"],
+      "rules": {
+        "react/forbid-dom-props": "off",
+        "react/forbid-component-props": "off",
+        "no-restricted-syntax": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.{js,jsx,ts,tsx}", "**/__tests__/**/*"],
+      "rules": {
+        "react/forbid-dom-props": "off",
+        "react/forbid-component-props": "off",
+        "no-restricted-syntax": "off"
+      }
+    }
+  ]
+}

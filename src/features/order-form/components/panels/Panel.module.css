@@ -1,0 +1,327 @@
+/* Panel.module.css - Shared styles for all panel components */
+
+.panelContainer {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  container-type: inline-size;
+  container-name: panel;
+}
+
+.panelImage {
+  inline-size: 100%;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+
+.panelTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-block-end: var(--space-2);
+  text-align: center;
+}
+
+.readOnlyInfo {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  padding: var(--space-2);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+  margin-block-start: var(--space-2);
+}
+
+.packSizeInfo {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-block-start: var(--space-1);
+  text-align: center;
+}
+
+/* Color selector layouts */
+.colorSelectorRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2);
+}
+
+.colorSelectorColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.colorField {
+  flex: 1;
+  min-inline-size: 0;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+}
+
+.colorLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-block-end: var(--space-1);
+  text-align: center;
+}
+
+/* Display options styles */
+.displayOptionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-block-start: var(--space-2);
+}
+
+.displayOptionRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.displayOptionLabel {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.displayOptionValue {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Quantity stepper styles */
+.quantityStepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+
+.stepperButton {
+  block-size: 2rem;
+  inline-size: 2rem;
+  font-size: 1rem;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--motion-fast) var(--motion-ease);
+}
+
+.stepperButton:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.stepperButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stepperInput {
+  block-size: 2rem;
+  flex: 1;
+  min-inline-size: 60px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+/* Size pack selector styles */
+.sizePackContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.sizePackLabel {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sizePackGrid {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  grid-template-columns: repeat(5, minmax(0, 1fr)); /* Default for 5 sizes */
+}
+
+/* Dynamic grid columns based on size count */
+.sizePackGrid[data-size-count="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sizePackGrid[data-size-count="4"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sizePackGrid[data-size-count="5"] {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.sizePackGrid[data-size-count="6"] {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.sizePackGrid[data-size-count="7"] {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.sizePackCell {
+  padding: var(--space-1);
+  box-sizing: border-box;
+  min-inline-size: 0;
+}
+
+.sizePackCellContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  inline-size: 100%;
+}
+
+.sizePackButton {
+  block-size: 1.4rem;
+  inline-size: 1.4rem;
+  font-size: 0.8rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--motion-fast) var(--motion-ease);
+}
+
+.sizePackButton:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.sizePackButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sizeLabel {
+  font-weight: 600;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--color-text);
+}
+
+.sizeInput {
+  block-size: 1.4rem;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  padding: 0;
+  margin: 0;
+  font-size: 0.8rem;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+.sizePackHelper {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  font-size: 0.75rem;
+  color: var(--helper-color, var(--color-text-muted));
+  text-align: center;
+  padding: var(--space-1);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+  margin-block-start: var(--space-1);
+}
+
+.sizePackHelper[data-valid="false"][data-positive="true"] {
+  color: var(--color-danger);
+}
+
+.sizePackHelper[data-valid="true"][data-positive="true"] {
+  color: var(--color-success);
+}
+
+.sizePackActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  margin-block-start: var(--space-2);
+}
+
+/* Container query adjustments */
+@container panel (max-width: 300px) {
+  .panelContainer {
+    padding: var(--space-2);
+  }
+  
+  .panelTitle {
+    font-size: 0.8rem;
+  }
+  
+  .colorSelectorRow {
+    flex-direction: column;
+  }
+  
+  .sizePackGrid {
+    gap: 2px;
+    padding: var(--space-1);
+  }
+  
+  .sizePackButton,
+  .sizeInput {
+    block-size: 1.2rem;
+    font-size: 0.7rem;
+  }
+  
+  .sizePackButton {
+    inline-size: 1.2rem;
+  }
+}
+
+/* RTL support */
+[dir="rtl"] .colorSelectorRow,
+[dir="rtl"] .displayOptionRow,
+[dir="rtl"] .quantityStepper,
+[dir="rtl"] .sizePackActions {
+  flex-direction: row-reverse;
+}

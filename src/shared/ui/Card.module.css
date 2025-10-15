@@ -1,0 +1,181 @@
+@layer components {
+  /* Card root component */
+  .card {
+    container-type: inline-size;
+    container-name: card;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    padding: var(--card-padding);
+    transition: all var(--motion-fast) var(--motion-ease);
+    box-shadow: var(--elevation-1);
+  }
+
+  /* Card variants */
+  .card--elevated {
+    box-shadow: var(--elevation-2);
+    border: 1px solid var(--color-border);
+  }
+
+  .card--outlined {
+    border: 1px solid var(--color-border);
+    box-shadow: none;
+  }
+
+  /* Card states */
+  .card[data-active="true"] {
+    border-color: var(--color-primary);
+    box-shadow: var(--elevation-2), 0 0 0 1px var(--color-primary);
+  }
+
+  .card[data-expanded="true"] {
+    box-shadow: var(--elevation-3);
+  }
+
+  /* Interactive card styles */
+  .card[data-interactive="true"] {
+    cursor: pointer;
+  }
+
+  .card[data-interactive="true"]:hover {
+    box-shadow: var(--elevation-2);
+    transform: translateY(-1px);
+  }
+
+  .card[data-interactive="true"]:focus-within {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-contrast: more) {
+    .card[data-interactive="true"]:focus-within {
+      outline-width: 3px;
+    }
+  }
+
+  .card[data-interactive="true"]:active {
+    transform: translateY(0);
+  }
+
+  /* Container query responsive adjustments */
+  @container card (max-width: 250px) {
+    .card {
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  @container card (min-width: 250px) and (max-width: 350px) {
+    .card {
+      padding: var(--space-2) var(--space-3);
+    }
+  }
+
+  @container card (min-width: 500px) {
+    .card {
+      padding: var(--space-4);
+    }
+  }
+
+  /* Ensure cards work well in narrow grid contexts */
+  @container card-grid (max-width: 400px) {
+    .card {
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  /* Media query fallback for older browsers */
+  @media (--bp-md) {
+    .card {
+      padding: var(--space-4);
+    }
+  }
+
+  /* Card Header */
+  .cardHeader {
+    margin-block-end: var(--space-2);
+  }
+
+  .cardHeader[data-clickable="true"] {
+    min-height: 44px;
+    min-width: 44px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    padding: var(--space-1);
+    margin: calc(-1 * var(--space-1));
+    margin-block-end: var(--space-1);
+  }
+
+  .cardHeader[data-clickable="true"]:hover {
+    background: var(--color-bg-alt);
+  }
+
+  .cardHeader[data-clickable="true"]:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-contrast: more) {
+    .cardHeader[data-clickable="true"]:focus-visible {
+      outline-width: 3px;
+    }
+  }
+
+  /* Container query adjustments for header */
+  @container card (max-width: 300px) {
+    .cardHeader {
+      margin-block-end: var(--space-1);
+    }
+  }
+
+  /* Card Body */
+  .cardBody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .cardBody[data-expanded="true"] {
+    padding-block-start: var(--space-2);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  /* Container query adjustments for body */
+  @container card (max-width: 300px) {
+    .cardBody {
+      gap: var(--space-2);
+    }
+  }
+
+  /* Card Title */
+  .cardTitle {
+    margin: 0;
+    font-size: var(--font-1);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-block-end: var(--space-2);
+  }
+
+  /* Container query adjustments for title */
+  @container card (max-width: 300px) {
+    .cardTitle {
+      font-size: var(--font-0);
+      margin-block-end: var(--space-1);
+    }
+  }
+
+  /* Card Footer */
+  .cardFooter {
+    margin-block-start: var(--space-3);
+    padding-block-start: var(--space-2);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  /* Container query adjustments for footer */
+  @container card (max-width: 300px) {
+    .cardFooter {
+      margin-block-start: var(--space-2);
+      padding-block-start: var(--space-1);
+    }
+  }
+}

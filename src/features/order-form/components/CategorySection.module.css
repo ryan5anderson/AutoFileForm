@@ -1,0 +1,202 @@
+/* CategorySection.module.css */
+
+.categorySection {
+  container-type: inline-size;
+  container-name: category-section;
+  max-width: var(--container-xl);
+  margin: 0 auto;
+}
+
+.displayOptionsSection {
+  margin-block-end: var(--space-4);
+  padding: var(--space-3);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-0);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.sectionGrid {
+  align-items: start;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width, 16rem), 1fr));
+  container-type: inline-size;
+  container-name: section-grid;
+}
+
+.validationIcon {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  inline-size: 24px;
+  block-size: 24px;
+  background: var(--color-danger);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.successIcon {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  inline-size: 24px;
+  block-size: 24px;
+  background: var(--color-success);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.validationOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(220, 38, 38, 0.1);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Container query adjustments using enhanced responsive patterns */
+@container category-section (max-width: 640px) {
+  .categorySection {
+    max-width: var(--container-sm);
+  }
+  
+  .displayOptionsSection {
+    padding: var(--space-2);
+    margin-block-end: var(--space-3);
+    font-size: var(--font-0);
+  }
+  
+  .validationIcon,
+  .successIcon {
+    inline-size: clamp(18px, 3vw, 20px);
+    block-size: clamp(18px, 3vw, 20px);
+    font-size: var(--font-0);
+  }
+}
+
+@container section-grid (max-width: 480px) {
+  .sectionGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}
+
+@container section-grid (min-width: 480px) and (max-width: 768px) {
+  .sectionGrid {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+@container section-grid (min-width: 768px) {
+  .sectionGrid {
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+/* RTL support */
+[dir="rtl"] .validationIcon,
+[dir="rtl"] .successIcon {
+  inset-inline-end: auto;
+  inset-inline-start: var(--space-2);
+}
+
+/* Media query fallbacks for older browsers */
+@media (--bp-sm) and (max-width: 640px) {
+  .categorySection {
+    max-width: var(--container-sm);
+  }
+  
+  .displayOptionsSection {
+    padding: var(--space-2);
+    margin-block-end: var(--space-3);
+  }
+  
+  .validationIcon,
+  .successIcon {
+    inline-size: 20px;
+    block-size: 20px;
+    font-size: var(--font-0);
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}
+
+@media (--bp-md) {
+  .sectionGrid {
+    gap: var(--space-4);
+  }
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .validationIcon,
+  .successIcon {
+    border: 1px solid;
+    forced-color-adjust: none;
+  }
+  
+  .validationOverlay {
+    border-width: 3px;
+    background: transparent;
+  }
+  
+  .displayOptionsSection {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .validationIcon,
+  .successIcon,
+  .validationOverlay {
+    transition: none;
+  }
+}
+
+/* Enhanced contrast support */
+@media (prefers-contrast: more) {
+  .validationIcon {
+    background: var(--color-danger-high-contrast, var(--color-danger));
+    border: 2px solid var(--color-text);
+  }
+  
+  .successIcon {
+    background: var(--color-success-high-contrast, var(--color-success));
+    border: 2px solid var(--color-text);
+  }
+  
+  .validationOverlay {
+    border-width: 3px;
+    background: rgba(220, 38, 38, 0.2);
+  }
+  
+  .displayOptionsSection {
+    border-width: 2px;
+    border-color: var(--color-border-high-contrast, var(--color-border));
+  }
+}

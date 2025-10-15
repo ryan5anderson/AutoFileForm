@@ -1,0 +1,70 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "property-disallowed-list": [
+      "margin-left",
+      "margin-right", 
+      "padding-left",
+      "padding-right",
+      "left",
+      "right",
+      "border-left",
+      "border-right",
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-bottom-left-radius",
+      "border-bottom-right-radius"
+    ],
+    "declaration-property-value-allowed-list": {
+      "text-align": ["start", "end", "center", "justify"]
+    },
+    "color-hex-length": "short",
+    "color-no-hex": [true, {
+      "message": "Use design tokens (var(--color-*)) instead of raw hex colors"
+    }],
+    "declaration-no-important": [true, {
+      "severity": "error",
+      "message": "Avoid !important declarations. Use CSS specificity and cascade layers instead"
+    }],
+    "media-feature-name-no-unknown": [true, {
+      "ignoreMediaFeatureNames": ["/^--bp-/", "/^--container-/"],
+      "message": "Use custom media queries (--bp-*, --container-*) instead of raw breakpoint values"
+    }],
+    "media-feature-range-notation": "prefix",
+    "function-disallowed-list": [
+      ["rgb", "rgba", "hsl", "hsla"],
+      {
+        "message": "Use design tokens (var(--color-*)) instead of color functions"
+      }
+    ],
+    "custom-media-pattern": [
+      "^--(?:bp|container)-[a-z]+$",
+      {
+        "message": "Custom media queries must follow the pattern --bp-* or --container-* (e.g., --bp-md, --container-lg)"
+      }
+    ],
+    "selector-class-pattern": [
+      "^[a-z][a-zA-Z0-9]*(__[a-z][a-zA-Z0-9]*)?(-{1,2}[a-z][a-zA-Z0-9]*)?$",
+      {
+        "message": "CSS Modules classes should use camelCase or BEM naming (e.g., .componentName, .componentName__element, .componentName--modifier)"
+      }
+    ],
+    "property-no-vendor-prefix": [true, {
+      "message": "Use autoprefixer instead of vendor prefixes"
+    }],
+    "value-no-vendor-prefix": [true, {
+      "message": "Use autoprefixer instead of vendor prefixes"
+    }],
+    "at-rule-no-vendor-prefix": [true, {
+      "message": "Use autoprefixer instead of vendor prefixes"
+    }],
+    "selector-no-vendor-prefix": [true, {
+      "message": "Use autoprefixer instead of vendor prefixes"
+    }]
+  },
+  "ignoreFiles": [
+    "node_modules/**/*",
+    "build/**/*",
+    "public/**/*"
+  ]
+}

@@ -1,0 +1,82 @@
+@layer components {
+  .colorQuantitySelector {
+    display: flex;
+    gap: var(--space-3);
+    width: 100%;
+    container-type: inline-size;
+    container-name: color-quantity-selector;
+  }
+
+  /* Side-by-side layout for 2 colors */
+  .colorQuantitySelector--sideBySide {
+    flex-direction: row;
+  }
+
+  .colorQuantitySelector--sideBySide .colorQuantitySelector__colorField {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Stacked layout for more than 2 colors */
+  .colorQuantitySelector--stacked {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .colorQuantitySelector__colorField {
+    /* Inherits field styling from global styles */
+  }
+
+  .colorQuantitySelector__colorLabel {
+    font-size: 0.8rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .colorQuantitySelector__packInfo {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
+  }
+
+  /* Dynamic layout support using CSS custom properties */
+  .colorQuantitySelector--dynamic {
+    gap: var(--color-quantity-gap, var(--space-3));
+  }
+
+  .colorQuantitySelector--dynamic.colorQuantitySelector--stacked {
+    gap: var(--color-quantity-gap, var(--space-2));
+  }
+
+  /* Container queries for responsive behavior */
+  @container color-quantity-selector (max-width: 500px) {
+    .colorQuantitySelector--sideBySide {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .colorQuantitySelector--sideBySide .colorQuantitySelector__colorField {
+      flex: none;
+      width: 100%;
+    }
+  }
+
+  /* Media query fallback */
+  @media (max-width: 500px) {
+    .colorQuantitySelector--sideBySide {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .colorQuantitySelector--sideBySide .colorQuantitySelector__colorField {
+      flex: none;
+      width: 100%;
+    }
+  }
+
+  /* Enhanced responsive patterns using custom media queries */
+  @media (--bp-sm) {
+    .colorQuantitySelector__colorLabel {
+      font-size: var(--font-0);
+    }
+  }
+}

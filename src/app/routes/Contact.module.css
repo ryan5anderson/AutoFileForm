@@ -1,0 +1,17 @@
+/* Contact Page Styles */
+.main {
+  max-width: 800px;
+}
+
+.title {
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.sectionTitle {
+  margin-top: 0;
+}
+
+.card {
+  margin-bottom: var(--space-4);
+}

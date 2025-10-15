@@ -1,70 +1,111 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { asset } from '../../utils/asset';
+import { asset } from '../../shared/utils/asset';
+import styles from '../../shared/ui/Header.module.css';
 
 interface HeaderProps {
   showSidebarToggle?: boolean;
   onSidebarToggle?: () => void;
   showBackButton?: boolean; // Legacy prop for backward compatibility
+  onMenuToggle?: (triggerRef: React.RefObject<HTMLElement>) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
   showSidebarToggle = false, 
   onSidebarToggle,
-  showBackButton = false 
+  showBackButton = false,
+  onMenuToggle
 }) => {
-  // Root-level header; hamburger toggles global sidebar
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Handle hamburger menu toggle
   const handleHamburger = () => {
-    window.dispatchEvent(new CustomEvent('global-sidebar-toggle'));
+    if (onMenuToggle) {
+      // Use new responsive pattern
+      setIsMenuOpen(prev => !prev);
+      onMenuToggle(menuButtonRef as React.RefObject<HTMLElement>);
+    } else {
+      // Fallback to legacy pattern
+      window.dispatchEvent(new CustomEvent('global-sidebar-toggle'));
+    }
   };
 
+  // Handle Escape key for menu
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isMenuOpen) {
+        setIsMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isMenuOpen]);
+
   return (
-    <header style={{
-      background: 'white',
-      borderBottom: '1px solid var(--color-border)',
-      height: '64px',
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0 var(--space-4)',
-      width: '100%',
-      boxSizing: 'border-box',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 1000
-    }}>
+    <header 
+      role="banner"
+      className={styles.header}
+    >
       {/* Left: Hamburger */}
-      <div style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
+      <div className={styles.leftSection}>
         <button
+          ref={menuButtonRef}
           onClick={handleHamburger}
-          aria-label="Open menu"
-          style={{
-            background: 'transparent',
-            border: '1px solid var(--color-border)',
-            borderRadius: '6px',
-            width: 40,
-            height: 40,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer'
-          }}
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMenuOpen}
+          aria-controls="main-nav"
+          className={styles.menuButton}
+          type="button"
         >
-          ☰
+          <span className="visually-hidden">Menu</span>
+          <span aria-hidden="true">☰</span>
         </button>
       </div>
 
       {/* Center: Logos */}
-      <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', pointerEvents: 'none' }}>
-        <img src={asset('logo/campustraditions.png')} alt="Campus Traditions" style={{ height: 32, width: 'auto' }} />
-        <img src={asset('logo/opi-logo-no-bg.png')} alt="Ohiopyle Prints" style={{ height: 28, width: 'auto' }} />
+      <div className={styles.centerSection}>
+        <Link 
+          to="/" 
+          className={styles.logoLink}
+          aria-label="Go to homepage"
+        >
+          <img 
+            src={asset('logo/campustraditions.png')} 
+            alt="Campus Traditions" 
+            className={styles.logo}
+          />
+          <img 
+            src={asset('logo/opi-logo-no-bg.png')} 
+            alt="Ohiopyle Prints" 
+            className={styles.logoSecondary}
+          />
+        </Link>
       </div>
 
-      {/* Right: Nav links */}
-      <nav aria-label="Primary" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Link to="/about" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>About Us</Link>
-        <Link to="/contact" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>Contact Us</Link>
+      {/* Right: Nav links - Hidden on mobile, shown on desktop */}
+      <nav 
+        id="main-nav"
+        role="navigation"
+        aria-label="Primary navigation"
+        className={styles.rightSection}
+      >
+        <Link 
+          to="/about" 
+          className={styles.navLink}
+        >
+          About Us
+        </Link>
+        <Link 
+          to="/contact" 
+          className={styles.navLink}
+        >
+          Contact Us
+        </Link>
       </nav>
     </header>
   );

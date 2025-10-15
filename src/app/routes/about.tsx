@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
+import styles from './About.module.css';
 
 const AboutPage: React.FC = () => {
   return (
@@ -8,10 +9,10 @@ const AboutPage: React.FC = () => {
       <div className="college-page-header">
         <Header />
       </div>
-      <main className="summary-page-main" style={{ maxWidth: 800 }}>
-        <h1 style={{ color: 'var(--color-text)', marginBottom: 'var(--space-4)' }}>About Us</h1>
+      <main className={`summary-page-main ${styles.main}`}>
+        <h1 className={styles.title}>About Us</h1>
         <div className="summary-card">
-          <h2 style={{ marginTop: 0 }}>Campus Traditions Guaranteed Program</h2>
+          <h2 className={styles.sectionTitle}>Campus Traditions Guaranteed Program</h2>
           <p>
             Campus Traditions partners with Ohiopyle Prints to provide a curated program of collegiate merchandise
             backed by dependable service and quality. Our streamlined process helps stores order confidently.

@@ -1,0 +1,315 @@
+/**
+ * Responsive Design Patterns Examples
+ * 
+ * This file demonstrates various responsive approaches using CSS Modules
+ */
+
+@layer components {
+  /* Example 1: Container Query Responsive Component */
+  .containerQueryExample {
+    container-type: inline-size;
+    container-name: cq-example;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    background: var(--color-bg);
+  }
+
+  .containerQueryExample__header {
+    font-weight: 600;
+    margin-block-end: var(--space-2);
+    color: var(--color-primary);
+  }
+
+  .containerQueryExample__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* Container query breakpoints */
+  @container cq-example (min-width: 300px) {
+    .containerQueryExample {
+      padding: var(--space-4);
+    }
+    
+    .containerQueryExample__content {
+      flex-direction: row;
+      gap: var(--space-3);
+    }
+  }
+
+  @container cq-example (min-width: 500px) {
+    .containerQueryExample {
+      padding: var(--space-5);
+    }
+    
+    .containerQueryExample__header {
+      font-size: var(--font-2);
+    }
+  }
+
+  /* Example 2: Media Query Responsive Component */
+  .mediaQueryExample {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .mediaQueryExample[data-layout="sidebar"] {
+    @media (--bp-md) {
+      flex-direction: row;
+      gap: var(--space-4);
+    }
+  }
+
+  @media (--bp-lg) {
+    .mediaQueryExample {
+      padding: var(--space-4);
+      gap: var(--space-4);
+    }
+  }
+
+  /* Example 3: Fluid Typography Component */
+  .fluidTypographyExample {
+    padding: clamp(var(--space-3), 4vw, var(--space-6));
+    margin-block: clamp(var(--space-2), 3vw, var(--space-4));
+  }
+
+  .fluidTypographyExample__header {
+    margin-block-end: clamp(var(--space-2), 3vw, var(--space-4));
+  }
+
+  .fluidTypographyExample__title {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    color: var(--color-text);
+  }
+
+  .fluidTypographyExample__subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    color: var(--color-text-muted);
+    margin: 0;
+    margin-block-start: clamp(var(--space-1), 1vw, var(--space-2));
+  }
+
+  .fluidTypographyExample__content {
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    line-height: 1.6;
+  }
+
+  /* Example 4: Responsive Grid Component */
+  .responsiveGridExample {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit, 
+      minmax(var(--grid-min-width, 16rem), 1fr)
+    );
+    gap: var(--grid-gap, var(--space-3));
+    padding: var(--space-3);
+  }
+
+  /* Ensure grid items don't get too wide */
+  .responsiveGridExample > * {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* Example 5: Adaptive Card Layout */
+  .adaptiveCardExample {
+    container-type: inline-size;
+    container-name: adaptive-card;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+  }
+
+  .adaptiveCardExample__content {
+    flex: 1;
+  }
+
+  .adaptiveCardExample__title {
+    font-size: var(--font-1);
+    font-weight: 600;
+    margin: 0;
+    margin-block-end: var(--space-1);
+    color: var(--color-text);
+  }
+
+  .adaptiveCardExample__text {
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .adaptiveCardExample__actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  /* Horizontal layout when there's enough space */
+  @container adaptive-card (min-width: 400px) {
+    .adaptiveCardExample[data-orientation="auto"] {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    
+    .adaptiveCardExample[data-orientation="auto"] .adaptiveCardExample__actions {
+      flex-shrink: 0;
+    }
+  }
+
+  /* Force horizontal layout */
+  .adaptiveCardExample[data-orientation="horizontal"] {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .adaptiveCardExample[data-orientation="horizontal"] .adaptiveCardExample__actions {
+    flex-shrink: 0;
+  }
+
+  /* Force vertical layout */
+  .adaptiveCardExample[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
+  /* Example 6: Responsive Navigation */
+  .responsiveNavExample {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-2);
+  }
+
+  .responsiveNavExample__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .responsiveNavExample__item {
+    margin: 0;
+  }
+
+  .responsiveNavExample__link {
+    display: block;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background-color var(--motion-fast) var(--motion-ease);
+  }
+
+  .responsiveNavExample__link:hover {
+    background: var(--color-bg);
+  }
+
+  .responsiveNavExample__link[data-active="true"] {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .responsiveNavExample__link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* Horizontal navigation variant */
+  .responsiveNavExample[data-variant="horizontal"] .responsiveNavExample__list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* Adaptive navigation - changes based on screen size */
+  @media (--bp-md) {
+    .responsiveNavExample[data-variant="adaptive"] .responsiveNavExample__list {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+  }
+
+  /* Container query version for adaptive navigation */
+  .responsiveNavExample[data-variant="adaptive"] {
+    container-type: inline-size;
+    container-name: responsive-nav;
+  }
+
+  @container responsive-nav (min-width: 600px) {
+    .responsiveNavExample[data-variant="adaptive"] .responsiveNavExample__list {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+  }
+
+  /* Accessibility enhancements */
+  @media (prefers-reduced-motion: reduce) {
+    .responsiveNavExample__link {
+      transition: none;
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    .responsiveNavExample {
+      border-width: 2px;
+    }
+    
+    .responsiveNavExample__link {
+      border: 1px solid transparent;
+    }
+    
+    .responsiveNavExample__link:hover {
+      border-color: var(--color-text);
+    }
+  }
+}
+
+/*
+Usage Notes:
+
+1. Container Queries (Preferred):
+   - Use for component-level responsiveness
+   - Components adapt based on their container size
+   - More flexible than media queries
+
+2. Media Queries (Fallback):
+   - Use for viewport-based responsiveness
+   - Good for layout changes that depend on screen size
+   - Provide fallbacks for container queries
+
+3. Fluid Typography:
+   - Use clamp() for smooth scaling
+   - Set minimum and maximum sizes
+   - Consider readability at all sizes
+
+4. Responsive Grids:
+   - Use CSS Grid with auto-fit/auto-fill
+   - Set minimum item widths with minmax()
+   - Allow dynamic column counts
+
+5. Adaptive Layouts:
+   - Combine container queries with data attributes
+   - Provide manual override options
+   - Consider content hierarchy
+
+6. Performance Considerations:
+   - Container queries are well-supported in modern browsers
+   - Provide media query fallbacks for older browsers
+   - Test performance with many container queries
+*/

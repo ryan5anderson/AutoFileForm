@@ -1,0 +1,50 @@
+.cardGridHeader {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.cardGridTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.cardGridDescription {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width, 280px), 1fr));
+  gap: var(--grid-gap, var(--space-4));
+  width: 100%;
+}
+
+/* Fallback for when minCardWidth is not supported */
+.cardGrid:not([style*="--min-card-width"]) {
+  grid-template-columns: repeat(var(--grid-columns, 3), 1fr);
+}
+
+@media (max-width: 768px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cardGridTitle {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .cardGridDescription {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cardGrid:not([style*="--min-card-width"]) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

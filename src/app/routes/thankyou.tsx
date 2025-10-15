@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
-import '../../styles/college-pages.css';
+import '../../shared/styles/college-pages.css';
 
 const ThankYouPage: React.FC = () => {
   return (

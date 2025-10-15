@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
-import StoreInfoForm from '../../features/components/StoreInfoForm';
-import CategorySection from '../../features/components/CategorySection';
-import OrderNotesSection from '../../features/components/OrderNotesSection';
-import Header from '../layout/Header';
+import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../shared/types';
+import StoreInfoForm from '../../features/order-form/components/StoreInfoForm';
+import CategorySection from '../../features/order-form/components/CategorySection';
+import OrderNotesSection from '../../features/order-form/components/OrderNotesSection';
 import Footer from '../layout/Footer';
-import CollapsibleSidebar from '../layout/CollapsibleSidebar';
-import '../../styles/college-pages.css';
+import '../../shared/styles/college-pages.css';
 
 interface CollegeConfig {
   name: string;
@@ -62,8 +60,6 @@ const FormPage: React.FC<FormPageProps> = ({
     });
   }, [categories, collegeConfig]);
   const collegeName = collegeConfig ? collegeConfig.name : 'College';
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('');
 
   // Scroll to category when returning from product detail page
   useEffect(() => {
@@ -81,59 +77,9 @@ const FormPage: React.FC<FormPageProps> = ({
     }
   }, [location]);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
 
-  const handleBackToColleges = () => {
-    navigate('/');
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = sortedCategories.map(cat => {
-        const id = cat.name.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
-        return { id, element: document.getElementById(id) };
-      }).filter(section => section.element);
-
-      const currentSection = sections.find(section => {
-        if (section.element) {
-          const rect = section.element.getBoundingClientRect();
-          return rect.top <= 200 && rect.bottom >= 200;
-        }
-        return false;
-      });
-
-      if (currentSection) {
-        setActiveSection(currentSection.id);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [sortedCategories]);
   return (
     <div className="college-page-container">
-      <div className="college-page-header">
-        <Header 
-          showSidebarToggle={true} 
-          onSidebarToggle={toggleSidebar}
-        />
-      </div>
-      
-      <CollapsibleSidebar
-        categories={sortedCategories}
-        activeSection={activeSection}
-        isOpen={sidebarOpen}
-        onToggle={toggleSidebar}
-        onBackToColleges={handleBackToColleges}
-        showCategories={true}
-      />
-      
       <main className="college-page-main">
         <div className="college-page-title">
           <h1>{collegeName} Product Order Form</h1>

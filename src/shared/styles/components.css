@@ -1,0 +1,120 @@
+@layer components {
+  /* Legacy component styles - these should be migrated to individual CSS modules */
+  /* Keeping only essential legacy styles that are still in use */
+
+/* =================================
+   Size Pack Selector (modern look)
+   ================================= */
+.size-pack { 
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.size-pack__grid {
+  width: 100%;
+}
+
+.size-pack__cell {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.size-pack__cell:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.size-pack__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(180deg,#f8fafc,#eef2f7);
+  border-radius: 8px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.size-pack__btn:hover { 
+  background: linear-gradient(180deg,#eef2f7,#e5e9f0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.size-pack__btn:active { 
+  transform: translateY(1px);
+}
+
+.size-pack__input {
+  text-align: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  border-radius: 8px;
+  font-weight: 600;
+  width: 100%;
+  max-width: 100%;
+}
+
+.size-pack__helper { 
+  font-size: 0.8rem; 
+  color: #6b7280;
+}
+
+.btn-ghost-sm {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-ghost-sm:hover {
+  border-color: #9ca3af;
+}
+
+/* Additional mobile responsive styles for size selector */
+@media (--bp-sm) and (max-width: 640px) {
+  .size-pack__grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)) !important;
+    gap: 0.3rem;
+  }
+
+  .size-pack__cell {
+    min-width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .size-pack__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.25rem;
+  }
+
+  .size-pack__btn {
+    height: 1rem !important;
+    width: 1rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .size-pack__input {
+    height: 1rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .size-pack__cell {
+    padding: 0.15rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .size-pack__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.2rem;
+  }
+}}

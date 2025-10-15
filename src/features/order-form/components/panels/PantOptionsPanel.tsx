@@ -1,0 +1,170 @@
+import React, { useState } from 'react';
+import { PantOption, SizeCounts } from '../../../../shared/types';
+import SizePackSelector from './SizePackSelector';
+import { getPackSize } from '../../../../config/packSizes';
+import { getSizeOptions } from '../../utils/calculations';
+import styles from './PantOptionsPanel.module.css';
+
+interface PantOptionsPanelProps {
+  pantOption: PantOption;
+  onChange: (option: PantOption) => void;
+  pantStyles?: string[];
+  disabled?: boolean;
+  categoryPath?: string;
+  allowAnyQuantity?: boolean;
+  gap?: string;
+}
+
+const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
+  pantOption,
+  onChange,
+  pantStyles = ['sweatpants', 'joggers'],
+  disabled = false,
+  categoryPath = 'pants',
+  allowAnyQuantity = false,
+  gap
+}) => {
+  const [activeTab, setActiveTab] = useState<string>(pantStyles[0] || 'sweatpants');
+  const packSize = getPackSize(categoryPath);
+  const sizes = getSizeOptions(categoryPath);
+
+  const handleSizeCountsChange = (style: 'sweatpants' | 'joggers', color: 'steel' | 'black' | 'darkHeather' | 'darkNavy', counts: SizeCounts) => {
+    const newOption = { ...pantOption };
+
+    if (!newOption[style]) {
+      newOption[style] = {};
+    }
+
+    // Use type assertion to handle the different color structures for each style
+    if (style === 'sweatpants') {
+      (newOption[style] as { steel?: SizeCounts; black?: SizeCounts; darkNavy?: SizeCounts })[color as 'steel' | 'black' | 'darkNavy'] = counts;
+    } else {
+      (newOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })[color as 'steel' | 'darkHeather'] = counts;
+    }
+
+    onChange(newOption);
+  };
+
+  const getSizeCounts = (style: 'sweatpants' | 'joggers', color: 'steel' | 'black' | 'darkHeather' | 'darkNavy'): SizeCounts => {
+    if (style === 'sweatpants') {
+      return (pantOption[style] as { steel?: SizeCounts; black?: SizeCounts; darkNavy?: SizeCounts })?.[color as 'steel' | 'black' | 'darkNavy'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+    } else {
+      return (pantOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })?.[color as 'steel' | 'darkHeather'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+    }
+  };
+
+  // Create dynamic style props for CSS custom properties
+  const dynamicStyles = {
+    ...(gap && { '--pant-options-gap': gap })
+  } as React.CSSProperties;
+
+  const renderColorOptions = (style: 'sweatpants' | 'joggers') => {
+    if (style === 'joggers') {
+      // Joggers only have 2 colors - keep in one row
+      const colors: Array<'steel' | 'darkHeather'> = ['steel', 'darkHeather'];
+      return (
+        <div className={styles.pantOptionsPanel__colorRow}>
+          {colors.map((color) => (
+            <div key={color} className={styles.pantOptionsPanel__colorOption}>
+              <div className={styles.pantOptionsPanel__colorLabel}>
+                {color === 'steel' ? 'Steel' : 'Dark Heather'}
+              </div>
+              <SizePackSelector
+                counts={getSizeCounts(style, color)}
+                onChange={(counts) => handleSizeCountsChange(style, color, counts)}
+                packSize={packSize}
+                sizes={sizes}
+                disabled={disabled}
+                allowAnyQuantity={allowAnyQuantity}
+              />
+            </div>
+          ))}
+        </div>
+      );
+    } else {
+      // Sweatpants have 3 colors - split into two rows
+      const firstRowColors: Array<'steel' | 'black'> = ['steel', 'black'];
+      const secondRowColors: Array<'darkNavy'> = ['darkNavy'];
+
+      return (
+        <div className={`${styles.pantOptionsPanel__colorGrid} ${styles['pantOptionsPanel__colorGrid--sweatpants']}`}>
+          {/* First row with Steel and Black */}
+          <div className={styles.pantOptionsPanel__colorRow}>
+            {firstRowColors.map((color) => (
+              <div key={color} className={styles.pantOptionsPanel__colorOption}>
+                <div className={styles.pantOptionsPanel__colorLabel}>
+                  {color === 'steel' ? 'Steel' : 'Black'}
+                </div>
+                <SizePackSelector
+                  counts={getSizeCounts(style, color)}
+                  onChange={(counts) => handleSizeCountsChange(style, color, counts)}
+                  packSize={packSize}
+                  sizes={sizes}
+                  disabled={disabled}
+                  allowAnyQuantity={allowAnyQuantity}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Second row with Dark Navy centered */}
+          <div className={styles.pantOptionsPanel__colorRow}>
+            {secondRowColors.map((color) => (
+              <div key={color} className={styles.pantOptionsPanel__colorOption}>
+                <div className={styles.pantOptionsPanel__colorLabel}>
+                  Dark Navy
+                </div>
+                <SizePackSelector
+                  counts={getSizeCounts(style, color)}
+                  onChange={(counts) => handleSizeCountsChange(style, color, counts)}
+                  packSize={packSize}
+                  sizes={sizes}
+                  disabled={disabled}
+                  allowAnyQuantity={allowAnyQuantity}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div 
+      className={`${styles.pantOptionsPanel} ${gap ? styles['pantOptionsPanel--dynamic'] : ''}`}
+      style={dynamicStyles}
+    >
+      {/* Tab Navigation - matching t-shirt style */}
+      <div className="product-detail-tabs">
+        {pantStyles.map((style) => (
+          <button
+            key={style}
+            type="button"
+            onClick={() => setActiveTab(style)}
+            className={`product-detail-tab ${activeTab === style ? 'product-detail-tab--active' : ''}`}
+            disabled={disabled}
+          >
+            {style === 'sweatpants' ? 'Sweatpants' : 'Joggers'}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="product-detail-tab-content">
+        {pantStyles.map((style) => (
+          <div 
+            key={style}
+            className="product-detail-tab-panel"
+            style={{ display: activeTab === style ? 'block' : 'none' }}
+          >
+            {renderColorOptions(style as 'sweatpants' | 'joggers')}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default PantOptionsPanel;
+

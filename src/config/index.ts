@@ -2,7 +2,7 @@ import michiganStateConfig from './colleges/michiganState.json';
 import arizonaStateConfig from './colleges/arizonaState.json';
 import westVirginiaUniversityConfig from './colleges/westVirginiaUniversity.json';
 import pittsburghUniversityConfig from './colleges/pittsburghuniversity.json';
-import { College } from '../types';
+import { College } from '../shared/types';
 
 // Type assertion since JSON imports need explicit typing
 const michiganState = michiganStateConfig as College;

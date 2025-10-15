@@ -1,0 +1,111 @@
+@layer components {
+  .pantOptionsPanel {
+    width: 100%;
+  }
+
+  /* Color options layout */
+  .pantOptionsPanel__colorGrid {
+    width: 100%;
+  }
+
+  /* Two-color row layout (for joggers) */
+  .pantOptionsPanel__colorRow {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  .pantOptionsPanel__colorRow .pantOptionsPanel__colorOption {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Three-color layout (for sweatpants) */
+  .pantOptionsPanel__colorGrid--sweatpants {
+    width: 100%;
+  }
+
+  .pantOptionsPanel__colorGrid--sweatpants .pantOptionsPanel__colorRow {
+    margin-bottom: var(--space-3);
+  }
+
+  .pantOptionsPanel__colorGrid--sweatpants .pantOptionsPanel__colorRow:last-child {
+    margin-bottom: 0;
+    justify-content: center;
+  }
+
+  .pantOptionsPanel__colorGrid--sweatpants .pantOptionsPanel__colorRow:last-child .pantOptionsPanel__colorOption {
+    width: 50%;
+    max-width: var(--container-xs);
+    flex: none;
+  }
+
+  /* Individual color option styling */
+  .pantOptionsPanel__colorOption {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-2);
+  }
+
+  .pantOptionsPanel__colorLabel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: var(--color-text);
+  }
+
+  /* Dynamic gap support using CSS custom properties */
+  .pantOptionsPanel--dynamic .pantOptionsPanel__colorRow {
+    gap: var(--pant-options-gap, var(--space-3));
+  }
+  /*
+   * Responsive adjustments using container queries
+   */
+  @container (max-width: 600px) {
+    .pantOptionsPanel__colorRow {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .pantOptionsPanel__colorRow .pantOptionsPanel__colorOption {
+      flex: none;
+      width: 100%;
+    }
+
+    .pantOptionsPanel__colorGrid--sweatpants .pantOptionsPanel__colorRow:last-child .pantOptionsPanel__colorOption {
+      width: 100%;
+      max-width: none;
+    }
+  }
+
+  /* Media query fallback for browsers without container query support */
+  @media (max-width: 600px) {
+    .pantOptionsPanel__colorRow {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .pantOptionsPanel__colorRow .pantOptionsPanel__colorOption {
+      flex: none;
+      width: 100%;
+    }
+
+    .pantOptionsPanel__colorGrid--sweatpants .pantOptionsPanel__colorRow:last-child .pantOptionsPanel__colorOption {
+      width: 100%;
+      max-width: none;
+    }
+  }
+
+  /* Enhanced responsive patterns using custom media queries */
+  @media (--bp-sm) {
+    .pantOptionsPanel__colorOption {
+      padding: var(--space-3);
+    }
+
+    .pantOptionsPanel__colorLabel {
+      font-size: var(--font-0);
+    }
+  }
+}

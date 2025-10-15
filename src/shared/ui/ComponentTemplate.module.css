@@ -1,0 +1,167 @@
+/**
+ * CSS Module Template
+ * 
+ * Copy this file and rename to create new component styles following
+ * the established patterns for the UI system unification.
+ */
+
+@layer components {
+  /* Component root - always use the component name as the base class */
+  .componentTemplate {
+    /* Container queries for responsive behavior */
+    container-type: inline-size;
+    container-name: component-template;
+    
+    /* Base styles using design tokens */
+    display: flex;
+    flex-direction: column;
+    gap: var(--component-gap, var(--space-2));
+    padding: var(--component-padding, var(--space-3));
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    transition: all var(--motion-fast) var(--motion-ease);
+  }
+
+  /* Size variants - only define non-default sizes */
+  .componentTemplate--sm {
+    padding: var(--space-2);
+    font-size: var(--font-0);
+    gap: var(--space-1);
+  }
+
+  .componentTemplate--lg {
+    padding: var(--space-4);
+    font-size: var(--font-2);
+    gap: var(--space-3);
+  }
+
+  /* Color/style variants */
+  .componentTemplate--primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
+
+  .componentTemplate--secondary {
+    background: var(--color-bg-alt);
+    border-color: var(--color-border);
+  }
+
+  /* State styles using data attributes */
+  .componentTemplate[data-active="true"] {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+
+  .componentTemplate[data-disabled="true"] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Interactive states */
+  .componentTemplate[data-interactive="true"] {
+    cursor: pointer;
+  }
+
+  .componentTemplate[data-interactive="true"]:hover:not([data-disabled="true"]) {
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-2);
+  }
+
+  .componentTemplate[data-interactive="true"]:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-contrast: more) {
+    .componentTemplate[data-interactive="true"]:focus-visible {
+      outline-width: 3px;
+    }
+  }
+
+  .componentTemplate[data-interactive="true"]:active:not([data-disabled="true"]) {
+    transform: translateY(0);
+  }
+
+  /* Container query responsive adjustments */
+  @container component-template (max-width: 300px) {
+    .componentTemplate {
+      padding: var(--space-2);
+      font-size: var(--font-0);
+      gap: var(--space-1);
+    }
+  }
+
+  @container component-template (min-width: 500px) {
+    .componentTemplate {
+      padding: var(--space-4);
+      gap: var(--space-3);
+    }
+  }
+
+  /* Media query fallback for older browsers */
+  @media (--bp-md) {
+    .componentTemplate {
+      padding: var(--space-4);
+      gap: var(--space-3);
+    }
+  }
+
+  /* Child elements using BEM-style naming */
+  .componentTemplate__header {
+    margin-block-end: var(--space-2);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .componentTemplate__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+  }
+
+  .componentTemplate__footer {
+    margin-block-start: var(--space-2);
+    padding-block-start: var(--space-2);
+    border-block-start: 1px solid var(--color-border);
+    font-size: var(--font-0);
+    color: var(--color-text-muted);
+  }
+
+  /* Accessibility enhancements */
+  @media (prefers-reduced-motion: reduce) {
+    .componentTemplate {
+      transition: none;
+    }
+    
+    .componentTemplate[data-interactive="true"]:hover:not([data-disabled="true"]) {
+      transform: none;
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    .componentTemplate {
+      border-width: 2px;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .componentTemplate {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+    }
+  }
+}
+
+/* 
+Usage Notes:
+1. Replace 'componentTemplate' with your actual component name in kebab-case
+2. Update container-name to match your component
+3. Add/remove variants as needed for your component
+4. Customize the base styles while maintaining design token usage
+5. Always test responsive behavior and accessibility features
+*/

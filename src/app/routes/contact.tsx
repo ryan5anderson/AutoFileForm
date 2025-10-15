@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
+import styles from './Contact.module.css';
 
 const ContactPage: React.FC = () => {
   return (
@@ -8,10 +9,10 @@ const ContactPage: React.FC = () => {
       <div className="college-page-header">
         <Header />
       </div>
-      <main className="summary-page-main" style={{ maxWidth: 800 }}>
-        <h1 style={{ color: 'var(--color-text)', marginBottom: 'var(--space-4)' }}>Contact Us</h1>
-        <div className="summary-card" style={{ marginBottom: 'var(--space-4)' }}>
-          <h2 style={{ marginTop: 0 }}>Representative</h2>
+      <main className={`summary-page-main ${styles.main}`}>
+        <h1 className={styles.title}>Contact Us</h1>
+        <div className={`summary-card ${styles.card}`}>
+          <h2 className={styles.sectionTitle}>Representative</h2>
           <p><strong>Dana Anderson</strong><br />Collegiate Representative</p>
           <p>
             <a href="mailto:Dana@ohiopyleprints.com">Dana@ohiopyleprints.com</a><br />
@@ -19,7 +20,7 @@ const ContactPage: React.FC = () => {
           </p>
         </div>
         <div className="summary-card">
-          <h2 style={{ marginTop: 0 }}>General Contact</h2>
+          <h2 className={styles.sectionTitle}>General Contact</h2>
           <p>
             <a href="tel:18008297460">1-800-829-7460</a><br />
             <a href="mailto:MyTown@ohiopyleprints.com">MyTown@ohiopyleprints.com</a>
