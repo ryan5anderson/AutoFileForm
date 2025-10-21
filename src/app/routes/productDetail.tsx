@@ -325,37 +325,38 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </div>
 
-        <div className="product-detail-options-section">
-          <div className="product-detail-options-header">
-            <h3>Configure Options</h3>
-          </div>
-          {category.hasDisplayOptions && (
-            <div style={{
-              marginBottom: 'var(--space-4)',
-              padding: 'var(--space-3)',
-              background: 'var(--color-bg)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius)',
-              fontSize: '0.875rem',
-              color: 'var(--color-text)',
-              lineHeight: '1.5'
-            }}>
-              <strong>Display Only:</strong> Just the display unit without garments.<br />
-              <strong>Display Standard Case Pack:</strong> Display unit includes garments.
+        <div className="product-detail-right-section">
+          <div className="product-detail-options-section">
+            <div className="product-detail-options-header">
+              <h3>Configure Options</h3>
             </div>
-          )}
-          <div className="product-detail-options-content" style={{
-            overflowY: category.hasPantOptions ? 'hidden' : 'auto',
-            paddingBottom: '2rem',
-            maxHeight: category.hasPantOptions ? 'none' : 'calc(100vh - 400px)'
-          }}>
-            {renderConfigurationPanel()}
+            {category.hasDisplayOptions && (
+              <div style={{
+                marginBottom: 'var(--space-4)',
+                padding: 'var(--space-3)',
+                background: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius)',
+                fontSize: '0.875rem',
+                color: 'var(--color-text)',
+                lineHeight: '1.5'
+              }}>
+                <strong>Display Only:</strong> Just the display unit without garments.<br />
+                <strong>Display Standard Case Pack:</strong> Display unit includes garments.
+              </div>
+            )}
+            <div className="product-detail-options-content" style={{
+              overflowY: category.hasPantOptions ? 'hidden' : 'auto',
+              paddingBottom: '2rem',
+              maxHeight: category.hasPantOptions ? 'none' : 'calc(100vh - 400px)'
+            }}>
+              {renderConfigurationPanel()}
+            </div>
           </div>
-          <div className="product-detail-actions">
-            <button onClick={handleDone} className="btn-primary btn-large">
-              Done
-            </button>
-          </div>
+          
+          <button onClick={handleDone} className="done-btn">
+            Done
+          </button>
         </div>
       </div>
     </div>

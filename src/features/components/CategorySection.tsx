@@ -343,7 +343,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
                 {!readOnly && (
                   <p className="card__action-text">
-                    Tap to configure options
+                    Tap to select options
                   </p>
                 )}
 

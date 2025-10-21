@@ -112,15 +112,23 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
         margin: '0 auto',
         width: '100%'
       }}>
-        <h1 style={{ 
-          color: 'var(--color-primary)', 
-          marginBottom: 'var(--space-6)', 
-          textAlign: 'center',
-          fontSize: '2rem',
-          fontWeight: '600'
+        <div style={{
+          position: 'relative',
+          width: '100%',
+          marginBottom: 'var(--space-6)'
         }}>
-          Order Receipt
-        </h1>
+          <h1 style={{ 
+            color: 'var(--color-primary)', 
+            margin: '0',
+            textAlign: 'center',
+            fontSize: '2rem',
+            fontWeight: '600',
+            position: 'relative',
+            width: '100%'
+          }}>
+            Order Receipt
+          </h1>
+        </div>
         
         <div style={{ 
           background: 'var(--color-bg)', 
@@ -287,7 +295,11 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           fontWeight: '600',
                           fontSize: '1rem',
                           marginBottom: 'var(--space-2)',
-                          color: 'var(--color-text)'
+                          color: 'var(--color-text)',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          hyphens: 'auto',
+                          maxWidth: '100%'
                         }}>{productName}</div>
                         {options.map(opt => (
                           Number(sj[opt.key as keyof typeof sj]) > 0 && (
@@ -339,7 +351,11 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           fontWeight: '600',
                           fontSize: '1rem',
                           marginBottom: 'var(--space-2)',
-                          color: 'var(--color-text)'
+                          color: 'var(--color-text)',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          hyphens: 'auto',
+                          maxWidth: '100%'
                         }}>{productName}</div>
                         {filteredVersions.map((version, idx) => {
                           const counts = sizeByVersion[version as keyof ShirtVersion];
@@ -421,7 +437,11 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           fontWeight: '600',
                           fontSize: '1rem',
                           marginBottom: 'var(--space-2)',
-                          color: 'var(--color-text)'
+                          color: 'var(--color-text)',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          hyphens: 'auto',
+                          maxWidth: '100%'
                         }}>{productName}</div>
                         {versionOrder.map((vk, i) => {
                           const vTotal = totalsByVersion[i];
@@ -489,7 +509,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                       borderRadius: 'var(--radius)',
                       border: '1px solid var(--color-border)'
                     }}>
-                      <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)' }}>{productName}</div>
+                      <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%' }}>{productName}</div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
                         <span>Qty</span>
                         <span style={{ fontWeight: '500' }}>{qty}</span>
