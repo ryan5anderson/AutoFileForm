@@ -544,14 +544,14 @@
 /* Mobile - optimized touch targets (44x44px minimum) */
 @media (max-width: 640px) {
   .size-pack__grid {
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
     gap: clamp(0.5rem, 2vw, 0.75rem);
     width: 100%;
     box-sizing: border-box;
   }
 
   .size-pack__cell {
-    min-width: 70px;
+    min-width: 90px;
     padding: clamp(0.5rem, 2vw, 0.75rem);
     box-sizing: border-box;
   }
@@ -619,11 +619,11 @@
   }
 }
 
-/* Extra small mobile - 2 column layout for very small screens */
+/* Extra small mobile - 3 column layout maintained for small screens */
 @media (max-width: 380px) {
   .size-pack__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: clamp(0.4rem, 2vw, 0.5rem);
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: clamp(0.35rem, 2vw, 0.45rem);
     width: 100%;
     box-sizing: border-box;
   }
@@ -655,11 +655,11 @@
   }
 }
 
-/* Ultra small screens - preserve usability */
+/* Ultra small screens - preserve usability with 3 columns minimum */
 @media (max-width: 320px) {
   .size-pack__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: clamp(0.3rem, 2vw, 0.4rem);
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: clamp(0.25rem, 1.5vw, 0.35rem);
   }
 
   .size-pack__cell {
