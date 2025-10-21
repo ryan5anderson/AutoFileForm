@@ -600,18 +600,6 @@
     margin-top: clamp(1rem, 3vw, 1.5rem);
   }
 
-  /* Improve size selector for mobile */
-  .size-pack__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: clamp(0.3rem, 2vw, 0.5rem);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .size-pack__cell {
-    min-width: 0;
-    box-sizing: border-box;
-  }
 
   .product-detail-tabs {
     gap: clamp(0.125rem, 1vw, 0.125rem);
@@ -712,28 +700,6 @@
     box-sizing: border-box;
   }
 
-  .size-pack__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: clamp(0.25rem, 2vw, 0.4rem);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .size-pack__cell {
-    min-width: 0;
-    box-sizing: border-box;
-  }
-
-  .size-pack__btn {
-    height: clamp(0.9rem, 3vw, 1.1rem) !important;
-    width: clamp(0.9rem, 3vw, 1.1rem) !important;
-    font-size: clamp(0.6rem, 2.5vw, 0.7rem) !important;
-  }
-
-  .size-pack__input {
-    height: clamp(0.9rem, 3vw, 1.1rem) !important;
-    font-size: clamp(0.6rem, 2.5vw, 0.7rem) !important;
-  }
 
   .product-detail-tabs {
     padding: 0 clamp(0.125rem, 2vw, 0.25rem);
@@ -810,28 +776,6 @@
     box-sizing: border-box;
   }
 
-  .size-pack__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: clamp(0.2rem, 1.5vw, 0.3rem);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .size-pack__cell {
-    min-width: 0;
-    box-sizing: border-box;
-  }
-
-  .size-pack__btn {
-    height: clamp(0.8rem, 2.5vw, 1rem) !important;
-    width: clamp(0.8rem, 2.5vw, 1rem) !important;
-    font-size: clamp(0.55rem, 2vw, 0.65rem) !important;
-  }
-
-  .size-pack__input {
-    height: clamp(0.8rem, 2.5vw, 1rem) !important;
-    font-size: clamp(0.55rem, 2vw, 0.65rem) !important;
-  }
 
   .product-detail-tabs {
     padding: 0 clamp(0.1rem, 1vw, 0.125rem);
@@ -908,28 +852,6 @@
     box-sizing: border-box;
   }
 
-  .size-pack__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: clamp(0.05rem, 0.5vw, 0.1rem);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .size-pack__cell {
-    min-width: 0;
-    box-sizing: border-box;
-  }
-
-  .size-pack__btn {
-    height: clamp(0.7rem, 1.5vw, 0.8rem) !important;
-    width: clamp(0.7rem, 1.5vw, 0.8rem) !important;
-    font-size: clamp(0.45rem, 1.5vw, 0.5rem) !important;
-  }
-
-  .size-pack__input {
-    height: clamp(0.7rem, 1.5vw, 0.8rem) !important;
-    font-size: clamp(0.45rem, 1.5vw, 0.5rem) !important;
-  }
 
   .product-detail-tabs {
     padding: 0 clamp(0.05rem, 0.5vw, 0.1rem);

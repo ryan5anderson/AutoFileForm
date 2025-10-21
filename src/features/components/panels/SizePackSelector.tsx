@@ -79,10 +79,10 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
         }}
       >
         {SIZE_LIST.map((size: Size) => (
-          <div key={size} className="size-pack__cell" style={{ padding: '0.25rem', boxSizing: 'border-box', minWidth: 0 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', width: '100%' }}>
-              <button type="button" className="size-pack__btn" onClick={() => handleDelta(size, +1)} aria-label={`Increase ${size}`} disabled={disabled} style={{ height: '1.4rem', width: '1.4rem', fontSize: '0.8rem' }}>+</button>
-              <div style={{ fontWeight: 600, fontSize: '0.8rem', lineHeight: 1 }}>{size}</div>
+          <div key={size} className="size-pack__cell">
+            <div className="size-pack__cell-content">
+              <button type="button" className="size-pack__btn" onClick={() => handleDelta(size, +1)} aria-label={`Increase ${size}`} disabled={disabled}>+</button>
+              <div className="size-pack__label">{size}</div>
               <input
                 aria-label={`${size} quantity`}
                 inputMode="numeric"
@@ -91,9 +91,8 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
                 onChange={(e) => handleInput(size, e.target.value)}
                 disabled={disabled}
                 className="size-pack__input"
-                style={{ height: '1.4rem', width: '100%', maxWidth: '100%', minWidth: 0, padding: 0, margin: 0, fontSize: '0.8rem' }}
               />
-              <button type="button" className="size-pack__btn" onClick={() => handleDelta(size, -1)} aria-label={`Decrease ${size}`} disabled={disabled} style={{ height: '1.4rem', width: '1.4rem', fontSize: '0.8rem' }}>-</button>
+              <button type="button" className="size-pack__btn" onClick={() => handleDelta(size, -1)} aria-label={`Decrease ${size}`} disabled={disabled}>-</button>
             </div>
           </div>
         ))}

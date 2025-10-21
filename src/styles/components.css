@@ -412,6 +412,9 @@
   border-radius: var(--radius);
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .size-pack__cell:hover {
@@ -419,40 +422,83 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
+.size-pack__cell-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.4rem, 2vw, 0.5rem);
+  width: 100%;
+}
+
+.size-pack__label {
+  font-weight: 600;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  line-height: 1;
+  color: var(--color-text);
+}
+
 .size-pack__btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-border);
-  background: linear-gradient(180deg,#f8fafc,#eef2f7);
+  border: 2px solid var(--color-border);
+  background: linear-gradient(180deg, #f8fafc, #eef2f7);
   border-radius: 8px;
   color: var(--color-text);
   cursor: pointer;
+  font-weight: 600;
   transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+  /* Desktop sizes - comfortable for mouse */
+  height: 2rem;
+  width: 2rem;
+  font-size: 1rem;
+  min-height: 2rem;
+  min-width: 2rem;
 }
 
 .size-pack__btn:hover { 
-  background: linear-gradient(180deg,#eef2f7,#e5e9f0);
+  background: linear-gradient(180deg, #eef2f7, #e5e9f0);
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border-color: var(--color-primary);
 }
 
 .size-pack__btn:active { 
   transform: translateY(1px);
+  background: linear-gradient(180deg, #e5e9f0, #d1d9e3);
+}
+
+.size-pack__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .size-pack__input {
   text-align: center;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   background: var(--color-input-bg);
   border-radius: 8px;
   font-weight: 600;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  /* Desktop sizes */
+  height: 2rem;
+  font-size: 0.95rem;
+}
+
+.size-pack__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1);
 }
 
 .size-pack__helper { 
-  font-size: 0.8rem; 
+  font-size: 0.875rem; 
   color: #6b7280;
+  margin-top: 0.5rem;
 }
 
 .btn-ghost-sm {
@@ -460,86 +506,184 @@
   background: var(--color-bg);
   color: var(--color-text);
   border-radius: 8px;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-ghost-sm:hover {
   border-color: #9ca3af;
+  background: #f9fafb;
 }
 
-/* Additional mobile responsive styles for size selector */
+/* Tablet - slightly larger touch targets */
+@media (max-width: 768px) {
+  .size-pack__btn {
+    height: 2.25rem;
+    width: 2.25rem;
+    font-size: 1.05rem;
+    min-height: 2.25rem;
+    min-width: 2.25rem;
+  }
+
+  .size-pack__input {
+    height: 2.25rem;
+    font-size: 1rem;
+  }
+
+  .size-pack__label {
+    font-size: 0.95rem;
+  }
+
+  .size-pack__cell {
+    padding: 0.6rem;
+  }
+}
+
+/* Mobile - optimized touch targets (44x44px minimum) */
 @media (max-width: 640px) {
   .size-pack__grid {
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)) !important;
-    gap: clamp(0.2rem, 2vw, 0.3rem);
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)) !important;
+    gap: clamp(0.5rem, 2vw, 0.75rem);
     width: 100%;
     box-sizing: border-box;
   }
 
   .size-pack__cell {
-    min-width: 60px;
+    min-width: 70px;
+    padding: clamp(0.5rem, 2vw, 0.75rem);
     box-sizing: border-box;
   }
 
+  .size-pack__cell-content {
+    gap: clamp(0.5rem, 2vw, 0.65rem);
+  }
+
   .size-pack__btn {
-    height: clamp(1rem, 3vw, 1.2rem) !important;
-    width: clamp(1rem, 3vw, 1.2rem) !important;
-    font-size: clamp(0.6rem, 2.5vw, 0.7rem) !important;
+    /* Apple HIG recommends 44x44pt minimum for touch targets */
+    height: 2.75rem; /* 44px */
+    width: 2.75rem; /* 44px */
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    font-size: 1.25rem;
+    border-width: 2px;
   }
 
   .size-pack__input {
-    height: clamp(1rem, 3vw, 1.2rem) !important;
-    font-size: clamp(0.6rem, 2.5vw, 0.7rem) !important;
+    height: 2.75rem; /* 44px */
+    font-size: 1.125rem;
+    border-width: 2px;
+  }
+
+  .size-pack__label {
+    font-size: 1rem;
+    font-weight: 700;
   }
 }
 
+/* Small mobile - 3 column layout, maintain touch targets */
 @media (max-width: 480px) {
   .size-pack__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: clamp(0.15rem, 1.5vw, 0.25rem);
+    gap: clamp(0.4rem, 2vw, 0.6rem);
     width: 100%;
     box-sizing: border-box;
   }
 
+  .size-pack__cell {
+    min-width: 0;
+    padding: clamp(0.4rem, 2vw, 0.6rem);
+  }
+
+  .size-pack__cell-content {
+    gap: clamp(0.4rem, 2vw, 0.55rem);
+  }
+
   .size-pack__btn {
-    height: clamp(0.9rem, 2.5vw, 1rem) !important;
-    width: clamp(0.9rem, 2.5vw, 1rem) !important;
-    font-size: clamp(0.55rem, 2vw, 0.65rem) !important;
+    /* Maintain good touch targets */
+    height: 2.5rem; /* 40px */
+    width: 2.5rem; /* 40px */
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+    font-size: 1.15rem;
   }
 
   .size-pack__input {
-    height: clamp(0.9rem, 2.5vw, 1rem) !important;
-    font-size: clamp(0.55rem, 2vw, 0.65rem) !important;
+    height: 2.5rem; /* 40px */
+    font-size: 1rem;
   }
 
-  .size-pack__cell {
-    padding: clamp(0.1rem, 1vw, 0.15rem) !important;
-    box-sizing: border-box;
+  .size-pack__label {
+    font-size: 0.95rem;
   }
 }
 
+/* Extra small mobile - 2 column layout for very small screens */
 @media (max-width: 380px) {
   .size-pack__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: clamp(0.1rem, 1vw, 0.2rem);
+    gap: clamp(0.4rem, 2vw, 0.5rem);
     width: 100%;
     box-sizing: border-box;
   }
 
+  .size-pack__cell {
+    padding: clamp(0.35rem, 2vw, 0.5rem);
+  }
+
+  .size-pack__cell-content {
+    gap: clamp(0.35rem, 2vw, 0.5rem);
+  }
+
   .size-pack__btn {
-    height: clamp(0.8rem, 2vw, 0.9rem) !important;
-    width: clamp(0.8rem, 2vw, 0.9rem) !important;
-    font-size: clamp(0.5rem, 1.5vw, 0.6rem) !important;
+    /* Still maintain reasonable touch targets */
+    height: 2.25rem; /* 36px */
+    width: 2.25rem; /* 36px */
+    min-height: 2.25rem;
+    min-width: 2.25rem;
+    font-size: 1.05rem;
   }
 
   .size-pack__input {
-    height: clamp(0.8rem, 2vw, 0.9rem) !important;
-    font-size: clamp(0.5rem, 1.5vw, 0.6rem) !important;
+    height: 2.25rem; /* 36px */
+    font-size: 0.95rem;
+  }
+
+  .size-pack__label {
+    font-size: 0.875rem;
+  }
+}
+
+/* Ultra small screens - preserve usability */
+@media (max-width: 320px) {
+  .size-pack__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: clamp(0.3rem, 2vw, 0.4rem);
   }
 
   .size-pack__cell {
-    padding: clamp(0.05rem, 0.5vw, 0.1rem) !important;
+    padding: clamp(0.3rem, 2vw, 0.4rem);
+  }
+
+  .size-pack__cell-content {
+    gap: clamp(0.3rem, 2vw, 0.4rem);
+  }
+
+  .size-pack__btn {
+    height: 2rem; /* 32px - minimum acceptable */
+    width: 2rem; /* 32px */
+    min-height: 2rem;
+    min-width: 2rem;
+    font-size: 1rem;
+  }
+
+  .size-pack__input {
+    height: 2rem; /* 32px */
+    font-size: 0.875rem;
+  }
+
+  .size-pack__label {
+    font-size: 0.8rem;
   }
 }
