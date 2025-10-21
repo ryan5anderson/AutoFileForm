@@ -11,9 +11,9 @@ Order by size
 v3 Notes
     To-do
         Pack size distrution logic
-        Nice looking title linked to M# title
-
+        
     Done
+        Nice looking title linked to M# title
         No crew neck for tiedye products
         Applique only crew and hoodie
         Jogger colors are steel and dark heather
