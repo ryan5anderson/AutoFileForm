@@ -1,0 +1,168 @@
+{
+  "name": "Alabama University",
+  "logo": "/logo/alabamalogo.png",
+  "categories": [
+    {
+      "name": "Display Options",
+      "path": "displays",
+      "hasDisplayOptions": true,
+      "images": [
+        "The_University_of_Alabama_CrimsonTide_3ft Inline_500PX.jpg",
+        "The_University_of_Alabama_CrimsonTide_Premium Floor Display 2.0_500PX.jpg",
+        "The_University_of_Alabama_CrimsonTide_Tier2_Display_Floor_500PX.jpg"
+      ]
+    },
+    {
+      "name": "Tshirts (Unisex)",
+      "path": "tshirt/men",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt",
+        "longsleeve",
+        "hoodie",
+        "crewneck"
+      ],
+      "tieDyeImages": [
+        "M100114591_SH2FDW_Custom_DTF_Crimson.png",
+        "M100853866_SH2FDC_Built_by_DTFN_on_CrimsoBlack.png"
+      ],
+      "images": [
+        "M100066812_SDARMC_Aristotle_DTF_on_Crimson.png",
+        "M100067959_SHFCDS_Final_Cut_DTF_on_Steel.png",
+        "M100068034_SH2FDS_Full_Front_DTF_on_Steel.png",
+        "M100068192_SH2FDS_Full_Front_Custom_DTF_on_Steel.png",
+        "M100068556_SDPLAS_Plato_DTF_on_SteelWhite.png",
+        "M100068897_SDNIET_Nietzsche_DTF_on_Crimson.png",
+        "M100069466_SDFREG_Frege_DTF_on_Black.png",
+        "M100082157_SH2FDS_Neutral_DTF_on_SteelWhite.png",
+        "M100082210_SH2FDS_Full_Custom_DTFN_SteelWhite.png",
+        "M100082512_SHRIDC_Rise_DTF_on_Crimson.png",
+        "M100083212_SDRENC_Renown_DTF_Crimson_or_Black.png",
+        "M100084780_SHLJOB_Love_Jones_DTF_on_Black.png",
+        "M100085023_SH2FDC_Full_Front_DTF_on_Black.png",
+        "M100085284_SHHODC_Hover_DTF_on_Black.png",
+        "M100108378_SDLOCK_Neutral_Locke_DTF_on_Black.png",
+        "M100113956_SDSOCR_Socrates_DTF_on_Black.png",
+        "M100114591_SH2FDW_Custom_DTF_Crimson.png",
+        "M100114845_SH2FDS_Full_Front_DTF_on_SteelWhite.png",
+        "M100853596_SH2FDC_Custom_Legends_DTF_on_Black.png",
+        "M100853688_SH2FDS_Custom_Legends_DTF_on_Steel.png",
+        "M100853866_SH2FDC_Built_by_DTFN_on_CrimsoBlack.png",
+        "M101003169_SH2FDC_Crimson_A_DTFon_Black.png",
+        "M101457413_CM7031_Custom_LC_FZ_Steel_Hood.png",
+        "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Stee.png",
+        "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
+        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png",
+        "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
+        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png"
+      ]
+    },
+    {
+      "name": "Tshirts (Women)",
+      "path": "tshirt/women",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M100085689_SHBMDC_Jr_Backer_DTF_on_Black.png",
+        "M100086269_SDABSC_Jr_Absent_DTF_on_Black.png",
+        "M100109174_SDBIOS_Jr_Bionic_DTF_on_Steel.png",
+        "M100109716_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png",
+        "M100110295_SDMULS_Jr_Multipler_DTF_on_Steel.png",
+        "M100133741_SH2FDS_Jr_Full_Front_DTF_on_SteelWhite.png",
+        "M101003278_SH2FDC_Jr_Crimson_A_DTF_on_Black.png"
+      ]
+    },
+    {
+      "name": "Caps",
+      "path": "hat",
+      "images": [
+        "M100120547_SHE1CH_Custom_on_GrayWhite_Hat.png",
+        "M100120777_SHE1CH_Custom_on_GrayWhite_Hat.png",
+        "M100908172_SHE1CH_Crimson_A_Black_Hat.png"
+      ]
+    },
+    {
+      "name": "Knit Caps",
+      "path": "beanie",
+      "images": [
+        "M100121025_SHE1CB_Custom_GrayWhite_Beanie.png",
+        "M100908250_SHE1CB_Crimson_A_Black_Beanie.png"
+      ]
+    },
+    {
+      "name": "Jackets",
+      "path": "jacket",
+      "hasSizeOptions": true,
+      "images": [
+        "M100110796_SEUCBJ_Revere_Emb_Black_Jacket.png",
+        "M100327761_SDLCJA_Custom_DTF_Gray_Jacket.png",
+        "M100328372_SEUHBJ_Overhand_Black_Jacket.png",
+        "M103746362_SHE1CJ_Custom_Fleece_Jacket.png"
+      ]
+    },
+    {
+      "name": "Flannels",
+      "path": "flannels",
+      "hasSizeOptions": true,
+      "images": [
+        "M100111594_SHPHFD_Custom_DTF_Flannels.png",
+        "M100119223_SHPHFD_Custom_Hip_DTF_Flannels.png"
+      ]
+    },
+    {
+      "name": "Pants",
+      "path": "pants",
+      "hasPantOptions": true,
+      "pantStyles": [
+        "sweatpants",
+        "joggers"
+      ],
+      "images": [
+        "M100112172_SHPHDS_CustomCircle_DTF_Gray_Jogger.png",
+        "M100114472_SH1HDS_Custom_DTF_Gray_Jogger.png",
+        "M100120151_SH1CDS_Custom_DTF_Gray_Jogger.png"
+      ]
+    },
+    {
+      "name": "Shorts",
+      "path": "shorts",
+      "hasSizeOptions": true,
+      "images": [
+        "M100115322_SHSHDS_Custom_DTF_Gray_Shorts.png",
+        "M100115615_SHSHDS_Custom_Circle_DTF_Gray_Shorts.png",
+        "M100115927_SHSHDS_Custom_DTF_Gray_Shorts.png",
+        "M101006172_SHSHDS_Jr_Custom_DTF_Gray_Shorts.png",
+        "M101006499_SHSHDS_Jr_Circle_DTF_Gray_Shorts.png",
+        "M102607560_SDSPSS_Custom_DTF_Gray_Stripe_Shorts.png"
+      ]
+    },
+    {
+      "name": "Socks",
+      "path": "socks",
+      "hasSizeOptions": true,
+      "images": [
+        "M100052285_SS8052_Custom_Logo_Socks.png",
+        "M100328736_SS8052_Custom_Crimson_Tide_Socks.png"
+      ]
+    },
+    {
+      "name": "Plush",
+      "path": "plush",
+      "images": [
+        "M101242227_SHPLUD_Custom_DTF_Plush.png",
+        "M101242929_SDPIHC_I_Heart_DTF_Plush.png"
+      ]
+    },
+    {
+      "name": "Signage",
+      "path": "card",
+      "images": [
+        "M100327125_SHWGCS_Spinner_Header_Card.png",
+        "M100330026_SHWGCH_PFD_Header_Card.png"
+      ]
+    }
+  ]
+}
+

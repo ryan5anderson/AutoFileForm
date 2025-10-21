@@ -20,6 +20,8 @@ const CollegeRouteWrapper: React.FC = () => {
       document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
     } else if (college === 'pittsburghuniversity') {
       document.documentElement.style.setProperty('--color-primary', '#003594'); // Pitt blue
+    } else if (college === 'alabamauniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#9E1B32'); // Alabama Crimson
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }

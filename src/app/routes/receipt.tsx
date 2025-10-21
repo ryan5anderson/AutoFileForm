@@ -40,6 +40,10 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
       document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
     } else if (urlCollege === 'westvirginiauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
+    } else if (urlCollege === 'pittsburghuniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#003594'); // Pitt blue
+    } else if (urlCollege === 'alabamauniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#9E1B32'); // Alabama Crimson
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }
@@ -465,13 +469,6 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           if (vTotal <= 0) return null;
                           // Include sock sizes in the size order
                           const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
-                          const sizePieces = counts ? sizeOrder
-                            .map((sz) => {
-                              const val = counts[sz] || 0;
-                              return val > 0 ? `${sz} ${val}` : '';
-                            })
-                            .filter(Boolean)
-                            .join(' ') : '';
                           
                           // Format sizes as "S: 1 M: 2 XL: 3" etc.
                           const formattedSizes = counts ? sizeOrder
