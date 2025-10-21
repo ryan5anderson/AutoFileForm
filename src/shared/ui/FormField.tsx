@@ -78,7 +78,6 @@ const FormField: React.FC<FormFieldProps> & {
       data-has-error={!!error}
       data-sticky-label={stickyLabel}
       style={style}
-      id={fieldId}
     >
       <label 
         className={styles.formFieldLabel}

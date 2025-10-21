@@ -85,6 +85,7 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
               </button>
               <div className={styles.sizeLabel}>{size}</div>
               <input
+                id={`size-${size}-${Math.random().toString(36).substr(2, 9)}`}
                 aria-label={`${size} quantity`}
                 inputMode="numeric"
                 pattern="[0-9]*"
@@ -92,6 +93,10 @@ export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
                 onChange={(e) => handleInput(size, e.target.value)}
                 disabled={disabled}
                 className={styles.sizeInput}
+                autoComplete="off"
+                name={`size-${size}`}
+                type="number"
+                min="0"
               />
               <button 
                 type="button" 

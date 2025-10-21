@@ -22,9 +22,10 @@
   align-items: start;
   display: grid;
   gap: var(--space-3);
-  grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width, 16rem), 1fr));
+  grid-template-columns: repeat(auto-fill, var(--card-min-width, 320px));
   container-type: inline-size;
   container-name: section-grid;
+  justify-content: center;
 }
 
 .validationIcon {
@@ -97,21 +98,21 @@
 
 @container section-grid (max-width: 480px) {
   .sectionGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-2);
   }
 }
 
 @container section-grid (min-width: 480px) and (max-width: 768px) {
   .sectionGrid {
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fill, 280px);
     gap: var(--space-3);
   }
 }
 
 @container section-grid (min-width: 768px) {
   .sectionGrid {
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    grid-template-columns: repeat(auto-fill, 320px);
     gap: var(--space-4);
   }
 }
@@ -144,7 +145,7 @@
 
 @media (max-width: 480px) {
   .sectionGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-2);
   }
 }

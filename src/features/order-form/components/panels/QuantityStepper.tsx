@@ -7,9 +7,10 @@ interface QuantityStepperProps {
   disabled?: boolean;
   ariaLabel?: string;
   step?: number;
+  inputId?: string;
 }
 
-const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disabled = false, ariaLabel, step = 1 }) => {
+const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disabled = false, ariaLabel, step = 1, inputId }) => {
   const handleDelta = (d: number) => {
     const next = Math.max(0, value + d * step);
     onChange(next);
@@ -33,6 +34,7 @@ const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disa
         -
       </button>
       <input
+        id={inputId}
         className={styles.stepperInput}
         aria-label={ariaLabel ? `${ariaLabel} quantity` : 'Quantity'}
         inputMode="numeric"
@@ -40,6 +42,10 @@ const QuantityStepper: React.FC<QuantityStepperProps> = ({ value, onChange, disa
         value={value}
         onChange={handleInput}
         disabled={disabled}
+        autoComplete="off"
+        name={inputId}
+        type="number"
+        min="0"
       />
       <button
         type="button"

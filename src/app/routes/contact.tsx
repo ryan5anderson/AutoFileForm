@@ -1,17 +1,14 @@
 import React from 'react';
-import Header from '../layout/Header';
 import Footer from '../layout/Footer';
+import clsx from 'clsx';
 import styles from './Contact.module.css';
 
 const ContactPage: React.FC = () => {
   return (
     <div className="summary-page-container">
-      <div className="college-page-header">
-        <Header />
-      </div>
-      <main className={`summary-page-main ${styles.main}`}>
-        <h1 className={styles.title}>Contact Us</h1>
-        <div className={`summary-card ${styles.card}`}>
+      <main className={clsx('summary-page-main', styles.main)}>
+
+        <div className={clsx('summary-card', styles.card)}>
           <h2 className={styles.sectionTitle}>Representative</h2>
           <p><strong>Dana Anderson</strong><br />Collegiate Representative</p>
           <p>
@@ -19,7 +16,7 @@ const ContactPage: React.FC = () => {
             <a href="tel:7245622764">724-562-2764</a>
           </p>
         </div>
-        <div className="summary-card">
+        <div className={clsx('summary-card', styles.card)}>
           <h2 className={styles.sectionTitle}>General Contact</h2>
           <p>
             <a href="tel:18008297460">1-800-829-7460</a><br />

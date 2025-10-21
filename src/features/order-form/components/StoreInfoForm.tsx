@@ -22,6 +22,8 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           value={formData.company}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFormDataChange({ company: e.target.value })}
           required
+          autoComplete="organization"
+          name="company"
         />
       </FormField>
       
@@ -36,6 +38,8 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           value={formData.storeNumber}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFormDataChange({ storeNumber: e.target.value })}
           required
+          autoComplete="off"
+          name="storeNumber"
         />
       </FormField>
       
@@ -50,6 +54,8 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           value={formData.storeManager}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFormDataChange({ storeManager: e.target.value })}
           required
+          autoComplete="name"
+          name="storeManager"
         />
       </FormField>
       
@@ -64,6 +70,8 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           value={formData.date}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFormDataChange({ date: e.target.value })}
           required
+          autoComplete="off"
+          name="date"
         />
       </FormField>
     </FormContainer>

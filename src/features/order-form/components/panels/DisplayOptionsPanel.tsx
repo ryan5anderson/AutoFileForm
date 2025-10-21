@@ -42,13 +42,14 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
     return (
       <>
         <div className="field">
-          <div className="field-label">Quantity</div>
+          <label className="field-label" htmlFor={`display-quantity-${activeOption}-${imagePath}`}>Quantity</label>
           <div className="field-control">
             <QuantityStepper
               value={Number(displayOption[activeOption] || 0)}
               onChange={(v) => handleOptionChange(activeOption, String(v))}
               disabled={readOnly}
               ariaLabel={`${activeOption === 'displayOnly' ? 'Display Only' : 'Display Standard Case Pack'} Quantity`}
+              inputId={`display-quantity-${activeOption}-${imagePath}`}
             />
           </div>
         </div>
@@ -78,7 +79,7 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
       </div>
       
       <div className="field">
-        <div className="field-label">Display Only</div>
+        <label className="field-label" htmlFor={`displayOnly-${imagePath}`}>Display Only</label>
         <div className="field-control">
           <input
             type="number"
@@ -88,11 +89,13 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
             value={displayOption.displayOnly || ''}
             onChange={(e) => handleOptionChange('displayOnly', e.target.value)}
             disabled={readOnly}
+            autoComplete="off"
+            name={`displayOnly-${imagePath}`}
           />
         </div>
       </div>
       <div className="field">
-        <div className="field-label">Standard Case Pack</div>
+        <label className="field-label" htmlFor={`displayStandardCasePack-${imagePath}`}>Standard Case Pack</label>
         <div className="field-control">
           <input
             type="number"
@@ -102,6 +105,8 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
             value={displayOption.displayStandardCasePack || ''}
             onChange={(e) => handleOptionChange('displayStandardCasePack', e.target.value)}
             disabled={readOnly}
+            autoComplete="off"
+            name={`displayStandardCasePack-${imagePath}`}
           />
         </div>
       </div>

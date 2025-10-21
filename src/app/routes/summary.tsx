@@ -175,18 +175,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             type="button"
             onClick={onBack}
             disabled={sending}
-            style={{
-              background: 'var(--color-bg)',
-              color: 'var(--color-primary)',
-              padding: 'var(--space-3) var(--space-4)',
-              border: '2px solid var(--color-primary)',
-              borderRadius: 'var(--radius-lg)',
-              fontSize: '1rem',
-              fontWeight: '500',
-              cursor: sending ? 'not-allowed' : 'pointer',
-              minWidth: '150px',
-              opacity: sending ? 0.6 : 1
-            }}
+            className="summary-button-back"
           >
             Back to Form
           </button>
@@ -195,18 +184,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             type="button"
             onClick={onConfirm}
             disabled={sending}
-            style={{
-              background: 'var(--color-primary)',
-              color: 'white',
-              padding: 'var(--space-3) var(--space-4)',
-              border: 'none',
-              borderRadius: 'var(--radius-lg)',
-              fontSize: '1rem',
-              fontWeight: '500',
-              cursor: sending ? 'not-allowed' : 'pointer',
-              minWidth: '150px',
-              opacity: sending ? 0.6 : 1
-            }}
+            className="summary-button-send"
           >
             {sending ? 'Sending...' : 'Send Order'}
           </button>

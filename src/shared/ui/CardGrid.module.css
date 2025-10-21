@@ -19,9 +19,10 @@
 
 .cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--min-card-width, 280px), 1fr));
+  grid-template-columns: repeat(auto-fill, var(--min-card-width, 320px));
   gap: var(--grid-gap, var(--space-4));
   width: 100%;
+  justify-content: center;
 }
 
 /* Fallback for when minCardWidth is not supported */
@@ -45,6 +46,6 @@
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .cardGrid:not([style*="--min-card-width"]) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, 300px);
   }
 }

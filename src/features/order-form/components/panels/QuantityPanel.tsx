@@ -46,19 +46,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <>
                 {['sweatpantSteel', 'sweatpantBlack', 'sweatpantDarkNavy', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
                   <div key={optionKey} className="field">
-                    <div className="field-label">
+                    <label className="field-label" htmlFor={`${optionKey}-${imagePath}`}>
                       {optionKey === 'sweatpantSteel' && 'Straight-Leg Steel'}
                       {optionKey === 'sweatpantBlack' && 'Straight-Leg Black'}
                       {optionKey === 'sweatpantDarkNavy' && 'Straight-Leg Dark Navy'}
                       {optionKey === 'joggerSteel' && 'Jogger Steel'}
                       {optionKey === 'joggerDarkHeather' && 'Jogger Dark Heather'}
-                    </div>
+                    </label>
                     <div className="field-control">
                       <select
                         id={`${optionKey}-${imagePath}`}
                         value={(sweatpantJoggerOption ? sweatpantJoggerOption[optionKey as keyof SweatpantJoggerOption] : '') || ''}
                         onChange={e => onSweatpantJoggerOptionChange && onSweatpantJoggerOptionChange(imagePath, optionKey as keyof SweatpantJoggerOption, e.target.value)}
                         disabled={readOnly}
+                        autoComplete="off"
+                        name={`${optionKey}-${imagePath}`}
                       >
                         <option value="">Select</option>
                         {getQuantityMultiples(imageName, 'Sweatpants/Joggers', categoryPath, undefined).map(val => (
@@ -71,7 +73,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </>
             ) : (
               <div className="field">
-                <div className="field-label">Quantity</div>
+                <label className="field-label" htmlFor={`quantity-${imagePath}`}>Quantity</label>
                 <div className="field-control">
                   <QuantityStepper
                     value={Number(quantity || 0)}
@@ -79,6 +81,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     disabled={readOnly}
                     ariaLabel={productName}
                     step={packSize}
+                    inputId={`quantity-${imagePath}`}
                   />
                   {packSize > 1 && (
                     <div style={{
@@ -133,19 +136,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <>
               {['sweatpantSteel', 'sweatpantBlack', 'sweatpantDarkNavy', 'joggerSteel', 'joggerDarkHeather'].map((optionKey) => (
                 <div key={optionKey} className="field">
-                  <div className="field-label">
+                  <label className="field-label" htmlFor={`${optionKey}-${imagePath}-card`}>
                     {optionKey === 'sweatpantSteel' && 'Straight-Leg Steel'}
                     {optionKey === 'sweatpantBlack' && 'Straight-Leg Black'}
                     {optionKey === 'sweatpantDarkNavy' && 'Straight-Leg Dark Navy'}
                     {optionKey === 'joggerSteel' && 'Jogger Steel'}
                     {optionKey === 'joggerDarkHeather' && 'Jogger Dark Heather'}
-                  </div>
+                  </label>
                   <div className="field-control">
                     <select
-                      id={`${optionKey}-${imagePath}`}
+                      id={`${optionKey}-${imagePath}-card`}
                       value={(sweatpantJoggerOption ? sweatpantJoggerOption[optionKey as keyof SweatpantJoggerOption] : '') || ''}
                       onChange={e => onSweatpantJoggerOptionChange && onSweatpantJoggerOptionChange(imagePath, optionKey as keyof SweatpantJoggerOption, e.target.value)}
                       disabled={readOnly}
+                      autoComplete="off"
+                      name={`${optionKey}-${imagePath}-card`}
                     >
                       <option value="">Select</option>
                       {getQuantityMultiples(imageName, 'Sweatpants/Joggers', categoryPath, undefined).map(val => (
@@ -158,7 +163,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </>
           ) : (
             <div className="field">
-              <div className="field-label">Quantity</div>
+              <label className="field-label" htmlFor={`quantity-${imagePath}-card`}>Quantity</label>
               <div className="field-control">
                 <QuantityStepper
                   value={Number(quantity || 0)}
@@ -166,6 +171,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   disabled={readOnly}
                   ariaLabel={productName}
                   step={packSize}
+                  inputId={`quantity-${imagePath}-card`}
                 />
                 {packSize > 1 && (
                   <div style={{

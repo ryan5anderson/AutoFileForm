@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import clsx from 'clsx';
 import { Category, SizeCounts, PantOption } from '../../shared/types';
 import ProductCard from '../../features/order-form/components/panels/QuantityPanel';
 import DisplayOptionCard from '../../features/order-form/components/panels/DisplayOptionsPanel';
@@ -11,13 +10,13 @@ import PantOptionsPanel from '../../features/order-form/components/panels/PantOp
 import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/order-form/utils';
 import { asset, getCollegeFolderName } from '../../shared/utils/asset';
 import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
-import '../../shared/styles/product-detail.css';
+import styles from './ProductDetailPage.module.css';
 
 interface ProductDetailPageProps {
   categories: Category[];
   formData: any;
   onQuantityChange?: (imagePath: string, value: string) => void;
-  onShirtVersionChange?: (imagePath: string, version: any, value: string) => void;
+
   onSizeCountsChange?: (imagePath: string, version: any, counts: any) => void;
   onDisplayOptionChange?: (imagePath: string, option: any, value: string) => void;
   onSweatpantJoggerOptionChange?: (imagePath: string, option: any, value: string) => void;
@@ -30,7 +29,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   categories,
   formData,
   onQuantityChange,
-  onShirtVersionChange,
+
   onSizeCountsChange,
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
@@ -69,11 +68,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   // Early return AFTER all hooks
   if (!category || !imageName) {
     return (
-      <div className="product-detail-error">
-        <h2>Product not found</h2>
-        <button onClick={() => navigate(`/${college}`)} className="btn-primary">
-          Back to Form
-        </button>
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <h2 className={styles.errorTitle}>Product not found</h2>
+          <button onClick={() => navigate(`/${college}`)} className={styles.errorButton}>
+            Back to Form
+          </button>
+        </div>
       </div>
     );
   }
@@ -123,23 +124,30 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       
       return (
         <>
-          <div className="product-detail-tabs">
+          <div className={styles.tabs} role="tablist">
             {displayTabs.map((tab) => (
               <button
                 key={tab}
-                className={clsx('product-detail-tab', activeTab === tab && 'product-detail-tab--active')}
+                className={styles.tab}
+                data-active={activeTab === tab}
                 onClick={() => setActiveTab(tab)}
+                role="tab"
+                aria-selected={activeTab === tab}
+                aria-controls={`panel-${tab}`}
               >
                 {tab === 'displayOnly' ? 'Display Only' : 'Display Standard Case Pack'}
               </button>
             ))}
           </div>
-          <div className="product-detail-tab-content">
+          <div className={styles.tabContent}>
             {displayTabs.map((tab) => (
               <div 
                 key={tab}
-                className="product-detail-tab-panel"
-                style={{ display: activeTab === tab ? 'block' : 'none' }}
+                id={`panel-${tab}`}
+                className={styles.tabPanel}
+                data-active={activeTab === tab}
+                role="tabpanel"
+                aria-labelledby={`tab-${tab}`}
               >
                 <DisplayOptionCard
                   {...cardProps}
@@ -160,18 +168,22 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       // Render with tabs - each tab shows its own content when active (only if more than 1 version)
       return (
         <>
-          <div className="product-detail-tabs">
+          <div className={styles.tabs} role="tablist">
             {getFilteredShirtVersions(imageName, category.shirtVersions).map((version: string) => (
               <button
                 key={version}
-                className={clsx('product-detail-tab', activeTab === version && 'product-detail-tab--active')}
+                className={styles.tab}
+                data-active={activeTab === version}
                 onClick={() => setActiveTab(version)}
+                role="tab"
+                aria-selected={activeTab === version}
+                aria-controls={`panel-${version}`}
               >
                 {getVersionDisplayName(version, imageName)}
               </button>
             ))}
           </div>
-          <div className="product-detail-tab-content">
+          <div className={styles.tabContent}>
             {getFilteredShirtVersions(imageName, category.shirtVersions).map((version: string) => {
               const versionKey = version;
               const packSize = getPackSize(category.path, version, imageName);
@@ -183,8 +195,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 return (
                   <div
                     key={version}
-                    className="product-detail-tab-panel"
-                    style={{ display: activeTab === version ? 'block' : 'none' }}
+                    id={`panel-${version}`}
+                    className={styles.tabPanel}
+                    data-active={activeTab === version}
+                    role="tabpanel"
+                    aria-labelledby={`tab-${version}`}
                   >
                   <ColorSizeSelector
                     colors={colors}
@@ -204,8 +219,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 return (
                   <div
                     key={version}
-                    className="product-detail-tab-panel"
-                    style={{ display: activeTab === version ? 'block' : 'none' }}
+                    id={`panel-${version}`}
+                    className={styles.tabPanel}
+                    data-active={activeTab === version}
+                    role="tabpanel"
+                    aria-labelledby={`tab-${version}`}
                   >
                     <SizePackSelector
                       counts={counts}
@@ -247,22 +265,20 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       const sizesArray = getSizeOptions(category.path, version);
 
       return (
-        <>
-          <div className="single-option-panel">
-            <div className="field">
-              <div className="field-label">Quantity</div>
-              <div className="field-control">
-                <SizePackSelector
-                  counts={counts}
-                  sizes={sizesArray}
-                  onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
-                  packSize={packSize}
-                  allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
-                />
-              </div>
+        <div className={styles.singleOptionPanel}>
+          <div className={styles.field}>
+            <label className={styles.fieldLabel}>Quantity</label>
+            <div className={styles.fieldControl}>
+              <SizePackSelector
+                counts={counts}
+                sizes={sizesArray}
+                onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                packSize={packSize}
+                allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+              />
             </div>
           </div>
-        </>
+        </div>
       );
     } else {
       // Check if this product has color options (for non-shirt items like hats)
@@ -301,64 +317,61 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   };
 
   return (
-    <div className="product-detail-container">
-      <div className="product-detail-content">
-        <div className="product-detail-left-section">
-          <div className="product-detail-header-inline">
-            <button onClick={handleDone} className="product-detail-back">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/>
-              </svg>
-              Back to Form
-            </button>
-            <h2 className="product-detail-category">{category.name}</h2>
-          </div>
+    <div className={styles.container}>
+      <main className={styles.productDetail}>
+        {/* Image Section */}
+        <section className={styles.imageSection}>
+          <button onClick={handleDone} className={styles.backButton}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/>
+            </svg>
+            Back to Form
+          </button>
           
-          <div className="product-detail-image-section">
-            <h1 className="product-detail-name">{productName}</h1>
-            <div className="product-detail-image-container">
-              <img
-                src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
-                alt={imageName}
-                className="product-detail-image"
-              />
-            </div>
+          <p className={styles.categoryBreadcrumb}>{category.name}</p>
+          
+          <div className={styles.imageContainer}>
+            <img
+              src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
+              alt={productName}
+              className={styles.productImage}
+            />
           </div>
-        </div>
+        </section>
 
-        <div className="product-detail-options-section">
-          <div className="product-detail-options-header">
-            <h3>Configure Options</h3>
-          </div>
-          {category.hasDisplayOptions && (
-            <div style={{
-              marginBottom: 'var(--space-4)',
-              padding: 'var(--space-3)',
-              background: 'var(--color-bg)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius)',
-              fontSize: '0.875rem',
-              color: 'var(--color-text)',
-              lineHeight: '1.5'
-            }}>
-              <strong>Display Only:</strong> Just the display unit without garments.<br />
-              <strong>Display Standard Case Pack:</strong> Display unit includes garments.
+        {/* Product Info Section */}
+        <section className={styles.productInfo}>
+          <header className={styles.productHeader}>
+            <p className={styles.productCategory}>{category.name}</p>
+            <h1 className={styles.productTitle}>{productName}</h1>
+          </header>
+
+          <div className={styles.configSection}>
+            <div className={styles.configHeader}>
+              <h2 className={styles.configTitle}>Configure Options</h2>
+              {category.hasDisplayOptions && (
+                <div className={styles.configDescription}>
+                  <strong>Display Only:</strong> Just the display unit without garments.<br />
+                  <strong>Display Standard Case Pack:</strong> Display unit includes garments.
+                </div>
+              )}
             </div>
-          )}
-          <div className="product-detail-options-content" style={{
-            overflowY: category.hasPantOptions ? 'hidden' : 'auto',
-            paddingBottom: '2rem',
-            maxHeight: category.hasPantOptions ? 'none' : 'calc(100vh - 400px)'
-          }}>
-            {renderConfigurationPanel()}
+
+            <div 
+              className={styles.optionsContent}
+              data-scrollable={!category.hasPantOptions}
+            >
+              {renderConfigurationPanel()}
+            </div>
+
+            <div className={styles.actions}>
+              <button onClick={handleDone} className={styles.doneButton}>
+                Done
+              </button>
+            </div>
           </div>
-          <div className="product-detail-actions">
-            <button onClick={handleDone} className="btn-primary btn-large">
-              Done
-            </button>
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };

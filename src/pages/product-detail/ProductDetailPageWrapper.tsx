@@ -16,7 +16,6 @@ const ProductDetailPageWrapper: React.FC = () => {
   const {
     formData,
     handleQuantityChange,
-    handleShirtVersionChange,
     handleSizeCountsChange,
     handleDisplayOptionChange,
     handleSweatpantJoggerOptionChange,
@@ -34,7 +33,6 @@ const ProductDetailPageWrapper: React.FC = () => {
       categories={categories}
       formData={formData}
       onQuantityChange={handleQuantityChange}
-      onShirtVersionChange={handleShirtVersionChange}
       onSizeCountsChange={handleSizeCountsChange}
       onDisplayOptionChange={handleDisplayOptionChange}
       onSweatpantJoggerOptionChange={handleSweatpantJoggerOptionChange}

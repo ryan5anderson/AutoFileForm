@@ -24,6 +24,8 @@ const OrderNotesSection: React.FC<OrderNotesSectionProps> = ({ formData, onFormD
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onFormDataChange({ orderNotes: e.target.value })}
           placeholder="Enter any additional comments, special requests, or notes for this order..."
           autoResize
+          autoComplete="off"
+          name="orderNotes"
         />
       </FormField>
     </FormContainer>
