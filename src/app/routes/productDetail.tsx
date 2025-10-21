@@ -7,7 +7,7 @@ import SizePackSelector from '../../features/components/panels/SizePackSelector'
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
-import { getProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
+import { getProductName, getDisplayProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
 import '../../styles/product-detail.css';
@@ -80,7 +80,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const imagePath = getImagePath(category.path, imageName);
   const productName = category.name === 'Display Options'
     ? getRackDisplayName(imageName)
-    : getProductName(imageName);
+    : getDisplayProductName(imageName);
 
   const handleDone = () => {
     // Navigate back and pass state to restore scroll position
@@ -151,7 +151,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if (category.hasShirtVersions && category.shirtVersions && (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions).length > 1 : false)) {
+    } else if (category.hasShirtVersions && category.shirtVersions && (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).length > 1 : false)) {
       // Check if this product has color options
       const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
       const hasColors = colors.length > 0;
@@ -160,7 +160,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       return (
         <>
           <div className="product-detail-tabs">
-            {getFilteredShirtVersions(imageName, category.shirtVersions).map((version: string) => (
+            {getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).map((version: string) => (
               <button
                 key={version}
                 className={`product-detail-tab ${activeTab === version ? 'product-detail-tab--active' : ''}`}
@@ -171,7 +171,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             ))}
           </div>
           <div className="product-detail-tab-content">
-            {getFilteredShirtVersions(imageName, category.shirtVersions).map((version: string) => {
+            {getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).map((version: string) => {
               const versionKey = version;
               const packSize = getPackSize(category.path, version, imageName);
 
@@ -220,12 +220,12 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions).length <= 1 : false) || category.hasSizeOptions) {
+    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).length <= 1 : false) || category.hasSizeOptions) {
       // Single shirt version OR applique OR size options - render without tabs, show "Quantity" label with size selector
       let version = 'tshirt'; // default fallback
 
       if (category.shirtVersions && category.shirtVersions.length > 0) {
-        const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions);
+        const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages);
         version = filteredVersions.length > 0 ? filteredVersions[0] : category.shirtVersions[0];
       } else if (category.path.includes('jacket')) {
         version = 'jacket';

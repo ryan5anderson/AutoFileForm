@@ -10,13 +10,11 @@ Order by size
 
 v3 Notes
     To-do
-        No crew neck for tiedye products
-        optimize for the phone
         Pack size distrution logic
         Nice looking title linked to M# title
-        Order summary, reciept and email have a uniform way of tracking quantites and size quantites
 
     Done
+        No crew neck for tiedye products
         Applique only crew and hoodie
         Jogger colors are steel and dark heather
         Removed old multiples of 7 validation system
@@ -32,4 +30,6 @@ v3 Notes
         Everything ordered shows on Summary Page and then to Recipet Page and Email
         Socks come in pack of 6, fixed sizing issue
         cant send empty order
-        Combine Display Card and Magnets sections in one labeled Signage   
+        Combine Display Card and Magnets sections in one labeled Signage
+        optimize for the phone
+        Order summary, reciept and email have a uniform way of tracking quantites and size quantites

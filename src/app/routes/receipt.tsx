@@ -175,6 +175,19 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 const sj = formData.sweatpantJoggerOptions[imagePath];
                 if (sj && Object.values(sj).some(val => Number(val) > 0)) return true;
               }
+              // Pant Options (for pants with style/color/size options)
+              if (category.hasPantOptions && formData.pantOptions) {
+                const pOptions = formData.pantOptions[imagePath];
+                if (pOptions) {
+                  // Check if any style/color combination has quantities > 0
+                  const hasQuantities = Object.values(pOptions).some(style => 
+                    style && typeof style === 'object' && Object.values(style).some(color => 
+                      color && typeof color === 'object' && Object.values(color).some(qty => Number(qty) > 0)
+                    )
+                  );
+                  if (hasQuantities) return true;
+                }
+              }
               // Shirt Versions or Size Options - prefer size counts
               if (category.hasShirtVersions && category.shirtVersions) {
                 const sizeByVersion = formData.shirtSizeCounts?.[imagePath];
@@ -329,6 +342,94 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                   }
                   return null;
                 }
+                // Handle Pant Options (for pants with style/color/size options)
+                if (category.hasPantOptions && formData.pantOptions) {
+                  const pOptions = formData.pantOptions[imagePath];
+                  if (pOptions) {
+                    const pantItems: React.ReactElement[] = [];
+                    let totalPantQty = 0;
+
+                    // Helper function to process size counts for a specific style and color
+                    const processSizeCounts = (styleName: string, colorName: string, sizeCounts: any) => {
+                      if (!sizeCounts || typeof sizeCounts !== 'object') return;
+
+                      // Format sizes as "S: 1 M: 2 XL: 3" etc.
+                      const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+                      const formattedSizes = sizeOrder
+                        .map(sz => {
+                          const val = sizeCounts[sz] || 0;
+                          return val > 0 ? `${sz}: ${val}` : '';
+                        })
+                        .filter(Boolean)
+                        .join(', ');
+
+                      const totalQty = Object.values(sizeCounts).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0);
+
+                      if (totalQty > 0) {
+                        pantItems.push(
+                          <div key={`${styleName}-${colorName}`} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                            <span>{`${styleName} - ${colorName}${formattedSizes ? ` ${formattedSizes}` : ''}`}</span>
+                            <span style={{ fontWeight: '500' }}>Qty: {totalQty}</span>
+                          </div>
+                        );
+                        totalPantQty += totalQty;
+                      }
+                    };
+
+                    // Process Sweatpants
+                    if (pOptions.sweatpants) {
+                      processSizeCounts('Sweatpants', 'Steel', pOptions.sweatpants.steel);
+                      processSizeCounts('Sweatpants', 'Black', pOptions.sweatpants.black);
+                      processSizeCounts('Sweatpants', 'Dark Navy', pOptions.sweatpants.darkNavy);
+                    }
+
+                    // Process Joggers
+                    if (pOptions.joggers) {
+                      processSizeCounts('Joggers', 'Steel', pOptions.joggers.steel);
+                      processSizeCounts('Joggers', 'Dark Heather', pOptions.joggers.darkHeather);
+                    }
+
+                    if (totalPantQty > 0) {
+                      return (
+                        <div key={img} style={{
+                          marginBottom: 'var(--space-3)',
+                          padding: 'var(--space-3)',
+                          background: 'var(--color-bg)',
+                          borderRadius: 'var(--radius)',
+                          border: '1px solid var(--color-border)'
+                        }}>
+                          <div style={{
+                            fontWeight: '600',
+                            fontSize: '1rem',
+                            marginBottom: 'var(--space-2)',
+                            color: 'var(--color-text)',
+                            wordWrap: 'break-word',
+                            overflowWrap: 'break-word',
+                            hyphens: 'auto',
+                            maxWidth: '100%'
+                          }}>{productName}</div>
+                          {pantItems}
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            padding: 'var(--space-1) 0',
+                            fontSize: '0.875rem',
+                            marginLeft: 'var(--space-3)',
+                            fontWeight: '600',
+                            color: 'var(--color-primary)',
+                            borderTop: '1px solid var(--color-border)',
+                            marginTop: 'var(--space-2)',
+                            paddingTop: 'var(--space-2)'
+                          }}>
+                            <span>Total</span>
+                            <span>Qty: {totalPantQty}</span>
+                          </div>
+                        </div>
+                      );
+                    }
+                  }
+                  return null;
+                }
                 // Handle Shirt Versions (size breakdown)
                 if (category.hasShirtVersions && category.shirtVersions) {
                   const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
@@ -372,10 +473,19 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                             .filter(Boolean)
                             .join(' ') : '';
                           
+                          // Format sizes as "S: 1 M: 2 XL: 3" etc.
+                          const formattedSizes = counts ? sizeOrder
+                            .map((sz) => {
+                              const val = counts[sz] || 0;
+                              return val > 0 ? `${sz}: ${val}` : '';
+                            })
+                            .filter(Boolean)
+                            .join(', ') : '';
+                          
                           // Special handling for socks - show just the size breakdown
-                          const displayText = img.toLowerCase().includes('sock') && sizePieces 
-                            ? sizePieces 
-                            : `${displayName}${sizePieces ? ` (${sizePieces})` : ''}`;
+                          const displayText = img.toLowerCase().includes('sock') && formattedSizes 
+                            ? formattedSizes 
+                            : `${displayName}${formattedSizes ? ` ${formattedSizes}` : ''}`;
                           
                           return (
                             <div key={version} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
@@ -449,25 +559,30 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                             const c = sizeByVersion[vk as keyof typeof sizeByVersion] as SizeCounts;
                             // Include sock sizes in the size order
                             const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
-                            const sizePieces = c ? sizeOrder
+                            
+                            // Format sizes as "S: 1 M: 2 XL: 3" etc.
+                            const formattedSizes = c ? sizeOrder
                               .map((sz) => {
                                 const val = c[sz] || 0;
-                                return val > 0 ? `${sz} ${val}` : '';
+                                return val > 0 ? `${sz}: ${val}` : '';
                               })
                               .filter(Boolean)
-                              .join(' ') : '';
+                              .join(', ') : '';
 
                             // For shirt versions, use the standard labels
                             let versionLabel = vk;
                             if (category.hasShirtVersions) {
                               const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
                               versionLabel = labels[vk as keyof typeof labels] || vk;
+                            } else {
+                              // Remove category-specific words from version labels
+                              versionLabel = vk.replace(/(jacket|flannels|shorts|socks)/gi, '').trim();
                             }
 
                             // Special handling for socks - show just the size breakdown
-                            const displayText = img.toLowerCase().includes('sock') && sizePieces 
-                              ? sizePieces 
-                              : `${versionLabel}${sizePieces ? ` (${sizePieces})` : ''}`;
+                            const displayText = img.toLowerCase().includes('sock') && formattedSizes 
+                              ? formattedSizes 
+                              : `${versionLabel}${formattedSizes ? ` ${formattedSizes}` : ''}`;
 
                             return (
                               <div key={vk} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
@@ -511,8 +626,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                     }}>
                       <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%' }}>{productName}</div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
-                        <span>Qty</span>
-                        <span style={{ fontWeight: '500' }}>{qty}</span>
+                        <span>{productName}</span>
+                        <span style={{ fontWeight: '500' }}>Qty: {qty}</span>
                       </div>
                       <div style={{
                         display: 'flex',
