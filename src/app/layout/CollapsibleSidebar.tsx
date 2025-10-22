@@ -20,12 +20,26 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
   showCategories = true
 }) => {
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   React.useEffect(() => {
     const handler = () => onToggle();
     window.addEventListener('global-sidebar-toggle', handler);
     return () => window.removeEventListener('global-sidebar-toggle', handler);
   }, [onToggle]);
+
+  React.useEffect(() => {
+    const handleAdminLogin = () => setIsAdminLoggedIn(true);
+    const handleAdminLogout = () => setIsAdminLoggedIn(false);
+    
+    window.addEventListener('admin-login', handleAdminLogin);
+    window.addEventListener('admin-logout', handleAdminLogout);
+    
+    return () => {
+      window.removeEventListener('admin-login', handleAdminLogin);
+      window.removeEventListener('admin-logout', handleAdminLogout);
+    };
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -47,6 +61,13 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
   const toggleCategories = () => {
     setCategoriesExpanded(!categoriesExpanded);
+  };
+
+  const handleLogout = () => {
+    window.dispatchEvent(new CustomEvent('admin-logout'));
+    onToggle(); // Close sidebar after logout
+    // Redirect to homepage
+    window.location.href = '/#/';
   };
 
   return (
@@ -72,15 +93,16 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           </button>
         </div>
 
-        <nav className="sidebar-nav">
-          {/* Back to Colleges */}
-          <button
-            className="sidebar-nav-item back-button"
-            onClick={onBackToColleges}
-          >
-            <span className="nav-icon">←</span>
-            <span className="nav-text">Back to Colleges</span>
-          </button>
+        <div className="sidebar-content">
+          <nav className="sidebar-nav">
+            {/* Back to Colleges */}
+            <button
+              className="sidebar-nav-item back-button"
+              onClick={onBackToColleges}
+            >
+              <span className="nav-icon">←</span>
+              <span className="nav-text">Back to Colleges</span>
+            </button>
 
           {/* Categories Dropdown - Only show on form and summary pages */}
           {showCategories && categories.length > 0 && (
@@ -127,15 +149,38 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             <span className="nav-text">About Us</span>
           </Link>
 
-          <Link
-            to="/contact"
-            className="sidebar-nav-item sidebar-link"
-            onClick={onToggle}
-          >
-            <span className="nav-icon">📧</span>
-            <span className="nav-text">Contact Us</span>
-          </Link>
-        </nav>
+            <Link
+              to="/contact"
+              className="sidebar-nav-item sidebar-link"
+              onClick={onToggle}
+            >
+              <span className="nav-icon">📧</span>
+              <span className="nav-text">Contact Us</span>
+            </Link>
+          </nav>
+
+          {/* Admin Section - Bottom of sidebar */}
+          <div className="sidebar-admin-section">
+            {isAdminLoggedIn ? (
+              <button
+                className="sidebar-nav-item admin-logout-button"
+                onClick={handleLogout}
+              >
+                <span className="nav-icon">🚪</span>
+                <span className="nav-text">Logout</span>
+              </button>
+            ) : (
+              <Link
+                to="/admin"
+                className="sidebar-nav-item sidebar-link admin-link"
+                onClick={onToggle}
+              >
+                <span className="nav-icon">🔒</span>
+                <span className="nav-text">Admin</span>
+              </Link>
+            )}
+          </div>
+        </div>
 
         <style>{`
           .sidebar-backdrop {
@@ -204,6 +249,12 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           .sidebar-close:hover {
             background: #e5e7eb;
             color: #374151;
+          }
+
+          .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
           }
 
           .sidebar-nav {
@@ -325,6 +376,55 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
           .sidebar-section {
             margin-bottom: 8px;
+          }
+
+          .sidebar-admin-section {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+          }
+
+          .admin-link {
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0;
+            padding: 10px 16px;
+            font-size: 0.8125rem;
+          }
+
+          .admin-link:hover {
+            background: #f9fafb;
+            color: #374151;
+            border-color: #d1d5db;
+            transform: none;
+            box-shadow: none;
+          }
+
+          .admin-link .nav-icon {
+            font-size: 16px;
+          }
+
+          .admin-logout-button {
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0;
+            padding: 10px 16px;
+            font-size: 0.8125rem;
+          }
+
+          .admin-logout-button:hover {
+            background: #f9fafb;
+            color: #374151;
+            border-color: #d1d5db;
+          }
+
+          .admin-logout-button .nav-icon {
+            font-size: 16px;
           }
 
           /* Mobile adjustments */

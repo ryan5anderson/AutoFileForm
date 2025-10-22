@@ -3,7 +3,7 @@ export * from './calculations';
 export * from './imagePath';
 export * from './naming';
 export * from './emailTemplate';
-export { getSizeOptions } from './calculations';
+export { getSizeOptions, calculateTotalItems } from './calculations';
 export { getDisplayProductName } from './naming';
 
 // Utility function to filter shirt versions for applique and tiedye products

@@ -13,7 +13,7 @@
       ]
     },
     {
-      "name": "Tshirts (Unisex)",
+      "name": "Unisex Tops",
       "path": "tshirt/men",
       "hasShirtVersions": true,
       "shirtVersions": [
@@ -24,7 +24,9 @@
       ],
       "tieDyeImages": [
         "M100114591_SH2FDW_Custom_DTF_Crimson.png",
-        "M100853866_SH2FDC_Built_by_DTFN_on_CrimsoBlack.png"
+        "M100853866_SH2FDC_Built_by_DTFN_on_CrimsoBlack.png",
+        "M100085023_SH2FDC_Full_Front_DTF_on_Black.png",
+        "M100085284_SHHODC_Hover_DTF_on_Black.png"
       ],
       "images": [
         "M100066812_SDARMC_Aristotle_DTF_on_Crimson.png",
@@ -39,8 +41,6 @@
         "M100082512_SHRIDC_Rise_DTF_on_Crimson.png",
         "M100083212_SDRENC_Renown_DTF_Crimson_or_Black.png",
         "M100084780_SHLJOB_Love_Jones_DTF_on_Black.png",
-        "M100085023_SH2FDC_Full_Front_DTF_on_Black.png",
-        "M100085284_SHHODC_Hover_DTF_on_Black.png",
         "M100108378_SDLOCK_Neutral_Locke_DTF_on_Black.png",
         "M100113956_SDSOCR_Socrates_DTF_on_Black.png",
         "M100114591_SH2FDW_Custom_DTF_Crimson.png",
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "name": "Tshirts (Women)",
+      "name": "Ladies Tops",
       "path": "tshirt/women",
       "hasShirtVersions": true,
       "shirtVersions": [
@@ -103,7 +103,7 @@
       ]
     },
     {
-      "name": "Flannels",
+      "name": "Flannel Pajama Pants",
       "path": "flannels",
       "hasSizeOptions": true,
       "images": [
@@ -112,7 +112,7 @@
       ]
     },
     {
-      "name": "Pants",
+      "name": "Sweatpants & Joggers",
       "path": "pants",
       "hasPantOptions": true,
       "pantStyles": [

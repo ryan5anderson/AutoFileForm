@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
-import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts } from '../utils/index';
+import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts, calculateTotalItems } from '../utils/index';
+import { orderStorage } from '../../services/orderStorage';
 import { sendOrderEmail } from '../../services/emailService';
 
 export const useOrderForm = (categories: Category[]) => {
@@ -254,6 +255,22 @@ export const useOrderForm = (categories: Category[]) => {
     try {
       const templateParams = createTemplateParams(formData, categories);
       await sendOrderEmail(templateParams);
+      
+      // Store order in admin system
+      if (college) {
+        const totalItems = calculateTotalItems(formData);
+
+        orderStorage.addOrder({
+          college: college,
+          storeNumber: formData.storeNumber,
+          storeManager: formData.storeManager,
+          date: formData.date,
+          status: 'pending',
+          totalItems: totalItems,
+          orderNotes: formData.orderNotes,
+        });
+      }
+      
       setPage('receipt');
       // Navigate to receipt URL
       if (college) {
