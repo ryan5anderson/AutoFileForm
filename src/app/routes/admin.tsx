@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { orderStorage, Order } from '../../services/orderStorage';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    location.state?.isAuthenticated || false
+  );
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
@@ -21,6 +24,17 @@ const AdminPage: React.FC = () => {
     if (isAuthenticated) {
       loadOrders();
       loadStats();
+    }
+  }, [isAuthenticated]);
+
+  // Set up real-time subscription for orders
+  useEffect(() => {
+    if (isAuthenticated) {
+      const unsubscribe = firebaseOrderService.subscribeToRecentOrders(10, (orders) => {
+        setOrders(orders);
+      });
+
+      return () => unsubscribe();
     }
   }, [isAuthenticated]);
 
@@ -41,34 +55,34 @@ const AdminPage: React.FC = () => {
     };
   }, []);
 
-  const loadOrders = () => {
-    const recentOrders = orderStorage.getRecentOrders(10);
+  const loadOrders = async () => {
+    const recentOrders = await firebaseOrderService.getRecentOrders(10);
     setOrders(recentOrders);
   };
 
-  const loadStats = () => {
-    const stats = orderStorage.getOrderStats();
+  const loadStats = async () => {
+    const stats = await firebaseOrderService.getOrderStats();
     setOrderStats(stats);
   };
 
-  const handleStatusChange = (orderId: string, newStatus: Order['status']) => {
-    if (orderStorage.updateOrderStatus(orderId, newStatus)) {
+  const handleStatusChange = async (orderId: string, newStatus: Order['status']) => {
+    if (await firebaseOrderService.updateOrderStatus(orderId, newStatus)) {
       loadOrders();
       loadStats();
     }
   };
 
-  const handleDeleteOrder = (orderId: string) => {
+  const handleDeleteOrder = async (orderId: string) => {
     if (window.confirm('Are you sure you want to delete this order?')) {
-      if (orderStorage.deleteOrder(orderId)) {
+      if (await firebaseOrderService.deleteOrder(orderId)) {
         loadOrders();
         loadStats();
       }
     }
   };
 
-  const addTestOrder = () => {
-    const testOrder = orderStorage.addOrder({
+  const addTestOrder = async () => {
+    const testOrder = await firebaseOrderService.addOrder({
       college: 'Alabama University',
       storeNumber: '001',
       storeManager: 'John Smith',
@@ -380,7 +394,10 @@ const AdminPage: React.FC = () => {
                 <span className="action-icon">🧪</span>
                 <span>Add Test Order</span>
               </button>
-              <button className="admin-action-button">
+              <button 
+                className="admin-action-button"
+                onClick={() => navigate('/all-orders')}
+              >
                 <span className="action-icon">📋</span>
                 <span>View All Orders</span>
               </button>
