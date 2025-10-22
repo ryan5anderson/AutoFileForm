@@ -37,11 +37,9 @@
         "M100068897_SDNIET_Nietzsche_DTF_on_Crimson.png",
         "M100069466_SDFREG_Frege_DTF_on_Black.png",
         "M100082157_SH2FDS_Neutral_DTF_on_SteelWhite.png",
-        "M100082210_SH2FDS_Full_Custom_DTFN_SteelWhite.png",
         "M100082512_SHRIDC_Rise_DTF_on_Crimson.png",
         "M100083212_SDRENC_Renown_DTF_Crimson_or_Black.png",
         "M100084780_SHLJOB_Love_Jones_DTF_on_Black.png",
-        "M100108378_SDLOCK_Neutral_Locke_DTF_on_Black.png",
         "M100113956_SDSOCR_Socrates_DTF_on_Black.png",
         "M100114591_SH2FDW_Custom_DTF_Crimson.png",
         "M100114845_SH2FDS_Full_Front_DTF_on_SteelWhite.png",
@@ -51,10 +49,7 @@
         "M101003169_SH2FDC_Crimson_A_DTFon_Black.png",
         "M101457413_CM7031_Custom_LC_FZ_Steel_Hood.png",
         "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Stee.png",
-        "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
-        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png",
-        "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
-        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png"
+        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png"
       ]
     },
     {
@@ -71,7 +66,9 @@
         "M100109716_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png",
         "M100110295_SDMULS_Jr_Multipler_DTF_on_Steel.png",
         "M100133741_SH2FDS_Jr_Full_Front_DTF_on_SteelWhite.png",
-        "M101003278_SH2FDC_Jr_Crimson_A_DTF_on_Black.png"
+        "M101003278_SH2FDC_Jr_Crimson_A_DTF_on_Black.png",
+        "M100082210_SH2FDS_Full_Custom_DTFN_SteelWhite.png",
+        "M100108378_SDLOCK_Neutral_Locke_DTF_on_Black.png"
       ]
     },
     {
@@ -89,6 +86,15 @@
       "images": [
         "M100121025_SHE1CB_Custom_GrayWhite_Beanie.png",
         "M100908250_SHE1CB_Crimson_A_Black_Beanie.png"
+      ]
+    },
+    {
+      "name": "Infant",
+      "path": "tshirt/men",
+      "images": [
+        "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
+        "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
+        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png"
       ]
     },
     {

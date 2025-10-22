@@ -66,6 +66,8 @@ export const SPECIAL_PACK_SIZES: { [key: string]: number } = {
   'applique': 6,
   'tie-dye': 8,
   'fleece': 6,
+  'infant': 6,
+  'onsie': 6,
 };
 
 /**
@@ -83,6 +85,7 @@ export const getPackSize = (categoryPath: string, version?: string, productName?
     if (lowerName.includes('tie-dye') || lowerName.includes('tie dye')) return SPECIAL_PACK_SIZES['tie-dye'];
     if (lowerName.includes('fleece short')) return 4; // Fleece shorts are special case
     if (lowerName.includes('fleece zip') || lowerName.includes('fleece_zip')) return 6;
+    if (lowerName.includes('infant') || lowerName.includes('onsie')) return SPECIAL_PACK_SIZES['infant'];
   }
 
   const config = PACK_SIZES[categoryPath];
