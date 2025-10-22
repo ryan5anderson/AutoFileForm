@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Category } from '../../types';
 
 interface CollapsibleSidebarProps {
@@ -115,6 +116,25 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               )}
             </div>
           )}
+
+          {/* About Us & Contact Us Links */}
+          <Link
+            to="/about"
+            className="sidebar-nav-item sidebar-link"
+            onClick={onToggle}
+          >
+            <span className="nav-icon">ℹ️</span>
+            <span className="nav-text">About Us</span>
+          </Link>
+
+          <Link
+            to="/contact"
+            className="sidebar-nav-item sidebar-link"
+            onClick={onToggle}
+          >
+            <span className="nav-icon">📧</span>
+            <span className="nav-text">Contact Us</span>
+          </Link>
         </nav>
 
         <style>{`
@@ -224,6 +244,10 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           .sidebar-nav-item.back-button:hover {
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: white;
+          }
+
+          .sidebar-link {
+            text-decoration: none;
           }
 
           .dropdown-toggle {

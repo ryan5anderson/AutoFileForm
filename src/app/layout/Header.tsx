@@ -61,11 +61,19 @@ const Header: React.FC<HeaderProps> = ({
         <img src={asset('logo/opi-logo-no-bg.png')} alt="Ohiopyle Prints" style={{ height: 28, width: 'auto' }} />
       </div>
 
-      {/* Right: Nav links */}
+      {/* Right: Nav links - Hidden on mobile */}
       <nav aria-label="Primary" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Link to="/about" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>About Us</Link>
-        <Link to="/contact" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>Contact Us</Link>
+        <Link to="/about" className="desktop-nav-link" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>About Us</Link>
+        <Link to="/contact" className="desktop-nav-link" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>Contact Us</Link>
       </nav>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav-link {
+            display: none !important;
+          }
+        }
+      `}</style>
     </header>
   );
 };

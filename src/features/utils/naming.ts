@@ -13,6 +13,37 @@ export const getProductName = (imageName: string): string => {
   return baseName;
 };
 
+// Get display name for user-facing pages (removes product ID and codes)
+// Example: "M102073197_SDCAVC_Cavalier_DTF_on_Maroon" -> "Cavalier DTF on Maroon"
+export const getDisplayProductName = (imageName: string): string => {
+  const baseName = imageName.replace(/\.(png|jpg)$/, '');
+
+  // Custom display names for specific sweatpant items (with ID/codes removed)
+  const sweatpantDisplayMapping: Record<string, string> = {
+    'M100447223 SHVSCD Value DTF Gray Pants Jogger.png': 'Value DTF Gray Pants',
+    'M100446293 SHPSDS Shake it DTF Gray Pants Jogger.png': 'Shake it DTF Gray Pants',
+    'M100448649 SHFDDS Force Down DTF Gray Pants Straight-Leg.png': 'Force Down DTF Gray Pants',
+  };
+
+  if (sweatpantDisplayMapping[imageName]) return sweatpantDisplayMapping[imageName];
+
+  // Step 1: Find the second underscore and remove everything before it (including the second underscore)
+  const firstUnderscoreIndex = baseName.indexOf('_');
+  if (firstUnderscoreIndex !== -1) {
+    const secondUnderscoreIndex = baseName.indexOf('_', firstUnderscoreIndex + 1);
+    if (secondUnderscoreIndex !== -1) {
+      // Remove everything up to and including the second underscore
+      const afterSecondUnderscore = baseName.substring(secondUnderscoreIndex + 1);
+      // Step 2: Replace remaining underscores with spaces
+      const cleanedName = afterSecondUnderscore.replace(/_/g, ' ').trim();
+      return cleanedName || baseName;
+    }
+  }
+
+  // Fallback: just replace underscores with spaces if pattern doesn't match
+  return baseName.replace(/_/g, ' ').trim();
+};
+
 export const getRackDisplayName = (imageName: string): string => {
   // Map rack image names to display names
   const rackDisplayMapping: Record<string, string> = {
@@ -21,7 +52,14 @@ export const getRackDisplayName = (imageName: string): string => {
     'Michigan_State_University_Tier2_Display_Floor_500px.jpg': 'Michigan State University Floor Display'
   };
   
-  return rackDisplayMapping[imageName] || getProductName(imageName);
+  // If we have a custom mapping, use it
+  if (rackDisplayMapping[imageName]) {
+    return rackDisplayMapping[imageName];
+  }
+  
+  // Otherwise, just replace underscores with spaces
+  const baseName = imageName.replace(/\.(png|jpg)$/, '');
+  return baseName.replace(/_/g, ' ').trim();
 };
 
 export const getVersionDisplayName = (version: string, imageName?: string): string => {

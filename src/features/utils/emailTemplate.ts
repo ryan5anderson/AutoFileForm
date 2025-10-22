@@ -23,7 +23,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
         // For shirt categories, check for color-based size counts first, then regular size counts
         const colorSizeCountsByVersion = formData.shirtColorSizeCounts?.[imagePath];
         const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
-        const filteredVersions = getFilteredShirtVersions(img, cat.shirtVersions);
+        const filteredVersions = getFilteredShirtVersions(img, cat.shirtVersions, cat.tieDyeImages);
 
         // Check for color-based size counts first
         if (colorSizeCountsByVersion) {
@@ -33,24 +33,24 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           for (const version of filteredVersions) {
             const byColor = colorSizeCountsByVersion[version as keyof ShirtVersion];
             if (byColor) {
-              const colorBreakdown = Object.entries(byColor)
-                .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
-                .map(([colorName, counts]) => {
-                  if (!counts) return '';
-                  const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
-                  const sizePieces = sizeOrder
-                    .map(sz => {
-                      const val = counts[sz] || 0;
-                      return val > 0 ? `${sz}${val}` : '';
+                  const colorBreakdown = Object.entries(byColor)
+                    .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
+                    .map(([colorName, counts]) => {
+                      if (!counts) return '';
+                      const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+                      const formattedSizes = sizeOrder
+                        .map(sz => {
+                          const val = counts[sz] || 0;
+                          return val > 0 ? `${sz}: ${val}` : '';
+                        })
+                        .filter(Boolean)
+                        .join(', ');
+
+                      const totalForColor = Object.values(counts).reduce((a, b) => a + b, 0);
+                      return `${colorName}: ${totalForColor}${formattedSizes ? ` (${formattedSizes})` : ''}`;
                     })
                     .filter(Boolean)
-                    .join(' ');
-
-                  const totalForColor = Object.values(counts).reduce((a, b) => a + b, 0);
-                  return `${colorName}: ${totalForColor}${sizePieces ? ` (${sizePieces})` : ''}`;
-                })
-                .filter(Boolean)
-                .join(', ');
+                    .join(', ');
 
               if (colorBreakdown) {
                 const versionName = getVersionDisplayName(version, img);
@@ -58,7 +58,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
                   sum + Object.values(counts || {}).reduce((a, b) => a + b, 0), 0);
 
                 if (totalForVersion > 0) {
-                  combinedBreakdown.push(`${versionName}: ${totalForVersion} (${colorBreakdown})`);
+                  combinedBreakdown.push(`${versionName}: ${totalForVersion} ${colorBreakdown}`);
                 }
               }
             }
@@ -72,7 +72,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
 
             categoryItems.push({
               sku,
-              name: `${name} (${combinedBreakdown.join('; ')})`,
+              name: `${name} ${combinedBreakdown.join('; ')}`,
               qty: String(totalQty)
             });
           }
@@ -83,18 +83,18 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
             const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
             if (vTotal > 0) {
               const versionName = getVersionDisplayName(version, img);
-              // Build size detail like S7 M7 XL7
+              // Format sizes as "S: 1 M: 2 XL: 3" etc.
               const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
-              const sizePieces = counts ? sizeOrder
+              const formattedSizes = counts ? sizeOrder
                 .map(sz => {
                   const val = counts[sz] || 0;
-                  return val > 0 ? `${sz}${val}` : '';
+                  return val > 0 ? `${sz}: ${val}` : '';
                 })
                 .filter(Boolean)
-                .join(' ') : '';
+                .join(', ') : '';
               categoryItems.push({
                 sku,
-                name: `${name} (${versionName}${sizePieces ? ` - ${sizePieces}` : ''})`,
+                name: `${versionName}${formattedSizes ? ` ${formattedSizes}` : ''}`,
                 qty: String(vTotal),
                 version
               });
@@ -119,26 +119,29 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           const counts = sizeByVersion[version] as SizeCounts;
           const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
           if (vTotal > 0) {
-            // Build size detail like S7 M7 XL7
+            // Format sizes as "S: 1 M: 2 XL: 3" etc.
             const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
-            const sizePieces = counts ? sizeOrder
+            const formattedSizes = counts ? sizeOrder
               .map(sz => {
                 const val = counts[sz] || 0;
-                return val > 0 ? `${sz}${val}` : '';
+                return val > 0 ? `${sz}: ${val}` : '';
               })
               .filter(Boolean)
-              .join(' ') : '';
+              .join(', ') : '';
 
             // For shirt versions, use the standard labels
             let versionLabel = version;
             if (cat.hasShirtVersions) {
               const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
               versionLabel = labels[version as keyof typeof labels] || version;
+            } else {
+              // Remove category-specific words from version labels
+              versionLabel = version.replace(/(jacket|flannels|shorts|socks)/gi, '').trim();
             }
 
             categoryItems.push({
               sku,
-              name: `${name} (${versionLabel}${sizePieces ? ` - ${sizePieces}` : ''})`,
+              name: `${versionLabel}${formattedSizes ? ` ${formattedSizes}` : ''}`,
               qty: String(vTotal)
             });
           }
@@ -172,22 +175,22 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
           const processSizeCounts = (styleName: string, colorName: string, sizeCounts: any) => {
             if (!sizeCounts || typeof sizeCounts !== 'object') return;
 
-            // Build size detail like S7 M7 XL7
+            // Format sizes as "S: 1 M: 2 XL: 3" etc.
             const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
-            const sizePieces = sizeOrder
+            const formattedSizes = sizeOrder
               .map(sz => {
                 const val = sizeCounts[sz] || 0;
-                return val > 0 ? `${sz}${val}` : '';
+                return val > 0 ? `${sz}: ${val}` : '';
               })
               .filter(Boolean)
-              .join(' ');
+              .join(', ');
 
             const totalQty = Object.values(sizeCounts).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0);
 
             if (totalQty > 0) {
               categoryItems.push({
                 sku,
-                name: `${name} (${styleName} - ${colorName}${sizePieces ? ` - ${sizePieces}` : ''})`,
+                name: `${styleName} - ${colorName}${formattedSizes ? ` ${formattedSizes}` : ''}`,
                 qty: String(totalQty)
               });
             }
@@ -232,7 +235,7 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
         if (Number(quantity) > 0) {
           categoryItems.push({
             sku,
-            name,
+            name: name, // Repeat the product name as description
             qty: quantity
           });
 

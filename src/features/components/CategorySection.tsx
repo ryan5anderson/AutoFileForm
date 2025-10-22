@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts } from '../../types';
 import OrderSummaryCard from './OrderSummaryCard';
 import { Card } from '../../components/ui';
-import { getImagePath, getProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+import { getImagePath, getProductName, getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 
 interface CategorySectionProps {
@@ -330,7 +330,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 onClick={handleCardClick}
               >
                 <h3 className="card__title">
-                  {category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img)}
+                  {category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img)}
                 </h3>
 
                 <div className="card__image-container">
@@ -343,7 +343,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
                 {!readOnly && (
                   <p className="card__action-text">
-                    Tap to configure options
+                    Tap to select options
                   </p>
                 )}
 
