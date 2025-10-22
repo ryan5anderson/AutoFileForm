@@ -21,10 +21,6 @@ const AboutPage: React.FC = () => {
             This form supports multiple colleges, simplifies product selection, and ensures accuracy from store to production.
             Orders are grouped by product to make it easy to review and submit.
           </p>
-          <h3>Packs of 7</h3>
-          <p>
-            Many garments are ordered in packs of 7 to optimize printing and inventory. The form guides you to valid pack totals.
-          </p>
         </div>
       </main>
       <Footer />

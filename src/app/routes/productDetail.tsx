@@ -314,7 +314,6 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
           
           <div className="product-detail-image-section">
-            <h1 className="product-detail-name">{productName}</h1>
             <div className="product-detail-image-container">
               <img
                 src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
@@ -326,6 +325,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         </div>
 
         <div className="product-detail-right-section">
+          <h1 className="product-detail-title">{productName}</h1>
           <div className="product-detail-options-section">
             <div className="product-detail-options-header">
               <h3>Configure Options</h3>
