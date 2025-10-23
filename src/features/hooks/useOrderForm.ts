@@ -1,8 +1,134 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
-import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts } from '../utils/index';
+import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts, calculateTotalItems } from '../utils/index';
+import { firebaseOrderService, OrderProduct } from '../../services/firebaseOrderService';
 import { sendOrderEmail } from '../../services/emailService';
+
+// Convert FormData to OrderProduct array for detailed product display
+const convertFormDataToProducts = (formData: FormData, categories: Category[]): OrderProduct[] => {
+  const products: OrderProduct[] = [];
+  
+  if (!formData || !categories.length) return products;
+
+  categories.forEach(category => {
+    category.images.forEach((img: string) => {
+      const imagePath = `${category.path}/${img}`;
+      const productName = img.replace(/\.(png|jpg|jpeg)$/i, '').replace(/_/g, ' ');
+      
+      // Check for different types of product data
+      let hasData = false;
+      let quantities: { [key: string]: number } = {};
+      let totalQuantity = 0;
+
+      // Simple quantities
+      if (formData.quantities && formData.quantities[imagePath]) {
+        const qty = Number(formData.quantities[imagePath]);
+        if (qty > 0) {
+          quantities['Total'] = qty;
+          totalQuantity = qty;
+          hasData = true;
+        }
+      }
+
+      // Shirt size counts
+      if (formData.shirtSizeCounts && formData.shirtSizeCounts[imagePath]) {
+        const sizeCounts = formData.shirtSizeCounts[imagePath];
+        Object.entries(sizeCounts).forEach(([version, sizes]) => {
+          if (sizes && typeof sizes === 'object') {
+            Object.entries(sizes as any).forEach(([size, qty]) => {
+              const quantity = Number(qty);
+              if (quantity > 0) {
+                quantities[size] = (quantities[size] || 0) + quantity;
+                totalQuantity += quantity;
+                hasData = true;
+              }
+            });
+          }
+        });
+      }
+
+      // Display options
+      if (formData.displayOptions && formData.displayOptions[imagePath]) {
+        const displayOption = formData.displayOptions[imagePath];
+        const displayOnly = Number(displayOption.displayOnly || 0);
+        const displayStandard = Number(displayOption.displayStandardCasePack || 0);
+        
+        if (displayOnly > 0) {
+          quantities['Display Only'] = displayOnly;
+          totalQuantity += displayOnly;
+          hasData = true;
+        }
+        if (displayStandard > 0) {
+          quantities['Display Standard'] = displayStandard;
+          totalQuantity += displayStandard;
+          hasData = true;
+        }
+      }
+
+      // Sweatpant/Jogger options
+      if (formData.sweatpantJoggerOptions && formData.sweatpantJoggerOptions[imagePath]) {
+        const sjOptions = formData.sweatpantJoggerOptions[imagePath];
+        Object.entries(sjOptions).forEach(([option, qty]) => {
+          const quantity = Number(qty);
+          if (quantity > 0) {
+            quantities[option.replace(/([A-Z])/g, ' $1').trim()] = quantity;
+            totalQuantity += quantity;
+            hasData = true;
+          }
+        });
+      }
+
+      // Pant options
+      if (formData.pantOptions && formData.pantOptions[imagePath]) {
+        const pantOptions = formData.pantOptions[imagePath];
+        Object.entries(pantOptions).forEach(([style, colors]) => {
+          if (colors && typeof colors === 'object') {
+            Object.entries(colors as any).forEach(([color, sizes]) => {
+              if (sizes && typeof sizes === 'object') {
+                Object.entries(sizes as any).forEach(([size, qty]) => {
+                  const quantity = Number(qty);
+                  if (quantity > 0) {
+                    const key = `${style} ${color} ${size}`;
+                    quantities[key] = (quantities[key] || 0) + quantity;
+                    totalQuantity += quantity;
+                    hasData = true;
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+
+      // Color options
+      if (formData.colorOptions && formData.colorOptions[imagePath]) {
+        const colorOptions = formData.colorOptions[imagePath];
+        Object.entries(colorOptions).forEach(([color, qty]) => {
+          const quantity = Number(qty);
+          if (quantity > 0) {
+            quantities[color] = (quantities[color] || 0) + quantity;
+            totalQuantity += quantity;
+            hasData = true;
+          }
+        });
+      }
+
+      if (hasData) {
+        products.push({
+          category: category.name,
+          productName,
+          imagePath,
+          quantities,
+          totalQuantity,
+          sku: `SKU-${img.replace(/\.(png|jpg|jpeg)$/i, '').toUpperCase()}`
+        });
+      }
+    });
+  });
+
+  return products;
+};
 
 export const useOrderForm = (categories: Category[]) => {
   // Store categories for validation
@@ -254,6 +380,25 @@ export const useOrderForm = (categories: Category[]) => {
     try {
       const templateParams = createTemplateParams(formData, categories);
       await sendOrderEmail(templateParams);
+      
+      // Store order in admin system
+      if (college) {
+        const totalItems = calculateTotalItems(formData);
+        const products = convertFormDataToProducts(formData, categories);
+
+        await firebaseOrderService.addOrder({
+          college: college,
+          storeNumber: formData.storeNumber,
+          storeManager: formData.storeManager,
+          date: formData.date,
+          status: 'pending',
+          totalItems: totalItems,
+          orderNotes: formData.orderNotes,
+          products: products,
+          formData: formData, // Store complete form data for detailed receipt generation
+        });
+      }
+      
       setPage('receipt');
       // Navigate to receipt URL
       if (college) {

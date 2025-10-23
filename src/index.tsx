@@ -5,6 +5,8 @@ import CollegeSelector from './components/CollegeSelector';
 import CollegeRouteWrapper from './components/CollegeRouteWrapper';
 import AboutPage from './app/routes/about';
 import ContactPage from './app/routes/contact';
+import AdminPage from './app/routes/admin';
+import AllOrdersPage from './app/routes/allOrders';
 import Header from './app/layout/Header';
 import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
 import { colleges } from './config';
@@ -59,7 +61,7 @@ function AppShell() {
 
   // Avoid rendering global sidebar on the form root where the page has its own sidebar
   const segments = location.pathname.split('/').filter(Boolean);
-  const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact');
+  const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact' || segments[0] === 'admin' || segments[0] === 'all-orders');
   
   // Determine if we should show categories in sidebar
   const shouldShowCategories = React.useMemo(() => {
@@ -84,6 +86,8 @@ function AppShell() {
         <Route path='/' element={<CollegeSelector />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
+        <Route path='/admin' element={<AdminPage />} />
+        <Route path='/all-orders' element={<AllOrdersPage />} />
         <Route path='/:college/*' element={<CollegeRouteWrapper />} />
       </Routes>
     </>

@@ -617,3 +617,93 @@ export function getSizeOptions(categoryPath: string, version?: string): Size[] {
   // Default sizes for all other items (including women's t-shirts)
   return ['S', 'M', 'L', 'XL', 'XXL'];
 }
+
+/**
+ * Calculate the total number of items from all quantity sources in form data
+ * @param formData - The form data containing all product selections
+ * @returns The total number of items across all products and quantity types
+ */
+export const calculateTotalItems = (formData: FormData): number => {
+  let total = 0;
+
+  // Count simple quantities (for products like bottles, stickers, etc.)
+  Object.values(formData.quantities || {}).forEach(qty => {
+    total += parseInt(qty) || 0;
+  });
+
+  // Count shirt size counts
+  Object.values(formData.shirtSizeCounts || {}).forEach(versionCounts => {
+    if (versionCounts) {
+      Object.values(versionCounts).forEach(counts => {
+        if (counts) {
+          total += Object.values(counts).reduce((sum, count) => sum + count, 0);
+        }
+      });
+    }
+  });
+
+  // Count color options
+  Object.values(formData.colorOptions || {}).forEach(colorOption => {
+    if (colorOption) {
+      Object.values(colorOption).forEach(qty => {
+        total += parseInt(qty) || 0;
+      });
+    }
+  });
+
+  // Count shirt color size counts
+  Object.values(formData.shirtColorSizeCounts || {}).forEach(versionData => {
+    if (versionData) {
+      Object.values(versionData).forEach(colorData => {
+        if (colorData) {
+          Object.values(colorData).forEach(counts => {
+            if (counts) {
+              total += Object.values(counts).reduce((sum, count) => sum + count, 0);
+            }
+          });
+        }
+      });
+    }
+  });
+
+  // Count pant options (sweatpants and joggers)
+  Object.values(formData.pantOptions || {}).forEach(pantOption => {
+    if (pantOption) {
+      // Count sweatpants
+      if (pantOption.sweatpants) {
+        Object.values(pantOption.sweatpants).forEach(counts => {
+          if (counts) {
+            total += Object.values(counts).reduce((sum, count) => sum + count, 0);
+          }
+        });
+      }
+      // Count joggers
+      if (pantOption.joggers) {
+        Object.values(pantOption.joggers).forEach(counts => {
+          if (counts) {
+            total += Object.values(counts).reduce((sum, count) => sum + count, 0);
+          }
+        });
+      }
+    }
+  });
+
+  // Count sweatpant/jogger options (dropdown selections)
+  Object.values(formData.sweatpantJoggerOptions || {}).forEach(option => {
+    if (option) {
+      Object.values(option).forEach(value => {
+        total += parseInt(value) || 0;
+      });
+    }
+  });
+
+  // Count display options
+  Object.values(formData.displayOptions || {}).forEach(displayOption => {
+    if (displayOption) {
+      total += parseInt(displayOption.displayOnly || '0') || 0;
+      total += parseInt(displayOption.displayStandardCasePack || '0') || 0;
+    }
+  });
+
+  return total;
+};

@@ -15,7 +15,7 @@
       ]
     },
     {
-      "name": "Tshirts (Unisex)",
+      "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
       "path": "tshirt/men",
       "hasShirtVersions": true,
       "shirtVersions": [
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "name": "Tshirts (Women)",
+      "name": "Ladies Tops",
       "path": "tshirt/women",
       "hasShirtVersions": true,
       "shirtVersions": [
@@ -121,7 +121,7 @@
       ]
     },
     {
-      "name": "Pants",
+      "name": "Sweatpants & Joggers",
       "path": "pants",
       "hasPantOptions": true,
       "pantStyles": [
@@ -157,7 +157,7 @@
       ]
     },
     {
-      "name": "Flannels",
+      "name": "Flannel Pajama Pants",
       "path": "flannels",
       "hasSizeOptions": true,
       "images": [
