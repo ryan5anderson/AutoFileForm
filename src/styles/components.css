@@ -480,13 +480,14 @@
   font-weight: 600;
   width: 100%;
   max-width: 100%;
-  min-width: 0;
-  padding: 0;
+  min-width: 35px;
+  padding: 0.125rem 0.25rem;
   margin: 0;
   box-sizing: border-box;
+  color: var(--color-text);
   /* Desktop sizes */
-  height: 2rem;
-  font-size: 0.95rem;
+  height: 1.75rem;
+  font-size: 0.875rem;
 }
 
 .size-pack__input:focus {

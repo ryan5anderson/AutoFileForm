@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
+import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
 import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts, calculateTotalItems } from '../utils/index';
 import { firebaseOrderService, OrderProduct } from '../../services/firebaseOrderService';
 import { sendOrderEmail } from '../../services/emailService';
@@ -319,6 +319,16 @@ export const useOrderForm = (categories: Category[]) => {
     }));
   };
 
+  const handleInfantSizeCountsChange = (imagePath: string, counts: InfantSizeCounts) => {
+    setFormData((prev: FormData) => ({
+      ...prev,
+      infantSizeCounts: {
+        ...prev.infantSizeCounts,
+        [imagePath]: counts
+      }
+    }));
+  };
+
 
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -428,6 +438,7 @@ export const useOrderForm = (categories: Category[]) => {
     handlePantOptionChange,
     handleColorOptionChange,
     handleShirtColorSizeCountsChange,
+    handleInfantSizeCountsChange,
     handleFormSubmit,
     handleBack,
     handleBackToSummary,
