@@ -215,8 +215,8 @@ def categorize_image(caption: str) -> str:
     Rules applied in order (first match wins):
     1. Beanie → beanie/
     2. Bottle → bottle/
-    3. header → card/
-    4. card → card/
+    3. header → signage/
+    4. card → signage/
     5. hat → hat/
     6. flannels → flannels/
     7. plush → plush/
@@ -240,11 +240,11 @@ def categorize_image(caption: str) -> str:
         return "beanie"
     if "bottle" in caption_lower:
         return "bottle"
-    # header → card (must come before card)
+    # header → signage (must come before card)
     if "header" in caption_lower:
-        return "card"
+        return "signage"
     if "card" in caption_lower:
-        return "card"
+        return "signage"
     if "hat" in caption_lower:
         return "hat"
     if "flannels" in caption_lower:

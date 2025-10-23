@@ -163,7 +163,7 @@
     },
     {
       "name": "Signage",
-      "path": "card",
+      "path": "signage",
       "images": [
         "M100327125_SHWGCS_Spinner_Header_Card.png",
         "M100330026_SHWGCH_PFD_Header_Card.png"
