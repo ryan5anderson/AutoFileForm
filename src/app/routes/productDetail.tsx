@@ -7,7 +7,7 @@ import SizePackSelector from '../../features/components/panels/SizePackSelector'
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
-import { getProductName, getDisplayProductName, getRackDisplayName, getImagePath, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
+import { getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
 import '../../styles/product-detail.css';
@@ -77,7 +77,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     );
   }
 
-  const imagePath = getImagePath(category.path, imageName);
+  const imagePath = `${category.path}/${imageName}`;
   const productName = category.name === 'Display Options'
     ? getRackDisplayName(imageName)
     : getDisplayProductName(imageName);

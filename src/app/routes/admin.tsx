@@ -82,7 +82,7 @@ const AdminPage: React.FC = () => {
   };
 
   const addTestOrder = async () => {
-    const testOrder = await firebaseOrderService.addOrder({
+    await firebaseOrderService.addOrder({
       college: 'Alabama University',
       storeNumber: '001',
       storeManager: 'John Smith',

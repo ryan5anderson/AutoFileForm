@@ -1,6 +1,6 @@
 import React from 'react';
 import { DisplayOption } from '../../../types';
-import { getImagePath, getRackDisplayName } from '../../utils';
+import { getRackDisplayName } from '../../utils';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
 import QuantityStepper from './QuantityStepper';
 
@@ -25,7 +25,7 @@ const DisplayOptionCard: React.FC<DisplayOptionCardProps> = ({
   college,
   activeOption = 'displayOnly'
 }) => {
-  const imagePath = getImagePath(categoryPath, imageName);
+  const imagePath = `${categoryPath}/${imageName}`;
   const productName = getRackDisplayName(imageName);
 
   const handleOptionChange = (option: keyof DisplayOption, value: string) => {

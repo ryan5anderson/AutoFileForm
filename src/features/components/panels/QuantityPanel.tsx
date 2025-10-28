@@ -1,5 +1,5 @@
 import React from 'react';
-import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../../utils';
+import { getProductName, getRackDisplayName, getQuantityMultiples } from '../../utils';
 import { SweatpantJoggerOption } from '../../../types';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
 import { getPackSize } from '../../../config/packSizes';
@@ -32,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   hideImage = false,
   college
 }) => {
-  const imagePath = getImagePath(categoryPath, imageName);
+  const imagePath = `${categoryPath}/${imageName}`;
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
   const packSize = getPackSize(categoryPath, undefined, imageName);
 

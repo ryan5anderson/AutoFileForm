@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { FormData, Category, ShirtVersion, SizeCounts } from '../../types';
 import { colleges } from '../../config';
-import { getProductName, getImagePath, getVersionDisplayName, getRackToCardMapping, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
+import { getProductName, getVersionDisplayName, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 import { useOrderForm } from '../../features/hooks';
@@ -52,52 +52,10 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
   if (!collegeConfig && !propCategories) {
     return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>College not found</div>;
   }
-  // Generate auto-added cards based on rack selections
-  const generateAutoAddedCards = () => {
-    const rackToCardMapping = getRackToCardMapping();
-    const autoAddedCards: { sku: string; name: string; qty: number }[] = [];
-
-    // Find the rack category
-    const rackCategory = categories.find((cat: Category) => cat.name === 'Display Options');
-    if (rackCategory) {
-      rackCategory.images.forEach((img: string) => {
-        const imagePath = getImagePath(rackCategory.path, img);
-        const quantity = formData.quantities[imagePath] || '0';
-        
-        if (Number(quantity) > 0) {
-          const cardMapping = rackToCardMapping[imagePath];
-          if (cardMapping) {
-            // Add the card for each quantity of the rack item
-            for (let i = 0; i < Number(quantity); i++) {
-              autoAddedCards.push({
-                sku: cardMapping.sku,
-                name: cardMapping.name,
-                qty: 1
-              });
-            }
-          }
-        }
-      });
-    }
-
-    // Group cards by SKU and sum quantities
-    const groupedCards: Record<string, { sku: string; name: string; qty: number }> = {};
-    autoAddedCards.forEach(card => {
-      if (groupedCards[card.sku]) {
-        groupedCards[card.sku].qty += card.qty;
-      } else {
-        groupedCards[card.sku] = { ...card };
-      }
-    });
-
-    return Object.values(groupedCards);
-  };
 
   const handlePrintReceipt = () => {
     window.print();
   };
-
-  const autoAddedCards = generateAutoAddedCards();
 
   return (
     <div style={{ 
@@ -168,7 +126,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
           }).filter(category => {
             // Check if any image in the category has a nonzero quantity or selection
             return category.images.some(img => {
-              const imagePath = getImagePath(category.path, img);
+              const imagePath = `${category.path}/${img}`;
               // Display Options
               if (category.hasDisplayOptions) {
                 const displayOption = formData.displayOptions?.[imagePath];
@@ -221,7 +179,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 {category.name}
               </div>
               {category.images.map((img) => {
-                const imagePath = getImagePath(category.path, img);
+                const imagePath = `${category.path}/${img}`;
                 const productName = category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img);
                 // Handle Display Options
                 if (category.hasDisplayOptions) {
@@ -649,38 +607,6 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               })}
             </div>
           ))}
-
-          {/* Auto-Added Cards Section */}
-          {autoAddedCards.length > 0 && (
-            <div style={{ 
-              marginTop: 'var(--space-4)',
-              paddingTop: 'var(--space-4)',
-              borderTop: '1px solid var(--color-border)'
-            }}>
-              <div style={{ 
-                fontWeight: '600', 
-                fontSize: '1.125rem',
-                borderBottom: '2px solid var(--color-primary)', 
-                marginBottom: 'var(--space-3)',
-                paddingBottom: 'var(--space-2)',
-                color: 'var(--color-primary)'
-              }}>
-                Auto-Added Cards
-              </div>
-              {autoAddedCards.map((card, index) => (
-                <div key={index} style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  padding: 'var(--space-2) 0', 
-                  fontSize: '1rem',
-                  borderBottom: '1px solid var(--color-border)'
-                }}>
-                  <span style={{ fontWeight: '500' }}>{card.name}</span>
-                  <span style={{ fontWeight: '600', color: 'var(--color-primary)' }}>Qty: {card.qty}</span>
-                </div>
-              ))}
-            </div>
-          )}
 
           {formData.orderNotes && (
             <div style={{ 

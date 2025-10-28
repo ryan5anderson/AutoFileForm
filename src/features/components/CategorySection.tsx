@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts } from '../../types';
 import OrderSummaryCard from './OrderSummaryCard';
 import { Card } from '../../components/ui';
-import { getImagePath, getProductName, getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 
 interface CategorySectionProps {
@@ -196,7 +196,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   // Filter images to only show those with quantities in read-only mode
   const filteredImages = category.images.filter((img: string) => {
     if (!readOnly) return true; // Show all items in form mode
-    const imagePath = getImagePath(category.path, img);
+    const imagePath = `${category.path}/${img}`;
     return hasQuantity(imagePath, img);
   });
 
@@ -234,7 +234,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       )}
       <div className="section__grid" style={{ alignItems: 'start' }}>
         {filteredImages.map((img: string) => {
-          const imagePath = getImagePath(category.path, img);
+          const imagePath = `${category.path}/${img}`;
           
           const handleCardClick = () => {
             if (!readOnly) {

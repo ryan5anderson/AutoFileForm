@@ -1,14 +1,11 @@
 import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion, SizeCounts } from '../../types';
 import { PROVIDER_EMAIL } from '../../constants';
-import { getRackToCardMapping } from './imagePath';
 import { getVersionDisplayName } from './naming';
 import { calculateTotalUnits } from './calculations';
 import { getFilteredShirtVersions } from './index';
 
 export const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {
   const emailCategories: EmailCategory[] = [];
-  const rackToCardMapping = getRackToCardMapping();
-  const autoAddedCards: EmailItem[] = [];
 
   // Process regular categories
   categories.forEach((cat: Category) => {
@@ -238,21 +235,6 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
             name: name, // Repeat the product name as description
             qty: quantity
           });
-
-          // If this is a rack item, add corresponding cards
-          if (cat.name === 'Display Options') {
-            const cardMapping = rackToCardMapping[imagePath];
-            if (cardMapping) {
-              // Add the card for each quantity of the rack item
-              for (let i = 0; i < Number(quantity); i++) {
-                autoAddedCards.push({
-                  sku: cardMapping.sku,
-                  name: cardMapping.name,
-                  qty: '1'
-                });
-              }
-            }
-          }
         }
       }
     });
@@ -264,27 +246,6 @@ export const createEmailCategories = (formData: FormData, categories: Category[]
       });
     }
   });
-
-  // Add auto-added cards as a separate category
-  if (autoAddedCards.length > 0) {
-    // Group cards by SKU and sum quantities
-    const groupedCards: Record<string, EmailItem> = {};
-    autoAddedCards.forEach(card => {
-      if (groupedCards[card.sku]) {
-        groupedCards[card.sku].qty = (Number(groupedCards[card.sku].qty) + Number(card.qty)).toString();
-      } else {
-        groupedCards[card.sku] = { ...card };
-      }
-    });
-
-    const autoAddedItems = Object.values(groupedCards);
-    if (autoAddedItems.length > 0) {
-      emailCategories.push({
-        category: 'Auto-Added Cards',
-        items: autoAddedItems
-      });
-    }
-  }
 
   return emailCategories;
 };

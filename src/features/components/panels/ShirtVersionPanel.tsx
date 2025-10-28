@@ -1,5 +1,5 @@
 import React from 'react';
-import { getProductName, getImagePath, getShirtVersionTotal, getVersionDisplayName, getSizeOptions } from '../../utils';
+import { getProductName, getShirtVersionTotal, getVersionDisplayName, getSizeOptions } from '../../utils';
 import { ShirtVersion, SizeCounts, Size } from '../../../types';
 import { Field } from '../../../components/ui';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
@@ -29,7 +29,7 @@ const ShirtVersionCard: React.FC<ShirtVersionCardProps> = ({
   hideImage = false,
   college
 }) => {
-  const imagePath = getImagePath(categoryPath, imageName);
+  const imagePath = `${categoryPath}/${imageName}`;
   const productName = getProductName(imageName);
   const totalQuantity = availableVersions.reduce((sum, v) => {
     const vc = sizeCountsByVersion[v as keyof ShirtVersion];

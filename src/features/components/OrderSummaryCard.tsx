@@ -1,5 +1,5 @@
 import React from 'react';
-import { getImagePath, hasColorOptions } from '../utils';
+import { hasColorOptions } from '../utils';
 import { ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, SizeCounts, Size, ShirtColorSizeCounts } from '../../types';
 
 interface OrderSummaryCardProps {
@@ -39,7 +39,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   hasSizeOptions = false,
   hasPantOptions = false
 }) => {
-  const imagePath = getImagePath(categoryPath, imageName);
+  const imagePath = `${categoryPath}/${imageName}`;
 
   const getQuantityInfo = () => {
     // Handle display options
