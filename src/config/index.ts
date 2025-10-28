@@ -20,4 +20,4 @@ export const colleges = {
   alabamauniversity: alabamaUniversity,
 };
 
-export type CollegeKey = keyof typeof colleges;
+// CollegeKey type removed - no external usage found

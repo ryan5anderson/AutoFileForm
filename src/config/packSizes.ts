@@ -3,11 +3,11 @@
  * This defines the minimum purchase quantity (pack size) for each category
  */
 
-export interface PackSizeConfig {
+interface PackSizeConfig {
   [categoryPath: string]: number | VersionPackSizes;
 }
 
-export interface VersionPackSizes {
+interface VersionPackSizes {
   tshirt?: number;
   longsleeve?: number;
   crewneck?: number;
@@ -23,7 +23,7 @@ export interface VersionPackSizes {
  * Pack sizes by category path and shirt version
  * You can customize these values as needed for your business requirements
  */
-export const PACK_SIZES: PackSizeConfig = {
+const PACK_SIZES: PackSizeConfig = {
   // T-Shirts (Unisex) - 6 or any quantity allowed for t-shirts and longsleeve
   'tshirt/men': {
     tshirt: 6,        // 6 or any quantity allowed
@@ -62,7 +62,7 @@ export const PACK_SIZES: PackSizeConfig = {
 /**
  * Pack sizes for special product types (detected by name)
  */
-export const SPECIAL_PACK_SIZES: { [key: string]: number } = {
+const SPECIAL_PACK_SIZES: { [key: string]: number } = {
   'applique': 6,
   'tie-dye': 8,
   'fleece': 6,
@@ -129,10 +129,5 @@ export const allowsAnyQuantity = (categoryPath: string, version?: string, produc
  * @param allowsAny - Whether any quantity is also allowed
  * @returns Formatted message for validation errors
  */
-export const getPackSizeMessage = (packSize: number, allowsAny = false): string => {
-  if (allowsAny) {
-    return `Please ensure all selected garment sizes total to multiples of ${packSize} or any quantity.`;
-  }
-  return `Please ensure all selected garment sizes total to multiples of ${packSize}.`;
-};
+// getPackSizeMessage removed - no external usage found
 

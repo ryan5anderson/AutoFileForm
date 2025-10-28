@@ -4,7 +4,7 @@ import { getVersionDisplayName } from './naming';
 import { calculateTotalUnits } from './calculations';
 import { getFilteredShirtVersions } from './index';
 
-export const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {
+const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {
   const emailCategories: EmailCategory[] = [];
 
   // Process regular categories

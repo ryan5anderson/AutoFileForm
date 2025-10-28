@@ -4,15 +4,9 @@
   "private": true,
   "homepage": "https://ohiopylecollege.com",
   "dependencies": {
-    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "classnames": "^2.5.1",
     "emailjs-com": "^3.2.0",
     "firebase": "^12.4.0",
     "react": "^19.1.0",
@@ -29,7 +23,9 @@
     "eject": "react-scripts eject",
     "deploy": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git push origin HEAD:gh-pages --force",
     "deploy:clean": "if exist build rmdir /s /q build && npm run build && gh-pages -d build -b gh-pages --cname ohiopylecollege.com --nojekyll",
-    "deploy:manual": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git subtree push --prefix build origin gh-pages"
+    "deploy:manual": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git subtree push --prefix build origin gh-pages",
+    "check:unused": "ts-prune",
+    "check:deps": "depcheck"
   },
   "eslintConfig": {
     "extends": [
@@ -50,6 +46,9 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
+    "depcheck": "^1.4.7",
+    "eslint-config-react-app": "^7.0.1",
+    "gh-pages": "^6.3.0",
+    "ts-prune": "^0.10.3"
   }
 }

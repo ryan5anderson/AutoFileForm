@@ -177,7 +177,7 @@ const getAllowsAnyQuantity = (categoryPath: string, version?: string, productNam
 };
 
 
-export interface ValidationResult {
+interface ValidationResult {
   isValid: boolean;
   errorMessage: string | null;
   invalidProductPaths: string[];
@@ -530,7 +530,7 @@ export const getShirtVersionTotal = (shirtVersions: ShirtVersion | undefined, av
   }, 0);
 };
 
-export type Totals = {
+type Totals = {
   total: number;
   packs: number;
   remainder: number;
