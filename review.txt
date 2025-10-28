@@ -1,0 +1,364 @@
+1) PROJECT SNAPSHOT
+- Framework/build tool: React 19.1.0 with Create React App (react-scripts 5.0.1)
+- TypeScript usage level: Full TypeScript with strict mode enabled
+- Key runtime deps with versions that impact app behavior or styling:
+  * react-router-dom: ^7.7.0 (routing)
+  * firebase: ^12.4.0 (database/orders)
+  * emailjs-com: ^3.2.0 (email service)
+  * zustand: ^5.0.6 (state management - imported but not used)
+  * classnames: ^2.5.1 (CSS class utilities)
+- Build artifacts and output size: Unknown (build/ directory present but size not analyzed)
+
+2) DIRECTORY HIERARCHY (src/)
+src/
+├── app/
+│   ├── layout/ (3 files) - UI layout components (Header, Footer, CollapsibleSidebar)
+│   └── routes/ (9 files) - Page components (about, admin, allOrders, contact, form, productDetail, receipt, summary, thankyou)
+├── components/ (7 files) - Shared UI components and wrappers
+│   └── ui/ (4 files) - Reusable UI primitives (ButtonIcon, Card, Field, index)
+├── config/ (8 files) - Configuration and college data
+│   └── colleges/ (5 files) - College-specific JSON configurations
+├── constants/ (1 file) - Application constants (EmailJS config)
+├── contexts/ (1 file) - React Context for order form state
+├── features/ (19 files) - Feature-specific components and logic
+│   ├── components/ (12 files) - Form components and panels
+│   │   └── panels/ (7 files) - Specialized input panels
+│   ├── hooks/ (2 files) - Custom React hooks
+│   └── utils/ (5 files) - Feature-specific utilities
+├── services/ (4 files) - External service integrations
+│   └── templates/ (1 file) - Email template
+├── styles/ (5 files) - CSS stylesheets
+├── types/ (1 file) - TypeScript type definitions
+└── utils/ (4 files) - Generic utility functions
+
+3) FILE INDEX AND ROLES
+
+src/index.tsx
+- Purpose: Application entry point with routing setup
+- Exports: None (renders AppShell component)
+- Primary imports: React Router, layout components, college config
+- Owner domain: App bootstrap
+- Notes: Uses HashRouter for GitHub Pages compatibility, complex sidebar logic
+
+src/types/index.ts
+- Purpose: Central type definitions for the application
+- Exports: Category, College, ShirtVersion, DisplayOption, PantOption, FormData, EmailCategory, etc.
+- Primary imports: None
+- Owner domain: Data modeling
+- Notes: Comprehensive type system with complex nested structures
+
+src/contexts/OrderFormContext.tsx
+- Purpose: React Context wrapper for order form state management
+- Exports: OrderFormProvider, useOrderFormContext
+- Primary imports: useOrderForm hook, types
+- Owner domain: State management
+- Notes: Thin wrapper around useOrderForm hook
+
+src/config/index.ts
+- Purpose: College configuration aggregation
+- Exports: colleges object, CollegeKey type
+- Primary imports: Individual college JSON files
+- Owner domain: Configuration
+- Notes: Type assertions for JSON imports, manual college key mapping
+
+src/features/hooks/useOrderForm.ts
+- Purpose: Core order form state management hook
+- Exports: useOrderForm hook
+- Primary imports: React hooks, validation utils, services
+- Owner domain: State management
+- Notes: 437 lines, complex state management with multiple quantity types
+
+src/services/emailService.ts
+- Purpose: Email sending service using EmailJS
+- Exports: sendOrderEmail function
+- Primary imports: emailjs-com, constants
+- Owner domain: External services
+- Notes: Environment-based template selection, @ts-ignore for emailjs import
+
+src/services/firebaseOrderService.ts
+- Purpose: Firebase Firestore operations for orders
+- Exports: firebaseOrderService instance, Order/OrderProduct interfaces
+- Primary imports: Firebase Firestore functions
+- Owner domain: Data persistence
+- Notes: Comprehensive CRUD operations with real-time subscriptions
+
+src/styles/tokens.css
+- Purpose: CSS custom properties (design tokens)
+- Exports: CSS variables for colors, spacing, border radius
+- Primary imports: None
+- Owner domain: Styling
+- Notes: MSU green primary color, consistent spacing scale
+
+src/components/CollegeSelector.tsx
+- Purpose: College selection landing page
+- Exports: CollegeSelector component
+- Primary imports: React Router, college config, asset utils
+- Owner domain: UI
+- Notes: Dynamic college logo loading with fallback
+
+src/app/routes/form.tsx
+- Purpose: Main order form page
+- Exports: FormPage component
+- Primary imports: Form components, validation, layout
+- Owner domain: UI
+- Notes: Complex form with scroll-to-error functionality
+
+src/app/routes/summary.tsx
+- Purpose: Order summary/review page
+- Exports: SummaryPage component
+- Primary imports: Order form hook, category components
+- Owner domain: UI
+- Notes: Dynamic college branding via CSS variables
+
+src/app/routes/admin.tsx
+- Purpose: Admin dashboard for order management
+- Exports: AdminPage component
+- Primary imports: Firebase service, React Router
+- Owner domain: UI
+- Notes: 668 lines, embedded styles, simple password auth
+
+src/config/colleges/michiganState.json
+- Purpose: Michigan State University product configuration
+- Exports: College configuration object
+- Primary imports: None
+- Owner domain: Configuration
+- Notes: Complex category structure with product images and options
+
+src/features/components/CategorySection.tsx
+- Purpose: Product category display component
+- Exports: CategorySection component
+- Primary imports: Order components, validation utils
+- Owner domain: UI
+- Notes: 378 lines, complex quantity validation logic
+
+src/features/utils/calculations.ts
+- Purpose: Order validation and calculation utilities
+- Exports: Validation functions, calculation helpers
+- Primary imports: Types
+- Owner domain: Business logic
+- Notes: 709 lines, complex pack size validation logic
+
+src/services/templates/email_template.html
+- Purpose: EmailJS template for order emails
+- Exports: HTML template
+- Primary imports: None
+- Owner domain: External services
+- Notes: Handlebars-style templating with EmailJS
+
+src/components/ui/Card.tsx
+- Purpose: Reusable card component
+- Exports: Card component with Header/Body/Footer subcomponents
+- Primary imports: React
+- Owner domain: UI
+- Notes: Compound component pattern
+
+src/app/layout/Header.tsx
+- Purpose: Application header component
+- Exports: Header component
+- Primary imports: React Router, asset utils
+- Owner domain: UI
+- Notes: Fixed positioning, responsive navigation
+
+4) MODULE INTERACTIONS (HOW THEY WORK TOGETHER)
+
+Data Flow:
+UI Components → OrderFormContext → useOrderForm Hook → Validation Utils → Services → External APIs
+
+- UI Layer: Components consume context and trigger state changes
+- State Layer: useOrderForm manages complex form state with multiple quantity types
+- Validation Layer: calculations.ts validates pack sizes and business rules
+- Service Layer: emailService and firebaseOrderService handle external operations
+- Storage: Firebase Firestore for order persistence, EmailJS for notifications
+
+Circular Dependencies: None detected
+
+Hotspots (modules imported by many others):
+- src/types/index.ts (imported by most components)
+- src/features/hooks/useOrderForm.ts (central state management)
+- src/features/utils/index.ts (validation and calculations)
+- src/utils/asset.ts (asset path resolution)
+
+5) STYLING AND UI SYSTEM
+
+Styling Methods:
+- CSS Custom Properties (design tokens) in tokens.css
+- Global CSS reset and base styles in global.css
+- Component-specific CSS in components.css
+- College-specific styles in college-pages.css
+- Inline styles for dynamic theming (college colors)
+
+Global Styles Location:
+- src/styles/tokens.css: CSS variables for colors, spacing, border radius
+- src/styles/global.css: Reset, typography, form elements
+- src/styles/components.css: Reusable component styles
+
+Consistency Issues:
+- Mixed styling approaches (CSS files + inline styles)
+- College branding via dynamic CSS variable updates
+- Some components use embedded styles (admin.tsx)
+- Inconsistent spacing (some hardcoded values vs CSS variables)
+
+Anti-patterns:
+- Dynamic CSS variable manipulation for college theming
+- Embedded styles in admin component
+- Mixed responsive approaches (CSS media queries + inline styles)
+
+6) STATE MANAGEMENT AND DATA
+
+Data Collection:
+- React state in useOrderForm hook
+- Complex FormData interface with multiple quantity types
+- Real-time validation with useEffect hooks
+
+Data Storage:
+- React Context (OrderFormContext) for component tree
+- Firebase Firestore for order persistence
+- Local state for form data and validation
+
+Data Modification:
+- useOrderForm hook provides handlers for all form updates
+- Firebase service handles CRUD operations
+- EmailJS handles order notifications
+
+Persistence:
+- Firebase Firestore: Order documents with detailed product info
+- No localStorage usage detected
+- EmailJS: Order notifications to admin
+
+Uniformity:
+- Consistent naming: camelCase for variables, PascalCase for components
+- Strong TypeScript typing throughout
+- Consistent error handling patterns
+- Standardized form validation approach
+
+API Clients:
+- Firebase Firestore: Order management
+- EmailJS: Order notifications
+- No runtime validation libraries (zod/yup) detected
+
+7) RUNTIME FLOWS
+
+App Bootstrap:
+- index.tsx renders AppShell with HashRouter
+- College selection → college-specific routes
+- Order form → summary → receipt → thank you flow
+
+Routing:
+- HashRouter for GitHub Pages compatibility
+- Nested routes for college-specific pages
+- Dynamic college parameter handling
+
+Layout Composition:
+- Fixed Header component
+- CollapsibleSidebar for navigation
+- College-specific theming
+
+Protected Routes:
+- Admin route with simple password authentication
+- No other route protection detected
+
+Loading/Error Boundaries:
+- No Suspense usage detected
+- No Error Boundaries detected
+- Basic error handling in form validation
+
+8) QUALITY AND SAFETY
+
+Type Coverage:
+- Strong TypeScript usage throughout
+- No @ts-ignore except for emailjs import
+- Comprehensive type definitions
+- Strict mode enabled in tsconfig
+
+Lint Configuration:
+- React-app ESLint config
+- No custom rules detected
+- No lint warnings visible in analysis
+
+Test Coverage:
+- Testing libraries installed (@testing-library/*)
+- No test files detected in src/
+- setupTests.ts present but no actual tests
+
+Accessibility:
+- Basic semantic HTML structure
+- Some aria-label attributes
+- No comprehensive accessibility audit performed
+- Missing focus management and keyboard navigation
+
+9) DEAD CODE AND REDUNDANCY
+
+Unused Files/Exports:
+- zustand dependency imported but not used
+- Some utility functions may be unused
+- No comprehensive dead code analysis performed
+
+Duplicate Components:
+- No obvious duplicates detected
+- Some similar validation logic across components
+
+Unreferenced Assets:
+- All college logos and product images appear to be referenced
+- No unreferenced assets detected
+
+Stale Configuration:
+- All environment variables appear to be used
+- No stale feature flags detected
+
+10) PERFORMANCE RISKS
+
+Large Bundles:
+- No dynamic imports detected
+- All components loaded upfront
+- Firebase and EmailJS libraries included in main bundle
+
+Re-render Hotspots:
+- Complex useOrderForm hook with many state updates
+- Real-time validation on every form change
+- No memoization detected for expensive calculations
+
+N+1 Fetches:
+- No API calls detected in components
+- Firebase operations are batched appropriately
+
+Images:
+- No image optimization detected
+- Images served directly from public folder
+- No lazy loading implemented
+
+11) SECURITY AND CONFIG
+
+Secrets Handling:
+- EmailJS credentials in constants/index.ts (exposed to client)
+- Firebase config in firebase.ts (exposed to client)
+- Admin password hardcoded in admin.tsx
+
+Client/Server Boundary:
+- All operations are client-side
+- No server-side validation
+- Firebase security rules not analyzed
+
+Input Sanitization:
+- Basic form validation
+- No XSS protection detected
+- EmailJS template uses safe templating
+
+12) ACTIONABLE TODOs (PRIORITIZED)
+
+Quick Wins:
+1. [High Impact][Low Effort][src/features/hooks/useOrderForm.ts] Remove unused zustand dependency from package.json
+2. [Medium Impact][Low Effort][src/services/emailService.ts] Remove @ts-ignore and properly type emailjs import
+3. [Medium Impact][Low Effort][src/app/routes/admin.tsx] Extract embedded styles to separate CSS file
+4. [Low Impact][Low Effort][src/styles/] Consolidate CSS files and remove redundant styles
+
+Medium Effort:
+5. [High Impact][Medium Effort][src/] Add Error Boundaries for better error handling
+6. [Medium Impact][Medium Effort][src/] Implement React.memo for expensive components
+7. [Medium Impact][Medium Effort][src/] Add comprehensive test suite
+8. [Medium Impact][Medium Effort][src/] Implement image optimization and lazy loading
+
+Larger Epics:
+9. [High Impact][High Effort][src/] Refactor complex useOrderForm hook into smaller, focused hooks
+10. [High Impact][High Effort][src/] Implement proper authentication system for admin
+11. [Medium Impact][High Effort][src/] Add comprehensive accessibility features
+12. [Low Impact][High Effort][src/] Migrate to modern build tool (Vite) for better performance
