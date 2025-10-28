@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { colleges } from '../../config';
+import { adminConfig } from '../../config/env';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 
 import ReceiptPage from './receipt';
@@ -67,7 +68,7 @@ const AllOrdersPage: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin123') {
+    if (password === adminConfig.password) {
       setIsAuthenticated(true);
       setError('');
     } else {
