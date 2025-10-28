@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 
 const AdminPage: React.FC = () => {

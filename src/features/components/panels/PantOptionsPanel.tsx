@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { PantOption, SizeCounts } from '../../../types';
-import SizePackSelector from './SizePackSelector';
+
 import { getPackSize } from '../../../config/packSizes';
+import { PantOption, SizeCounts } from '../../../types';
 import { getSizeOptions } from '../../utils/calculations';
+
+import SizePackSelector from './SizePackSelector';
 
 interface PantOptionsPanelProps {
   pantOption: PantOption;

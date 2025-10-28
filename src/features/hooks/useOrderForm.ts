@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+
+import { sendOrderEmail } from '../../services/emailService';
+import { firebaseOrderService, OrderProduct } from '../../services/firebaseOrderService';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
 import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts, calculateTotalItems } from '../utils/index';
-import { firebaseOrderService, OrderProduct } from '../../services/firebaseOrderService';
-import { sendOrderEmail } from '../../services/emailService';
 
 // Convert FormData to OrderProduct array for detailed product display
 const convertFormDataToProducts = (formData: FormData, categories: Category[]): OrderProduct[] => {
@@ -18,7 +19,7 @@ const convertFormDataToProducts = (formData: FormData, categories: Category[]): 
       
       // Check for different types of product data
       let hasData = false;
-      let quantities: { [key: string]: number } = {};
+      const quantities: { [key: string]: number } = {};
       let totalQuantity = 0;
 
       // Simple quantities

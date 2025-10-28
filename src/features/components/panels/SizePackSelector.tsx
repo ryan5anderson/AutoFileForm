@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Size, SizeCounts } from '../../../types';
 import { calcTotals } from '../../utils';
 

@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { DisplayOption } from '../../../types';
-import { getRackDisplayName } from '../../utils';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
+import { getRackDisplayName } from '../../utils';
+
 import QuantityStepper from './QuantityStepper';
 
 interface DisplayOptionCardProps {

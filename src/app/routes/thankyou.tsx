@@ -1,6 +1,7 @@
 import React from 'react';
-import Header from '../layout/Header';
+
 import Footer from '../layout/Footer';
+import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 const ThankYouPage: React.FC = () => {

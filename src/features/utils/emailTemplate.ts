@@ -1,7 +1,9 @@
-import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion, SizeCounts } from '../../types';
 import { PROVIDER_EMAIL } from '../../constants';
-import { getVersionDisplayName } from './naming';
+import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion, SizeCounts } from '../../types';
+
 import { calculateTotalUnits } from './calculations';
+import { getVersionDisplayName } from './naming';
+
 import { getFilteredShirtVersions } from './index';
 
 const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {

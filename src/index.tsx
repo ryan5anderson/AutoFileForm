@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import CollegeSelector from './components/CollegeSelector';
-import CollegeRouteWrapper from './components/CollegeRouteWrapper';
+
+import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
+import Header from './app/layout/Header';
 import AboutPage from './app/routes/about';
-import ContactPage from './app/routes/contact';
 import AdminPage from './app/routes/admin';
 import AllOrdersPage from './app/routes/allOrders';
-import Header from './app/layout/Header';
-import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
+import ContactPage from './app/routes/contact';
+import CollegeRouteWrapper from './components/CollegeRouteWrapper';
+import CollegeSelector from './components/CollegeSelector';
 import { colleges } from './config';
 import { Category } from './types';
 import './styles/global.css';

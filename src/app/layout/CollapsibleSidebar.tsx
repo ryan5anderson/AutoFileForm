@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import { Category } from '../../types';
 
 interface CollapsibleSidebarProps {
@@ -58,6 +59,14 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
         <div 
           className="sidebar-backdrop"
           onClick={onToggle}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              onToggle();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close sidebar"
         />
       )}
 

@@ -1,7 +1,9 @@
 import React from 'react';
-import SizePackSelector from './SizePackSelector';
+
 import { SizeCounts, Size } from '../../../types';
 import { getColorDisplayName } from '../../utils';
+
+import SizePackSelector from './SizePackSelector';
 
 interface ColorSizeSelectorProps {
   colors: string[];

@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Category, SizeCounts, PantOption } from '../../types';
-import ProductCard from '../../features/components/panels/QuantityPanel';
-import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
-import SizePackSelector from '../../features/components/panels/SizePackSelector';
-import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
-import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
-import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
-import { getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
-import { asset, getCollegeFolderName } from '../../utils/asset';
+
 import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
+import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
+import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
+import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
+import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
+import ProductCard from '../../features/components/panels/QuantityPanel';
+import SizePackSelector from '../../features/components/panels/SizePackSelector';
+import { getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
+import { Category, SizeCounts, PantOption } from '../../types';
+import { asset, getCollegeFolderName } from '../../utils/asset';
 import '../../styles/product-detail.css';
 
 interface ProductDetailPageProps {

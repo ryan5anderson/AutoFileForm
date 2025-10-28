@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { colleges } from '../config';
 import { asset } from '../utils/asset';
 import './CollegeSelector.css';
@@ -30,6 +31,7 @@ const CollegeSelector: React.FC = () => {
             onClick={() => handleCollegeSelect(key)}
           >
             <div className="college-logo">
+              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
               <img 
                 src={asset(college.logo)} 
                 alt={`${college.name} Logo`}

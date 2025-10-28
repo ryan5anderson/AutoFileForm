@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
-import StoreInfoForm from '../../features/components/StoreInfoForm';
+
 import CategorySection from '../../features/components/CategorySection';
 import OrderNotesSection from '../../features/components/OrderNotesSection';
-import Header from '../layout/Header';
-import Footer from '../layout/Footer';
+import StoreInfoForm from '../../features/components/StoreInfoForm';
+import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
+import Footer from '../layout/Footer';
+import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 interface CollegeConfig {

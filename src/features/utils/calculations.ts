@@ -552,6 +552,7 @@ export function calcTotals(counts: SizeCounts, packSize: number = 7, allowAnyQua
 
 export function getQuantityMultiples(imageName: string, categoryName: string, categoryPath?: string, version?: string): number[] {
   // Import getPackSize here to avoid circular dependency issues
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { getPackSize } = require('../../config/packSizes');
 
   // Get the pack size for this category/version

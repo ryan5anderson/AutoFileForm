@@ -1,6 +1,8 @@
 import React from 'react';
-import QuantityStepper from './QuantityStepper';
+
 import { getColorDisplayName } from '../../utils';
+
+import QuantityStepper from './QuantityStepper';
 
 interface ColorQuantitySelectorProps {
   colors: string[];

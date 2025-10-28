@@ -1,11 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, SizeCounts } from '../../types';
+
 import { colleges } from '../../config';
-import { getProductName, getVersionDisplayName, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
-import Header from '../layout/Header';
-import Footer from '../layout/Footer';
 import { useOrderForm } from '../../features/hooks';
+import { getProductName, getVersionDisplayName, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
+import { FormData, Category, ShirtVersion, SizeCounts } from '../../types';
+import Footer from '../layout/Footer';
+import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 interface ReceiptPageProps {

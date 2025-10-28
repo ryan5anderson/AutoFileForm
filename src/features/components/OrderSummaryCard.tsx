@@ -1,6 +1,7 @@
 import React from 'react';
-import { hasColorOptions } from '../utils';
+
 import { ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, SizeCounts, Size, ShirtColorSizeCounts } from '../../types';
+import { hasColorOptions } from '../utils';
 
 interface OrderSummaryCardProps {
   categoryPath: string;

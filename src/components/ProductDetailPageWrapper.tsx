@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+
 import ProductDetailPage from '../app/routes/productDetail';
 import { colleges } from '../config';
 import { useOrderFormContext } from '../contexts/OrderFormContext';

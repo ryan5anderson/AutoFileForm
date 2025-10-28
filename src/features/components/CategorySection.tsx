@@ -1,10 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts } from '../../types';
-import OrderSummaryCard from './OrderSummaryCard';
+
 import { Card } from '../../components/ui';
-import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
+import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+
+import OrderSummaryCard from './OrderSummaryCard';
+
 
 interface CategorySectionProps {
   category: Category;

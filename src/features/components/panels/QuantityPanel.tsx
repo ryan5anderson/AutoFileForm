@@ -1,8 +1,10 @@
 import React from 'react';
-import { getProductName, getRackDisplayName, getQuantityMultiples } from '../../utils';
+
+import { getPackSize } from '../../../config/packSizes';
 import { SweatpantJoggerOption } from '../../../types';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
-import { getPackSize } from '../../../config/packSizes';
+import { getProductName, getRackDisplayName, getQuantityMultiples } from '../../utils';
+
 import QuantityStepper from './QuantityStepper';
 
 interface ProductCardProps {

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
+
 import { colleges } from '../../config';
+import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
+
 import ReceiptPage from './receipt';
 
 const AllOrdersPage: React.FC = () => {
@@ -354,7 +356,19 @@ const AllOrdersPage: React.FC = () => {
         ) : (
           <div className="orders-grid">
             {filteredOrders.map((order) => (
-              <div key={order.id} className="order-card" onClick={() => setSelectedOrder(order)}>
+              <div 
+                key={order.id} 
+                className="order-card" 
+                onClick={() => setSelectedOrder(order)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedOrder(order);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="order-header">
                   <div className="order-id">{order.id}</div>
                   <div className={`order-status status-${order.status}`}>
@@ -399,8 +413,27 @@ const AllOrdersPage: React.FC = () => {
 
       {/* Receipt Modal - Reusing ReceiptPage Component */}
       {selectedOrder && (
-        <div className="modal-overlay" onClick={() => setSelectedOrder(null)}>
-          <div className="modal-content receipt-modal" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="modal-overlay" 
+          onClick={() => setSelectedOrder(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setSelectedOrder(null);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close modal"
+        >
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+          <div 
+            className="modal-content receipt-modal" 
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
+          >
             <div className="modal-header">
               <h3>Order Receipt - {selectedOrder.id}</h3>
               <button className="modal-close" onClick={() => setSelectedOrder(null)}>×</button>
