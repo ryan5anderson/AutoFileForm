@@ -24,7 +24,8 @@
     "deploy:clean": "if exist build rmdir /s /q build && npm run build && gh-pages -d build -b gh-pages --cname ohiopylecollege.com --nojekyll",
     "deploy:manual": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git subtree push --prefix build origin gh-pages",
     "check:unused": "ts-prune",
-    "check:deps": "depcheck"
+    "check:deps": "depcheck",
+    "lint:css": "stylelint 'src/**/*.{css,scss}'"
   },
   "eslintConfig": {
     "extends": [
@@ -50,6 +51,12 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "gh-pages": "^6.3.0",
+    "stylelint": "^16.25.0",
+    "stylelint-config-css-modules": "^4.5.1",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-standard": "^39.0.1",
+    "stylelint-declaration-strict-value": "^1.10.11",
+    "stylelint-order": "^6.0.4",
     "ts-prune": "^0.10.3",
     "typescript": "^5.9.3"
   }

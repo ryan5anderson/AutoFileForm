@@ -1,0 +1,128 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "plugins": [
+    "stylelint-declaration-strict-value",
+    "stylelint-order"
+  ],
+  "rules": {
+    "color-no-hex": true,
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "/color/",
+        "fill",
+        "stroke",
+        "background-color",
+        "border-color",
+        "border-top-color",
+        "border-right-color",
+        "border-bottom-color",
+        "border-left-color",
+        "outline-color",
+        "text-decoration-color",
+        "column-rule-color",
+        "caret-color"
+      ],
+      {
+        "ignoreValues": [
+          "transparent",
+          "inherit",
+          "currentColor",
+          "none",
+          "var\\(--.*\\)",
+          "initial",
+          "unset"
+        ],
+        "message": "Use design tokens (var(--...)) instead of raw values."
+      }
+    ],
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "/margin/",
+        "/padding/",
+        "gap",
+        "row-gap",
+        "column-gap",
+        "top",
+        "right",
+        "bottom",
+        "left",
+        "width",
+        "height",
+        "min-width",
+        "min-height",
+        "max-width",
+        "max-height"
+      ],
+      {
+        "ignoreValues": [
+          "0",
+          "auto",
+          "inherit",
+          "initial",
+          "unset",
+          "none",
+          "100%",
+          "50%",
+          "var\\(--.*\\)"
+        ],
+        "message": "Use design tokens (var(--...)) for spacing and sizing."
+      }
+    ],
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "border-radius",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius"
+      ],
+      {
+        "ignoreValues": [
+          "0",
+          "inherit",
+          "initial",
+          "unset",
+          "var\\(--.*\\)"
+        ],
+        "message": "Use design tokens (var(--...)) for border radius."
+      }
+    ],
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "font-size",
+        "line-height",
+        "font-weight",
+        "letter-spacing"
+      ],
+      {
+        "ignoreValues": [
+          "inherit",
+          "initial",
+          "unset",
+          "normal",
+          "bold",
+          "bolder",
+          "lighter",
+          "var\\(--.*\\)"
+        ],
+        "message": "Use design tokens (var(--...)) for typography."
+      }
+    ],
+    "order/properties-alphabetical-order": true,
+    "declaration-block-no-redundant-longhand-properties": true,
+    "shorthand-property-no-redundant-values": true,
+    "declaration-no-important": true,
+    "selector-max-id": 0,
+    "selector-max-universal": 0,
+    "selector-no-vendor-prefix": true,
+    "media-feature-name-no-vendor-prefix": true,
+    "at-rule-no-vendor-prefix": true,
+    "property-no-vendor-prefix": true,
+    "selector-class-pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__[a-z0-9]+(?:-[a-z0-9]+)*)?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$"
+  },
+  "ignoreFiles": [
+    "src/styles/tokens.css"
+  ]
+}

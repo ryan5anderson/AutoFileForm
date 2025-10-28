@@ -1,145 +1,144 @@
 /* College Pages Styling - Enhanced to match home page vibe */
 
 .college-page-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-blue-200) 100%);
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .college-page-header {
-  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background: rgb(255 255 255 / 95%);
+  border-bottom: 1px solid rgb(229 231 235 / 50%);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
 }
 
 .college-page-main {
-  flex: 1;
-  padding: var(--space-6);
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
   box-sizing: border-box;
+  flex: 1;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: var(--space-6);
+  width: 100%;
 }
 
 .college-page-title {
-  text-align: center;
+  backdrop-filter: blur(10px);
+  background: rgb(255 255 255 / 90%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
   margin-bottom: var(--space-6);
   padding: var(--space-6);
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(10px);
+  text-align: center;
 }
 
 .college-page-title h1 {
-  font-size: 2.5rem;
-  color: var(--color-text);
-  margin-bottom: var(--space-2);
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--color-primary), #374151);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-gray-700));
   background-clip: text;
+  color: var(--color-text);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-2);
+  -webkit-text-fill-color: transparent;
 }
 
 .college-page-title p {
-  font-size: 1.2rem;
-  color: #6b7280;
+  color: var(--color-gray-500);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
   margin: 0;
-  font-weight: 500;
 }
 
 .form-section {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  margin-bottom: var(--space-6);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(229 231 235 / 50%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
+  margin-bottom: var(--space-6);
+  padding: var(--space-6);
 }
 
 .form-section h2 {
-  font-size: 1.5rem;
-  color: var(--color-text);
-  margin-bottom: var(--space-4);
-  font-weight: 600;
   border-bottom: 2px solid var(--color-primary);
+  color: var(--color-text);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-4);
   padding-bottom: var(--space-2);
 }
 
 .category-section {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255 255 255 / 80%);
+  border: 1px solid rgb(229 231 235 / 30%);
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
   margin-bottom: var(--space-4);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(229, 231, 235, 0.3);
+  padding: var(--space-4);
   transition: all 0.3s ease;
 }
 
 .category-section:hover {
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .category-section h3 {
-  font-size: 1.25rem;
   color: var(--color-text);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
   margin-bottom: var(--space-3);
-  font-weight: 600;
 }
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   margin-top: var(--space-4);
 }
 
 .product-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(229 231 235 / 30%);
   border-radius: var(--radius-lg);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
   padding: var(--space-4);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(229, 231, 235, 0.3);
   transition: all 0.3s ease;
 }
 
 .product-card:hover {
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .submit-section {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  margin-top: var(--space-6);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(229 231 235 / 50%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
+  margin-top: var(--space-6);
+  padding: var(--space-6);
   text-align: center;
 }
 
 .submit-button {
-  background: linear-gradient(135deg, var(--color-primary), #374151);
-  color: white;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-gray-700));
   border: none;
   border-radius: var(--radius-lg);
-  padding: var(--space-4) var(--space-6);
-  font-size: 1.1rem;
-  font-weight: 600;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+  color: white;
   cursor: pointer;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--space-4) var(--space-6);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .submit-button:hover {
+  box-shadow: 0 6px 12px rgb(0 0 0 / 15%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .submit-button:active {
@@ -147,88 +146,87 @@
 }
 
 .error-message {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgb(239 68 68 / 10%);
+  border: 1px solid rgb(239 68 68 / 20%);
   border-radius: var(--radius);
-  padding: var(--space-3);
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
   margin-bottom: var(--space-4);
+  padding: var(--space-3);
   text-align: center;
-  font-weight: 500;
 }
 
 /* Summary and Receipt pages styling */
 .summary-page-container,
 .receipt-page-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-blue-200) 100%);
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .summary-page-main,
 .receipt-page-main {
-  flex: 1;
-  padding: var(--space-6);
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
   box-sizing: border-box;
+  flex: 1;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: var(--space-6);
+  width: 100%;
 }
 
 .summary-card,
 .receipt-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(229 231 235 / 50%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
+  padding: var(--space-6);
 }
 
 /* Thank you page styling */
 .thank-you-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  align-items: center;
+  background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-blue-200) 100%);
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  min-height: 100vh;
   padding: var(--space-6);
   padding-top: calc(64px + var(--space-6)); /* Account for fixed header */
 }
 
 .thank-you-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  text-align: center;
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(229 231 235 / 50%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
   max-width: 600px;
+  padding: var(--space-6);
+  text-align: center;
   width: 100%;
 }
 
 .thank-you-card h1 {
-  font-size: 2.5rem;
-  color: var(--color-text);
-  margin-bottom: var(--space-4);
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--color-primary), #374151);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-gray-700));
   background-clip: text;
+  color: var(--color-text);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-4);
+  -webkit-text-fill-color: transparent;
 }
 
 .thank-you-card p {
-  font-size: 1.2rem;
-  color: #6b7280;
+  color: var(--color-gray-500);
+  font-size: var(--font-size-xl);
   margin-bottom: var(--space-4);
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .college-page-main,
   .summary-page-main,
   .receipt-page-main {
@@ -236,7 +234,7 @@
   }
   
   .college-page-title h1 {
-    font-size: 2rem;
+    font-size: var(--font-size-3xl);
   }
   
   .product-grid {
@@ -249,12 +247,12 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .college-page-title h1 {
-    font-size: 1.75rem;
+    font-size: var(--font-size-2xl);
   }
   
   .college-page-title p {
-    font-size: 1rem;
+    font-size: var(--font-size-base);
   }
 }
