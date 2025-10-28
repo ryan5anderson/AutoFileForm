@@ -1,0 +1,78 @@
+{
+  "name": "Oregon University",
+  "logo": "/logo/asulogo.png",
+  "categories": [
+    {
+      "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
+      "path": "tshirt/men",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt",
+        "longsleeve",
+        "hoodie",
+        "crewneck"
+      ],
+      "images": [
+        "M103287148_SH2FDC_Custom_DTF_on_Kelly_Green.png",
+        "M103287376_SDNIET_Nietzsche_DTF_on_Kelly_Green.png",
+        "M103287462_SH2FDS_Custom_DTF_on_Steel.png",
+        "M103287559_SDFLNS_Flinch_DTF_on_Steel.png"
+      ]
+    },
+    {
+      "name": "Ladies Tops",
+      "path": "tshirt/women",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M103290394_SH2FDC_Jr_Custom_DTF_on_Black.png",
+        "M103290611_SHOTDC_Jr_On_Track_DTF_on_Black.png",
+        "M103290731_SH2FDS_Jr_Custom_DTF_on_Steel.png",
+        "M103290996_SDDLAS_Jr_Dreamland_DTF_on_Steel.png"
+      ]
+    },
+    {
+      "name": "Caps",
+      "path": "hat",
+      "images": [
+        "M103293879_SHE1CH_Custom_Kelly_Green_Hat.png",
+        "M103294617_SHE1CH_Custom_Gray_Hat.png",
+        "M103296471_SELISH_Lightweight_Gray_Hat.png"
+      ]
+    },
+    {
+      "name": "Knit Caps",
+      "path": "beanie",
+      "images": [
+        "M103294896_SHE2CB_Custom_Kelly_Green_Beanie.png",
+        "M103295096_SHE1CB_Custom_Kellly_Green_Beanie.png",
+        "M103295192_SHE1CB_Custom_Gray_Beanie.png",
+        "M103295333_SHE1CB_Custom_Gray_Beanie.png"
+      ]
+    },
+    {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M103293417_SHWBUV_Custom_Logo_Water_Bottle.png",
+        "M103293585_SHSSUV_Stainless_Steel_Water_Bottle.png"
+      ]
+    },
+    {
+      "name": "Plush",
+      "path": "plush",
+      "images": [
+        "M103467569_SHPLUD_Custom_DTF_Plush.png"
+      ]
+    },
+    {
+      "name": "Stickers",
+      "path": "sticker",
+      "images": [
+        "M103467322_SHSTPK_Custom_Logo_Sticker_Pack.png"
+      ]
+    }
+  ]
+}

@@ -45,6 +45,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
       document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
     } else if (college === 'michiganstate') {
       document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else if (college === 'oregonuniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#00A651'); // Oregon Kelly Green
     } else if (college === 'westvirginiauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
     } else if (college === 'pittsburghuniversity') {
