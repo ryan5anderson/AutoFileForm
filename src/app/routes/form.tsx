@@ -68,7 +68,7 @@ const FormPage: React.FC<FormPageProps> = ({
 
   // Scroll to category when returning from product detail page
   useEffect(() => {
-    const state = location.state as any;
+    const state = location.state as { returnFromProduct?: boolean; scrollToCategory?: string };
     if (state?.returnFromProduct && state?.scrollToCategory) {
       const categoryId = state.scrollToCategory.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
       setTimeout(() => {

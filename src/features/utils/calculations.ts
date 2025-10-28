@@ -8,10 +8,12 @@ import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } fro
  */
 const getCategoryPathForImage = (imagePath: string, categories?: Category[]): string => {
   if (!categories) {
+    // eslint-disable-next-line no-console
     console.log(`DEBUG: getCategoryPathForImage - no categories provided for ${imagePath}`);
     return '';
   }
 
+  // eslint-disable-next-line no-console
   console.log(`DEBUG: getCategoryPathForImage called with imagePath=${imagePath}, categories=${categories.length}`);
 
   // Handle image paths that might include category prefixes

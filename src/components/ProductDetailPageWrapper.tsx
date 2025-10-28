@@ -9,7 +9,7 @@ import { Category } from '../types';
 const ProductDetailPageWrapper: React.FC = () => {
   const { college } = useParams();
 
-  const collegeConfig = college ? (colleges as any)[college] : undefined;
+  const collegeConfig = college ? colleges[college as keyof typeof colleges] : undefined;
   const categories: Category[] = collegeConfig?.categories ?? [];
 
   // Get shared state from context

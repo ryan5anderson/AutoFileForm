@@ -6,13 +6,14 @@ export function asset(path: string) {
 
 /**
  * Maps college key to folder name
- * @param collegeKey - The college key (e.g., 'arizonastate', 'michiganstate', 'westvirginiauniversity', 'pittsburghuniversity', 'alabamauniversity')
- * @returns The folder name (e.g., 'ArizonaState', 'MichiganState', 'WestVirginiaUniversity', 'PittsburghUniversity', 'AlabamaUniversity')
+ * @param collegeKey - The college key (e.g., 'arizonastate', 'michiganstate', 'oregonuniversity', 'westvirginiauniversity', 'pittsburghuniversity', 'alabamauniversity')
+ * @returns The folder name (e.g., 'ArizonaState', 'MichiganState', 'OregonUniversity', 'WestVirginiaUniversity', 'PittsburghUniversity', 'AlabamaUniversity')
  */
 export function getCollegeFolderName(collegeKey: string): string {
   const folderMap: Record<string, string> = {
     'arizonastate': 'ArizonaState',
     'michiganstate': 'MichiganState',
+    'oregonuniversity': 'OregonUniversity',
     'westvirginiauniversity': 'WestVirginiaUniversity',
     'pittsburghuniversity': 'PittsburghUniversity',
     'alabamauniversity': 'AlabamaUniversity'

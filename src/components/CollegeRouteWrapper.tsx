@@ -9,7 +9,7 @@ import ProductDetailPageWrapper from './ProductDetailPageWrapper';
 
 const CollegeRouteWrapper: React.FC = () => {
   const { college } = useParams();
-  const collegeConfig = college ? (colleges as any)[college] : undefined;
+  const collegeConfig = college ? colleges[college as keyof typeof colleges] : undefined;
   const categories = collegeConfig?.categories ?? [];
 
   // Apply college-specific theme

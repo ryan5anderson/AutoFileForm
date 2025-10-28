@@ -18,11 +18,15 @@ import './styles/components.css';
 
 // HashRouter handles all routing via hash fragments, compatible with GitHub Pages
 
+// eslint-disable-next-line no-console
 console.log('React app starting...');
+// eslint-disable-next-line no-console
 console.log('Current URL:', window.location.href);
+// eslint-disable-next-line no-console
 console.log('Hash:', window.location.hash);
 
 const root = document.getElementById('root');
+// eslint-disable-next-line no-console
 console.log('Root element found:', !!root);
 
 if (root) {
@@ -33,8 +37,10 @@ if (root) {
       </HashRouter>
     </React.StrictMode>
   );
+  // eslint-disable-next-line no-console
   console.log('React app rendered');
 } else {
+  // eslint-disable-next-line no-console
   console.error('Root element not found!');
 }
 
