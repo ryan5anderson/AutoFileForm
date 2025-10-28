@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Category, SizeCounts, PantOption } from '../../types';
+import { Category, SizeCounts, PantOption, InfantSizeCounts } from '../../types';
 import ProductCard from '../../features/components/panels/QuantityPanel';
 import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
+import InfantSizePackSelector from '../../features/components/panels/InfantSizePackSelector';
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
@@ -23,6 +24,7 @@ interface ProductDetailPageProps {
   onPantOptionChange?: (imagePath: string, option: PantOption) => void;
   onColorOptionChange?: (imagePath: string, color: string, value: string) => void;
   onShirtColorSizeCountsChange?: (imagePath: string, version: any, color: string, counts: any) => void;
+  onInfantSizeCountsChange?: (imagePath: string, counts: InfantSizeCounts) => void;
 }
 
 const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
@@ -36,6 +38,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   onPantOptionChange,
   onColorOptionChange,
   onShirtColorSizeCountsChange,
+  onInfantSizeCountsChange,
 }) => {
   const { college, category: categoryPath, productId } = useParams();
   const navigate = useNavigate();
@@ -49,6 +52,9 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   // Check if this is an applique product (should use simple quantity, not tabs)
   const isApplique = imageName.toLowerCase().includes('applique');
+  
+  // Check if this is an infant product (should use infant size selector)
+  const isInfant = imageName.toLowerCase().includes('infant') || imageName.toLowerCase().includes('onsie') || category?.name === 'Infant';
 
   // State for active tab (for shirt versions and display options) - MUST be before any early returns
   const [activeTab, setActiveTab] = useState<string>(() => {
@@ -114,6 +120,20 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           onChange={(option) => onPantOptionChange?.(imagePath, option)}
           pantStyles={category.pantStyles}
           categoryPath={category.path}
+        />
+      );
+    } else if (isInfant) {
+      // Infant products with 6M/12M size options
+      const infantCounts: InfantSizeCounts = formData.infantSizeCounts?.[imagePath] || { '6M': 0, '12M': 0 };
+      const packSize = getPackSize(category.path, undefined, imageName);
+      
+      return (
+        <InfantSizePackSelector
+          label="Quantity"
+          counts={infantCounts}
+          onChange={(counts) => onInfantSizeCountsChange?.(imagePath, counts)}
+          packSize={packSize}
+          allowAnyQuantity={allowsAnyQuantity(category.path, undefined, imageName)}
         />
       );
     } else if (category.hasDisplayOptions) {

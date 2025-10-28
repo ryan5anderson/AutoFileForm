@@ -54,6 +54,10 @@ export interface PantOption {
 export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL' | 'S/M' | 'L/XL' | 'SM';
 export type SizeCounts = Record<Size, number>;
 
+// Infant-specific sizes
+export type InfantSize = '6M' | '12M';
+export type InfantSizeCounts = Record<InfantSize, number>;
+
 // Color options for products with multiple colors
 export interface ColorOption {
   [colorName: string]: string; // colorName -> quantity
@@ -79,6 +83,8 @@ export interface FormData {
   shirtColorSizeCounts?: ShirtColorSizeCounts;
   // imagePath -> colorName -> quantity (for non-shirt items with colors like hats)
   colorOptions?: Record<string, ColorOption>;
+  // imagePath -> InfantSizeCounts (for infant products)
+  infantSizeCounts?: Record<string, InfantSizeCounts>;
 }
 
 export interface EmailCategory {

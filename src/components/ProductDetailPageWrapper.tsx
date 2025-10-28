@@ -22,6 +22,7 @@ const ProductDetailPageWrapper: React.FC = () => {
     handlePantOptionChange,
     handleColorOptionChange,
     handleShirtColorSizeCountsChange,
+    handleInfantSizeCountsChange,
   } = useOrderFormContext();
 
   if (!collegeConfig) {
@@ -40,6 +41,7 @@ const ProductDetailPageWrapper: React.FC = () => {
       onPantOptionChange={handlePantOptionChange}
       onColorOptionChange={handleColorOptionChange}
       onShirtColorSizeCountsChange={handleShirtColorSizeCountsChange}
+      onInfantSizeCountsChange={handleInfantSizeCountsChange}
     />
   );
 };

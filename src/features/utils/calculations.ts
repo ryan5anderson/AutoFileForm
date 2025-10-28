@@ -1,4 +1,4 @@
-import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } from '../../types';
+import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category, InfantSizeCounts } from '../../types';
 
 /**
  * Find the category path for a given imagePath
@@ -135,6 +135,7 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     case 'socks':
       return 6;
     case 'bottle':
+    case 'bags':
     case 'signage':
       return 1;
     case 'sticker':
@@ -550,6 +551,18 @@ export function calcTotals(counts: SizeCounts, packSize: number = 7, allowAnyQua
   };
 }
 
+export function calcInfantTotals(counts: InfantSizeCounts, packSize: number = 6, allowAnyQuantity: boolean = false): Totals {
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const isValid = total > 0 && (allowAnyQuantity || total % packSize === 0);
+  return {
+    total,
+    packs: Math.floor(total / packSize),
+    remainder: total % packSize,
+    needed: allowAnyQuantity ? 0 : (packSize - (total % packSize)) % packSize,
+    isValid,
+  };
+}
+
 export function getQuantityMultiples(imageName: string, categoryName: string, categoryPath?: string, version?: string): number[] {
   // Import getPackSize here to avoid circular dependency issues
   const { getPackSize } = require('../../config/packSizes');
@@ -564,8 +577,8 @@ export function getQuantityMultiples(imageName: string, categoryName: string, ca
     multiples.push(packSize * i);
   }
 
-  // Special handling for bottles (allow individual quantities)
-  if (categoryName.toLowerCase().includes('bottle')) {
+  // Special handling for bottles and bags (allow individual quantities)
+  if (categoryName.toLowerCase().includes('bottle') || categoryName.toLowerCase().includes('bags')) {
     return [1, 2, 3, 4, 5, 6];
   }
 

@@ -22,6 +22,8 @@ const CollegeRouteWrapper: React.FC = () => {
       document.documentElement.style.setProperty('--color-primary', '#003594'); // Pitt blue
     } else if (college === 'alabamauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#9E1B32'); // Alabama Crimson
+    } else if (college === 'oregonuniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#FFD700'); // Oregon Green/Gold
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }
