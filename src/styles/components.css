@@ -63,7 +63,7 @@
   height: 160px;
   justify-content: center;
   margin-bottom: var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-10);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 160px;
 }
