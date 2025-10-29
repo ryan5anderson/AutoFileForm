@@ -190,7 +190,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             transition: left 0.3s ease;
-            overflow-y: auto;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
           }
@@ -234,12 +234,16 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           .sidebar-content {
             display: flex;
             flex-direction: column;
-            height: 100%;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
           }
 
           .sidebar-nav {
             padding: 16px;
             flex: 1;
+            overflow: hidden;
+            min-height: 0;
           }
 
           .sidebar-nav-item {
@@ -363,6 +367,9 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             padding: 16px;
             border-top: 1px solid #e2e8f0;
             background: #f8fafc;
+            flex-shrink: 0;
+            width: 100%;
+            box-sizing: border-box;
           }
 
           .admin-link {
@@ -373,6 +380,8 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             margin-bottom: 0;
             padding: 10px 16px;
             font-size: 0.8125rem;
+            width: 100%;
+            box-sizing: border-box;
           }
 
           .admin-link:hover {
@@ -396,23 +405,6 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             }
           }
 
-          /* Custom scrollbar */
-          .collapsible-sidebar::-webkit-scrollbar {
-            width: 4px;
-          }
-
-          .collapsible-sidebar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-          }
-
-          .collapsible-sidebar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 2px;
-          }
-
-          .collapsible-sidebar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-          }
         `}</style>
       </div>
     </>
