@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
@@ -65,6 +65,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     }
     return '';
   });
+
+  // Scroll to top when product page loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [imageName, categoryPath]);
 
   // Early return AFTER all hooks
   if (!category || !imageName) {
