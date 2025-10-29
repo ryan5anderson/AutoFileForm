@@ -4,24 +4,16 @@
   "private": true,
   "homepage": "https://ohiopylecollege.com",
   "dependencies": {
-    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "classnames": "^2.5.1",
     "emailjs-com": "^3.2.0",
     "firebase": "^12.4.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.0",
     "react-scripts": "^5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4",
-    "zustand": "^5.0.6"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -30,7 +22,10 @@
     "eject": "react-scripts eject",
     "deploy": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git push origin HEAD:gh-pages --force",
     "deploy:clean": "if exist build rmdir /s /q build && npm run build && gh-pages -d build -b gh-pages --cname ohiopylecollege.com --nojekyll",
-    "deploy:manual": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git subtree push --prefix build origin gh-pages"
+    "deploy:manual": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git subtree push --prefix build origin gh-pages",
+    "check:unused": "ts-prune",
+    "check:deps": "depcheck",
+    "lint:css": "stylelint 'src/**/*.{css,scss}'"
   },
   "eslintConfig": {
     "extends": [
@@ -51,6 +46,18 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
+    "depcheck": "^1.4.7",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "gh-pages": "^6.3.0",
+    "stylelint": "^16.25.0",
+    "stylelint-config-css-modules": "^4.5.1",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-standard": "^39.0.1",
+    "stylelint-declaration-strict-value": "^1.10.11",
+    "stylelint-order": "^6.0.4",
+    "ts-prune": "^0.10.3",
+    "typescript": "^5.9.3"
   }
 }

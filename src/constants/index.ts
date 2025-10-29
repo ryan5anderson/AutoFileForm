@@ -1,6 +1,11 @@
-export const EMAILJS_SERVICE_ID = 'service_ehf05es';
-export const EMAILJS_TEMPLATE_ID_PROD = 'template_t1138kn';
-export const EMAILJS_TEMPLATE_ID_DEV = 'template_3q0gxfm';
-export const EMAILJS_USER_ID = 'f7BZO-3hAYB-QusoW';
-export const PROVIDER_EMAIL = 'anderson.t.ryan@gmail.com';
+// Import environment configuration
+import { emailjsConfig } from '../config/env';
+
+// Individual exports for cleaner imports
+export const EMAILJS_SERVICE_ID = emailjsConfig.serviceId;
+export const EMAILJS_TEMPLATE_ID_PROD = emailjsConfig.templateIdProd;
+export const EMAILJS_TEMPLATE_ID_DEV = emailjsConfig.templateIdDev;
+export const EMAILJS_USER_ID = emailjsConfig.userId;
+export const PROVIDER_EMAIL = emailjsConfig.providerEmail;
+
 // college data is now in config/colleges/ 

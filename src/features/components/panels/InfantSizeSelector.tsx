@@ -1,10 +1,8 @@
 import React from 'react';
+
 import { InfantSize, InfantSizeCounts } from '../../../types';
-import { calcInfantTotals } from '../../utils';
 
-const INFANT_SIZES: InfantSize[] = ['6M', '12M'];
-
-interface InfantSizePackSelectorProps {
+interface InfantSizeSelectorProps {
   label?: string;
   counts: InfantSizeCounts;
   onChange: (counts: InfantSizeCounts) => void;
@@ -14,7 +12,9 @@ interface InfantSizePackSelectorProps {
   hideTotal?: boolean;
 }
 
-export const InfantSizePackSelector: React.FC<InfantSizePackSelectorProps> = ({
+const INFANT_SIZES: InfantSize[] = ['6M', '12M'];
+
+const InfantSizeSelector: React.FC<InfantSizeSelectorProps> = ({
   label,
   counts,
   onChange,
@@ -23,12 +23,13 @@ export const InfantSizePackSelector: React.FC<InfantSizePackSelectorProps> = ({
   allowAnyQuantity = false,
   hideTotal = false,
 }) => {
-  const totals = calcInfantTotals(counts, packSize, allowAnyQuantity);
+  const total = (counts['6M'] || 0) + (counts['12M'] || 0);
+  const needed = total > 0 ? (packSize - (total % packSize)) % packSize : packSize;
+  const isValid = total > 0 && (total % packSize === 0);
 
   const handleDelta = (size: InfantSize, delta: number) => {
     if (disabled) return;
-    // Use single unit increment/decrement for better UX, validation happens in input
-    const next: InfantSizeCounts = { ...counts, [size]: Math.max(0, (counts[size] || 0) + delta) } as InfantSizeCounts;
+    const next: InfantSizeCounts = { ...counts, [size]: Math.max(0, (counts[size] || 0) + delta) };
     onChange(next);
   };
 
@@ -38,12 +39,12 @@ export const InfantSizePackSelector: React.FC<InfantSizePackSelectorProps> = ({
     // If allowAnyQuantity is true, allow any quantity. Otherwise, round to nearest multiple of packSize.
     const adjustedValue = allowAnyQuantity ? numeric : Math.round(numeric / packSize) * packSize;
 
-    const next: InfantSizeCounts = { ...counts, [size]: adjustedValue } as InfantSizeCounts;
+    const next: InfantSizeCounts = { ...counts, [size]: adjustedValue };
     onChange(next);
   };
 
   const handleClear = () => {
-    const cleared = INFANT_SIZES.reduce((acc: InfantSizeCounts, s: InfantSize) => ({ ...acc, [s]: 0 }), {} as InfantSizeCounts);
+    const cleared: InfantSizeCounts = { '6M': 0, '12M': 0 };
     onChange(cleared);
   };
 
@@ -51,7 +52,7 @@ export const InfantSizePackSelector: React.FC<InfantSizePackSelectorProps> = ({
     const base = Math.floor(packSize / INFANT_SIZES.length);
     const remainder = packSize % INFANT_SIZES.length;
     const distribution = INFANT_SIZES.map((_, idx) => base + (idx < remainder ? 1 : 0));
-    const next: InfantSizeCounts = { ...counts } as InfantSizeCounts;
+    const next: InfantSizeCounts = { ...counts };
     INFANT_SIZES.forEach((s: InfantSize, idx: number) => {
       next[s] = (next[s] || 0) + distribution[idx];
     });
@@ -101,17 +102,17 @@ export const InfantSizePackSelector: React.FC<InfantSizePackSelectorProps> = ({
           style={{
             width: '100%',
             maxWidth: '100%',
-            color: allowAnyQuantity ? 'var(--color-text)' : (totals.total > 0 && !totals.isValid ? 'var(--color-danger)' : totals.isValid ? 'var(--color-success)' : undefined)
+            color: allowAnyQuantity ? 'var(--color-text)' : (total > 0 && !isValid ? 'var(--color-danger)' : isValid ? 'var(--color-success)' : undefined)
           }}
           role="status"
           aria-live="polite"
-          data-valid={allowAnyQuantity ? 'true' : (totals.isValid ? 'true' : 'false')}
-          data-positive={totals.total > 0 ? 'true' : 'false'}
+          data-valid={allowAnyQuantity ? 'true' : (isValid ? 'true' : 'false')}
+          data-positive={total > 0 ? 'true' : 'false'}
         >
           {allowAnyQuantity ? (
-            <>Total: {totals.total} items</>
+            <>Total: {total} items</>
           ) : (
-            <>Total: {totals.total} items • Add {totals.isValid ? packSize : totals.needed} more to complete a pack of {packSize}.</>
+            <>Total: {total} items • Add {isValid ? packSize : needed} more to complete a pack of {packSize}.</>
           )}
         </div>
       )}
@@ -124,4 +125,5 @@ export const InfantSizePackSelector: React.FC<InfantSizePackSelectorProps> = ({
   );
 };
 
-export default InfantSizePackSelector;
+export default InfantSizeSelector;
+

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Size, SizeCounts } from '../../../types';
 import { calcTotals } from '../../utils';
 
@@ -15,7 +16,7 @@ interface SizePackSelectorProps {
   hideTotal?: boolean;
 }
 
-export const SizePackSelector: React.FC<SizePackSelectorProps> = ({
+const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   label,
   counts,
   onChange,

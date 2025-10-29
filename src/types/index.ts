@@ -51,7 +51,7 @@ export interface PantOption {
 }
 
 // Size-based ordering for shirt versions
-export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL' | 'S/M' | 'L/XL' | 'SM';
+export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL' | 'S/M' | 'L/XL' | 'SM';
 export type SizeCounts = Record<Size, number>;
 
 // Infant-specific sizes

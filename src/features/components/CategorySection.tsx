@@ -1,10 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts } from '../../types';
-import OrderSummaryCard from './OrderSummaryCard';
+
 import { Card } from '../../components/ui';
-import { getImagePath, getProductName, getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
+import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+
+import OrderSummaryCard from './OrderSummaryCard';
+
 
 interface CategorySectionProps {
   category: Category;
@@ -16,6 +19,7 @@ interface CategorySectionProps {
   pantOptions?: Record<string, PantOption>;
   colorOptions?: Record<string, ColorOption>;
   shirtColorSizeCounts?: ShirtColorSizeCounts;
+  infantSizeCounts?: Record<string, InfantSizeCounts>;
   invalidProductPaths?: string[];
   validProductPaths?: string[];
   onQuantityChange?: (imagePath: string, value: string) => void;
@@ -38,6 +42,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   pantOptions = {},
   colorOptions = {},
   shirtColorSizeCounts = {},
+  infantSizeCounts = {},
   invalidProductPaths = [],
   validProductPaths = [],
   onQuantityChange,
@@ -81,6 +86,17 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       return false;
     }
 
+    // Handle infant products (only check by image name, not category name)
+    // This allows youth products in "Youth & Infant" category to use shirtSizeCounts
+    if (imageName.toLowerCase().includes('infant') || imageName.toLowerCase().includes('onsie')) {
+      const infantCounts = infantSizeCounts[imagePath];
+      if (infantCounts) {
+        const totalQty = Object.values(infantCounts).reduce((sum, count) => sum + count, 0);
+        return totalQty > 0;
+      }
+      return false;
+    }
+
     // Handle sweatpants/joggers (legacy)
     if (category.name === 'Sweatpants/Joggers') {
       const sjOptions = sweatpantJoggerOptions[imagePath];
@@ -93,21 +109,19 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
     // Handle shirt versions (tshirt, longsleeve, hoodie, crewneck)
     if (category.hasShirtVersions) {
-      // Check for color-based size counts first
-      if (hasColorOptions(imageName)) {
-        const colorSizeCountsByVersion = shirtColorSizeCounts[imagePath];
-        if (colorSizeCountsByVersion) {
-          const totalQty = Object.values(colorSizeCountsByVersion).reduce((sum, byColor) => {
-            if (!byColor) return sum;
-            const colorTotal = Object.values(byColor).reduce((colorSum, counts) => {
-              if (!counts) return colorSum;
-              const sizeTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
-              return colorSum + sizeTotal;
-            }, 0);
-            return sum + colorTotal;
+      // Check for color-based size counts first (regardless of filename pattern)
+      const colorSizeCountsByVersion = shirtColorSizeCounts?.[imagePath];
+      if (colorSizeCountsByVersion) {
+        const totalQty = Object.values(colorSizeCountsByVersion).reduce((sum, byColor) => {
+          if (!byColor) return sum;
+          const colorTotal = Object.values(byColor).reduce((colorSum, counts) => {
+            if (!counts) return colorSum;
+            const sizeTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
+            return colorSum + sizeTotal;
           }, 0);
-          if (totalQty > 0) return true;
-        }
+          return sum + colorTotal;
+        }, 0);
+        if (totalQty > 0) return true;
       }
 
       // Regular size counts
@@ -196,7 +210,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   // Filter images to only show those with quantities in read-only mode
   const filteredImages = category.images.filter((img: string) => {
     if (!readOnly) return true; // Show all items in form mode
-    const imagePath = getImagePath(category.path, img);
+    const imagePath = `${category.path}/${img}`;
     return hasQuantity(imagePath, img);
   });
 
@@ -234,7 +248,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       )}
       <div className="section__grid" style={{ alignItems: 'start' }}>
         {filteredImages.map((img: string) => {
-          const imagePath = getImagePath(category.path, img);
+          const imagePath = `${category.path}/${img}`;
           
           const handleCardClick = () => {
             if (!readOnly) {
@@ -360,6 +374,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     sweatpantJoggerOptions={sweatpantJoggerOptions}
                     pantOptions={pantOptions}
                     colorOptions={colorOptions}
+                    infantSizeCounts={infantSizeCounts}
                     college={college}
                     hasShirtVersions={category.hasShirtVersions}
                     hasSizeOptions={category.hasSizeOptions}

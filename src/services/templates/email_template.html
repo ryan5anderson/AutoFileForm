@@ -18,7 +18,6 @@
       <!-- CATEGORY LOOPS -->
       {{#categories}}
       <h3 style="margin: 24px 0 8px 0; color: #1e3a8a;">{{category}}</h3>
-      {{#items}}{{/items}}
       <table style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr>
@@ -28,11 +27,13 @@
           </tr>
         </thead>
         <tbody>
+          {{#items}}
           <tr>
             <td style="padding: 2px 4px;">{{sku}}</td>
             <td style="padding: 2px 4px;">{{name}}</td>
             <td style="padding: 2px 4px; text-align: right; font-weight: bold;">{{qty}}</td>
           </tr>
+          {{/items}}
         </tbody>
       </table>
       {{/categories}}

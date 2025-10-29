@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { FormData } from '../../types';
 
 interface StoreInfoFormProps {
@@ -9,7 +10,7 @@ interface StoreInfoFormProps {
 const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChange }) => {
   return (
     <div className="form-section">
-      <div>
+      <div style={{ marginBottom: 'var(--space-4)' }}>
         <label htmlFor="company" style={{ 
           display: 'block', 
           marginBottom: 'var(--space-2)', 
@@ -29,12 +30,13 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
-            background: 'var(--color-input-bg)'
+            background: 'var(--color-input-bg)',
+            boxSizing: 'border-box'
           }}
           required
         />
       </div>
-      <div>
+      <div style={{ marginBottom: 'var(--space-4)' }}>
         <label htmlFor="storeNumber" style={{ 
           display: 'block', 
           marginBottom: 'var(--space-2)', 
@@ -54,12 +56,13 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
-            background: 'var(--color-input-bg)'
+            background: 'var(--color-input-bg)',
+            boxSizing: 'border-box'
           }}
           required
         />
       </div>
-      <div>
+      <div style={{ marginBottom: 'var(--space-4)' }}>
         <label htmlFor="storeManager" style={{ 
           display: 'block', 
           marginBottom: 'var(--space-2)', 
@@ -79,7 +82,8 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
-            background: 'var(--color-input-bg)'
+            background: 'var(--color-input-bg)',
+            boxSizing: 'border-box'
           }}
           required
         />
@@ -104,7 +108,8 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
-            background: 'var(--color-input-bg)'
+            background: 'var(--color-input-bg)',
+            boxSizing: 'border-box'
           }}
           required
         />

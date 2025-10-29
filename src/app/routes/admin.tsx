@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+
+import { adminConfig } from '../../config/env';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 
 const AdminPage: React.FC = () => {
@@ -82,7 +84,7 @@ const AdminPage: React.FC = () => {
   };
 
   const addTestOrder = async () => {
-    const testOrder = await firebaseOrderService.addOrder({
+    await firebaseOrderService.addOrder({
       college: 'Alabama University',
       storeNumber: '001',
       storeManager: 'John Smith',
@@ -98,7 +100,7 @@ const AdminPage: React.FC = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Simple password check - in production, this would be more secure
-    if (password === 'admin123') {
+    if (password === adminConfig.password) {
       setIsAuthenticated(true);
       setError('');
       // Notify sidebar that admin is logged in

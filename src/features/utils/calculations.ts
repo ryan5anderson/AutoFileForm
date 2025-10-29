@@ -1,4 +1,4 @@
-import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category, InfantSizeCounts } from '../../types';
+import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } from '../../types';
 
 /**
  * Find the category path for a given imagePath
@@ -8,10 +8,12 @@ import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category, Infa
  */
 const getCategoryPathForImage = (imagePath: string, categories?: Category[]): string => {
   if (!categories) {
+    // eslint-disable-next-line no-console
     console.log(`DEBUG: getCategoryPathForImage - no categories provided for ${imagePath}`);
     return '';
   }
 
+  // eslint-disable-next-line no-console
   console.log(`DEBUG: getCategoryPathForImage called with imagePath=${imagePath}, categories=${categories.length}`);
 
   // Handle image paths that might include category prefixes
@@ -33,7 +35,8 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
           potentialCategory === 'socks' || potentialCategory === 'bottle' ||
           potentialCategory === 'sticker' || potentialCategory === 'plush' ||
           potentialCategory === 'signage' ||
-          potentialCategory === 'displays') {
+          potentialCategory === 'displays' ||
+          potentialCategory === 'youth&infant') {
         console.log(`DEBUG: Found matching category path: ${potentialCategory}`);
         return potentialCategory;
       } else {
@@ -135,11 +138,13 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     case 'socks':
       return 6;
     case 'bottle':
-    case 'bags':
     case 'signage':
       return 1;
     case 'sticker':
     case 'plush':
+      return 6;
+    case 'youth&infant':
+      console.log(`DEBUG: youth&infant category, returning 6`);
       return 6;
     default:
       console.log(`DEBUG: Unknown categoryPath: ${normalizedCategory}, version: ${normalizedVersion}, returning default 7`);
@@ -178,7 +183,7 @@ const getAllowsAnyQuantity = (categoryPath: string, version?: string, productNam
 };
 
 
-export interface ValidationResult {
+interface ValidationResult {
   isValid: boolean;
   errorMessage: string | null;
   invalidProductPaths: string[];
@@ -493,6 +498,32 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
     }
   });
 
+  // Validate infant size counts (6M/12M)
+  Object.entries(formData.infantSizeCounts || {}).forEach(([imagePath, counts]) => {
+    if (counts) {
+      const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+      if (total > 0) {
+        const categoryPath = getCategoryPathForImage(imagePath, categories);
+        const packSize = getCorrectPackSize(categoryPath, undefined, imagePath);
+        const allowsAny = getAllowsAnyQuantity(categoryPath, undefined, imagePath);
+
+        if (allowsAny) {
+          // For categories that allow any quantity, only check minimum
+          if (total < 1) {
+            errors.push(`${imagePath}: Minimum quantity is 1`);
+            invalidProductPaths.push(imagePath);
+          }
+        } else {
+          // For categories that require pack size multiples
+          if (total % packSize !== 0) {
+            errors.push(`${imagePath}: Total must be a multiple of ${packSize}`);
+            invalidProductPaths.push(imagePath);
+          }
+        }
+      }
+    }
+  });
+
   if (errors.length > 0) {
     // Remove duplicates from invalidProductPaths
     const uniquePaths: string[] = [];
@@ -531,7 +562,7 @@ export const getShirtVersionTotal = (shirtVersions: ShirtVersion | undefined, av
   }, 0);
 };
 
-export type Totals = {
+type Totals = {
   total: number;
   packs: number;
   remainder: number;
@@ -551,20 +582,9 @@ export function calcTotals(counts: SizeCounts, packSize: number = 7, allowAnyQua
   };
 }
 
-export function calcInfantTotals(counts: InfantSizeCounts, packSize: number = 6, allowAnyQuantity: boolean = false): Totals {
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
-  const isValid = total > 0 && (allowAnyQuantity || total % packSize === 0);
-  return {
-    total,
-    packs: Math.floor(total / packSize),
-    remainder: total % packSize,
-    needed: allowAnyQuantity ? 0 : (packSize - (total % packSize)) % packSize,
-    isValid,
-  };
-}
-
 export function getQuantityMultiples(imageName: string, categoryName: string, categoryPath?: string, version?: string): number[] {
   // Import getPackSize here to avoid circular dependency issues
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { getPackSize } = require('../../config/packSizes');
 
   // Get the pack size for this category/version
@@ -577,8 +597,8 @@ export function getQuantityMultiples(imageName: string, categoryName: string, ca
     multiples.push(packSize * i);
   }
 
-  // Special handling for bottles and bags (allow individual quantities)
-  if (categoryName.toLowerCase().includes('bottle') || categoryName.toLowerCase().includes('bags')) {
+  // Special handling for bottles (allow individual quantities)
+  if (categoryName.toLowerCase().includes('bottle')) {
     return [1, 2, 3, 4, 5, 6];
   }
 
@@ -590,6 +610,11 @@ export function getSizeOptions(categoryPath: string, version?: string): Size[] {
   // Socks use different sizing
   if (categoryPath.includes('sock')) {
     return ['SM', 'XL'] as any;
+  }
+
+  // Youth products get XS-XL sizes
+  if (categoryPath.includes('youth')) {
+    return ['XS', 'S', 'M', 'L', 'XL'];
   }
 
   // T-shirts and hoodies get XXXL option (but not women's t-shirts)

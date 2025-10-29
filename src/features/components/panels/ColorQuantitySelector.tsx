@@ -1,6 +1,8 @@
 import React from 'react';
-import QuantityStepper from './QuantityStepper';
+
 import { getColorDisplayName } from '../../utils';
+
+import QuantityStepper from './QuantityStepper';
 
 interface ColorQuantitySelectorProps {
   colors: string[];
@@ -17,19 +19,16 @@ const ColorQuantitySelector: React.FC<ColorQuantitySelectorProps> = ({
   disabled = false,
   packSize = 1
 }) => {
-  // Use side-by-side layout for 2 colors, stacked for more
-  const useSideBySide = colors.length === 2;
-  
+  // Always stack vertically
   return (
     <div style={{
       display: 'flex',
-      flexDirection: useSideBySide ? 'row' : 'column',
-      gap: useSideBySide ? 'var(--space-3)' : 'var(--space-2)',
+      flexDirection: 'column',
+      gap: 'var(--space-2)',
       width: '100%'
     }}>
       {colors.map((color) => (
         <div key={color} className="field" style={{
-          flex: useSideBySide ? '1' : undefined,
           minWidth: 0
         }}>
           <div className="field-label" style={{

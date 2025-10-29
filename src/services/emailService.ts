@@ -1,7 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import emailjs from 'emailjs-com';
-import { TemplateParams } from '../types';
+
 import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID_PROD, EMAILJS_TEMPLATE_ID_DEV, EMAILJS_USER_ID } from '../constants';
+import { TemplateParams } from '../types';
 
 // Determine which template to use based on environment
 const getTemplateId = (): string => {

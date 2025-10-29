@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { PantOption, SizeCounts } from '../../../types';
-import SizePackSelector from './SizePackSelector';
+
 import { getPackSize } from '../../../config/packSizes';
+import { PantOption, SizeCounts } from '../../../types';
 import { getSizeOptions } from '../../utils/calculations';
+
+import SizePackSelector from './SizePackSelector';
 
 interface PantOptionsPanelProps {
   pantOption: PantOption;
@@ -44,9 +46,9 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
 
   const getSizeCounts = (style: 'sweatpants' | 'joggers', color: 'steel' | 'black' | 'darkHeather' | 'darkNavy'): SizeCounts => {
     if (style === 'sweatpants') {
-      return (pantOption[style] as { steel?: SizeCounts; black?: SizeCounts; darkNavy?: SizeCounts })?.[color as 'steel' | 'black' | 'darkNavy'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+      return (pantOption[style] as { steel?: SizeCounts; black?: SizeCounts; darkNavy?: SizeCounts })?.[color as 'steel' | 'black' | 'darkNavy'] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
     } else {
-      return (pantOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })?.[color as 'steel' | 'darkHeather'] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+      return (pantOption[style] as { steel?: SizeCounts; darkHeather?: SizeCounts })?.[color as 'steel' | 'darkHeather'] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
     }
   };
 

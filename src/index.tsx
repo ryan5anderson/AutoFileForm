@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import CollegeSelector from './components/CollegeSelector';
-import CollegeRouteWrapper from './components/CollegeRouteWrapper';
+
+import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
+import Header from './app/layout/Header';
 import AboutPage from './app/routes/about';
-import ContactPage from './app/routes/contact';
 import AdminPage from './app/routes/admin';
 import AllOrdersPage from './app/routes/allOrders';
-import Header from './app/layout/Header';
-import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
+import ContactPage from './app/routes/contact';
+import CollegeRouteWrapper from './components/CollegeRouteWrapper';
+import CollegeSelector from './components/CollegeSelector';
 import { colleges } from './config';
 import { Category } from './types';
 import './styles/global.css';
@@ -17,11 +18,15 @@ import './styles/components.css';
 
 // HashRouter handles all routing via hash fragments, compatible with GitHub Pages
 
+// eslint-disable-next-line no-console
 console.log('React app starting...');
+// eslint-disable-next-line no-console
 console.log('Current URL:', window.location.href);
+// eslint-disable-next-line no-console
 console.log('Hash:', window.location.hash);
 
 const root = document.getElementById('root');
+// eslint-disable-next-line no-console
 console.log('Root element found:', !!root);
 
 if (root) {
@@ -32,8 +37,10 @@ if (root) {
       </HashRouter>
     </React.StrictMode>
   );
+  // eslint-disable-next-line no-console
   console.log('React app rendered');
 } else {
+  // eslint-disable-next-line no-console
   console.error('Root element not found!');
 }
 

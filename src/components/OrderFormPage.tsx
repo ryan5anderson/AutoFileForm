@@ -1,10 +1,11 @@
 import React from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { colleges } from '../config';
+
 import FormPage from '../app/routes/form';
-import SummaryPage from '../app/routes/summary';
 import ReceiptPage from '../app/routes/receipt';
+import SummaryPage from '../app/routes/summary';
 import ThankYouPage from '../app/routes/thankyou';
+import { colleges } from '../config';
 import { useOrderFormContext } from '../contexts/OrderFormContext';
 
 const OrderFormPage: React.FC = () => {

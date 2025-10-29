@@ -22,7 +22,6 @@
         "hoodie",
         "crewneck"
       ],
-      "tieDyeImages": [],
       "images": [
         "M103287148_SH2FDC_Custom_DTF_on_Kelly_Green.png",
         "M103287376_SDNIET_Nietzsche_DTF_on_Kelly_Green.png",
@@ -64,58 +63,11 @@
       ]
     },
     {
-      "name": "Water Bottle",
+      "name": "Water Bottles",
       "path": "bottle",
       "images": [
         "M103293417_SHWBUV_Custom_Logo_Water_Bottle.png",
         "M103293585_SHSSUV_Stainless_Steel_Water_Bottle.png"
-      ]
-    },
-    {
-      "name": "Jackets",
-      "path": "jacket",
-      "hasSizeOptions": true,
-      "images": [
-        "M103291491_SHE1CJ_Custom_Logo_Kelly_Green_Jacket.png",
-        "M103291637_SHE1CJ_Custom_Logo_Kelly_Green_Jacket.png",
-        "M103292720_SHE1CJ_Custom_Logo_Black_Jacket.png",
-        "M103297550_SHE1CJ_Custom_Logo_Black_Jacket.png"
-      ]
-    },
-    {
-      "name": "Bags",
-      "path": "bags",
-      "images": [
-        "M103467678_SDBAPA_Custom_DTf_Back_Pack.png"
-      ]
-    },
-    {
-      "name": "Sweatpants & Joggers",
-      "path": "pants",
-      "hasPantOptions": true,
-      "pantStyles": [
-        "sweatpants",
-        "joggers"
-      ],
-      "images": [
-        "M103293017_SHPHDS_Custom_DTF_Steel_Pants.png"
-      ]
-    },
-    {
-      "name": "Shorts",
-      "path": "shorts",
-      "hasSizeOptions": true,
-      "images": [
-        "M103293136_SDSPSS_Custom_DTF_Side_Print_Shorts.png",
-        "M103293295_SDSKSS_Skill_Check_DTF_Oxford_Shorts.png"
-      ]
-    },
-    {
-      "name": "Socks",
-      "path": "socks",
-      "hasSizeOptions": true,
-      "images": [
-        "M103293339_SS8052_Custom_Logo_Socks.png"
       ]
     },
     {
@@ -126,23 +78,7 @@
       ]
     },
     {
-      "name": "Signage",
-      "path": "signage",
-      "images": [
-        "M103296942_SHWGCH_Custom_PFD_Header_Card.png",
-        "M103297095_SHWGCS_Custom_Spinner_Header_Card.png"
-      ]
-    },
-    {
-      "name": "Banner",
-      "path": "banner",
-      "images": [
-        "M103490425_SHMH24_Custom_4ft_Shelf_Magnet.png",
-        "M103490861_SHMH23_Custom_3ft_Shelf_Magnet.png"
-      ]
-    },
-    {
-      "name": "Sticker",
+      "name": "Stickers",
       "path": "sticker",
       "images": [
         "M103467322_SHSTPK_Custom_Logo_Sticker_Pack.png"

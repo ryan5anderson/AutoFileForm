@@ -1,8 +1,10 @@
 import React from 'react';
-import { getProductName, getImagePath, getRackDisplayName, getQuantityMultiples } from '../../utils';
+
+import { getPackSize } from '../../../config/packSizes';
 import { SweatpantJoggerOption } from '../../../types';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
-import { getPackSize } from '../../../config/packSizes';
+import { getProductName, getRackDisplayName, getQuantityMultiples } from '../../utils';
+
 import QuantityStepper from './QuantityStepper';
 
 interface ProductCardProps {
@@ -32,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   hideImage = false,
   college
 }) => {
-  const imagePath = getImagePath(categoryPath, imageName);
+  const imagePath = `${categoryPath}/${imageName}`;
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
   const packSize = getPackSize(categoryPath, undefined, imageName);
 

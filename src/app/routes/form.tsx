@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
-import StoreInfoForm from '../../features/components/StoreInfoForm';
+
 import CategorySection from '../../features/components/CategorySection';
 import OrderNotesSection from '../../features/components/OrderNotesSection';
-import Header from '../layout/Header';
-import Footer from '../layout/Footer';
+import StoreInfoForm from '../../features/components/StoreInfoForm';
+import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
+import Footer from '../layout/Footer';
+import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 interface CollegeConfig {
@@ -67,7 +68,7 @@ const FormPage: React.FC<FormPageProps> = ({
 
   // Scroll to category when returning from product detail page
   useEffect(() => {
-    const state = location.state as any;
+    const state = location.state as { returnFromProduct?: boolean; scrollToCategory?: string };
     if (state?.returnFromProduct && state?.scrollToCategory) {
       const categoryId = state.scrollToCategory.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
       setTimeout(() => {
@@ -176,6 +177,7 @@ const FormPage: React.FC<FormPageProps> = ({
               pantOptions={formData.pantOptions}
               colorOptions={formData.colorOptions}
               shirtColorSizeCounts={formData.shirtColorSizeCounts}
+              infantSizeCounts={formData.infantSizeCounts}
               invalidProductPaths={invalidProductPaths}
               validProductPaths={validProductPaths}
               onQuantityChange={onQuantityChange}

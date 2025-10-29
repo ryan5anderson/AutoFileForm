@@ -24,6 +24,7 @@ interface CardFooterProps {
   children: React.ReactNode;
 }
 
+/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-tabindex */
 const Card: React.FC<CardProps> & {
   Header: React.FC<CardHeaderProps>;
   Body: React.FC<CardBodyProps>;
@@ -40,6 +41,14 @@ const Card: React.FC<CardProps> & {
     <div
       className={cardClasses}
       onClick={onClick}
+      onKeyDown={onClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      } : undefined}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
       style={style}
     >
       {children}
@@ -52,6 +61,14 @@ const CardHeader: React.FC<CardHeaderProps> = ({ children, onClick }) => {
     <div 
       className="card__header"
       onClick={onClick}
+      onKeyDown={onClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(e as any);
+        }
+      } : undefined}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
     >
       {children}
     </div>

@@ -76,19 +76,42 @@ export const getVersionDisplayName = (version: string, imageName?: string): stri
 
 // Check if a product has multiple color options
 export const hasColorOptions = (imageName: string): boolean => {
-  return imageName.includes('_or_');
+  // Standard pattern: "on_Color1_or_Color2" or "on_Color1_or_Color2_or_Color3"
+  if (imageName.includes('_or_')) return true;
+  
+  // Special case for WVU hat: "WhiteGrayor_Navy" pattern
+  if (imageName.includes('WhiteGrayor_')) return true;
+  
+  return false;
 };
 
 // Extract color options from filename
 // e.g., "Custom_DTF_on_White_or_Steel.png" -> ["White", "Steel"]
 // e.g., "Custom_Logo_on_White_or_Gray.png" -> ["White", "Gray"]
+// e.g., "Custom_Hat_on_White_or_Gray_or_Navy.png" -> ["White", "Gray", "Navy"]
+// e.g., "Scrap_WhiteGrayor_Navy_Hat.png" -> ["White", "Gray", "Navy"] (special case)
 export const getColorOptions = (imageName: string): string[] => {
   if (!hasColorOptions(imageName)) return [];
   
-  // Match pattern: "on_Color1_or_Color2"
-  const match = imageName.match(/on_(\w+)_or_(\w+)/i);
-  if (match) {
-    return [match[1], match[2]];
+  // Special case: Handle "WhiteGrayor_Navy" pattern (for WVU hat)
+  // Extract Navy before _Hat to avoid capturing "Hat" as a color
+  const whiteGrayNavyMatch = imageName.match(/WhiteGrayor_([^_]+)(?:_Hat)?\./i);
+  if (whiteGrayNavyMatch) {
+    const navyColor = whiteGrayNavyMatch[1];
+    return ['White', 'Gray', navyColor];
+  }
+  
+  // First try to match pattern with three colors: "on_Color1_or_Color2_or_Color3"
+  // Match colors but stop before _Hat, _Hat.png, etc. to avoid capturing "Hat" as a color
+  const threeColorMatch = imageName.match(/on_(\w+)_or_(\w+)_or_(\w+)(?:_(?:Hat|Beanie))?\./i);
+  if (threeColorMatch) {
+    return [threeColorMatch[1], threeColorMatch[2], threeColorMatch[3]];
+  }
+  
+  // Then try to match pattern with two colors: "on_Color1_or_Color2"
+  const twoColorMatch = imageName.match(/on_(\w+)_or_(\w+)(?:_(?:Hat|Beanie))?\./i);
+  if (twoColorMatch) {
+    return [twoColorMatch[1], twoColorMatch[2]];
   }
   
   return [];

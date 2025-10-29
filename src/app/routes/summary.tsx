@@ -1,11 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { FormData, Category } from '../../types';
+
 import { colleges } from '../../config';
 import CategorySection from '../../features/components/CategorySection';
-import Header from '../layout/Header';
-import Footer from '../layout/Footer';
 import { useOrderForm } from '../../features/hooks';
+import { FormData, Category } from '../../types';
+import Footer from '../layout/Footer';
+import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 interface SummaryPageProps {
@@ -44,6 +45,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
       document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
     } else if (college === 'michiganstate') {
       document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else if (college === 'oregonuniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#007030'); // Official UO Green
     } else if (college === 'westvirginiauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
     } else if (college === 'pittsburghuniversity') {
@@ -134,6 +137,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             pantOptions={formData.pantOptions}
             colorOptions={formData.colorOptions}
             shirtColorSizeCounts={formData.shirtColorSizeCounts}
+            infantSizeCounts={formData.infantSizeCounts}
             readOnly={true}
             college={college}
           />

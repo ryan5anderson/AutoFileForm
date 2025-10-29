@@ -1,13 +1,15 @@
 import React from 'react';
 import { Routes, Route, useParams } from 'react-router-dom';
+
 import { colleges } from '../config';
 import { OrderFormProvider } from '../contexts/OrderFormContext';
+
 import OrderFormPage from './OrderFormPage';
 import ProductDetailPageWrapper from './ProductDetailPageWrapper';
 
 const CollegeRouteWrapper: React.FC = () => {
   const { college } = useParams();
-  const collegeConfig = college ? (colleges as any)[college] : undefined;
+  const collegeConfig = college ? colleges[college as keyof typeof colleges] : undefined;
   const categories = collegeConfig?.categories ?? [];
 
   // Apply college-specific theme
@@ -16,14 +18,14 @@ const CollegeRouteWrapper: React.FC = () => {
       document.documentElement.style.setProperty('--color-primary', '#8c2434'); // Maroon
     } else if (college === 'michiganstate') {
       document.documentElement.style.setProperty('--color-primary', '#166534'); // MSU green
+    } else if (college === 'oregonuniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#007030'); // Official UO Green
     } else if (college === 'westvirginiauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#002855'); // WVU blue
     } else if (college === 'pittsburghuniversity') {
       document.documentElement.style.setProperty('--color-primary', '#003594'); // Pitt blue
     } else if (college === 'alabamauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#9E1B32'); // Alabama Crimson
-    } else if (college === 'oregonuniversity') {
-      document.documentElement.style.setProperty('--color-primary', '#FFD700'); // Oregon Green/Gold
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }
