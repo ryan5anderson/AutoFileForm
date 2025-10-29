@@ -346,11 +346,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <strong>Display Standard Case Pack:</strong> Display unit includes garments.
               </div>
             )}
-            <div className="product-detail-options-content" style={{
-              overflowY: category.hasPantOptions ? 'hidden' : 'auto',
-              paddingBottom: '2rem',
-              maxHeight: category.hasPantOptions ? 'none' : 'calc(100vh - 400px)'
-            }}>
+            <div className="product-detail-options-content">
               {renderConfigurationPanel()}
             </div>
           </div>
