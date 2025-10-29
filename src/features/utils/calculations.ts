@@ -35,7 +35,8 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
           potentialCategory === 'socks' || potentialCategory === 'bottle' ||
           potentialCategory === 'sticker' || potentialCategory === 'plush' ||
           potentialCategory === 'signage' ||
-          potentialCategory === 'displays') {
+          potentialCategory === 'displays' ||
+          potentialCategory === 'youth&infant') {
         console.log(`DEBUG: Found matching category path: ${potentialCategory}`);
         return potentialCategory;
       } else {
@@ -141,6 +142,9 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
       return 1;
     case 'sticker':
     case 'plush':
+      return 6;
+    case 'youth&infant':
+      console.log(`DEBUG: youth&infant category, returning 6`);
       return 6;
     default:
       console.log(`DEBUG: Unknown categoryPath: ${normalizedCategory}, version: ${normalizedVersion}, returning default 7`);
@@ -494,6 +498,32 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
     }
   });
 
+  // Validate infant size counts (6M/12M)
+  Object.entries(formData.infantSizeCounts || {}).forEach(([imagePath, counts]) => {
+    if (counts) {
+      const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+      if (total > 0) {
+        const categoryPath = getCategoryPathForImage(imagePath, categories);
+        const packSize = getCorrectPackSize(categoryPath, undefined, imagePath);
+        const allowsAny = getAllowsAnyQuantity(categoryPath, undefined, imagePath);
+
+        if (allowsAny) {
+          // For categories that allow any quantity, only check minimum
+          if (total < 1) {
+            errors.push(`${imagePath}: Minimum quantity is 1`);
+            invalidProductPaths.push(imagePath);
+          }
+        } else {
+          // For categories that require pack size multiples
+          if (total % packSize !== 0) {
+            errors.push(`${imagePath}: Total must be a multiple of ${packSize}`);
+            invalidProductPaths.push(imagePath);
+          }
+        }
+      }
+    }
+  });
+
   if (errors.length > 0) {
     // Remove duplicates from invalidProductPaths
     const uniquePaths: string[] = [];
@@ -580,6 +610,11 @@ export function getSizeOptions(categoryPath: string, version?: string): Size[] {
   // Socks use different sizing
   if (categoryPath.includes('sock')) {
     return ['SM', 'XL'] as any;
+  }
+
+  // Youth products get XS-XL sizes
+  if (categoryPath.includes('youth')) {
+    return ['XS', 'S', 'M', 'L', 'XL'];
   }
 
   // T-shirts and hoodies get XXXL option (but not women's t-shirts)

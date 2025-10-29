@@ -3,6 +3,16 @@
   "logo": "/logo/oregonlogo.png",
   "categories": [
     {
+      "name": "Display Options",
+      "path": "displays",
+      "hasDisplayOptions": true,
+      "images": [
+        "University of Oregon-3FT_Inline_500.jpg",
+        "University of Oregon-Premium Floor Display 2.0_500.jpg",
+        "University of Oregon-Tier2_Display_Floor_500.jpg"
+      ]
+    },
+    {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
       "path": "tshirt/men",
       "hasShirtVersions": true,

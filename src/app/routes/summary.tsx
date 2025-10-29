@@ -137,6 +137,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             pantOptions={formData.pantOptions}
             colorOptions={formData.colorOptions}
             shirtColorSizeCounts={formData.shirtColorSizeCounts}
+            infantSizeCounts={formData.infantSizeCounts}
             readOnly={true}
             college={college}
           />

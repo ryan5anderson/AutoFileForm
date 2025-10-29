@@ -47,9 +47,7 @@
         "M100853688_SH2FDS_Custom_Legends_DTF_on_Steel.png",
         "M100853866_SH2FDC_Built_by_DTFN_on_CrimsoBlack.png",
         "M101003169_SH2FDC_Crimson_A_DTFon_Black.png",
-        "M101457413_CM7031_Custom_LC_FZ_Steel_Hood.png",
-        "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Stee.png",
-        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png"
+        "M101457413_CM7031_Custom_LC_FZ_Steel_Hood.png"
       ]
     },
     {
@@ -89,12 +87,15 @@
       ]
     },
     {
-      "name": "Infant",
-      "path": "tshirt/men",
+      "name": "Youth & Infant",
+      "path": "youth&infant",
+      "hasSizeOptions": true,
       "images": [
-        "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
+        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png",
         "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
-        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png"
+        "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
+        "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Steel.png",
+        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png"
       ]
     },
     {

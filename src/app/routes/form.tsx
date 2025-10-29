@@ -177,6 +177,7 @@ const FormPage: React.FC<FormPageProps> = ({
               pantOptions={formData.pantOptions}
               colorOptions={formData.colorOptions}
               shirtColorSizeCounts={formData.shirtColorSizeCounts}
+              infantSizeCounts={formData.infantSizeCounts}
               invalidProductPaths={invalidProductPaths}
               validProductPaths={validProductPaths}
               onQuantityChange={onQuantityChange}

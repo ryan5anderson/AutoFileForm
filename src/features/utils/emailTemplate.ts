@@ -26,64 +26,67 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
 
         // Check for color-based size counts first
         if (colorSizeCountsByVersion) {
-          // Combine all colors and sizes for this product version
-          const combinedBreakdown: string[] = [];
+          // Group by color first, then show versions
+          const colorGroups: Map<string, string[]> = new Map();
+          let totalQty = 0;
 
+          // First pass: collect all color-version-size combinations
           for (const version of filteredVersions) {
             const byColor = colorSizeCountsByVersion[version as keyof ShirtVersion];
             if (byColor) {
-                  const colorBreakdown = Object.entries(byColor)
-                    .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
-                    .map(([colorName, counts]) => {
-                      if (!counts) return '';
-                      const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
-                      const formattedSizes = sizeOrder
-                        .map(sz => {
-                          const val = counts[sz] || 0;
-                          return val > 0 ? `${sz}: ${val}` : '';
-                        })
-                        .filter(Boolean)
-                        .join(', ');
+              const versionName = getVersionDisplayName(version, img);
+              const versionTotal = Object.values(byColor).reduce((sum, counts) =>
+                sum + Object.values(counts || {}).reduce((a, b) => a + b, 0), 0);
 
-                      const totalForColor = Object.values(counts).reduce((a, b) => a + b, 0);
-                      return `${colorName}: ${totalForColor}${formattedSizes ? ` (${formattedSizes})` : ''}`;
-                    })
-                    .filter(Boolean)
-                    .join(', ');
+              if (versionTotal > 0) {
+                totalQty += versionTotal;
 
-              if (colorBreakdown) {
-                const versionName = getVersionDisplayName(version, img);
-                const totalForVersion = Object.values(byColor).reduce((sum, counts) =>
-                  sum + Object.values(counts || {}).reduce((a, b) => a + b, 0), 0);
-
-                if (totalForVersion > 0) {
-                  combinedBreakdown.push(`${versionName}: ${totalForVersion} ${colorBreakdown}`);
-                }
+                Object.entries(byColor)
+                  .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
+                  .forEach(([colorName, counts]) => {
+                    if (!counts) return;
+                    const sizeOrder: ('XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+                    
+                    sizeOrder.forEach(sz => {
+                      const val = counts[sz] || 0;
+                      if (val > 0) {
+                        if (!colorGroups.has(colorName)) {
+                          colorGroups.set(colorName, []);
+                        }
+                        colorGroups.get(colorName)!.push(`${versionName} ${sz}:${val}`);
+                      }
+                    });
+                  });
               }
             }
           }
 
-          if (combinedBreakdown.length > 0) {
-            const totalQty = combinedBreakdown.reduce((sum, item) => {
-              const match = item.match(/: (\d+)/);
-              return sum + (match ? parseInt(match[1]) : 0);
-            }, 0);
+          // Format as "Color: Version Size:qty ; Version Size:qty"
+          const colorLines: string[] = [];
+          colorGroups.forEach((versionSizes, colorName) => {
+            colorLines.push(`${colorName}: ${versionSizes.join(' ; ')}`);
+          });
 
+          if (colorLines.length > 0) {
             categoryItems.push({
               sku,
-              name: `${name} ${combinedBreakdown.join('; ')}`,
+              name: colorLines.join(' ; '),
               qty: String(totalQty)
             });
           }
         } else {
-          // Fall back to regular size counts (no colors)
+          // Fall back to regular size counts (no colors) - combine all versions into one line
+          const versionDetails: string[] = [];
+          let totalQty = 0;
+
           for (const version of filteredVersions) {
             const counts = sizeByVersion[version as keyof ShirtVersion];
             const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
             if (vTotal > 0) {
+              totalQty += vTotal;
               const versionName = getVersionDisplayName(version, img);
               // Format sizes as "S: 1 M: 2 XL: 3" etc.
-              const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+              const sizeOrder: ('XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
               const formattedSizes = counts ? sizeOrder
                 .map(sz => {
                   const val = counts[sz] || 0;
@@ -91,13 +94,42 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
                 })
                 .filter(Boolean)
                 .join(', ') : '';
-              categoryItems.push({
-                sku,
-                name: `${versionName}${formattedSizes ? ` ${formattedSizes}` : ''}`,
-                qty: String(vTotal),
-                version
-              });
+              
+              // For youth products (in Youth & Infant category), don't show version name
+              const isYouth = cat.name === 'Youth & Infant' && img.toLowerCase().includes('youth');
+              const displayName = isYouth && formattedSizes ? formattedSizes : `${versionName}${formattedSizes ? ` ${formattedSizes}` : ''}`;
+              versionDetails.push(displayName);
             }
+          }
+
+          if (versionDetails.length > 0) {
+            categoryItems.push({
+              sku,
+              name: versionDetails.join(' ; '),
+              qty: String(totalQty)
+            });
+          }
+        }
+      } else if (img.toLowerCase().includes('infant') || img.toLowerCase().includes('onsie')) {
+        // Handle infant products with 6M/12M sizes FIRST (only check by image name, not category name)
+        // This allows youth products in "Youth & Infant" category to use shirtSizeCounts
+        // Must check BEFORE size options/shirt versions checks to avoid conflicts
+        const infantCounts = formData.infantSizeCounts?.[imagePath];
+        if (infantCounts) {
+          const totalQty = Object.values(infantCounts).reduce((sum, count) => sum + count, 0);
+          if (totalQty > 0) {
+            const sizeDetails: string[] = [];
+            if (infantCounts['6M'] > 0) {
+              sizeDetails.push(`6M: ${infantCounts['6M']}`);
+            }
+            if (infantCounts['12M'] > 0) {
+              sizeDetails.push(`12M: ${infantCounts['12M']}`);
+            }
+            categoryItems.push({
+              sku,
+              name: sizeDetails.length > 0 ? sizeDetails.join(', ') : name,
+              qty: String(totalQty)
+            });
           }
         }
       } else if (cat.hasSizeOptions) {
@@ -119,7 +151,7 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
           const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
           if (vTotal > 0) {
             // Format sizes as "S: 1 M: 2 XL: 3" etc.
-            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+            const sizeOrder: ('XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
             const formattedSizes = counts ? sizeOrder
               .map(sz => {
                 const val = counts[sz] || 0;
@@ -138,9 +170,12 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
               versionLabel = version.replace(/(jacket|flannels|shorts|socks)/gi, '').trim();
             }
 
+            // For youth products (in Youth & Infant category), don't show version name
+            const isYouth = cat.name === 'Youth & Infant' && img.toLowerCase().includes('youth');
+            const displayName = isYouth && formattedSizes ? formattedSizes : `${versionLabel}${formattedSizes ? ` ${formattedSizes}` : ''}`;
             categoryItems.push({
               sku,
-              name: `${versionLabel}${formattedSizes ? ` ${formattedSizes}` : ''}`,
+              name: displayName,
               qty: String(vTotal)
             });
           }
@@ -175,7 +210,7 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
             if (!sizeCounts || typeof sizeCounts !== 'object') return;
 
             // Format sizes as "S: 1 M: 2 XL: 3" etc.
-            const sizeOrder: ('S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+            const sizeOrder: ('XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
             const formattedSizes = sizeOrder
               .map(sz => {
                 const val = sizeCounts[sz] || 0;
@@ -228,6 +263,28 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
             });
           }
         });
+      } else if (formData.colorOptions && formData.colorOptions[imagePath]) {
+        // Handle color options for items like hats
+        const colorOpts = formData.colorOptions[imagePath];
+        let totalColorQty = 0;
+        const colorDetails: string[] = [];
+        
+        Object.entries(colorOpts).forEach(([colorName, qty]) => {
+          const quantity = Number(qty) || 0;
+          if (quantity > 0) {
+            totalColorQty += quantity;
+            colorDetails.push(`${colorName}: ${quantity}`);
+          }
+        });
+        
+        if (totalColorQty > 0) {
+          // Only show color and quantity, no product name/title
+          categoryItems.push({
+            sku,
+            name: colorDetails.join(', '),
+            qty: String(totalColorQty)
+          });
+        }
       } else {
         // For non-shirt categories, use regular quantity
         const quantity = formData.quantities[imagePath] || '0';

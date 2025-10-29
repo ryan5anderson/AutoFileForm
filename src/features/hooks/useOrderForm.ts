@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService, OrderProduct } from '../../services/firebaseOrderService';
-import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts } from '../../types';
+import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
 import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts, calculateTotalItems } from '../utils/index';
 
 // Convert FormData to OrderProduct array for detailed product display
@@ -115,6 +115,19 @@ const convertFormDataToProducts = (formData: FormData, categories: Category[]): 
         });
       }
 
+      // Infant size counts (6M/12M)
+      if (formData.infantSizeCounts && formData.infantSizeCounts[imagePath]) {
+        const infantCounts = formData.infantSizeCounts[imagePath];
+        Object.entries(infantCounts).forEach(([size, qty]) => {
+          const quantity = Number(qty);
+          if (quantity > 0) {
+            quantities[size] = quantity;
+            totalQuantity += quantity;
+            hasData = true;
+          }
+        });
+      }
+
       if (hasData) {
         products.push({
           category: category.name,
@@ -190,8 +203,10 @@ export const useOrderForm = (categories: Category[]) => {
       ...Object.keys(formData.shirtSizeCounts || {}),
       ...Object.keys(formData.colorOptions || {}),
       ...Object.keys(formData.shirtColorSizeCounts || {}),
+      ...Object.keys(formData.displayOptions || {}),
       ...Object.keys(formData.pantOptions || {}),
-      ...Object.keys(formData.sweatpantJoggerOptions || {})
+      ...Object.keys(formData.sweatpantJoggerOptions || {}),
+      ...Object.keys(formData.infantSizeCounts || {})
     ]);
 
     allProductPaths.forEach(imagePath => {
@@ -200,11 +215,16 @@ export const useOrderForm = (categories: Category[]) => {
         (formData.shirtSizeCounts?.[imagePath] && Object.values(formData.shirtSizeCounts[imagePath]).some(counts => Object.values(counts).some(count => count > 0))) ||
         (formData.colorOptions?.[imagePath] && Object.values(formData.colorOptions[imagePath]).some(qty => parseInt(qty) > 0)) ||
         (formData.shirtColorSizeCounts?.[imagePath] && Object.values(formData.shirtColorSizeCounts[imagePath]).some(colorData => Object.values(colorData).some(counts => Object.values(counts).some(count => count > 0)))) ||
+        (formData.displayOptions?.[imagePath] && (
+          Number(formData.displayOptions[imagePath]?.displayOnly || 0) > 0 || 
+          Number(formData.displayOptions[imagePath]?.displayStandardCasePack || 0) > 0
+        )) ||
         (formData.pantOptions?.[imagePath] && (
           (formData.pantOptions[imagePath].sweatpants && Object.values(formData.pantOptions[imagePath].sweatpants!).some(counts => Object.values(counts).some(count => count > 0))) ||
           (formData.pantOptions[imagePath].joggers && Object.values(formData.pantOptions[imagePath].joggers!).some(counts => Object.values(counts).some(count => count > 0)))
         )) ||
-        (formData.sweatpantJoggerOptions?.[imagePath] && Object.values(formData.sweatpantJoggerOptions[imagePath]).some(qty => parseInt(qty) > 0))
+        (formData.sweatpantJoggerOptions?.[imagePath] && Object.values(formData.sweatpantJoggerOptions[imagePath]).some(qty => parseInt(qty) > 0)) ||
+        (formData.infantSizeCounts?.[imagePath] && Object.values(formData.infantSizeCounts[imagePath]).some(count => count > 0))
       );
 
       if (hasQuantity && !validationResult.invalidProductPaths.includes(imagePath)) {
@@ -261,7 +281,8 @@ export const useOrderForm = (categories: Category[]) => {
       displayOptions: {
         ...prev.displayOptions,
         [imagePath]: {
-          ...prev.displayOptions?.[imagePath],
+          displayOnly: prev.displayOptions?.[imagePath]?.displayOnly || '',
+          displayStandardCasePack: prev.displayOptions?.[imagePath]?.displayStandardCasePack || '',
           [option]: value
         } as DisplayOption
       }
@@ -320,7 +341,15 @@ export const useOrderForm = (categories: Category[]) => {
     }));
   };
 
-
+  const handleInfantSizeCountsChange = (imagePath: string, counts: InfantSizeCounts) => {
+    setFormData((prev: FormData) => ({
+      ...prev,
+      infantSizeCounts: {
+        ...prev.infantSizeCounts,
+        [imagePath]: counts
+      }
+    }));
+  };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -429,6 +458,7 @@ export const useOrderForm = (categories: Category[]) => {
     handlePantOptionChange,
     handleColorOptionChange,
     handleShirtColorSizeCountsChange,
+    handleInfantSizeCountsChange,
     handleFormSubmit,
     handleBack,
     handleBackToSummary,

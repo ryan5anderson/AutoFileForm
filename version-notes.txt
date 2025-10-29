@@ -10,7 +10,6 @@ Order by size
 
 v3 Notes
     To-do
-        Pack size distrution logic
         
     Done
         Nice looking title linked to M# title
@@ -33,3 +32,13 @@ v3 Notes
         Combine Display Card and Magnets sections in one labeled Signage
         optimize for the phone
         Order summary, reciept and email have a uniform way of tracking quantites and size quantites
+
+v4 Notes
+     To-do
+        Pack size distrution logic
+        Uniform way of keeping sizes, color, quantites
+        
+    Done
+        Remove fleece from wvu
+        Add Oregon displays
+        

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, SizeCounts, Size, ShirtColorSizeCounts } from '../../types';
+import { ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, SizeCounts, Size, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
 import { hasColorOptions } from '../utils';
 
 interface OrderSummaryCardProps {
@@ -15,6 +15,7 @@ interface OrderSummaryCardProps {
   sweatpantJoggerOptions?: Record<string, SweatpantJoggerOption>;
   pantOptions?: Record<string, PantOption>;
   colorOptions?: Record<string, Record<string, string>>;
+  infantSizeCounts?: Record<string, InfantSizeCounts>;
   invalidProductPaths?: string[];
   college?: string;
   hasShirtVersions?: boolean;
@@ -34,6 +35,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   sweatpantJoggerOptions = {},
   pantOptions = {},
   colorOptions = {},
+  infantSizeCounts = {},
   invalidProductPaths = [],
   college,
   hasShirtVersions = false,
@@ -79,7 +81,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
                 styleTotal += colorTotal;
 
                 // Build size detail like S7 M7 XL7
-                const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
                 const sizePieces = sizeOrder
                   .map(sz => {
                     const val = sizeCounts[sz] || 0;
@@ -137,80 +139,108 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
       return null;
     }
 
+    // Handle infant products with 6M/12M sizes FIRST (only check by image name, not category name)
+    // This allows youth products in "Youth & Infant" category to use shirtSizeCounts
+    // Must check BEFORE size options/shirt versions checks to avoid conflicts
+    if (imageName.toLowerCase().includes('infant') || imageName.toLowerCase().includes('onsie')) {
+      const infantCounts = infantSizeCounts[imagePath];
+      if (infantCounts) {
+        const totalQty = Object.values(infantCounts).reduce((sum: number, count: number) => sum + count, 0);
+        if (totalQty > 0) {
+          const details: string[] = [];
+          if (infantCounts['6M'] > 0) {
+            details.push(`6M: ${infantCounts['6M']}`);
+          }
+          if (infantCounts['12M'] > 0) {
+            details.push(`12M: ${infantCounts['12M']}`);
+          }
+          return { total: totalQty, details: details.join(', ') };
+        }
+      }
+      return null;
+    }
+
     // Handle shirt versions or size options (size breakdown)
     if (hasShirtVersions) {
       // Check for color-based size counts first
       if (shirtColorSizeCounts[imagePath]) {
         const colorSizeCountsByVersion = shirtColorSizeCounts[imagePath];
         const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
-        const totalsByVersion = versionOrder.map((vk) => {
+        const totalQty = versionOrder.reduce((sum, vk) => {
           const byColor = colorSizeCountsByVersion[vk];
-          if (!byColor) return 0;
-          return Object.values(byColor).reduce((colorSum, counts) => {
+          if (!byColor) return sum;
+          return sum + Object.values(byColor).reduce((colorSum, counts) => {
             if (!counts) return colorSum;
             return colorSum + Object.values(counts).reduce((sizeSum: number, qty: number) => sizeSum + qty, 0);
           }, 0);
-        });
-        const totalQty = totalsByVersion.reduce((a: number, b: number) => a + b, 0);
+        }, 0);
+
         if (totalQty > 0) {
           const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
-          const details: string[] = [];
-          versionOrder.forEach((vk, i) => {
-            const vTotal = totalsByVersion[i];
-            if (vTotal > 0) {
-              const byColor = colorSizeCountsByVersion[vk];
-              if (byColor) {
-                const colorBreakdown = Object.entries(byColor)
-                  .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
-                  .map(([colorName, counts]) => {
-                    if (!counts) return '';
-                    const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
-                    const sizePieces = sizeOrder
-                      .map(sz => {
-                        const val = (counts as any)[sz] || 0;
-                        return val > 0 ? `${sz}${val}` : '';
-                      })
-                      .filter(Boolean)
-                      .join(' ');
-                    return `${colorName}: ${Object.values(counts).reduce((a, b) => a + b, 0)}${sizePieces ? ` (${sizePieces})` : ''}`;
-                  })
-                  .filter(Boolean)
-                  .join(', ');
-                details.push(`${labels[vk as keyof typeof labels]}: ${vTotal} (${colorBreakdown})`);
-              }
+          
+          // Group by color first
+          const colorGroups: Map<string, string[]> = new Map();
+
+          versionOrder.forEach((vk) => {
+            const byColor = colorSizeCountsByVersion[vk];
+            if (byColor) {
+              const versionName = labels[vk as keyof typeof labels];
+              Object.entries(byColor)
+                .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
+                .forEach(([colorName, counts]) => {
+                  if (!counts) return;
+                  const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                  
+                  sizeOrder.forEach(sz => {
+                    const val = (counts as any)[sz] || 0;
+                    if (val > 0) {
+                      if (!colorGroups.has(colorName)) {
+                        colorGroups.set(colorName, []);
+                      }
+                      colorGroups.get(colorName)!.push(`${versionName} ${sz}:${val}`);
+                    }
+                  });
+                });
             }
           });
-          return { total: totalQty, details: details.join('; ') };
+
+          // Format as "Color: Version Size:qty ; Version Size:qty"
+          const colorLines: string[] = [];
+          colorGroups.forEach((versionSizes, colorName) => {
+            colorLines.push(`${colorName}: ${versionSizes.join(' ; ')}`);
+          });
+
+          return { total: totalQty, details: colorLines.join(' ; ') };
         }
       }
 
-      // Regular size counts
+      // Regular size counts - combine all versions into one line
       const sizeByVersion = shirtSizeCounts[imagePath] || {};
       const versionOrder: (keyof ShirtVersion)[] = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
-      const totalsByVersion = versionOrder.map((vk) => {
+      const versionDetails: string[] = [];
+      let totalQty = 0;
+
+      versionOrder.forEach((vk) => {
         const c = sizeByVersion[vk];
-        return c ? Object.values(c).reduce((a,b)=>a+b,0) : 0;
+        const vTotal = c ? Object.values(c).reduce((a,b)=>a+b,0) : 0;
+        if (vTotal > 0) {
+          totalQty += vTotal;
+          const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
+          const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+          const sizePieces = c ? sizeOrder
+            .map((sz: Size) => {
+              const val = c[sz] || 0;
+              return val > 0 ? `${sz}: ${val}` : '';
+            })
+            .filter(Boolean)
+            .join(', ') : '';
+          const detail = `${labels[vk as keyof typeof labels]}${sizePieces ? ` ${sizePieces}` : ''}`;
+          versionDetails.push(detail);
+        }
       });
-      const totalQty = totalsByVersion.reduce((a,b)=>a+b,0);
+
       if (totalQty > 0) {
-        const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
-        const details: string[] = [];
-        versionOrder.forEach((vk, i) => {
-          const vTotal = totalsByVersion[i];
-          if (vTotal > 0) {
-            const c = sizeByVersion[vk];
-            const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
-            const sizePieces = c ? sizeOrder
-              .map((sz: Size) => {
-                const val = c[sz] || 0;
-                return val > 0 ? `${sz}${val}` : '';
-              })
-              .filter(Boolean)
-              .join(' ') : '';
-            details.push(`${labels[vk as keyof typeof labels]}: ${vTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
-          }
-        });
-        return { total: totalQty, details: details.join('; ') };
+        return { total: totalQty, details: versionDetails.join(' ; ') };
       }
       return null;
     }
@@ -243,7 +273,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
                   .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
                   .map(([colorName, counts]) => {
                     if (!counts) return '';
-                    const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+                    const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
                     const sizePieces = sizeOrder
                       .map(sz => {
                         const val = (counts as any)[sz] || 0;
@@ -289,7 +319,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
             if (vTotal > 0) {
               const c = sizeByVersion[vk];
               // Include sock sizes in the size order
-              const sizeOrder: Size[] = ['S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+              const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
               const sizePieces = c ? sizeOrder
                 .map((sz: Size) => {
                   const val = c[sz] || 0;
@@ -345,11 +375,11 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
       if (colorQty) {
         const totalQty = Object.values(colorQty).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
         if (totalQty > 0) {
-          // Create detailed breakdown like "White: 6, Gray: 6"
+          // Create one-line format like "White 6 Grays 6"
           const colorBreakdown = Object.entries(colorQty)
             .filter(([_, qty]) => Number(qty) > 0)
-            .map(([colorName, qty]) => `${colorName}: ${qty}`)
-            .join(', ');
+            .map(([colorName, qty]) => `${colorName} ${qty}`)
+            .join(' ');
 
           return { total: totalQty, details: colorBreakdown };
         }

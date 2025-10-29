@@ -55,6 +55,9 @@ const PACK_SIZES: PackSizeConfig = {
   'plush': 6,
   'signage': 1,      // Signage items - any quantity allowed
 
+  // Youth & Infant
+  'youth&infant': 6, // Packs of 6
+
   // Default fallback
   'default': 7,
 };

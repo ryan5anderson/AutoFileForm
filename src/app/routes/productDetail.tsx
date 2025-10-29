@@ -5,11 +5,12 @@ import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
 import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
+import InfantSizeSelector from '../../features/components/panels/InfantSizeSelector';
 import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
 import ProductCard from '../../features/components/panels/QuantityPanel';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
 import { getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
-import { Category, SizeCounts, PantOption } from '../../types';
+import { Category, SizeCounts, PantOption, InfantSizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import '../../styles/product-detail.css';
 
@@ -24,6 +25,7 @@ interface ProductDetailPageProps {
   onPantOptionChange?: (imagePath: string, option: PantOption) => void;
   onColorOptionChange?: (imagePath: string, color: string, value: string) => void;
   onShirtColorSizeCountsChange?: (imagePath: string, version: any, color: string, counts: any) => void;
+  onInfantSizeCountsChange?: (imagePath: string, counts: InfantSizeCounts) => void;
 }
 
 const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
@@ -37,6 +39,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   onPantOptionChange,
   onColorOptionChange,
   onShirtColorSizeCountsChange,
+  onInfantSizeCountsChange,
 }) => {
   const { college, category: categoryPath, productId } = useParams();
   const navigate = useNavigate();
@@ -107,11 +110,41 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   // Determine which configuration panel to render
   const renderConfigurationPanel = () => {
+    // Check if this is an infant product - only if image name contains "infant" or "onsie"
+    // Youth products have "youth" in the name and should NOT use infant sizes
+    // (For "Youth & Infant" category, we distinguish by image name, not category name)
+    const lowerImageName = imageName.toLowerCase();
+    const isInfantProduct = lowerImageName.includes('infant') || lowerImageName.includes('onsie');
+    
+    if (isInfantProduct && onInfantSizeCountsChange) {
+      // Handle infant products with 6M/12M sizes
+      const infantCounts: InfantSizeCounts = formData.infantSizeCounts?.[imagePath] || { '6M': 0, '12M': 0 };
+      const packSize = getPackSize(category.path, undefined, imageName);
+      
+      return (
+        <>
+          <div className="single-option-panel">
+            <div className="field">
+              <div className="field-label">Quantity</div>
+              <div className="field-control">
+                <InfantSizeSelector
+                  counts={infantCounts}
+                  onChange={(c: InfantSizeCounts) => onInfantSizeCountsChange(imagePath, c)}
+                  packSize={packSize}
+                  allowAnyQuantity={false}
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+    
     if (category.hasPantOptions) {
       // Pants with sweatpants/joggers and steel/black/dark navy options with size selection
       const pantOption = formData.pantOptions?.[imagePath] || {
-        sweatpants: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, black: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, darkNavy: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 } },
-        joggers: { steel: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, darkHeather: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 } }
+        sweatpants: { steel: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, black: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, darkNavy: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 } },
+        joggers: { steel: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 }, darkHeather: { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 } }
       };
       
       return (
@@ -203,7 +236,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 );
               } else {
                 // For single-color products, show regular SizePackSelector
-                const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+                const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
                 const packSize = getPackSize(category.path, version, imageName);
                 const sizesArray = getSizeOptions(category.path, version);
                 return (
@@ -247,7 +280,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         version = 'stickers';
       }
       const versionKey = version;
-      const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+      const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
       const packSize = getPackSize(category.path, version, imageName);
       const sizesArray = getSizeOptions(category.path, version);
 
