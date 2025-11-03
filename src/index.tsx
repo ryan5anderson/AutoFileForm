@@ -6,6 +6,8 @@ import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
 import Header from './app/layout/Header';
 import AboutPage from './app/routes/about';
 import AdminPage from './app/routes/admin';
+import AdminCollegeSelection from './app/routes/adminCollegeSelection';
+import AdminCollegeView from './app/routes/adminCollegeView';
 import AllOrdersPage from './app/routes/allOrders';
 import ContactPage from './app/routes/contact';
 import CollegeRouteWrapper from './components/CollegeRouteWrapper';
@@ -68,18 +70,21 @@ function AppShell() {
 
   // Avoid rendering global sidebar on the form root where the page has its own sidebar
   const segments = location.pathname.split('/').filter(Boolean);
+  const isAdminRoute = segments[0] === 'admin';
   const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact' || segments[0] === 'admin' || segments[0] === 'all-orders');
   
   // Determine if we should show categories in sidebar
   const shouldShowCategories = React.useMemo(() => {
+    // Don't show categories in global sidebar for admin routes (they have their own sidebar)
+    if (isAdminRoute) return false;
     // Show categories on college routes (form, summary, receipt, thankyou)
     return segments.length >= 1 && (colleges as any)[segments[0]] !== undefined;
-  }, [segments]);
+  }, [segments, isAdminRoute]);
 
   return (
     <>
       <Header />
-      {!isFormRoot && (
+      {!isFormRoot && !isAdminRoute && (
         <CollapsibleSidebar
           categories={categories}
           activeSection={''}
@@ -94,6 +99,8 @@ function AppShell() {
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/admin' element={<AdminPage />} />
+        <Route path='/admin/colleges' element={<AdminCollegeSelection />} />
+        <Route path='/admin/college/:collegeKey' element={<AdminCollegeView />} />
         <Route path='/all-orders' element={<AllOrdersPage />} />
         <Route path='/:college/*' element={<CollegeRouteWrapper />} />
       </Routes>

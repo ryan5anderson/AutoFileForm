@@ -392,9 +392,16 @@ const AdminPage: React.FC = () => {
           <div className="admin-section">
             <h2>Quick Actions</h2>
             <div className="admin-actions-grid">
-              <button className="admin-action-button" onClick={addTestOrder}>
-                <span className="action-icon">🧪</span>
-                <span>Add Test Order</span>
+              <button 
+                className="admin-action-button"
+                onClick={() => navigate('/admin/colleges')}
+              >
+                <span className="action-icon">🏫</span>
+                <span>Manage Colleges</span>
+              </button>
+              <button className="admin-action-button">
+                <span className="action-icon">➕</span>
+                <span>Add New Product</span>
               </button>
               <button 
                 className="admin-action-button"
@@ -403,13 +410,9 @@ const AdminPage: React.FC = () => {
                 <span className="action-icon">📋</span>
                 <span>View All Orders</span>
               </button>
-              <button className="admin-action-button">
-                <span className="action-icon">➕</span>
-                <span>Add New Product</span>
-              </button>
-              <button className="admin-action-button">
-                <span className="action-icon">🏫</span>
-                <span>Manage Colleges</span>
+              <button className="admin-action-button" onClick={addTestOrder}>
+                <span className="action-icon">🧪</span>
+                <span>Add Test Order</span>
               </button>
             </div>
           </div>

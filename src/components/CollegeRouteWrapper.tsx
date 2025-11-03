@@ -9,6 +9,7 @@ import ProductDetailPageWrapper from './ProductDetailPageWrapper';
 
 const CollegeRouteWrapper: React.FC = () => {
   const { college } = useParams();
+  
   const collegeConfig = college ? colleges[college as keyof typeof colleges] : undefined;
   const categories = collegeConfig?.categories ?? [];
 
@@ -30,6 +31,11 @@ const CollegeRouteWrapper: React.FC = () => {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }
   }, [college]);
+  
+  // Don't treat admin routes as college routes
+  if (college === 'admin' || college === 'about' || college === 'contact' || college === 'all-orders') {
+    return null;
+  }
 
   if (!collegeConfig) {
     return <div style={{ textAlign: 'center', marginTop: '2rem', color: '#dc2626' }}>College not found</div>;

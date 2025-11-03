@@ -208,14 +208,29 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   };
 
   // Filter images to only show those with quantities in read-only mode
+  // Exception: If all form data is empty (e.g., admin preview mode), show all products
+  const hasAnyFormData = Object.keys(quantities).length > 0 || 
+    Object.keys(shirtVersions).length > 0 ||
+    Object.keys(displayOptions).length > 0 ||
+    Object.keys(sweatpantJoggerOptions).length > 0 ||
+    Object.keys(pantOptions).length > 0 ||
+    Object.keys(colorOptions).length > 0 ||
+    Object.keys(shirtSizeCounts).length > 0 ||
+    Object.keys(shirtColorSizeCounts).length > 0 ||
+    Object.keys(infantSizeCounts).length > 0;
+
   const filteredImages = category.images.filter((img: string) => {
     if (!readOnly) return true; // Show all items in form mode
+    // If read-only but no form data exists, show all products (admin preview mode)
+    if (!hasAnyFormData) return true;
+    // Otherwise, only show products with quantities (summary/receipt mode)
     const imagePath = `${category.path}/${img}`;
     return hasQuantity(imagePath, img);
   });
 
   // Don't render the category section if no items have quantities in read-only mode
-  if (readOnly && filteredImages.length === 0) {
+  // Exception: If all form data is empty, always show (admin preview mode)
+  if (readOnly && filteredImages.length === 0 && hasAnyFormData) {
     return null;
   }
 
@@ -361,7 +376,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   </p>
                 )}
 
-                {readOnly && (
+                {readOnly && hasAnyFormData && (
                   <OrderSummaryCard
                     categoryPath={category.path}
                     imageName={img}
