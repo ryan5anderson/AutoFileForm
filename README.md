@@ -28,15 +28,6 @@ A React-based order form system for college retail stores to create and submit p
 - `npm run build` - Production build
 - `npm run deploy` - Deploy to GitHub Pages
 
-## Documentation Structure
-- `docs/ARCHITECTURE.md` - System architecture overview
-- `docs/STATE_MANAGEMENT.md` - State management analysis
-- `docs/COMPONENTS.md` - Component architecture and patterns
-- `docs/EMAIL_SYSTEM.md` - Email generation and sending
-- `docs/ISSUES.md` - Code quality issues and improvements
-- `docs/REFACTORING.md` - Recommended refactoring strategies
-- `UNUSED_CODE_ANALYSIS.md` - Detailed analysis of unused code and dependencies (see below)
-
 ## Quick Start
 1. **Clone the repository**
    ```bash
@@ -58,23 +49,7 @@ A React-based order form system for college retail stores to create and submit p
    - Navigate to `http://localhost:3000/` to select your college
    - The app uses HashRouter, so routes will be like `http://localhost:3000/#/michiganstate`
 
-## URL Structure
 
-The application uses HashRouter for GitHub Pages compatibility:
-
-- **College Selection**: `/#/`
-- **Order Form**: `/#/michiganstate` or `/#/arizonastate` or `/#/westvirginiauniversity`
-- **Product Detail**: `/#/michiganstate/product/:category/:productId`
-- **Order Summary**: `/#/michiganstate/summary`
-- **Order Receipt**: `/#/michiganstate/receipt`
-- **Thank You**: `/#/michiganstate/thankyou`
-- **About Page**: `/#/about`
-- **Contact Page**: `/#/contact`
-
-### Supported Colleges
-1. **Michigan State** (`michiganstate`)
-2. **Arizona State** (`arizonastate`)
-3. **West Virginia University** (`westvirginiauniversity`)
 
 ## Project Structure
 
@@ -161,90 +136,3 @@ src/
 └── constants/                # Application constants
     └── index.ts
 ```
-
-## Architecture Highlights
-
-### Feature-Based Organization
-The codebase has been restructured from a monolithic component structure to a feature-based architecture:
-
-- **Separation of Concerns**: Domain logic, UI components, and utilities are properly separated
-- **Modular Design**: Features are self-contained with their own components, hooks, and utilities
-- **Scalability**: Easy to add new colleges, products, or features without affecting existing code
-- **Maintainability**: Clear boundaries between different parts of the application
-
-### Key Architectural Decisions
-
-1. **Configuration-Driven**: College configurations moved to JSON files for easier management
-2. **Type Safety**: Strong TypeScript integration throughout the application
-3. **Reusable Components**: UI primitives in `components/ui/` for consistent design
-4. **Custom Hooks**: Business logic encapsulated in `useOrderForm` hook
-5. **Service Layer**: External integrations isolated in services directory
-6. **CSS Custom Properties**: Dynamic theming based on college selection
-
-### State Management
-- **Pattern**: React Context API + custom hooks (`useOrderForm`)
-- **Scope**: Global state via OrderFormContext, scoped to college routes
-- **Benefits**: 
-  - Simple and predictable state flow
-  - No external state management dependencies
-  - Easy to test and maintain
-  - Type-safe with TypeScript
-- **State Persistence**: Form state persists within a session but resets on page reload
-
-### Key Technical Features
-
-1. **Product Configuration System**
-   - Size pack selectors with real-time validation
-   - Multi-version support (t-shirt, long sleeve, hoodie, crewneck)
-   - Color variant management
-   - Display options and special configurations
-   - Sweatpant/Jogger style selectors
-
-2. **Validation System**
-   - Real-time quantity validation with visual feedback
-   - Size pack requirements (multiples of 6, 7, or 8 depending on product)
-   - Special case handling for tie-dye products
-   - Form completeness checking before submission
-
-3. **Email Generation**
-   - Automatic SKU extraction from filenames
-   - Category-based grouping
-   - Version and color information included
-   - Order notes support
-   - Professional HTML email template
-
-4. **Responsive Design**
-   - Mobile-first CSS approach
-   - Collapsible sidebar navigation
-   - Touch-friendly interfaces
-   - Optimized for both desktop and mobile ordering
-
-## Code Quality & Maintenance
-
-### Unused Code Identified
-
-A comprehensive analysis has identified the following unused dependencies and files. See `UNUSED_CODE_ANALYSIS.md` for full details.
-
-**Unused NPM Dependencies (can be removed):**
-- `zustand` (v5.0.6) - State management library, not currently used
-- `classnames` (v2.5.1) - CSS class utility, not currently used
-
-**Unused Utility Files (can be removed):**
-- `src/utils/format.ts` - Formatting utilities with no imports
-- `src/utils/guard.ts` - Type guard utilities with no imports
-- `src/reportWebVitals.ts` - Web vitals reporting, not imported
-
-**To clean up unused code:**
-```bash
-# Remove unused dependencies
-npm uninstall zustand classnames
-
-# Remove unused files
-rm src/utils/format.ts
-rm src/utils/guard.ts
-rm src/reportWebVitals.ts
-
-# Update src/utils/index.ts to remove the exports
-```
-
-**Note**: The codebase is generally very clean with minimal unused code. Most items are leftover from initial Create React App setup.
