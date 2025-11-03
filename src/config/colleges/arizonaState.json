@@ -6,11 +6,7 @@
       "name": "Display Options",
       "path": "displays",
       "hasDisplayOptions": true,
-      "images": [
-        "Arizona_State_3FT_Inline_500.jpg",
-        "Arizona_State_Premium Floor Display 2.0_500.jpg",
-        "Arizona_State_Tier2_Display_Floor_500.jpg"
-      ]
+      "images": []
     },
     {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
@@ -23,7 +19,8 @@
         "crewneck"
       ],
       "tieDyeImages": [
-        "M102595496_SH2FDC_Custom_DTF_on_Maroon.png"
+        "M102595496_SH2FDC_Custom_DTF_on_Maroon.png",
+        "M103842644_SDOLAC_Overlay_DTF_on_Maroon.png"
       ],
       "images": [
         "M102035313_SDARTC_Artificer_DTF_on_Maroon.png",
@@ -47,12 +44,19 @@
         "M102518813_SDBARC_Barbarian_DTF_on_Gold.png",
         "M102520049_SH2FDC_Custom_DTF_on_Gold.png",
         "M102593327_SDBMCC_Battle_Master_DTF_on_Black.png",
+        "M102593538_SDNIEB_Nietzsche_DTF_on_Black.png",
         "M102595122_SDWALC_Warlock_DTF_on_Black.png",
         "M102595496_SH2FDC_Custom_DTF_on_Maroon.png",
         "M102687033_SH2FDC_Custom_DTF_on_Gold.png",
         "M103347282_SH2FDS_Custom_DTF_on_White_or_Steel.png",
         "M103347352_SDBARS_Barbarian_DTF_on_Steel.png",
-        "M103725725_SH2FDC_Custom_Cavalier_DTF_on_Black.png"
+        "M103725725_SH2FDC_Custom_Cavalier_DTF_on_Black.png",
+        "M103824115_SDARMB_Aristotle_DTF_on_Black.png",
+        "M103824252_SDMONB_Monk_DTF_on_Black.png",
+        "M103826167_SDDRUB_Druid_DTF_on_Black.png",
+        "M103842644_SDOLAC_Overlay_DTF_on_Maroon.png",
+        "M103842779_SH2FDS_Custom_Forks_Up_DTF_on_Gold.png",
+        "M103847986_SH2FDS_Forks_Up_DTF_on_Steel_or_White.png"
       ]
     },
     {
@@ -64,7 +68,9 @@
       ],
       "images": [
         "M102073749_SDMAIC_Jr_Magician_DTF_on_Maroon.png",
-        "M102074486_SDSORS_Jr_Socrates_DTF_on_Steel.png"
+        "M102074486_SDSORS_Jr_Socrates_DTF_on_Steel.png",
+        "M103825931_SDMAIB_Jr_Magicia_DTF_on_Black.png",
+        "M103826467_SDTILS_Jr_Tilting_DTF_on_Black.png"
       ]
     },
     {
@@ -80,7 +86,6 @@
         "M103092526_SHSSUV_Custom_UV_Water_Bottle.png"
       ]
     },
-
     {
       "name": "Flannel Pajama Pants",
       "path": "flannels",
@@ -136,7 +141,9 @@
         "M103006622_SHMEMS_Mesh_Stripe_Sticker.png",
         "M103006734_SHSWMS_Swoosh_Mascot_Sticker_Pack.png",
         "M103006839_SHSTPK_Custom_Sticker_Pack.png",
-        "M103006972_SHAVES_Advenger_Mascot_Sticker.png"
+        "M103006972_SHAVES_Advenger_Mascot_Sticker.png",
+        "M103209294_CM7062_Sun_Devils_Shelf_Sticker_48x5.png",
+        "M103209417_CM7063_Arizona_State_Shelf_Sticker_48x5.png"
       ]
     },
     {
@@ -160,6 +167,33 @@
         "M102313692_SHWGCH_Custom_PFD_Header_Card.png",
         "M102313972_SHWGCS_Custom_Spinner_Header_Card.png",
         "M102630540_SHMH24_Custom_4ft_Shelf_Magnet.png"
+      ]
+    },
+    {
+      "name": "Hat",
+      "path": "hat",
+      "images": [
+        "M102300177_SHE1CH_Custom_Maroon_Conquer_Hat.png",
+        "M102300329_SHE1CH_Custom_Gray_Hale_Hat.png",
+        "M102349699_SHE1CH_Custom_Maroon_Conquer_Hat.png",
+        "M102542418_SHE2CH_Custom_Gray_Hale_or_Fly_Hat.png"
+      ]
+    },
+    {
+      "name": "Beanie",
+      "path": "beanie",
+      "images": [
+        "M102300460_SHE1CB_Custom_Logo_Maroon_Beanie.png",
+        "M102300567_SHE1CB_Custom_Logo_Gray_Beanie.png",
+        "M102542759_SHE2CB_Custom_Logo_Gray_Beanie.png"
+      ]
+    },
+    {
+      "name": "Backpack",
+      "path": "backpack",
+      "images": [
+        "M103842871_SDBAPA_Custom_DTF_Black_Cinch_Backpac.png",
+        "M103843288_SDBAPA_Custom_Logo_Gold_Cinch_Backpac.png"
       ]
     }
   ]

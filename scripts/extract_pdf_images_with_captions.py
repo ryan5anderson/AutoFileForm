@@ -1,15 +1,5 @@
 #!/usr/bin/env python3
 """
-Development-only helper script.
-
-Run whatever background tasks you need here (e.g., file watching,
-image processing, syncing). This file is ignored by production builds
-because it is not imported anywhere by the React app and lives outside
-the build pipeline.
-"""
-
-#!/usr/bin/env python3
-"""
 Extract images from a PDF, categorize them, and update college configs.
 
 This script:
@@ -18,6 +8,9 @@ This script:
 3. Categorizes images into subfolders (beanie, tshirt/men, etc.)
 4. Cleans existing images in the target college's public folder
 5. Updates the corresponding JSON config with extracted image filenames
+6. Ignores banner items (does not save or add to config)
+7. Maps magnet items to signage category
+8. Adds backpack category for items with "backpac" or "backpack" keywords
 
 Dependencies:
     pip install PyMuPDF pandas
@@ -46,13 +39,15 @@ Key Options:
 Note:
     The script handles M-codes with varying digit lengths (8-9 digits).
     Examples: M102595496, M90637743, M89672118
+    
+    Banner items are automatically skipped and not added to the config.
+    Magnet items are categorized under signage.
 """
 
 import argparse
 import re
 import json
 import os
-import glob
 import hashlib
 from pathlib import Path
 import fitz  # PyMuPDF
@@ -150,8 +145,13 @@ def update_college_config(
         path_to_category_idx[category['path']] = idx
     
     # Update existing categories and track which paths were processed
+    # Filter out banner category from being added/updated
     processed_paths = set()
     for category_path, image_files in category_image_map.items():
+        # Skip banner category entirely
+        if category_path == "banner":
+            continue
+            
         if category_path in path_to_category_idx:
             # Update existing category
             idx = path_to_category_idx[category_path]
@@ -168,6 +168,9 @@ def update_college_config(
             config['categories'].append(new_category)
             processed_paths.add(category_path)
             print(f"  ℹ Created new category: {category_name} (path: {category_path})")
+    
+    # Remove banner category if it exists
+    config['categories'] = [cat for cat in config['categories'] if cat['path'] != 'banner']
     
     # Clear images arrays for categories that weren't in the extraction
     for category in config['categories']:
@@ -207,40 +210,49 @@ def unique_path(base_dir: Path, base_name: str, ext: str) -> Path:
         i += 1
     return p
 
-def categorize_image(caption: str) -> str:
+def categorize_image(caption: str) -> Optional[str]:
     """
     Categorize an image based on its caption/title using case-insensitive matching.
     Returns the subfolder path (e.g., 'beanie/', 'tshirt/women/', etc.)
+    Returns None for items that should be ignored (e.g., banner items).
     
     Rules applied in order (first match wins):
-    1. Beanie → beanie/
-    2. Bottle → bottle/
-    3. header → signage/
-    4. card → signage/
-    5. hat → hat/
-    6. flannels → flannels/
-    7. plush → plush/
-    8. fleece → jacket/
-    9. jacket → jacket/
-    10. side_print → shorts/
-    11. shorts → shorts/
-    12. socks → socks/
-    13. sticker → sticker/
-    14. jogger → pants/
-    15. pants → pants/
-    16. banner → banner/
-    17. shelf → banner/
-    18. jr (as word) → tshirt/women/
-    19. default → tshirt/men/
+    1. banner → None (ignored)
+    2. Backpack/Backpac → backpack/
+    3. Beanie → beanie/
+    4. Bottle → bottle/
+    5. Magnet → signage/
+    6. header → signage/
+    7. card → signage/
+    8. hat → hat/
+    9. flannels → flannels/
+    10. plush → plush/
+    11. fleece → jacket/
+    12. jacket → jacket/
+    13. side_print → shorts/
+    14. shorts → shorts/
+    15. socks → socks/
+    16. sticker → sticker/
+    17. jogger → pants/
+    18. pants → pants/
+    19. jr (as word) → tshirt/women/
+    20. default → tshirt/men/
     """
     caption_lower = caption.lower()
     
+    # Ignore banner items (must check first)
+    if "banner" in caption_lower:
+        return None
+    
     # Check each rule in order (more specific rules first)
+    if "backpac" in caption_lower or "backpack" in caption_lower:
+        return "backpack"
     if "beanie" in caption_lower:
         return "beanie"
     if "bottle" in caption_lower:
         return "bottle"
-    # header → signage (must come before card)
+    if "magnet" in caption_lower:
+        return "signage"
     if "header" in caption_lower:
         return "signage"
     if "card" in caption_lower:
@@ -251,12 +263,10 @@ def categorize_image(caption: str) -> str:
         return "flannels"
     if "plush" in caption_lower:
         return "plush"
-    # fleece → jacket (must come before jacket)
     if "fleece" in caption_lower:
         return "jacket"
     if "jacket" in caption_lower:
         return "jacket"
-    # side_print → shorts (must come before shorts)
     if "side_print" in caption_lower or "side print" in caption_lower:
         return "shorts"
     if "shorts" in caption_lower:
@@ -265,18 +275,12 @@ def categorize_image(caption: str) -> str:
         return "socks"
     if "sticker" in caption_lower:
         return "sticker"
-    # jogger → pants (must come before pants)
     if "jogger" in caption_lower:
         return "pants"
     if "pants" in caption_lower:
         return "pants"
-    if "banner" in caption_lower:
-        return "banner"
-    if "shelf" in caption_lower:
-        return "banner"
     
     # Check for "jr" as a word (with word boundaries)
-    # Match: jr, Jr, JR, jr., jr,, jr-, etc.
     if re.search(r'\bjr\b', caption_lower):
         return "tshirt/women"
     
@@ -464,12 +468,11 @@ def extract_images_with_captions(
     manifest_rows = []
     saved_count = 0
     skipped_duplicates = 0
+    skipped_banners = 0
     failed_captions = 0
     
     # Track seen images by hash to avoid duplicates
     seen_hashes: Set[str] = set()
-    # Track captions to handle multiple images with same caption
-    caption_usage: Dict[str, int] = {}
 
     for pno in range(len(doc)):
         page = doc[pno]
@@ -505,6 +508,12 @@ def extract_images_with_captions(
 
             # Categorize the image based on caption
             category = categorize_image(caption)
+            
+            # Skip banner items (category is None)
+            if category is None:
+                skipped_banners += 1
+                print(f"  ⊗ Skipped banner item: {caption[:60]}")
+                continue
             
             # Create category subfolder
             category_dir = outdir / category
@@ -557,6 +566,7 @@ def extract_images_with_captions(
     print(f"\n{'='*50}")
     print(f"✓ Saved {saved_count} unique images to {outdir}")
     print(f"⊗ Skipped {skipped_duplicates} duplicate images")
+    print(f"⊗ Skipped {skipped_banners} banner items")
     print(f"⚠  {failed_captions} images with generic names (caption detection failed)")
     print(f"📊 Manifest: {manifest_csv}")
     return manifest_csv

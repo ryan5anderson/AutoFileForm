@@ -37,6 +37,7 @@ v4 Notes
      To-do
         Pack size distrution logic
         Uniform way of keeping sizes, color, quantites
+        Go back on broswer takes you back from product page to order page in one click
         
     Done
         Remove fleece from wvu
