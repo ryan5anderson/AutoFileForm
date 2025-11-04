@@ -409,8 +409,15 @@
   box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
   box-sizing: border-box;
   min-width: 0;
-  padding: clamp(0.5rem, 2vw, 0.75rem);
+  overflow: hidden;
+  padding: 0;
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  padding-left: 0;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .size-pack__cell:hover {
@@ -423,7 +430,11 @@
   display: flex;
   flex-direction: column;
   gap: clamp(0.4rem, 2vw, 0.5rem);
+  min-width: 0;
+  padding: 0;
   width: 100%;
+  justify-content: space-between;
+  flex: 1;
 }
 
 .size-pack__label {
@@ -438,30 +449,34 @@
   background: linear-gradient(180deg, var(--color-slate-50), var(--color-slate-100));
   border: 2px solid var(--color-border);
   border-radius: 8px;
+  box-sizing: border-box;
   color: var(--color-text);
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
+  flex-shrink: 0;
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
 
-  /* Desktop sizes - comfortable for mouse */
+  /* Fill container width, maintain minimum height for usability */
   height: 2rem;
   justify-content: center;
   min-height: 2rem;
-  min-width: 2rem;
-  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
-  width: 2rem;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  width: 100%;
 }
 
 .size-pack__btn:hover { 
-  background: linear-gradient(180deg, var(--color-slate-100), var(--color-slate-200));
+  background: var(--color-primary);
   border-color: var(--color-primary);
   box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+  color: white;
 }
 
 .size-pack__btn:active {
-  background: linear-gradient(180deg, var(--color-slate-200), var(--color-slate-300)); 
+  background: var(--color-primary);
+  filter: brightness(0.85);
   transform: translateY(1px);
+  color: white;
 }
 
 .size-pack__btn:disabled {
@@ -522,8 +537,7 @@
     font-size: var(--font-size-lg);
     height: 2.25rem;
     min-height: 2.25rem;
-    min-width: 2.25rem;
-    width: 2.25rem;
+    width: 100%;
   }
 
   .size-pack__input {
@@ -536,7 +550,11 @@
   }
 
   .size-pack__cell {
-    padding: 0.6rem;
+    padding: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
   }
 }
 
@@ -552,7 +570,11 @@
   .size-pack__cell {
     box-sizing: border-box;
     min-width: 90px;
-    padding: clamp(0.5rem, 2vw, 0.75rem);
+    padding: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
   }
 
   .size-pack__cell-content {
@@ -566,8 +588,7 @@
     /* Apple HIG recommends 44x44pt minimum for touch targets */
     height: 2.75rem; /* 44px */
     min-height: 2.75rem;
-    min-width: 2.75rem;
-    width: 2.75rem; /* 44px */
+    width: 100%;
   }
 
   .size-pack__input {
@@ -593,7 +614,11 @@
 
   .size-pack__cell {
     min-width: 0;
-    padding: clamp(0.4rem, 2vw, 0.6rem);
+    padding: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
   }
 
   .size-pack__cell-content {
@@ -606,8 +631,7 @@
     /* Maintain good touch targets */
     height: 2.5rem; /* 40px */
     min-height: 2.5rem;
-    min-width: 2.5rem;
-    width: 2.5rem; /* 40px */
+    width: 100%;
   }
 
   .size-pack__input {
@@ -630,7 +654,11 @@
   }
 
   .size-pack__cell {
-    padding: clamp(0.35rem, 2vw, 0.5rem);
+    padding: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
   }
 
   .size-pack__cell-content {
@@ -643,8 +671,7 @@
     /* Still maintain reasonable touch targets */
     height: 2.25rem; /* 36px */
     min-height: 2.25rem;
-    min-width: 2.25rem;
-    width: 2.25rem; /* 36px */
+    width: 100%;
   }
 
   .size-pack__input {
@@ -665,7 +692,11 @@
   }
 
   .size-pack__cell {
-    padding: clamp(0.3rem, 2vw, 0.4rem);
+    padding: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
   }
 
   .size-pack__cell-content {
@@ -676,8 +707,7 @@
     font-size: var(--font-size-base);
     height: 2rem; /* 32px - minimum acceptable */
     min-height: 2rem;
-    min-width: 2rem;
-    width: 2rem; /* 32px */
+    width: 100%;
   }
 
   .size-pack__input {

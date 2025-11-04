@@ -31,7 +31,7 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
     <div style={{
       display: 'flex',
       flexDirection: useSideBySide ? 'row' : 'column',
-      gap: useSideBySide ? 'var(--space-3)' : 'var(--space-2)',
+      gap: useSideBySide ? '0' : 'var(--space-2)',
       width: '100%'
     }}>
       {colors.map((color) => (

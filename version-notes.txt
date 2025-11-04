@@ -42,4 +42,7 @@ v4 Notes
     Done
         Remove fleece from wvu
         Add Oregon displays
+        Fix: can see size selections for two selections in a row
+        Fix: Category sidebar isnt scrolling
+        Removed colors from titles for pants
         

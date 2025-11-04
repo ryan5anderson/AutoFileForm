@@ -247,11 +247,12 @@
   box-sizing: border-box;
   flex: none;
   height: auto;
-  margin-right: 0;
+  margin-left: clamp(-0.875rem, -2.75vw, -1.375rem);
+  margin-right: clamp(-0.875rem, -2.75vw, -1.375rem);
   max-height: none;
   overflow: visible;
-  padding: 0 clamp(0.5rem, 2vw, 1rem);
-  width: 100%;
+  padding: 0;
+  width: calc(100% + clamp(1.75rem, 5.5vw, 2.75rem));
 }
 
 /* Scrollbar styles removed - no scrolling needed on mobile */
@@ -581,12 +582,13 @@
     box-sizing: border-box;
     flex: none;
     height: auto;
-    margin-right: 0;
+    margin-left: clamp(-0.375rem, -1.75vw, -0.875rem);
+    margin-right: clamp(-0.375rem, -1.75vw, -0.875rem);
     max-height: none;
     overflow: visible;
     overflow-y: visible;
-    padding-right: 0;
-    width: 100%;
+    padding: 0;
+    width: calc(100% + clamp(0.75rem, 3.5vw, 1.75rem));
   }
 
   .done-btn {

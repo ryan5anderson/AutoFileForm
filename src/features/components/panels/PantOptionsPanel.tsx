@@ -112,7 +112,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
                 background: 'var(--color-bg)',
                 border: '1px solid var(--color-border)',
                 borderRadius: 'var(--radius)',
-                padding: 'var(--space-2)',
+                padding: 0,
                 flex: '1',
                 minWidth: 0
               }}>
