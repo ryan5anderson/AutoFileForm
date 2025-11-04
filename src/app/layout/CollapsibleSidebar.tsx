@@ -128,16 +128,18 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               )}
             </div>
           )}
+          </nav>
 
-          {/* About Us & Contact Us Links */}
-          <Link
-            to="/about"
-            className="sidebar-nav-item sidebar-link"
-            onClick={onToggle}
-          >
-            <span className="nav-icon">ℹ️</span>
-            <span className="nav-text">About Us</span>
-          </Link>
+          {/* About Us & Contact Us Links - Bottom of sidebar */}
+          <div className="sidebar-bottom-section">
+            <Link
+              to="/about"
+              className="sidebar-nav-item sidebar-link"
+              onClick={onToggle}
+            >
+              <span className="nav-icon">ℹ️</span>
+              <span className="nav-text">About Us</span>
+            </Link>
 
             <Link
               to="/contact"
@@ -147,10 +149,8 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               <span className="nav-icon">📧</span>
               <span className="nav-text">Contact Us</span>
             </Link>
-          </nav>
 
-          {/* Admin Section - Bottom of sidebar */}
-          <div className="sidebar-admin-section">
+            {/* Admin Section - Bottom of sidebar */}
             <Link
               to="/admin"
               className="sidebar-nav-item sidebar-link admin-link"
@@ -242,7 +242,8 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           .sidebar-nav {
             padding: 16px;
             flex: 1;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             min-height: 0;
           }
 
@@ -287,10 +288,31 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
           .dropdown-toggle {
             justify-content: space-between !important;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          }
+
+          .dropdown-toggle:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
           }
 
           .dropdown-toggle.expanded {
-            background: #f3f4f6;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #2563eb;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+          }
+
+          .dropdown-toggle.expanded .nav-icon,
+          .dropdown-toggle.expanded .nav-text,
+          .dropdown-toggle.expanded .dropdown-arrow {
+            color: white;
           }
 
           .nav-icon {
@@ -315,6 +337,9 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             padding-left: 16px;
             margin-top: 8px;
             animation: slideDown 0.3s ease;
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
           }
 
           @keyframes slideDown {
@@ -331,22 +356,26 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           .dropdown-item {
             display: block;
             width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 4px;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 6px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
             text-align: left;
             cursor: pointer;
             transition: all 0.2s ease;
-            color: #6b7280;
-            font-size: 0.8125rem;
+            color: #374151;
+            font-size: 0.9375rem;
             font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
           }
 
           .dropdown-item:hover {
             background: #f9fafb;
-            color: #374151;
+            color: #1f2937;
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transform: translateX(2px);
           }
 
           .dropdown-item.active {
@@ -359,7 +388,33 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           }
 
           .sidebar-section {
-            margin-bottom: 8px;
+            margin-bottom: 16px;
+            margin-top: 8px;
+          }
+
+          .sidebar-bottom-section {
+            margin-top: auto;
+            padding: 12px 16px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            flex-shrink: 0;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+
+          .sidebar-bottom-section .sidebar-nav-item {
+            padding: 10px 14px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-bottom: 0;
+          }
+
+          .sidebar-bottom-section .nav-icon {
+            font-size: 14px;
+            min-width: 18px;
           }
 
           .sidebar-admin-section {
@@ -376,10 +431,10 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             background: transparent;
             color: #6b7280;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 6px;
             margin-bottom: 0;
-            padding: 10px 16px;
-            font-size: 0.8125rem;
+            padding: 8px 14px;
+            font-size: 0.75rem;
             width: 100%;
             box-sizing: border-box;
           }
@@ -393,7 +448,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           }
 
           .admin-link .nav-icon {
-            font-size: 16px;
+            font-size: 14px;
           }
 
 

@@ -20,9 +20,9 @@ export const getDisplayProductName = (imageName: string): string => {
 
   // Custom display names for specific sweatpant items (with ID/codes removed)
   const sweatpantDisplayMapping: Record<string, string> = {
-    'M100447223 SHVSCD Value DTF Gray Pants Jogger.png': 'Value DTF Gray Pants',
-    'M100446293 SHPSDS Shake it DTF Gray Pants Jogger.png': 'Shake it DTF Gray Pants',
-    'M100448649 SHFDDS Force Down DTF Gray Pants Straight-Leg.png': 'Force Down DTF Gray Pants',
+    'M100447223 SHVSCD Value DTF Gray Pants Jogger.png': 'Value DTF Pants',
+    'M100446293 SHPSDS Shake it DTF Gray Pants Jogger.png': 'Shake it DTF Pants',
+    'M100448649 SHFDDS Force Down DTF Gray Pants Straight-Leg.png': 'Force Down DTF Pants',
   };
 
   if (sweatpantDisplayMapping[imageName]) return sweatpantDisplayMapping[imageName];
@@ -36,13 +36,51 @@ export const getDisplayProductName = (imageName: string): string => {
       const afterSecondUnderscore = baseName.substring(secondUnderscoreIndex + 1);
       // Step 2: Replace remaining underscores with spaces
       const cleanedName = afterSecondUnderscore.replace(/_/g, ' ').trim();
-      return cleanedName || baseName;
+      return removeColorFromPantsTitle(cleanedName || baseName);
     }
   }
 
   // Fallback: just replace underscores with spaces if pattern doesn't match
-  return baseName.replace(/_/g, ' ').trim();
+  const fallbackName = baseName.replace(/_/g, ' ').trim();
+  return removeColorFromPantsTitle(fallbackName);
 };
+
+// Remove color words from sweatpants/joggers titles
+// Example: "Value DTF Gray Pants" -> "Value DTF Pants"
+// Example: "Custom DTF Steel Joggers" -> "Custom DTF Joggers"
+function removeColorFromPantsTitle(name: string): string {
+  // List of common color words to remove (order matters: multi-word colors first)
+  const colors = [
+    'Dark Navy', 'Dark Heather', 'Steel White', 'Crimson Black', 'Kelly Green',
+    'Gray', 'Grey', 'Steel', 'Navy', 'Black', 'White', 'Maroon', 'Crimson',
+    'Gold', 'Green', 'Forest', 'Royal', 'Charcoal', 'Ash', 'Heather'
+  ];
+  
+  // Check if the name ends with "Pants", "Jogger", or "Joggers" (case-insensitive)
+  const pantsMatch = name.match(/\s+(Pants|Jogger|Joggers)$/i);
+  if (!pantsMatch) {
+    return name; // Not a pants/jogger product, return as is
+  }
+  
+  const pantsSuffix = pantsMatch[1]; // "Pants", "Jogger", or "Joggers"
+  
+  // Try to match and remove color words (case-insensitive)
+  // Match colors that are followed by the pants/jogger suffix
+  for (const color of colors) {
+    // Escape special regex characters in the color name
+    const escapedColor = color.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // For multi-word colors, replace spaces with \s+ to match one or more spaces
+    const colorPattern = escapedColor.replace(/\s+/g, '\\s+');
+    // Create regex pattern: word boundary at start, color pattern, one or more spaces, then pants suffix
+    const colorRegex = new RegExp(`\\b${colorPattern}\\s+(?=${pantsSuffix})`, 'i');
+    if (colorRegex.test(name)) {
+      // Remove the color word and return
+      return name.replace(colorRegex, '').trim();
+    }
+  }
+  
+  return name; // No color found, return as is
+}
 
 export const getRackDisplayName = (imageName: string): string => {
   // Map rack image names to display names

@@ -474,6 +474,7 @@
   border: 2px solid var(--color-border);
   border-radius: 8px;
   box-sizing: border-box;
+  color: var(--color-text);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
 
