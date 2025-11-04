@@ -23,17 +23,3 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Product images - exclude from Git tracking to prevent E2BIG error
-/public/*/tshirt/
-/public/*/hat/
-/public/*/bottle/
-/public/*/beanie/
-/public/*/card/
-/public/*/pj/
-/public/*/rack/
-/public/*/raincoat/
-/public/*/short/
-/public/*/sock/
-/public/*/sweatpant/
-/public/*/sticker/
-/public/*/plush/
