@@ -72,6 +72,7 @@ function AppShell() {
   // Avoid rendering global sidebar on the form root where the page has its own sidebar
   const segments = location.pathname.split('/').filter(Boolean);
   const isAdminRoute = segments[0] === 'admin';
+  const isAdminCollegeView = isAdminRoute && segments.length === 3 && segments[1] === 'college';
   const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact' || segments[0] === 'admin' || segments[0] === 'all-orders');
   
   // Determine if we should show categories in sidebar
@@ -85,7 +86,7 @@ function AppShell() {
   return (
     <>
       <Header />
-      {!isFormRoot && !isAdminRoute && (
+      {!isFormRoot && !isAdminCollegeView && (
         <CollapsibleSidebar
           categories={categories}
           activeSection={''}

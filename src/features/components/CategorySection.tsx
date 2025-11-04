@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui';
 import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
-import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions } from '../utils';
+import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions, getVersionDisplayName } from '../utils';
 
 import OrderSummaryCard from './OrderSummaryCard';
 
@@ -54,6 +54,175 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   college
 }) => {
   const navigate = useNavigate();
+
+  // Helper function to get cart variations for a product
+  const getCartVariations = (imagePath: string, imageName: string): string[] => {
+    const variations: string[] = [];
+
+    // Handle shirt versions (tshirt, longsleeve, hoodie, crewneck)
+    if (category.hasShirtVersions) {
+      // Check color-based size counts first - group colors by version
+      const colorSizeCountsByVersion = shirtColorSizeCounts?.[imagePath];
+      if (colorSizeCountsByVersion) {
+        Object.entries(colorSizeCountsByVersion).forEach(([version, byColor]) => {
+          if (byColor) {
+            const colorsWithQuantity: string[] = [];
+            Object.entries(byColor).forEach(([colorName, counts]) => {
+              if (counts) {
+                const hasQuantity = Object.values(counts).some((qty) => qty > 0);
+                if (hasQuantity) {
+                  // Format color names nicely
+                  const formattedColor = colorName.charAt(0).toUpperCase() + colorName.slice(1);
+                  colorsWithQuantity.push(formattedColor);
+                }
+              }
+            });
+            
+            if (colorsWithQuantity.length > 0) {
+              const displayName = getVersionDisplayName(version);
+              // Group colors in parentheses: "T-Shirt (Black, Forest)"
+              if (colorsWithQuantity.length > 1) {
+                variations.push(`${displayName} (${colorsWithQuantity.join(', ')})`);
+              } else {
+                variations.push(`${displayName} (${colorsWithQuantity[0]})`);
+              }
+            }
+          }
+        });
+      }
+
+      // Check regular size counts (no colors, just versions)
+      const sizeCountsByVersion = shirtSizeCounts[imagePath];
+      if (sizeCountsByVersion) {
+        Object.entries(sizeCountsByVersion).forEach(([version, counts]) => {
+          if (counts) {
+            const hasQuantity = Object.values(counts).some((qty) => qty > 0);
+            if (hasQuantity) {
+              const displayName = getVersionDisplayName(version);
+              if (!variations.includes(displayName)) {
+                variations.push(displayName);
+              }
+            }
+          }
+        });
+      }
+
+      // Check legacy shirt versions
+      const shirtVersion = shirtVersions[imagePath];
+      if (shirtVersion) {
+        Object.entries(shirtVersion).forEach(([version, qty]) => {
+          if (qty && Number(qty) > 0) {
+            const displayName = getVersionDisplayName(version);
+            if (!variations.includes(displayName)) {
+              variations.push(displayName);
+            }
+          }
+        });
+      }
+    }
+
+    // Handle pant options (sweatpants/joggers with colors)
+    if (category.hasPantOptions) {
+      const pOptions = pantOptions[imagePath];
+      if (pOptions) {
+        // Check sweatpants
+        if (pOptions.sweatpants) {
+          const hasSweatpants = Object.values(pOptions.sweatpants).some((sizeCounts) => {
+            if (!sizeCounts) return false;
+            return Object.values(sizeCounts).some((qty) => qty > 0);
+          });
+          if (hasSweatpants) {
+            const colors: string[] = [];
+            Object.entries(pOptions.sweatpants).forEach(([color, sizeCounts]) => {
+              if (sizeCounts) {
+                const hasQty = Object.values(sizeCounts).some((qty) => qty > 0);
+                if (hasQty) {
+                  // Format color names nicely
+                  const colorName = color === 'darkNavy' ? 'Dark Navy' : 
+                                  color === 'darkHeather' ? 'Dark Heather' :
+                                  color.charAt(0).toUpperCase() + color.slice(1);
+                  colors.push(colorName);
+                }
+              }
+            });
+            if (colors.length > 0) {
+              variations.push(`Sweatpants (${colors.join(', ')})`);
+            }
+          }
+        }
+
+        // Check joggers
+        if (pOptions.joggers) {
+          const hasJoggers = Object.values(pOptions.joggers).some((sizeCounts) => {
+            if (!sizeCounts) return false;
+            return Object.values(sizeCounts).some((qty) => qty > 0);
+          });
+          if (hasJoggers) {
+            const colors: string[] = [];
+            Object.entries(pOptions.joggers).forEach(([color, sizeCounts]) => {
+              if (sizeCounts) {
+                const hasQty = Object.values(sizeCounts).some((qty) => qty > 0);
+                if (hasQty) {
+                  const colorName = color === 'darkHeather' ? 'Dark Heather' :
+                                  color === 'darkNavy' ? 'Dark Navy' :
+                                  color.charAt(0).toUpperCase() + color.slice(1);
+                  colors.push(colorName);
+                }
+              }
+            });
+            if (colors.length > 0) {
+              variations.push(`Joggers (${colors.join(', ')})`);
+            }
+          }
+        }
+      }
+    }
+
+    // Handle legacy sweatpants/joggers
+    if (category.name === 'Sweatpants/Joggers') {
+      const sjOptions = sweatpantJoggerOptions[imagePath];
+      if (sjOptions) {
+        const types: string[] = [];
+        Object.entries(sjOptions).forEach(([option, qty]) => {
+          if (qty && Number(qty) > 0) {
+            // Format option names: "sweatpantSteel" -> "Sweatpants (Steel)"
+            if (option.startsWith('sweatpant')) {
+              const color = option.replace('sweatpant', '');
+              const colorName = color === 'DarkNavy' ? 'Dark Navy' :
+                              color === 'DarkHeather' ? 'Dark Heather' :
+                              color.charAt(0).toUpperCase() + color.slice(1);
+              types.push(`Sweatpants (${colorName})`);
+            } else if (option.startsWith('jogger')) {
+              const color = option.replace('jogger', '');
+              const colorName = color === 'DarkHeather' ? 'Dark Heather' :
+                              color === 'DarkNavy' ? 'Dark Navy' :
+                              color.charAt(0).toUpperCase() + color.slice(1);
+              types.push(`Joggers (${colorName})`);
+            }
+          }
+        });
+        variations.push(...types);
+      }
+    }
+
+    // Handle color options (for items like hats)
+    if (hasColorOptions(imageName)) {
+      const colorQty = colorOptions[imagePath];
+      if (colorQty) {
+        const selectedColors: string[] = [];
+        Object.entries(colorQty).forEach(([colorName, qty]) => {
+          if (qty && Number(qty) > 0) {
+            selectedColors.push(colorName.charAt(0).toUpperCase() + colorName.slice(1));
+          }
+        });
+        if (selectedColors.length > 0) {
+          variations.push(...selectedColors);
+        }
+      }
+    }
+
+    return variations;
+  };
 
   // Helper function to check if an item has any quantity
   const hasQuantity = (imagePath: string, imageName: string) => {
@@ -276,7 +445,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           
           // Check if this product has validation errors or valid quantities
           const hasValidationError = invalidProductPaths.includes(imagePath);
-          const hasValidQuantity = validProductPaths.includes(imagePath);
+          const hasAnyQuantity = hasQuantity(imagePath, img);
           const shouldHighlight = hasValidationError;
 
           return (
@@ -315,7 +484,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
               )}
 
               {/* Blue cart icon for valid quantities */}
-              {hasValidQuantity && !shouldHighlight && (
+              {hasAnyQuantity && !shouldHighlight && (
                 <div
                   style={{
                     position: 'absolute',
@@ -338,6 +507,53 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   🛒
                 </div>
               )}
+
+              {/* Cart variations box at bottom of card - always visible */}
+              {hasAnyQuantity && !shouldHighlight && !readOnly && (() => {
+                const variations = getCartVariations(imagePath, img);
+                if (variations.length === 0) return null;
+                
+                return (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      left: '8px',
+                      right: '8px',
+                      backgroundColor: 'rgba(37, 99, 235, 0.85)',
+                      color: 'white',
+                      padding: '6px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.7rem',
+                      zIndex: 10,
+                      backdropFilter: 'blur(4px)',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    }}
+                  >
+                    <div style={{ fontWeight: '600', marginBottom: '3px', fontSize: '0.75rem' }}>
+                      In Cart:
+                    </div>
+                    <div style={{ 
+                      display: 'flex', 
+                      flexWrap: 'wrap', 
+                      gap: '4px',
+                      lineHeight: '1.3'
+                    }}>
+                      {variations.map((variation, idx) => (
+                        <span key={idx} style={{ 
+                          display: 'inline-block',
+                          padding: '2px 6px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                          borderRadius: '4px',
+                          fontSize: '0.65rem',
+                        }}>
+                          {variation}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Red overlay for invalid quantities */}
               {shouldHighlight && (
