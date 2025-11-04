@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-import { colleges } from '../../config';
 import { adminConfig } from '../../config/env';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 
-import ReceiptPage from './receipt';
 
 const AllOrdersPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(true); // Skip auth for now since coming from admin dashboard
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'completed' | 'cancelled'>('all');
   const [filterCollege, setFilterCollege] = useState<string>('all');
+  const [filterStoreNumber, setFilterStoreNumber] = useState<string>('all');
 
   // Load all orders when authenticated
   useEffect(() => {
@@ -37,21 +36,29 @@ const AllOrdersPage: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  // Hide the Back to Summary button when modal opens
+  // Handle orderId from URL query parameter - navigate to receipt page instead of modal
   useEffect(() => {
-    if (selectedOrder) {
-      const timer = setTimeout(() => {
-        const buttons = document.querySelectorAll('.receipt-wrapper button');
-        buttons.forEach(button => {
-          if (button.textContent?.includes('Back to Summary')) {
-            (button as HTMLButtonElement).style.display = 'none';
-          }
-        });
-      }, 100);
-
-      return () => clearTimeout(timer);
+    if (isAuthenticated && orders.length > 0) {
+      const searchParams = new URLSearchParams(location.search);
+      const orderId = searchParams.get('orderId');
+      if (orderId) {
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+          // Navigate to a receipt route instead of showing modal
+          // For now, we'll use a route like /receipt/:orderId or pass data via state
+          // Since we need the order data, we'll store it and navigate
+          navigate(`/receipt/${orderId}`, { 
+            state: { 
+              order,
+              fromAllOrders: true 
+            },
+            replace: true 
+          });
+        }
+      }
     }
-  }, [selectedOrder]);
+  }, [isAuthenticated, orders, location.search, navigate]);
+
 
   const loadAllOrders = async () => {
     try {
@@ -76,57 +83,28 @@ const AllOrdersPage: React.FC = () => {
     }
   };
 
-  // Filter orders based on status and college
+  // Filter orders based on status, college, and store number
   const filteredOrders = orders.filter(order => {
     const statusMatch = filterStatus === 'all' || order.status === filterStatus;
     const collegeMatch = filterCollege === 'all' || order.college === filterCollege;
-    return statusMatch && collegeMatch;
+    const storeMatch = filterStoreNumber === 'all' || order.storeNumber === filterStoreNumber;
+    return statusMatch && collegeMatch && storeMatch;
   });
 
   // Get unique colleges for filter
-  const uniqueColleges = Array.from(new Set(orders.map(order => order.college)));
-
-  // Get college categories for receipt display
-  const getCollegeCategories = (collegeName: string) => {
-    // Map college names to config keys
-    const collegeKeyMap: { [key: string]: string } = {
-      'alabamauniversity': 'alabamauniversity',
-      'arizonastate': 'arizonastate', 
-      'michiganstate': 'michiganstate',
-      'pittsburghuniversity': 'pittsburghuniversity',
-      'westvirginiauniversity': 'westvirginiauniversity'
-    };
-    
-    const collegeKey = collegeKeyMap[collegeName.toLowerCase()] || collegeName.toLowerCase();
-    const collegeConfig = colleges[collegeKey as keyof typeof colleges];
-    
-    return collegeConfig ? collegeConfig.categories : [];
-  };
-
-  // Convert Order to FormData for receipt component
-  const convertOrderToFormData = (order: Order) => {
-    // If we have the original formData stored, use it
-    if (order.formData) {
-      return order.formData;
+  const uniqueColleges = Array.from(new Set(orders.map(order => order.college))).sort();
+  
+  // Get unique store numbers for filter
+  const uniqueStoreNumbers = Array.from(new Set(orders.map(order => order.storeNumber))).sort((a, b) => {
+    // Sort numerically if possible, otherwise alphabetically
+    const numA = parseInt(a, 10);
+    const numB = parseInt(b, 10);
+    if (!isNaN(numA) && !isNaN(numB)) {
+      return numA - numB;
     }
-    
-    // Otherwise, reconstruct basic FormData from order info
-    return {
-      company: order.college,
-      storeNumber: order.storeNumber,
-      storeManager: order.storeManager,
-      date: order.date,
-      orderNotes: order.orderNotes || '',
-      quantities: {},
-      shirtVersions: {},
-      displayOptions: {},
-      sweatpantJoggerOptions: {},
-      pantOptions: {},
-      shirtSizeCounts: {},
-      colorOptions: {},
-      shirtColorSizeCounts: {},
-    };
-  };
+    return a.localeCompare(b);
+  });
+
 
 
   if (!isAuthenticated) {
@@ -337,6 +315,21 @@ const AllOrdersPage: React.FC = () => {
             </select>
           </div>
 
+          <div className="filter-group">
+            <label htmlFor="store-filter">Filter by Store #:</label>
+            <select 
+              id="store-filter"
+              value={filterStoreNumber} 
+              onChange={(e) => setFilterStoreNumber(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Stores</option>
+              {uniqueStoreNumbers.map(storeNumber => (
+                <option key={storeNumber} value={storeNumber}>Store #{storeNumber}</option>
+              ))}
+            </select>
+          </div>
+
           <div className="order-count">
             Showing {filteredOrders.length} of {orders.length} orders
           </div>
@@ -360,11 +353,21 @@ const AllOrdersPage: React.FC = () => {
               <div 
                 key={order.id} 
                 className="order-card" 
-                onClick={() => setSelectedOrder(order)}
+                onClick={() => navigate(`/receipt/${order.id}`, { 
+                  state: { 
+                    order,
+                    fromAllOrders: true 
+                  } 
+                })}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    setSelectedOrder(order);
+                    navigate(`/receipt/${order.id}`, { 
+                      state: { 
+                        order,
+                        fromAllOrders: true 
+                      } 
+                    });
                   }
                 }}
                 role="button"
@@ -411,48 +414,6 @@ const AllOrdersPage: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Receipt Modal - Reusing ReceiptPage Component */}
-      {selectedOrder && (
-        <div 
-          className="modal-overlay" 
-          onClick={() => setSelectedOrder(null)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setSelectedOrder(null);
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label="Close modal"
-        >
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-          <div 
-            className="modal-content receipt-modal" 
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            tabIndex={-1}
-          >
-            <div className="modal-header">
-              <h3>Order Receipt - {selectedOrder.id}</h3>
-              <button className="modal-close" onClick={() => setSelectedOrder(null)}>×</button>
-            </div>
-            
-            <div className="receipt-wrapper">
-              <div style={{ position: 'relative' }}>
-                <ReceiptPage 
-                  formData={convertOrderToFormData(selectedOrder)}
-                  categories={getCollegeCategories(selectedOrder.college)}
-                  onBackToSummary={() => setSelectedOrder(null)}
-                  onExit={() => setSelectedOrder(null)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <style>{`
         .all-orders-page {
@@ -514,7 +475,13 @@ const AllOrdersPage: React.FC = () => {
           border-radius: 6px;
           font-size: 0.875rem;
           background: white;
+          color: #1f2937;
           min-width: 150px;
+        }
+        
+        .filter-select option {
+          color: #1f2937;
+          background: white;
         }
 
         .order-count {
@@ -652,84 +619,6 @@ const AllOrdersPage: React.FC = () => {
           font-weight: 500;
         }
 
-        /* Modal Styles */
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.6);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          padding: 80px 20px 20px 20px; /* Add more top padding to account for header */
-          backdrop-filter: blur(4px);
-        }
-
-        .modal-content {
-          background: white;
-          border-radius: 16px;
-          max-width: 900px;
-          width: 100%;
-          max-height: 90vh;
-          overflow: hidden;
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-          display: flex;
-          flex-direction: column;
-        }
-
-        .receipt-modal {
-          max-width: 800px;
-        }
-
-        .modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 24px 32px;
-          border-bottom: 2px solid #f1f5f9;
-          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-
-        .modal-header h3 {
-          margin: 0;
-          color: #1f2937;
-          font-size: 1.5rem;
-          font-weight: 700;
-          letter-spacing: -0.025em;
-        }
-
-        .modal-close {
-          background: #f1f5f9;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 20px;
-          cursor: pointer;
-          color: #64748b;
-          padding: 8px;
-          line-height: 1;
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-          background: #e2e8f0;
-          color: #374151;
-          transform: scale(1.05);
-        }
-
-        .receipt-wrapper {
-          padding: 0;
-          flex: 1;
-          overflow-y: auto;
-        }
-
         @media (max-width: 768px) {
           .filters-container {
             flex-direction: column;
@@ -739,20 +628,6 @@ const AllOrdersPage: React.FC = () => {
           .orders-grid {
             grid-template-columns: 1fr;
           }
-
-          .modal-content {
-            margin: 10px;
-            max-height: 95vh;
-          }
-
-          .modal-header {
-            padding: 16px 20px;
-          }
-
-          .modal-header h3 {
-            font-size: 1.25rem;
-          }
-
         }
       `}</style>
     </div>
@@ -760,3 +635,4 @@ const AllOrdersPage: React.FC = () => {
 };
 
 export default AllOrdersPage;
+

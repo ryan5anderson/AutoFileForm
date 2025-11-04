@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import { adminConfig } from '../../config/env';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
@@ -83,18 +83,46 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const addTestOrder = async () => {
-    await firebaseOrderService.addOrder({
-      college: 'Alabama University',
-      storeNumber: '001',
-      storeManager: 'John Smith',
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      totalItems: 15,
-      orderNotes: 'Test order for demonstration',
-    });
-    loadOrders();
-    loadStats();
+  const [funButtonActive, setFunButtonActive] = useState(false);
+  const [funMessage, setFunMessage] = useState('');
+
+  const funMessages = [
+    '🎤 Why don\'t scientists trust atoms? Because they make up everything! 🎤',
+    '🎭 I told my wife she was drawing her eyebrows too high. She looked surprised! 🎭',
+    '🌮 I would tell you a chemistry joke, but I know I wouldn\'t get a reaction! 🌮',
+    '🐴 I used to be a baker, but I couldn\'t make enough dough! 🐴',
+    '🚪 I\'m reading a book about anti-gravity. It\'s impossible to put down! 🚪',
+    '🍞 Why did the scarecrow win an award? He was outstanding in his field! 🍞',
+    '⏰ I told my computer a joke, but it didn\'t get it. It must need more RAM! ⏰',
+    '🥖 What do you call a fake noodle? An impasta! 🥖',
+    '🚗 Why don\'t eggs tell jokes? They\'d crack each other up! 🚗',
+    '🍝 I don\'t trust stairs. They\'re always up to something! 🍝',
+    '🌙 Why did the math book look so sad? Because it had too many problems! 🌙',
+    '🧀 What do you call a sleeping bull? A bulldozer! 🧀',
+    '🎪 Why don\'t programmers like nature? It has too many bugs! 🎪',
+    '🍕 I asked my dog what\'s two minus two. He said nothing! 🍕',
+    '📚 Why did the golfer bring two pairs of pants? In case he got a hole in one! 📚',
+    '🎸 What\'s the best thing about Switzerland? I don\'t know, but the flag is a big plus! 🎸',
+    '🚲 Why don\'t bicycles fall over? Because they\'re two tired! 🚲',
+    '☕ What do you call a bear with no teeth? A gummy bear! ☕',
+    '🎯 Why did the coffee file a police report? It got mugged! 🎯',
+    '🎨 What do you call a factory that makes okay products? A satisfactory! 🎨',
+    '🌮 Want to hear a joke about construction? I\'m still working on it! 🌮',
+    '🍔 Why don\'t skeletons fight each other? They don\'t have the guts! 🍔',
+    '🎭 What did one ocean say to the other? Nothing, they just waved! 🎭',
+    '🎪 Why did the tomato turn red? Because it saw the salad dressing! 🎪',
+    '🎵 How do you organize a space party? You planet! 🎵',
+  ];
+
+  const handleFunButton = () => {
+    const randomMessage = funMessages[Math.floor(Math.random() * funMessages.length)];
+    setFunMessage(randomMessage);
+    setFunButtonActive(true);
+    
+    // Reset after animation
+    setTimeout(() => {
+      setFunButtonActive(false);
+    }, 3000);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -333,29 +361,37 @@ const AdminPage: React.FC = () => {
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Order ID</th>
-                      <th>College</th>
-                      <th>Store</th>
-                      <th>Manager</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th className="col-order-id">Order ID</th>
+                      <th className="col-college">College</th>
+                      <th className="col-store">Store</th>
+                      <th className="col-manager">Manager</th>
+                      <th className="col-date">Date</th>
+                      <th className="col-status">Status</th>
+                      <th className="col-actions">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.map((order) => (
                       <tr key={order.id}>
-                        <td>{order.id}</td>
-                        <td>{order.college}</td>
-                        <td>Store #{order.storeNumber}</td>
-                        <td>{order.storeManager}</td>
-                        <td>{new Date(order.date).toLocaleDateString()}</td>
-                        <td>
+                        <td className="col-order-id">{order.id}</td>
+                        <td className="col-college">{order.college}</td>
+                        <td className="col-store">
+                          <Link 
+                            to={`/all-orders?orderId=${order.id}`}
+                            className="store-link"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Store #{order.storeNumber}
+                          </Link>
+                        </td>
+                        <td className="col-manager">{order.storeManager}</td>
+                        <td className="col-date">{new Date(order.date).toLocaleDateString()}</td>
+                        <td className="col-status">
                           <span className={`status-${order.status}`}>
                             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                           </span>
                         </td>
-                        <td>
+                        <td className="col-actions">
                           <div className="order-actions">
                             {order.status === 'pending' && (
                               <button 
@@ -394,6 +430,13 @@ const AdminPage: React.FC = () => {
             <div className="admin-actions-grid">
               <button 
                 className="admin-action-button"
+                onClick={() => navigate('/all-orders')}
+              >
+                <span className="action-icon">📋</span>
+                <span>View All Orders</span>
+              </button>
+              <button 
+                className="admin-action-button"
                 onClick={() => navigate('/admin/colleges')}
               >
                 <span className="action-icon">🏫</span>
@@ -404,20 +447,35 @@ const AdminPage: React.FC = () => {
                 <span>Add New Product</span>
               </button>
               <button 
-                className="admin-action-button"
-                onClick={() => navigate('/all-orders')}
+                className={`admin-action-button fun-button ${funButtonActive ? 'active' : ''}`}
+                onClick={handleFunButton}
               >
-                <span className="action-icon">📋</span>
-                <span>View All Orders</span>
-              </button>
-              <button className="admin-action-button" onClick={addTestOrder}>
-                <span className="action-icon">🧪</span>
-                <span>Add Test Order</span>
+                <span className="action-icon">🎉</span>
+                <span>Surprise Me!</span>
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Fun Message Overlay */}
+      {funButtonActive && funMessage && (
+        <>
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="confetti"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                background: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7', '#a29bfe'][Math.floor(Math.random() * 8)],
+                top: '-10px',
+              }}
+            />
+          ))}
+          <div className="fun-message">{funMessage}</div>
+        </>
+      )}
 
       <style>{`
         .admin-dashboard {
@@ -451,6 +509,8 @@ const AdminPage: React.FC = () => {
           max-width: 1200px;
           margin: 0 auto;
           padding: 30px 20px;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .admin-stats-grid {
@@ -498,6 +558,13 @@ const AdminPage: React.FC = () => {
         .admin-sections {
           display: grid;
           gap: 30px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .admin-section {
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .admin-section h2 {
@@ -510,13 +577,35 @@ const AdminPage: React.FC = () => {
         .admin-table-container {
           background: white;
           border-radius: 12px;
-          overflow: hidden;
+          overflow-x: auto;
+          overflow-y: visible;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          -webkit-overflow-scrolling: touch;
         }
 
         .admin-table {
           width: 100%;
           border-collapse: collapse;
+          min-width: 800px;
+        }
+
+        .col-order-id,
+        .col-college,
+        .col-manager,
+        .col-date {
+          display: table-cell;
+        }
+
+        .store-link {
+          color: #3b82f6;
+          text-decoration: none;
+          font-weight: 500;
+          transition: color 0.2s ease;
+        }
+
+        .store-link:hover {
+          color: #2563eb;
+          text-decoration: underline;
         }
 
         .admin-table th {
@@ -619,6 +708,8 @@ const AdminPage: React.FC = () => {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 16px;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .admin-action-button {
@@ -632,6 +723,9 @@ const AdminPage: React.FC = () => {
           flex-direction: column;
           align-items: center;
           gap: 8px;
+          width: 100%;
+          box-sizing: border-box;
+          min-height: 100px;
         }
 
         .admin-action-button:hover {
@@ -650,7 +744,139 @@ const AdminPage: React.FC = () => {
           font-size: 0.875rem;
         }
 
+        .fun-button {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .fun-button.active {
+          animation: funPulse 0.5s ease-in-out;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+          background-size: 400% 400%;
+          animation: gradientShift 2s ease infinite, funPulse 0.5s ease-in-out;
+          color: white;
+          border: none;
+          transform: scale(1.1);
+        }
+
+        .fun-button.active .action-icon {
+          animation: spin 0.5s ease-in-out, bounce 1s ease-in-out infinite;
+        }
+
+        .fun-button.active span:last-child {
+          color: white;
+          font-weight: 700;
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        @keyframes funPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.15); }
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+
+        .fun-message {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 40px 60px;
+          border-radius: 20px;
+          font-size: clamp(1.125rem, 3vw, 1.75rem);
+          font-weight: 700;
+          z-index: 2000;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          animation: messageAppear 0.5s ease-out, messageDisappear 0.5s ease-in 2.5s;
+          pointer-events: none;
+          text-align: center;
+          white-space: normal;
+          width: auto;
+          min-width: 300px;
+          max-width: min(90vw, 800px);
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          line-height: 1.4;
+        }
+
+        @keyframes messageAppear {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
+        @keyframes messageDisappear {
+          from {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+          to {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+          }
+        }
+
+        .confetti {
+          position: fixed;
+          width: 10px;
+          height: 10px;
+          background: #ff6b6b;
+          animation: confettiFall 3s linear forwards;
+          z-index: 1999;
+        }
+
+        @keyframes confettiFall {
+          to {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+
         @media (max-width: 768px) {
+          .fun-message {
+            padding: 30px 40px;
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            max-width: 85vw;
+            min-width: 280px;
+          }
+
+          .admin-content {
+            padding: 20px 16px;
+          }
+
+          .admin-welcome-section {
+            margin: 40px 0 30px 0;
+            padding: 30px 16px;
+          }
+
+          .admin-welcome-section h1 {
+            font-size: 1.5rem;
+          }
+
+          .admin-welcome-section p {
+            font-size: 0.875rem;
+          }
+
           .admin-header-content {
             flex-direction: column;
             gap: 16px;
@@ -659,10 +885,216 @@ const AdminPage: React.FC = () => {
 
           .admin-stats-grid {
             grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+          }
+
+          .admin-stat-card {
+            padding: 20px;
+          }
+
+          .stat-icon {
+            font-size: 28px;
+          }
+
+          .stat-number {
+            font-size: 1.25rem;
+          }
+
+          .admin-sections {
+            gap: 24px;
+          }
+
+          .admin-section h2 {
+            font-size: 1.125rem;
+            margin-bottom: 16px;
+          }
+
+          .admin-table-container {
+            border-radius: 8px;
+          }
+
+          .admin-table {
+            font-size: 0.8125rem;
+            min-width: 400px;
+          }
+
+          .admin-table th,
+          .admin-table td {
+            padding: 12px 8px;
+            font-size: 0.8125rem;
+          }
+
+          .admin-table th {
+            font-size: 0.75rem;
+          }
+
+          /* Hide non-essential columns on tablet and mobile */
+          .col-order-id,
+          .col-college,
+          .col-manager,
+          .col-date {
+            display: none;
+          }
+
+          .col-store,
+          .col-status,
+          .col-actions {
+            display: table-cell;
+          }
+
+          .order-actions {
+            flex-direction: row;
+            gap: 4px;
+            flex-wrap: wrap;
+          }
+
+          .action-btn {
+            padding: 4px 8px;
+            font-size: 0.6875rem;
+            min-width: auto;
+            white-space: nowrap;
+          }
+
+          .admin-actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+
+          .admin-action-button {
+            padding: 16px 12px;
+            min-height: 90px;
+          }
+
+          .action-icon {
+            font-size: 20px;
+          }
+
+          .admin-action-button span:last-child {
+            font-size: 0.8125rem;
+            text-align: center;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .fun-message {
+            padding: 24px 30px;
+            font-size: clamp(0.9375rem, 4.5vw, 1.25rem);
+            max-width: 90vw;
+            min-width: 250px;
+            border-radius: 16px;
+          }
+
+          .admin-content {
+            padding: 16px 12px;
+          }
+
+          .admin-welcome-section {
+            margin: 30px 0 24px 0;
+            padding: 24px 12px;
+          }
+
+          .admin-welcome-section h1 {
+            font-size: 1.25rem;
+          }
+
+          .admin-stats-grid {
+            gap: 12px;
+            margin-bottom: 24px;
+          }
+
+          .admin-stat-card {
+            padding: 16px;
+            gap: 12px;
+          }
+
+          .stat-icon {
+            font-size: 24px;
+          }
+
+          .stat-content h3 {
+            font-size: 0.8125rem;
+          }
+
+          .stat-number {
+            font-size: 1.125rem;
+          }
+
+          .stat-change {
+            font-size: 0.6875rem;
+          }
+
+          .admin-sections {
+            gap: 20px;
+          }
+
+          .admin-section h2 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+          }
+
+          .admin-table {
+            min-width: 300px;
+          }
+
+          .admin-table th,
+          .admin-table td {
+            padding: 8px 6px;
+            font-size: 0.75rem;
+          }
+
+          .admin-table th {
+            font-size: 0.6875rem;
+            white-space: nowrap;
+          }
+
+          .admin-table td {
+            white-space: nowrap;
+          }
+
+          /* Ensure only Store, Status, Actions are visible on mobile */
+          .col-order-id,
+          .col-college,
+          .col-manager,
+          .col-date {
+            display: none;
+          }
+
+          .col-store,
+          .col-status,
+          .col-actions {
+            display: table-cell;
+          }
+
+          .order-actions {
+            flex-direction: row;
+            gap: 3px;
+            flex-wrap: wrap;
+          }
+
+          .action-btn {
+            padding: 3px 6px;
+            font-size: 0.625rem;
+            min-width: auto;
+            white-space: nowrap;
           }
 
           .admin-actions-grid {
             grid-template-columns: 1fr;
+            gap: 10px;
+          }
+
+          .admin-action-button {
+            padding: 14px 10px;
+            min-height: 80px;
+          }
+
+          .action-icon {
+            font-size: 18px;
+          }
+
+          .admin-action-button span:last-child {
+            font-size: 0.75rem;
           }
         }
       `}</style>

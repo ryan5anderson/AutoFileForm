@@ -73,7 +73,9 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
         paddingTop: 'calc(64px + var(--space-4))', // Account for fixed header
         maxWidth: '800px',
         margin: '0 auto',
-        width: '100%'
+        width: '100%',
+        boxSizing: 'border-box',
+        overflowX: 'hidden'
       }}>
         <div style={{
           position: 'relative',
@@ -84,32 +86,39 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
             color: 'var(--color-primary)', 
             margin: '0',
             textAlign: 'center',
-            fontSize: '2rem',
+            fontSize: 'clamp(1.5rem, 4vw, 2rem)',
             fontWeight: '600',
             position: 'relative',
-            width: '100%'
+            width: '100%',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word'
           }}>
             Order Receipt
           </h1>
         </div>
         
-        <div style={{ 
+        <div className="receipt-container" style={{ 
           background: 'var(--color-bg)', 
           border: '1px solid var(--color-border)', 
           borderRadius: 'var(--radius-lg)', 
           padding: 'var(--space-4)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          width: '100%',
+          boxSizing: 'border-box',
+          overflowX: 'hidden'
         }}>
           <div style={{ 
             marginBottom: 'var(--space-4)',
             paddingBottom: 'var(--space-3)',
             borderBottom: '1px solid var(--color-border)'
           }}>
-            <div style={{ 
+            <div className="receipt-header-grid" style={{ 
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
               gap: 'var(--space-3)',
-              marginBottom: 'var(--space-2)'
+              marginBottom: 'var(--space-2)',
+              width: '100%',
+              boxSizing: 'border-box'
             }}>
               <div><strong style={{ color: 'var(--color-text)' }}>Company:</strong> {formData.company}</div>
               <div><strong style={{ color: 'var(--color-text)' }}>Store Number:</strong> {formData.storeNumber}</div>
@@ -193,46 +202,55 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                   const totalDisplayQty = (Number(displayOption?.displayOnly || 0) + Number(displayOption?.displayStandardCasePack || 0));
                   if (totalDisplayQty > 0) {
                     return (
-                      <div key={img} style={{ 
+                      <div key={img} className="receipt-item" style={{ 
                         marginBottom: 'var(--space-3)',
                         padding: 'var(--space-3)',
                         background: 'var(--color-bg)',
                         borderRadius: 'var(--radius)',
-                        border: '1px solid var(--color-border)'
+                        border: '1px solid var(--color-border)',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        overflowX: 'hidden'
                       }}>
-                        <div style={{ 
+                        <div className="receipt-item-title" style={{ 
                           fontWeight: '600', 
                           fontSize: '1rem',
                           marginBottom: 'var(--space-2)',
-                          color: 'var(--color-text)'
+                          color: 'var(--color-text)',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word'
                         }}>
                           {productName}
                         </div>
                         {displayOption?.displayOnly && Number(displayOption.displayOnly) > 0 && (
-                          <div style={{ 
+                          <div className="receipt-item-row" style={{ 
                             display: 'flex', 
                             justifyContent: 'space-between', 
                             padding: 'var(--space-1) 0', 
                             fontSize: '0.875rem', 
-                            marginLeft: 'var(--space-3)' 
+                            marginLeft: 'var(--space-3)',
+                            flexWrap: 'wrap',
+                            gap: '4px'
                           }}>
                             <span>Display Only</span>
                             <span style={{ fontWeight: '500' }}>Qty: {displayOption.displayOnly}</span>
                           </div>
                         )}
                         {displayOption?.displayStandardCasePack && Number(displayOption.displayStandardCasePack) > 0 && (
-                          <div style={{ 
+                          <div className="receipt-item-row" style={{ 
                             display: 'flex', 
                             justifyContent: 'space-between', 
                             padding: 'var(--space-1) 0', 
                             fontSize: '0.875rem', 
-                            marginLeft: 'var(--space-3)' 
+                            marginLeft: 'var(--space-3)',
+                            flexWrap: 'wrap',
+                            gap: '4px'
                           }}>
                             <span>Display Standard Case Pack</span>
                             <span style={{ fontWeight: '500' }}>Qty: {displayOption.displayStandardCasePack}</span>
                           </div>
                         )}
-                        <div style={{ 
+                        <div className="receipt-item-row" style={{ 
                           display: 'flex', 
                           justifyContent: 'space-between', 
                           padding: 'var(--space-1) 0', 
@@ -242,7 +260,9 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           color: 'var(--color-primary)',
                           borderTop: '1px solid var(--color-border)',
                           marginTop: 'var(--space-2)',
-                          paddingTop: 'var(--space-2)'
+                          paddingTop: 'var(--space-2)',
+                          flexWrap: 'wrap',
+                          gap: '4px'
                         }}>
                           <span>Total</span>
                           <span>Qty: {totalDisplayQty}</span>
@@ -284,13 +304,13 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                         }}>{productName}</div>
                         {options.map(opt => (
                           Number(sj[opt.key as keyof typeof sj]) > 0 && (
-                            <div key={opt.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                            <div key={opt.key} className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                               <span>{opt.label}</span>
                               <span style={{ fontWeight: '500' }}>Qty: {sj[opt.key as keyof typeof sj]}</span>
                             </div>
                           )
                         ))}
-                        <div style={{
+                        <div className="receipt-item-row" style={{
                           display: 'flex',
                           justifyContent: 'space-between',
                           padding: 'var(--space-1) 0',
@@ -300,7 +320,9 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           color: 'var(--color-primary)',
                           borderTop: '1px solid var(--color-border)',
                           marginTop: 'var(--space-2)',
-                          paddingTop: 'var(--space-2)'
+                          paddingTop: 'var(--space-2)',
+                          flexWrap: 'wrap',
+                          gap: '4px'
                         }}>
                           <span>Total</span>
                           <span>Qty: {total}</span>
@@ -335,7 +357,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
 
                       if (totalQty > 0) {
                         pantItems.push(
-                          <div key={`${styleName}-${colorName}`} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                          <div key={`${styleName}-${colorName}`} className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                             <span>{`${styleName} - ${colorName}${formattedSizes ? ` ${formattedSizes}` : ''}`}</span>
                             <span style={{ fontWeight: '500' }}>Qty: {totalQty}</span>
                           </div>
@@ -424,7 +446,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                             hyphens: 'auto',
                             maxWidth: '100%'
                           }}>{productName}</div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                          <div className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                             <span>
                               {[
                                 infantCounts['6M'] > 0 ? `6M: ${infantCounts['6M']}` : '',
@@ -499,7 +521,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                       const colorItems: React.ReactElement[] = [];
                       colorGroups.forEach((versionSizes, colorName) => {
                         colorItems.push(
-                          <div key={colorName} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                          <div key={colorName} className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                             <span>{colorName}: {versionSizes.join(' ; ')}</span>
                           </div>
                         );
@@ -598,7 +620,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                           hyphens: 'auto',
                           maxWidth: '100%'
                         }}>{productName}</div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                        <div className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                           <span>{versionDetails.join(' ; ')}</span>
                         </div>
                         <div style={{
@@ -696,7 +718,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                               : `${versionLabel}${formattedSizes ? ` ${formattedSizes}` : ''}`;
 
                             return (
-                              <div key={vk} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                              <div key={vk} className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                                 <span>{displayText}</span>
                                 <span style={{ fontWeight: '500' }}>Qty: {vTotal}</span>
                               </div>
@@ -748,7 +770,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                         border: '1px solid var(--color-border)'
                       }}>
                         <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%' }}>{productName}</div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                        <div className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                           <span>{colorDetails.join(' ')}</span>
                         </div>
                         <div style={{
@@ -783,7 +805,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                       border: '1px solid var(--color-border)'
                     }}>
                       <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%' }}>{productName}</div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
+                      <div className="receipt-item-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginLeft: 'var(--space-3)', padding: 'var(--space-1) 0', flexWrap: 'wrap', gap: '4px' }}>
                         <span>{productName}</span>
                         <span style={{ fontWeight: '500' }}>Qty: {qty}</span>
                       </div>
@@ -839,16 +861,19 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
           )}
         </div>
 
-        <div style={{ 
+        <div className="receipt-buttons" style={{ 
           display: 'flex', 
           justifyContent: 'center',
           gap: 'var(--space-3)',
           marginTop: 'var(--space-6)',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           <button
             type="button"
             onClick={onBackToSummary}
+            className="receipt-button"
             style={{
               background: 'var(--color-bg)',
               color: 'var(--color-primary)',
@@ -858,7 +883,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               fontSize: '1rem',
               fontWeight: '500',
               cursor: 'pointer',
-              minWidth: '150px'
+              minWidth: '150px',
+              boxSizing: 'border-box'
             }}
           >
             Back to Summary
@@ -867,6 +893,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
           <button
             type="button"
             onClick={onExit}
+            className="receipt-button"
             style={{
               background: 'var(--color-primary)',
               color: 'white',
@@ -876,7 +903,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               fontSize: '1rem',
               fontWeight: '500',
               cursor: 'pointer',
-              minWidth: '150px'
+              minWidth: '150px',
+              boxSizing: 'border-box'
             }}
           >
             Exit
@@ -885,6 +913,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
           <button
             type="button"
             onClick={handlePrintReceipt}
+            className="receipt-button"
             style={{
               background: 'var(--color-success)',
               color: 'white',
@@ -894,7 +923,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               fontSize: '1rem',
               fontWeight: '500',
               cursor: 'pointer',
-              minWidth: '150px'
+              minWidth: '150px',
+              boxSizing: 'border-box'
             }}
           >
             Print Receipt
@@ -903,6 +933,83 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
       </main>
       
       <Footer />
+      
+      <style>{`
+        @media (max-width: 768px) {
+          main {
+            padding: 16px 12px !important;
+            padding-top: calc(64px + 16px) !important;
+          }
+          
+          .receipt-container {
+            padding: 16px !important;
+          }
+          
+          .receipt-header-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+          
+          .receipt-item {
+            padding: 12px !important;
+            margin-bottom: 12px !important;
+          }
+          
+          .receipt-item-title {
+            font-size: 0.9375rem !important;
+            margin-bottom: 8px !important;
+          }
+          
+          .receipt-item-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 4px !important;
+            margin-left: 0 !important;
+            padding: 6px 0 !important;
+          }
+          
+          .receipt-item-row span:last-child {
+            font-weight: 600 !important;
+          }
+          
+          .receipt-buttons {
+            flex-direction: column !important;
+            gap: 12px !important;
+          }
+          
+          .receipt-button {
+            width: 100% !important;
+            min-width: auto !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          main {
+            padding: 12px 8px !important;
+            padding-top: calc(64px + 12px) !important;
+          }
+          
+          .receipt-container {
+            padding: 12px !important;
+          }
+          
+          .receipt-header-grid {
+            gap: 8px !important;
+          }
+          
+          .receipt-item {
+            padding: 10px !important;
+          }
+          
+          .receipt-item-title {
+            font-size: 0.875rem !important;
+          }
+          
+          .receipt-item-row {
+            font-size: 0.8125rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

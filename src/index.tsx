@@ -10,6 +10,7 @@ import AdminCollegeSelection from './app/routes/adminCollegeSelection';
 import AdminCollegeView from './app/routes/adminCollegeView';
 import AllOrdersPage from './app/routes/allOrders';
 import ContactPage from './app/routes/contact';
+import OrderReceiptPage from './app/routes/orderReceipt';
 import CollegeRouteWrapper from './components/CollegeRouteWrapper';
 import CollegeSelector from './components/CollegeSelector';
 import { colleges } from './config';
@@ -102,6 +103,7 @@ function AppShell() {
         <Route path='/admin/colleges' element={<AdminCollegeSelection />} />
         <Route path='/admin/college/:collegeKey' element={<AdminCollegeView />} />
         <Route path='/all-orders' element={<AllOrdersPage />} />
+        <Route path='/receipt/:orderId' element={<OrderReceiptPage />} />
         <Route path='/:college/*' element={<CollegeRouteWrapper />} />
       </Routes>
     </>

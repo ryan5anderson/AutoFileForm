@@ -242,9 +242,10 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           .sidebar-nav {
             padding: 16px;
             flex: 1;
-            overflow-y: auto;
             overflow-x: hidden;
             min-height: 0;
+            display: flex;
+            flex-direction: column;
           }
 
           .sidebar-nav-item {
@@ -275,6 +276,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
             margin-bottom: 16px;
+            flex-shrink: 0;
           }
 
           .sidebar-nav-item.back-button:hover {
@@ -294,6 +296,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             border: 1px solid #e2e8f0;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
           }
 
           .dropdown-toggle:hover {
@@ -337,19 +340,21 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             padding-left: 16px;
             margin-top: 8px;
             animation: slideDown 0.3s ease;
-            max-height: 300px;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
             overflow-x: hidden;
+            max-height: none;
           }
 
           @keyframes slideDown {
             from {
               opacity: 0;
-              max-height: 0;
+              transform: translateY(-10px);
             }
             to {
               opacity: 1;
-              max-height: 400px;
+              transform: translateY(0);
             }
           }
 
@@ -390,6 +395,11 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           .sidebar-section {
             margin-bottom: 16px;
             margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
           }
 
           .sidebar-bottom-section {
