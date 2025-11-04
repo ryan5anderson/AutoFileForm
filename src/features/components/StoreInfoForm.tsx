@@ -31,6 +31,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
             background: 'var(--color-input-bg)',
+            color: '#000000',
             boxSizing: 'border-box'
           }}
           required
@@ -57,6 +58,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
             background: 'var(--color-input-bg)',
+            color: '#000000',
             boxSizing: 'border-box'
           }}
           required
@@ -83,6 +85,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
             background: 'var(--color-input-bg)',
+            color: '#000000',
             boxSizing: 'border-box'
           }}
           required
@@ -109,6 +112,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
             borderRadius: 'var(--radius)',
             fontSize: '1rem',
             background: 'var(--color-input-bg)',
+            color: '#000000',
             boxSizing: 'border-box'
           }}
           required

@@ -150,20 +150,35 @@ export const useOrderForm = (categories: Category[]) => {
   const navigate = useNavigate();
   const { college } = useParams();
   const location = useLocation();
-  const [formData, setFormData] = useState<FormData>({
-    company: '',
-    storeNumber: '',
-    storeManager: '',
-    date: new Date().toISOString().split('T')[0],
-    orderNotes: '',
-    quantities: {} as Record<string, string>,
-    shirtVersions: {} as Record<string, ShirtVersion>,
-    displayOptions: {} as Record<string, DisplayOption>,
-    sweatpantJoggerOptions: {} as Record<string, SweatpantJoggerOption>,
-    pantOptions: {} as Record<string, PantOption>,
-    shirtSizeCounts: {} as Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>,
-    colorOptions: {} as Record<string, ColorOption>,
-    shirtColorSizeCounts: {} as ShirtColorSizeCounts,
+  const [formData, setFormData] = useState<FormData>(() => {
+    const storageKey = `orderFormData_${college || 'default'}`;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Ensure date is set if missing
+        if (!parsed.date) parsed.date = new Date().toISOString().split('T')[0];
+        return parsed;
+      } catch (e) {
+        console.error('Failed to load saved form data:', e);
+      }
+    }
+    // Default state
+    return {
+      company: '',
+      storeNumber: '',
+      storeManager: '',
+      date: new Date().toISOString().split('T')[0],
+      orderNotes: '',
+      quantities: {} as Record<string, string>,
+      shirtVersions: {} as Record<string, ShirtVersion>,
+      displayOptions: {} as Record<string, DisplayOption>,
+      sweatpantJoggerOptions: {} as Record<string, SweatpantJoggerOption>,
+      pantOptions: {} as Record<string, PantOption>,
+      shirtSizeCounts: {} as Record<string, Partial<Record<keyof ShirtVersion, SizeCounts>>>,
+      colorOptions: {} as Record<string, ColorOption>,
+      shirtColorSizeCounts: {} as ShirtColorSizeCounts,
+    };
   });
   const [error, setError] = useState<string | null>(null);
   const [invalidProductPaths, setInvalidProductPaths] = useState<string[]>([]);
@@ -234,6 +249,16 @@ export const useOrderForm = (categories: Category[]) => {
 
     setValidProductPaths(validPaths);
   }, [formData, categoriesRef]);
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    const storageKey = `orderFormData_${college || 'default'}`;
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(formData));
+    } catch (error) {
+      console.error('Error saving form data to localStorage:', error);
+    }
+  }, [formData, college]);
 
   const handleFormDataChange = (updates: Partial<FormData>) => {
     setFormData((prev: FormData) => ({ ...prev, ...updates }));
@@ -428,6 +453,10 @@ export const useOrderForm = (categories: Category[]) => {
           formData: formData, // Store complete form data for detailed receipt generation
         });
       }
+      
+      // Clear saved form data after successful submission
+      const storageKey = `orderFormData_${college || 'default'}`;
+      localStorage.removeItem(storageKey);
       
       setPage('receipt');
       // Navigate to receipt URL
