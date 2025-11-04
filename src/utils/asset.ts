@@ -1,7 +1,9 @@
 export function asset(path: string) {
-  const base = process.env.PUBLIC_URL ?? "";
-  const p = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${p}`;
+  // Remove leading slash to make it relative
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  
+  // For GitHub Pages, use relative paths without PUBLIC_URL
+  return cleanPath;
 }
 
 /**
