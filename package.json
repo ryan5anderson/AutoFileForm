@@ -20,9 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git push origin HEAD:gh-pages --force",
-    "deploy:clean": "if exist build rmdir /s /q build && npm run build && gh-pages -d build -b gh-pages --cname ohiopylecollege.com --nojekyll",
-    "deploy:manual": "npm run build && git add build -f && git commit -m 'Deploy to gh-pages' && git subtree push --prefix build origin gh-pages",
+    "deploy": "if exist build rmdir /s /q build && npm run build && gh-pages -d build -b gh-pages --cname ohiopylecollege.com --nojekyll",
     "check:unused": "ts-prune",
     "check:deps": "depcheck",
     "lint:css": "stylelint 'src/**/*.{css,scss}'"
