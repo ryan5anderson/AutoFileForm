@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
+import { colleges } from '../../config';
 import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService, OrderProduct } from '../../services/firebaseOrderService';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
@@ -433,7 +434,11 @@ export const useOrderForm = (categories: Category[]) => {
     setSending(true);
 
     try {
-      const templateParams = createTemplateParams(formData, categories);
+      // Get school name from college config
+      const schoolName = college && colleges[college as keyof typeof colleges] 
+        ? colleges[college as keyof typeof colleges].name 
+        : '';
+      const templateParams = createTemplateParams(formData, categories, schoolName);
       await sendOrderEmail(templateParams);
       
       // Store order in admin system

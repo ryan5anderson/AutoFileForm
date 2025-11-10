@@ -309,7 +309,7 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
   return emailCategories;
 };
 
-export const createTemplateParams = (formData: FormData, categories: Category[]): TemplateParams => {
+export const createTemplateParams = (formData: FormData, categories: Category[], schoolName: string = ''): TemplateParams => {
   const emailCategories = createEmailCategories(formData, categories);
   const total_units = calculateTotalUnits(emailCategories);
 
@@ -322,5 +322,6 @@ export const createTemplateParams = (formData: FormData, categories: Category[])
     categories: emailCategories,
     total_units: total_units.toString(),
     provider_email: PROVIDER_EMAIL,
+    school_name: schoolName,
   };
 };

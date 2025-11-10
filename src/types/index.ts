@@ -108,6 +108,7 @@ export interface TemplateParams extends Record<string, unknown> {
   categories: EmailCategory[];
   total_units: string;
   provider_email: string;
+  school_name: string;
 }
 
 export type Page = 'form' | 'summary' | 'receipt' | 'thankyou'; 

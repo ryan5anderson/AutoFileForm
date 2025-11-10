@@ -101,7 +101,7 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
             gap: 'var(--space-3)'
           }}>
             <div style={{ marginBottom: 'var(--space-2)' }}>
-              <strong style={{ color: 'var(--color-text)' }}>Company:</strong> 
+              <strong style={{ color: 'var(--color-text)' }}>Store Name:</strong> 
               <span style={{ marginLeft: 'var(--space-2)' }}>{formData.company}</span>
             </div>
             <div style={{ marginBottom: 'var(--space-2)' }}>

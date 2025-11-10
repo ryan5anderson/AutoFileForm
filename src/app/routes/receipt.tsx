@@ -120,7 +120,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               width: '100%',
               boxSizing: 'border-box'
             }}>
-              <div><strong style={{ color: 'var(--color-text)' }}>Company:</strong> {formData.company}</div>
+              <div><strong style={{ color: 'var(--color-text)' }}>Store Name:</strong> {formData.company}</div>
               <div><strong style={{ color: 'var(--color-text)' }}>Store Number:</strong> {formData.storeNumber}</div>
               <div><strong style={{ color: 'var(--color-text)' }}>Store Manager:</strong> {formData.storeManager}</div>
               <div><strong style={{ color: 'var(--color-text)' }}>Date:</strong> {formData.date}</div>

@@ -17,7 +17,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           fontWeight: '600',
           color: 'var(--color-text)'
         }}>
-          Company
+          Store Name
         </label>
         <input
           type="text"
