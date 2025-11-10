@@ -13,6 +13,8 @@ interface ColorSizeSelectorProps {
   disabled?: boolean;
   packSize?: number;
   allowAnyQuantity?: boolean;
+  categoryPath?: string;
+  version?: string;
 }
 
 const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
@@ -23,6 +25,8 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
   disabled = false,
   packSize = 7,
   allowAnyQuantity = false,
+  categoryPath,
+  version,
 }) => {
   // Use side-by-side layout for 2 colors, stacked for more
   const useSideBySide = colors.length === 2;
@@ -58,6 +62,8 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
             disabled={disabled}
             packSize={packSize}
             allowAnyQuantity={allowAnyQuantity}
+            categoryPath={categoryPath}
+            version={version}
           />
         </div>
       ))}

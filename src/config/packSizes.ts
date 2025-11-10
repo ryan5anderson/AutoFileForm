@@ -3,6 +3,8 @@
  * This defines the minimum purchase quantity (pack size) for each category
  */
 
+import { getPackSizeFromRatios } from './garmentRatios';
+
 interface PackSizeConfig {
   [categoryPath: string]: number | VersionPackSizes;
 }
@@ -81,7 +83,13 @@ const SPECIAL_PACK_SIZES: { [key: string]: number } = {
  * @returns The pack size for that category/version
  */
 export const getPackSize = (categoryPath: string, version?: string, productName?: string): number => {
-  // Check for special product types first
+  // First check JSON ratios for pack size
+  const jsonPackSize = getPackSizeFromRatios(categoryPath, version);
+  if (jsonPackSize !== null && jsonPackSize !== undefined) {
+    return jsonPackSize;
+  }
+
+  // Check for special product types
   if (productName) {
     const lowerName = productName.toLowerCase();
     if (lowerName.includes('applique')) return SPECIAL_PACK_SIZES['applique'];

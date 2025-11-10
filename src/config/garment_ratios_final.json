@@ -1,0 +1,148 @@
+[
+    {
+        "Name": "tshirt",
+        "Set Pack": 12,
+        "Small": 1,
+        "Medium": 2,
+        "Large": 3,
+        "XL": 3,
+        "2X": 2,
+        "3X": 1,
+        "Size Scale": "S-XXXL"
+    },
+    {
+        "Name": "longsleeve",
+        "Set Pack": 7,
+        "Small": 1,
+        "Medium": 1,
+        "Large": 2,
+        "XL": 2,
+        "2X": 1,
+        "Size Scale": "S-XXXL"
+    },
+    {
+        "Name": "crewneck",
+        "Set Pack": 5,
+        "Small": 1,
+        "Medium": 1,
+        "Large": 1,
+        "XL": 1,
+        "2X": 1,
+        "Size Scale": "S-XXL"
+    },
+    {
+        "Name": "hoodie",
+        "Set Pack": 8,
+        "Small": 1,
+        "Medium": 2,
+        "Large": 2,
+        "XL": 2,
+        "2X": 1,
+        "Size Scale": "S-XXXL"
+    },
+    {
+        "Name": "jacket",
+        "Set Pack": 6,
+        "Small": "some",
+        "Medium": 1,
+        "Large": 2,
+        "XL": 2,
+        "2X": 1,
+        "Size Scale": "S-XXL"
+    },
+    {
+        "Name": "womens-tshirt",
+        "Set Pack": 5,
+        "Small": 1,
+        "Medium": 1,
+        "Large": 1,
+        "XL": 1,
+        "2X": 1,
+        "Size Scale": "S-XXL"
+    },
+    {
+        "Name": "joggers",
+        "Set Pack": 6,
+        "Small": 1,
+        "Medium": 2,
+        "Large": 2,
+        "XL": 1,
+        "2X": 0,
+        "Size Scale": "S-XXL"
+    },
+    {
+        "Name": "sweatpants",
+        "Set Pack": 6,
+        "Small": 1,
+        "Medium": 2,
+        "Large": 2,
+        "XL": 1,
+        "2X": 0,
+        "Size Scale": "S-XL"
+    },
+    {
+        "Name": "flannels",
+        "Set Pack": 6,
+        "Small": 1,
+        "Medium": 2,
+        "Large": 2,
+        "XL": 1,
+        "2X": 0,
+        "Size Scale": "S-XL"
+    },
+    {
+        "Name": "shorts",
+        "Set Pack": 4,
+        "Small": 1,
+        "Medium": 1,
+        "Large": 1,
+        "XL": 1,
+        "Size Scale": "S-XL"
+    },
+    {
+        "Name": "youth",
+        "Set Pack": 10,
+        "XS": 1,
+        "Small": 3,
+        "Medium": 3,
+        "Large": 3,
+        "XL": 0,
+        "Size Scale": "XS-XL"
+    },
+    {
+        "Name": "infant",
+        "Set Pack": null,
+        "6M": 3,
+        "12M": 3,
+        "Size Scale": "6M-12M"
+    },
+    {
+        "Name": "socks",
+        "Set Pack": 6,
+        "Size Scale": "SM-XL",
+        "Sizes": {
+            "SM": 3,
+            "LXL": 3
+        }
+    },
+    {
+        "Name": "sticker",
+        "Set Pack": null,
+        "Size Scale": "N/A"
+    },
+    {
+        "Name": "plush",
+        "Set Pack": null,
+        "Size Scale": "N/A"
+    },
+    {
+        "Name": "bottle",
+        "Set Pack": null,
+        "Size Scale": "N/A"
+    },
+    {
+        "Name": "signage",
+        "Set Pack": null,
+        "Size Scale": "N/A"
+    }
+]

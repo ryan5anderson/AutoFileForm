@@ -230,6 +230,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     colors={colors}
                     colorSizeCounts={colorSizeCounts}
                     onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey, color, counts)}
+                    categoryPath={category.path}
+                    version={version}
                     sizes={sizesArray}
                     packSize={packSize}
                     allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
@@ -253,6 +255,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
                       packSize={packSize}
                       allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+                      categoryPath={category.path}
+                      version={version}
                     />
                   </div>
                 );
@@ -299,6 +303,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
                   packSize={packSize}
                   allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+                  categoryPath={category.path}
+                  version={version}
                 />
               </div>
             </div>

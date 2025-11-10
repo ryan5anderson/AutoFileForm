@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { getSizeDistributionRatios } from '../../../config/garmentRatios';
 import { Size, SizeCounts } from '../../../types';
 import { calcTotals } from '../../utils';
 
@@ -14,6 +15,8 @@ interface SizePackSelectorProps {
   sizes?: Size[];
   allowAnyQuantity?: boolean;
   hideTotal?: boolean;
+  categoryPath?: string;
+  version?: string;
 }
 
 const SizePackSelector: React.FC<SizePackSelectorProps> = ({
@@ -25,6 +28,8 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   sizes,
   allowAnyQuantity = false,
   hideTotal = false,
+  categoryPath,
+  version,
 }) => {
   const totals = calcTotals(counts, packSize, allowAnyQuantity);
   const SIZE_LIST: Size[] = sizes && sizes.length > 0 ? sizes : ALL_SIZES_DEFAULT;
@@ -52,14 +57,28 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   };
 
   const handleEvenSplit = () => {
-    const base = Math.floor(packSize / SIZE_LIST.length);
-    const remainder = packSize % SIZE_LIST.length;
-    const distribution = SIZE_LIST.map((_, idx) => base + (idx < remainder ? 1 : 0));
-    const next: SizeCounts = { ...counts } as SizeCounts;
-    SIZE_LIST.forEach((s: Size, idx: number) => {
-      next[s] = (next[s] || 0) + distribution[idx];
-    });
-    onChange(next);
+    // Try to get ratios from JSON first
+    const ratios = categoryPath ? getSizeDistributionRatios(categoryPath, version) : null;
+    
+    if (ratios && packSize) {
+      // Use ratios from JSON
+      const next: SizeCounts = { ...counts } as SizeCounts;
+      Object.entries(ratios).forEach(([size, quantity]) => {
+        const sizeKey = size as Size;
+        next[sizeKey] = (next[sizeKey] || 0) + quantity;
+      });
+      onChange(next);
+    } else {
+      // Fall back to even split
+      const base = Math.floor(packSize / SIZE_LIST.length);
+      const remainder = packSize % SIZE_LIST.length;
+      const distribution = SIZE_LIST.map((_, idx) => base + (idx < remainder ? 1 : 0));
+      const next: SizeCounts = { ...counts } as SizeCounts;
+      SIZE_LIST.forEach((s: Size, idx: number) => {
+        next[s] = (next[s] || 0) + distribution[idx];
+      });
+      onChange(next);
+    }
   };
 
   return (

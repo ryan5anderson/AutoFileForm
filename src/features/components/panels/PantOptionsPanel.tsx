@@ -87,6 +87,8 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
                 sizes={sizes}
                 disabled={disabled}
                 allowAnyQuantity={allowAnyQuantity}
+                categoryPath={categoryPath}
+                version={style}
               />
             </div>
           ))}

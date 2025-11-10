@@ -1,3 +1,4 @@
+import { getSizeScaleFromRatios, parseSizeScale } from '../../config/garmentRatios';
 import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } from '../../types';
 
 /**
@@ -607,6 +608,16 @@ export function getQuantityMultiples(imageName: string, categoryName: string, ca
 }
 
 export function getSizeOptions(categoryPath: string, version?: string): Size[] {
+  // First try to get size scale from JSON
+  const sizeScale = getSizeScaleFromRatios(categoryPath, version);
+  if (sizeScale) {
+    const parsedSizes = parseSizeScale(sizeScale);
+    if (parsedSizes.length > 0) {
+      return parsedSizes as Size[];
+    }
+  }
+
+  // Fall back to existing logic if JSON doesn't have the size scale
   // Socks use different sizing
   if (categoryPath.includes('sock')) {
     return ['SM', 'XL'] as any;
