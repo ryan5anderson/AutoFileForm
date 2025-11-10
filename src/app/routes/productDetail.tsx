@@ -123,6 +123,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       
       return (
         <>
+          <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
           <div className="single-option-panel">
             <div className="field">
               <div className="field-label">Quantity</div>
@@ -209,6 +210,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </button>
             ))}
           </div>
+          <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
           <div className="product-detail-tab-content">
             {getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).map((version: string) => {
               const versionKey = version;
@@ -286,6 +288,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
       return (
         <>
+          <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
           <div className="single-option-panel">
             <div className="field">
               <div className="field-label">Quantity</div>
@@ -380,8 +383,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 color: 'var(--color-text)',
                 lineHeight: '1.5'
               }}>
-                <strong>Display Only:</strong> Just the display unit without garments.<br />
-                <strong>Display Standard Case Pack:</strong> Display unit includes garments.
+                <strong>Display Only:</strong> Just the display unit without products.<br />
+                <strong>Display Standard Case Pack:</strong> Display unit includes products.
               </div>
             )}
             <div className="product-detail-options-content">

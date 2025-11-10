@@ -426,8 +426,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           color: 'var(--color-text)',
           lineHeight: '1.5'
         }}>
-          <strong>Display Only:</strong> Just the display unit without garments.<br />
-          <strong>Display Standard Case Pack:</strong> Display unit includes garments.
+          <strong>Display Only:</strong> Just the display unit without products.<br />
+          <strong>Display Standard Case Pack:</strong> Display unit includes products.
         </div>
       )}
       <div className="section__grid" style={{ alignItems: 'start' }}>

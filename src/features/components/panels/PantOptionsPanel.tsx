@@ -191,6 +191,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
           </button>
         ))}
       </div>
+      <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
 
       {/* Tab Content */}
       <div className="product-detail-tab-content">
