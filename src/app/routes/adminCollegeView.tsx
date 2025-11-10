@@ -171,6 +171,7 @@ const AdminCollegeView: React.FC = () => {
             validProductPaths={[]}
             readOnly={true}
             college={collegeKey}
+            isAdmin={true}
           />
         ))}
       </main>

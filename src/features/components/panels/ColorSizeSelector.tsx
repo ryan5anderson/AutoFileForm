@@ -15,6 +15,7 @@ interface ColorSizeSelectorProps {
   allowAnyQuantity?: boolean;
   categoryPath?: string;
   version?: string;
+  collegeKey?: string;
 }
 
 const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
@@ -27,6 +28,7 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
   allowAnyQuantity = false,
   categoryPath,
   version,
+  collegeKey,
 }) => {
   // Use side-by-side layout for 2 colors, stacked for more
   const useSideBySide = colors.length === 2;
@@ -64,6 +66,7 @@ const ColorSizeSelector: React.FC<ColorSizeSelectorProps> = ({
             allowAnyQuantity={allowAnyQuantity}
             categoryPath={categoryPath}
             version={version}
+            collegeKey={collegeKey}
           />
         </div>
       ))}

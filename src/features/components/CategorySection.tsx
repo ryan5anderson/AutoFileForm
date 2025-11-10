@@ -29,6 +29,7 @@ interface CategorySectionProps {
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   readOnly?: boolean;
   college?: string;
+  isAdmin?: boolean;
 }
 
 
@@ -51,7 +52,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onDisplayOptionChange,
   onSweatpantJoggerOptionChange,
   readOnly = false,
-  college
+  college,
+  isAdmin = false
 }) => {
   const navigate = useNavigate();
 
@@ -440,6 +442,11 @@ const CategorySection: React.FC<CategorySectionProps> = ({
               const encodedCategory = encodeURIComponent(category.path);
               const encodedProductId = encodeURIComponent(img);
               navigate(`/${college}/product/${encodedCategory}/${encodedProductId}`);
+            } else if (isAdmin && college) {
+              // Navigate to admin product detail page
+              const encodedCategory = encodeURIComponent(category.path);
+              const encodedProductId = encodeURIComponent(img);
+              navigate(`/admin/college/${college}/product/${encodedCategory}/${encodedProductId}`);
             }
           };
           
@@ -448,15 +455,18 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           const hasAnyQuantity = hasQuantity(imagePath, img);
           const shouldHighlight = hasValidationError;
 
+          // Ensure onClick is always set when card should be clickable
+          const shouldBeClickable = !readOnly || (isAdmin && college);
+          
           return (
             <Card
               key={img}
-              className={`${!readOnly ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''}`}
+              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''}`}
               style={shouldHighlight ? {
                 position: 'relative',
                 overflow: 'hidden'
               } : undefined}
-              onClick={handleCardClick}
+              onClick={shouldBeClickable ? handleCardClick : undefined}
             >
               {/* Red exclamation icon for invalid quantities */}
               {shouldHighlight && (
@@ -571,9 +581,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   }}
                 />
               )}
-              <Card.Header
-                onClick={handleCardClick}
-              >
+              <Card.Header>
                 <h3 className="card__title">
                   {category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img)}
                 </h3>

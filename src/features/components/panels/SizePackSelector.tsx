@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { getSizeDistributionRatios } from '../../../config/garmentRatios';
+import { getSizeDistributionRatiosSync, getSizeDistributionRatios } from '../../../config/garmentRatios';
 import { Size, SizeCounts } from '../../../types';
 import { calcTotals } from '../../utils';
 
@@ -17,6 +17,7 @@ interface SizePackSelectorProps {
   hideTotal?: boolean;
   categoryPath?: string;
   version?: string;
+  collegeKey?: string;
 }
 
 const SizePackSelector: React.FC<SizePackSelectorProps> = ({
@@ -30,9 +31,39 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   hideTotal = false,
   categoryPath,
   version,
+  collegeKey,
 }) => {
   const totals = calcTotals(counts, packSize, allowAnyQuantity);
   const SIZE_LIST: Size[] = sizes && sizes.length > 0 ? sizes : ALL_SIZES_DEFAULT;
+  
+  // State for size distribution ratios (loaded from Firebase if college key provided)
+  const [sizeDistributionRatios, setSizeDistributionRatios] = useState<Record<string, number> | null>(null);
+
+  // Load size distribution ratios on mount
+  useEffect(() => {
+    const loadRatios = async () => {
+      if (!categoryPath) return;
+      
+      if (collegeKey) {
+        // Use async version with college-specific support
+        try {
+          const ratios = await getSizeDistributionRatios(categoryPath, version, collegeKey);
+          setSizeDistributionRatios(ratios);
+        } catch (error) {
+          console.error('Error loading size distribution ratios:', error);
+          // Fallback to sync version
+          const syncRatios = getSizeDistributionRatiosSync(categoryPath, version);
+          setSizeDistributionRatios(syncRatios);
+        }
+      } else {
+        // Use sync version (default ratios from JSON)
+        const syncRatios = getSizeDistributionRatiosSync(categoryPath, version);
+        setSizeDistributionRatios(syncRatios);
+      }
+    };
+
+    loadRatios();
+  }, [categoryPath, version, collegeKey]);
 
   const handleDelta = (size: Size, delta: number) => {
     if (disabled) return;
@@ -57,15 +88,15 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   };
 
   const handleEvenSplit = () => {
-    // Try to get ratios from JSON first
-    const ratios = categoryPath ? getSizeDistributionRatios(categoryPath, version) : null;
-    
-    if (ratios && packSize) {
-      // Use ratios from JSON
+    // Use loaded size distribution ratios (from Firebase or JSON)
+    if (sizeDistributionRatios && packSize) {
+      // Use ratios from Firebase/JSON
       const next: SizeCounts = { ...counts } as SizeCounts;
-      Object.entries(ratios).forEach(([size, quantity]) => {
+      Object.entries(sizeDistributionRatios).forEach(([size, quantity]) => {
         const sizeKey = size as Size;
-        next[sizeKey] = (next[sizeKey] || 0) + quantity;
+        if (SIZE_LIST.includes(sizeKey)) {
+          next[sizeKey] = (next[sizeKey] || 0) + quantity;
+        }
       });
       onChange(next);
     } else {

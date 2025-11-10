@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getPackSize } from '../../../config/packSizes';
+import { getPackSizeSync } from '../../../config/packSizes';
 import { SweatpantJoggerOption } from '../../../types';
 import { asset, getCollegeFolderName } from '../../../utils/asset';
 import { getProductName, getRackDisplayName, getQuantityMultiples } from '../../utils';
@@ -36,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const imagePath = `${categoryPath}/${imageName}`;
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
-  const packSize = getPackSize(categoryPath, undefined, imageName);
+  const packSize = getPackSizeSync(categoryPath, undefined, imageName);
 
   // When hideImage is true (used in configuration panel), return just the field structure
   if (hideImage) {

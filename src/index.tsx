@@ -8,6 +8,7 @@ import AboutPage from './app/routes/about';
 import AdminPage from './app/routes/admin';
 import AdminCollegeSelection from './app/routes/adminCollegeSelection';
 import AdminCollegeView from './app/routes/adminCollegeView';
+import AdminProductDetail from './app/routes/adminProductDetail';
 import AllOrdersPage from './app/routes/allOrders';
 import ContactPage from './app/routes/contact';
 import OrderReceiptPage from './app/routes/orderReceipt';
@@ -102,6 +103,7 @@ function AppShell() {
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/admin' element={<AdminPage />} />
         <Route path='/admin/colleges' element={<AdminCollegeSelection />} />
+        <Route path='/admin/college/:collegeKey/product/:category/:productId' element={<AdminProductDetail />} />
         <Route path='/admin/college/:collegeKey' element={<AdminCollegeView />} />
         <Route path='/all-orders' element={<AllOrdersPage />} />
         <Route path='/receipt/:orderId' element={<OrderReceiptPage />} />

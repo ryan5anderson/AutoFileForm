@@ -3,7 +3,7 @@
  * This defines the minimum purchase quantity (pack size) for each category
  */
 
-import { getPackSizeFromRatios } from './garmentRatios';
+import { getPackSizeFromRatiosSync } from './garmentRatios';
 
 interface PackSizeConfig {
   [categoryPath: string]: number | VersionPackSizes;
@@ -76,17 +76,95 @@ const SPECIAL_PACK_SIZES: { [key: string]: number } = {
 };
 
 /**
+ * Synchronous version of getPackSize for backward compatibility
+ * Uses default ratios from JSON (not college-specific)
+ */
+export const getPackSizeSync = (
+  categoryPath: string, 
+  version?: string, 
+  productName?: string
+): number => {
+  // Determine if this is an infant product based on product name
+  const isInfantProduct = productName && (productName.toLowerCase().includes('infant') || productName.toLowerCase().includes('onsie'));
+  
+  // For "youth&infant" category, determine which one to use based on product name
+  let categoryPathForRatios = categoryPath;
+  if (categoryPath.includes('youth') && categoryPath.includes('infant')) {
+    categoryPathForRatios = isInfantProduct ? 'infant' : 'youth';
+  }
+  
+  // Use sync version (default ratios from JSON)
+  const jsonPackSize = getPackSizeFromRatiosSync(categoryPathForRatios, version);
+  if (jsonPackSize !== null && jsonPackSize !== undefined) {
+    return jsonPackSize;
+  }
+
+  // Check for special product types
+  if (productName) {
+    const lowerName = productName.toLowerCase();
+    if (lowerName.includes('applique')) return SPECIAL_PACK_SIZES['applique'];
+    if (lowerName.includes('tie-dye') || lowerName.includes('tie dye')) return SPECIAL_PACK_SIZES['tie-dye'];
+    if (lowerName.includes('fleece short')) return 4; // Fleece shorts are special case
+    if (lowerName.includes('fleece zip') || lowerName.includes('fleece_zip')) return 6;
+    if (lowerName.includes('infant') || lowerName.includes('onsie')) return SPECIAL_PACK_SIZES['infant'];
+  }
+
+  const config = PACK_SIZES[categoryPath];
+
+  // If config is a number, return it directly
+  if (typeof config === 'number') {
+    return config;
+  }
+
+  // If config is an object with version-specific sizes
+  if (config && typeof config === 'object') {
+    if (version && version in config) {
+      return config[version as keyof VersionPackSizes] ?? config.default ?? PACK_SIZES['default'] as number;
+    }
+    return config.default ?? PACK_SIZES['default'] as number;
+  }
+
+  // Fallback to default
+  return PACK_SIZES['default'] as number;
+};
+
+/**
  * Get pack size for a given category path and optional shirt version
+ * Now supports college-specific overrides via Firebase
  * @param categoryPath - The category path (e.g., 'shorts', 'tshirt/men')
  * @param version - Optional shirt version (e.g., 'tshirt', 'hoodie')
  * @param productName - Optional product name to check for special types
+ * @param collegeKey - Optional college key for college-specific ratios
  * @returns The pack size for that category/version
  */
-export const getPackSize = (categoryPath: string, version?: string, productName?: string): number => {
-  // First check JSON ratios for pack size
-  const jsonPackSize = getPackSizeFromRatios(categoryPath, version);
-  if (jsonPackSize !== null && jsonPackSize !== undefined) {
-    return jsonPackSize;
+export const getPackSize = async (
+  categoryPath: string, 
+  version?: string, 
+  productName?: string,
+  collegeKey?: string
+): Promise<number> => {
+  // Determine if this is an infant product based on product name
+  const isInfantProduct = productName && (productName.toLowerCase().includes('infant') || productName.toLowerCase().includes('onsie'));
+  
+  // For "youth&infant" category, determine which one to use based on product name
+  let categoryPathForRatios = categoryPath;
+  if (categoryPath.includes('youth') && categoryPath.includes('infant')) {
+    categoryPathForRatios = isInfantProduct ? 'infant' : 'youth';
+  }
+  
+  // First check Firebase ratios for pack size (with college-specific support)
+  if (collegeKey) {
+    const { getPackSizeFromRatios } = await import('./garmentRatios');
+    const jsonPackSize = await getPackSizeFromRatios(categoryPathForRatios, version, collegeKey);
+    if (jsonPackSize !== null && jsonPackSize !== undefined) {
+      return jsonPackSize;
+    }
+  } else {
+    // Fallback to sync version if no college key
+    const jsonPackSize = getPackSizeFromRatiosSync(categoryPathForRatios, version);
+    if (jsonPackSize !== null && jsonPackSize !== undefined) {
+      return jsonPackSize;
+    }
   }
 
   // Check for special product types

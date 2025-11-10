@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { getPackSize } from '../../../config/packSizes';
+import { getPackSizeSync } from '../../../config/packSizes';
 import { PantOption, SizeCounts } from '../../../types';
 import { getSizeOptions } from '../../utils/calculations';
 
@@ -24,7 +24,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
   allowAnyQuantity = false,
 }) => {
   const [activeTab, setActiveTab] = useState<string>(pantStyles[0] || 'sweatpants');
-  const packSize = getPackSize(categoryPath);
+  const packSize = getPackSizeSync(categoryPath);
   const sizes = getSizeOptions(categoryPath);
 
   const handleSizeCountsChange = (style: 'sweatpants' | 'joggers', color: 'steel' | 'black' | 'darkHeather' | 'darkNavy', counts: SizeCounts) => {

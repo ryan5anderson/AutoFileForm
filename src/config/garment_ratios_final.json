@@ -111,7 +111,7 @@
     },
     {
         "Name": "infant",
-        "Set Pack": null,
+        "Set Pack": 6,
         "6M": 3,
         "12M": 3,
         "Size Scale": "6M-12M"

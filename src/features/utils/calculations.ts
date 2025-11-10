@@ -1,4 +1,4 @@
-import { getSizeScaleFromRatios, parseSizeScale } from '../../config/garmentRatios';
+import { getSizeScaleFromRatiosSync, parseSizeScale } from '../../config/garmentRatios';
 import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } from '../../types';
 
 /**
@@ -583,13 +583,25 @@ export function calcTotals(counts: SizeCounts, packSize: number = 7, allowAnyQua
   };
 }
 
-export function getQuantityMultiples(imageName: string, categoryName: string, categoryPath?: string, version?: string): number[] {
-  // Import getPackSize here to avoid circular dependency issues
+export function getQuantityMultiples(
+  imageName: string, 
+  categoryName: string, 
+  categoryPath?: string, 
+  version?: string
+): number[] {
+  // Import sync version for backward compatibility
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { getPackSize } = require('../../config/packSizes');
+  const { getPackSizeFromRatiosSync } = require('../../config/garmentRatios');
 
-  // Get the pack size for this category/version
-  const packSize = categoryPath ? getPackSize(categoryPath, version, imageName) : 7;
+  // Use sync version (uses default ratios from JSON, not college-specific)
+  // For college-specific ratios, the product detail page loads them separately
+  let packSize = 7;
+  if (categoryPath) {
+    const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, version);
+    if (ratioPackSize !== null && ratioPackSize !== undefined) {
+      packSize = ratioPackSize;
+    }
+  }
 
   // Generate quantity multiples based on pack size
   // Show up to 6 packs worth of quantities (e.g., for pack size 4: 4, 8, 12, 16, 20, 24)
@@ -608,8 +620,8 @@ export function getQuantityMultiples(imageName: string, categoryName: string, ca
 }
 
 export function getSizeOptions(categoryPath: string, version?: string): Size[] {
-  // First try to get size scale from JSON
-  const sizeScale = getSizeScaleFromRatios(categoryPath, version);
+  // First try to get size scale from JSON (using sync version)
+  const sizeScale = getSizeScaleFromRatiosSync(categoryPath, version);
   if (sizeScale) {
     const parsedSizes = parseSizeScale(sizeScale);
     if (parsedSizes.length > 0) {
