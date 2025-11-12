@@ -1,4 +1,4 @@
-import { getSizeScaleFromRatiosSync, parseSizeScale } from '../../config/garmentRatios';
+import { getSizeScaleFromRatiosSync, parseSizeScale, getPackSizeFromRatiosSync, getGarmentRatioSync } from '../../config/garmentRatios';
 import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } from '../../types';
 
 /**
@@ -77,6 +77,7 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
 
 /**
  * Get the correct pack size for a category/version combination
+ * Uses garment ratios "Set Pack" value as the source of truth
  * @param categoryPath - The category path
  * @param version - The shirt version (for shirts)
  * @param productName - The product name for special cases
@@ -91,7 +92,14 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
 
   console.log(`DEBUG: Normalized category: '${normalizedCategory}', version: '${normalizedVersion}'`);
 
-  // Handle special product types first
+  // Try to get pack size from garment ratios first
+  const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, version);
+  if (ratioPackSize !== null && ratioPackSize !== undefined) {
+    console.log(`DEBUG: Found pack size from ratios: ${ratioPackSize}`);
+    return ratioPackSize;
+  }
+
+  // Handle special product types (fallback for products not in ratios)
   if (productName) {
     const lowerName = productName.toLowerCase();
     if (lowerName.includes('applique')) {
@@ -112,7 +120,7 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     }
   }
 
-  // Handle specific category/version combinations
+  // Fallback to default values for categories not in ratios
   switch (normalizedCategory) {
     case 'tshirt/men':
       console.log(`DEBUG: tshirt/men with version ${normalizedVersion}, returning pack size`);
@@ -125,28 +133,12 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     case 'tshirt/women':
       console.log(`DEBUG: tshirt/women, returning 4`);
       return 4;
-    case 'jacket':
-      return 6;
-    case 'flannels':
-      return 8;
-    case 'pants':
-      return 4;
-    case 'shorts':
-      return 4;
     case 'hat':
     case 'beanie':
-      return 6;
-    case 'socks':
       return 6;
     case 'bottle':
     case 'signage':
       return 1;
-    case 'sticker':
-    case 'plush':
-      return 6;
-    case 'youth&infant':
-      console.log(`DEBUG: youth&infant category, returning 6`);
-      return 6;
     default:
       console.log(`DEBUG: Unknown categoryPath: ${normalizedCategory}, version: ${normalizedVersion}, returning default 7`);
       return 7; // fallback
@@ -302,10 +294,26 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
           invalidProductPaths.push(imagePath);
         }
       } else {
-        // For categories that require pack size multiples
-        if (quantity % packSize !== 0) {
-          errors.push(`${imagePath}: Quantity must be a multiple of ${packSize}`);
-          invalidProductPaths.push(imagePath);
+        // For categories that require pack size multiples, check minimum and multiple
+        // Get Set Pack from ratios to use as minimum
+        const ratio = getGarmentRatioSync(categoryPath, undefined);
+        const setPack = ratio?.["Set Pack"];
+        
+        if (setPack !== null && setPack !== undefined) {
+          // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+          if (quantity < setPack) {
+            errors.push(`${imagePath}: Minimum quantity is ${setPack} (Set Pack)`);
+            invalidProductPaths.push(imagePath);
+          } else if (quantity % packSize !== 0) {
+            errors.push(`${imagePath}: Quantity must be a multiple of ${packSize}`);
+            invalidProductPaths.push(imagePath);
+          }
+        } else {
+          // No Set Pack: just check multiple
+          if (quantity % packSize !== 0) {
+            errors.push(`${imagePath}: Quantity must be a multiple of ${packSize}`);
+            invalidProductPaths.push(imagePath);
+          }
         }
       }
     }
@@ -325,16 +333,32 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
             console.log(`VALIDATION: ${imagePath} (${version}): categoryPath=${categoryPath}, packSize=${packSize}, allowsAny=${allowsAny}, total=${total}`);
 
             if (allowsAny) {
-              // For categories that allow any quantity, only check minimum
+              // For categories that allow any quantity (tshirt, longsleeve, hoodie, crewneck), only check minimum
               if (total < 1) {
                 errors.push(`${imagePath} (${version}): Minimum quantity is 1`);
                 invalidProductPaths.push(imagePath);
               }
             } else {
-              // For categories that require pack size multiples
-              if (total % packSize !== 0) {
-                errors.push(`${imagePath} (${version}): Total must be a multiple of ${packSize}`);
-                invalidProductPaths.push(imagePath);
+              // For categories that require pack size multiples, check minimum and multiple
+              // Get Set Pack from ratios to use as minimum
+              const ratio = getGarmentRatioSync(categoryPath, version);
+              const setPack = ratio?.["Set Pack"];
+              
+              if (setPack !== null && setPack !== undefined) {
+                // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+                if (total < setPack) {
+                  errors.push(`${imagePath} (${version}): Minimum quantity is ${setPack} (Set Pack)`);
+                  invalidProductPaths.push(imagePath);
+                } else if (total % packSize !== 0) {
+                  errors.push(`${imagePath} (${version}): Total must be a multiple of ${packSize}`);
+                  invalidProductPaths.push(imagePath);
+                }
+              } else {
+                // No Set Pack: just check multiple
+                if (total % packSize !== 0) {
+                  errors.push(`${imagePath} (${version}): Total must be a multiple of ${packSize}`);
+                  invalidProductPaths.push(imagePath);
+                }
               }
             }
           }
@@ -359,9 +383,25 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
               invalidProductPaths.push(imagePath);
             }
           } else {
-            if (quantity % packSize !== 0) {
-              errors.push(`${imagePath} (${color}): Quantity must be a multiple of ${packSize}`);
-              invalidProductPaths.push(imagePath);
+            // Get Set Pack from ratios to use as minimum
+            const ratio = getGarmentRatioSync(categoryPath, undefined);
+            const setPack = ratio?.["Set Pack"];
+            
+            if (setPack !== null && setPack !== undefined) {
+              // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+              if (quantity < setPack) {
+                errors.push(`${imagePath} (${color}): Minimum quantity is ${setPack} (Set Pack)`);
+                invalidProductPaths.push(imagePath);
+              } else if (quantity % packSize !== 0) {
+                errors.push(`${imagePath} (${color}): Quantity must be a multiple of ${packSize}`);
+                invalidProductPaths.push(imagePath);
+              }
+            } else {
+              // No Set Pack: just check multiple
+              if (quantity % packSize !== 0) {
+                errors.push(`${imagePath} (${color}): Quantity must be a multiple of ${packSize}`);
+                invalidProductPaths.push(imagePath);
+              }
             }
           }
         }
@@ -388,9 +428,25 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
                     invalidProductPaths.push(imagePath);
                   }
                 } else {
-                  if (total % packSize !== 0) {
-                    errors.push(`${imagePath} (${version}, ${color}): Total must be a multiple of ${packSize}`);
-                    invalidProductPaths.push(imagePath);
+                  // Get Set Pack from ratios to use as minimum
+                  const ratio = getGarmentRatioSync(categoryPath, version);
+                  const setPack = ratio?.["Set Pack"];
+                  
+                  if (setPack !== null && setPack !== undefined) {
+                    // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+                    if (total < setPack) {
+                      errors.push(`${imagePath} (${version}, ${color}): Minimum quantity is ${setPack} (Set Pack)`);
+                      invalidProductPaths.push(imagePath);
+                    } else if (total % packSize !== 0) {
+                      errors.push(`${imagePath} (${version}, ${color}): Total must be a multiple of ${packSize}`);
+                      invalidProductPaths.push(imagePath);
+                    }
+                  } else {
+                    // No Set Pack: just check multiple
+                    if (total % packSize !== 0) {
+                      errors.push(`${imagePath} (${version}, ${color}): Total must be a multiple of ${packSize}`);
+                      invalidProductPaths.push(imagePath);
+                    }
                   }
                 }
               }
@@ -420,9 +476,25 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
                   invalidProductPaths.push(imagePath);
                 }
               } else {
-                if (total % packSize !== 0) {
-                  errors.push(`${imagePath} (Sweatpants ${color}): Total must be a multiple of ${packSize}`);
-                  invalidProductPaths.push(imagePath);
+                // Get Set Pack from ratios to use as minimum
+                const ratio = getGarmentRatioSync(categoryPath, 'sweatpants');
+                const setPack = ratio?.["Set Pack"];
+                
+                if (setPack !== null && setPack !== undefined) {
+                  // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+                  if (total < setPack) {
+                    errors.push(`${imagePath} (Sweatpants ${color}): Minimum quantity is ${setPack} (Set Pack)`);
+                    invalidProductPaths.push(imagePath);
+                  } else if (total % packSize !== 0) {
+                    errors.push(`${imagePath} (Sweatpants ${color}): Total must be a multiple of ${packSize}`);
+                    invalidProductPaths.push(imagePath);
+                  }
+                } else {
+                  // No Set Pack: just check multiple
+                  if (total % packSize !== 0) {
+                    errors.push(`${imagePath} (Sweatpants ${color}): Total must be a multiple of ${packSize}`);
+                    invalidProductPaths.push(imagePath);
+                  }
                 }
               }
             }
@@ -446,9 +518,25 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
                   invalidProductPaths.push(imagePath);
                 }
               } else {
-                if (total % packSize !== 0) {
-                  errors.push(`${imagePath} (Joggers ${color}): Total must be a multiple of ${packSize}`);
-                  invalidProductPaths.push(imagePath);
+                // Get Set Pack from ratios to use as minimum
+                const ratio = getGarmentRatioSync(categoryPath, 'joggers');
+                const setPack = ratio?.["Set Pack"];
+                
+                if (setPack !== null && setPack !== undefined) {
+                  // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+                  if (total < setPack) {
+                    errors.push(`${imagePath} (Joggers ${color}): Minimum quantity is ${setPack} (Set Pack)`);
+                    invalidProductPaths.push(imagePath);
+                  } else if (total % packSize !== 0) {
+                    errors.push(`${imagePath} (Joggers ${color}): Total must be a multiple of ${packSize}`);
+                    invalidProductPaths.push(imagePath);
+                  }
+                } else {
+                  // No Set Pack: just check multiple
+                  if (total % packSize !== 0) {
+                    errors.push(`${imagePath} (Joggers ${color}): Total must be a multiple of ${packSize}`);
+                    invalidProductPaths.push(imagePath);
+                  }
                 }
               }
             }
@@ -488,9 +576,26 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
                 invalidProductPaths.push(imagePath);
               }
             } else {
-              if (quantity % packSize !== 0) {
-                errors.push(`${imagePath} (${optionType}): Quantity must be a multiple of ${packSize}`);
-                invalidProductPaths.push(imagePath);
+              // Get Set Pack from ratios to use as minimum
+              const versionForRatio = optionType.includes('sweatpant') ? 'sweatpants' : 'joggers';
+              const ratio = getGarmentRatioSync(categoryPath, versionForRatio);
+              const setPack = ratio?.["Set Pack"];
+              
+              if (setPack !== null && setPack !== undefined) {
+                // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+                if (quantity < setPack) {
+                  errors.push(`${imagePath} (${optionType}): Minimum quantity is ${setPack} (Set Pack)`);
+                  invalidProductPaths.push(imagePath);
+                } else if (quantity % packSize !== 0) {
+                  errors.push(`${imagePath} (${optionType}): Quantity must be a multiple of ${packSize}`);
+                  invalidProductPaths.push(imagePath);
+                }
+              } else {
+                // No Set Pack: just check multiple
+                if (quantity % packSize !== 0) {
+                  errors.push(`${imagePath} (${optionType}): Quantity must be a multiple of ${packSize}`);
+                  invalidProductPaths.push(imagePath);
+                }
               }
             }
           }
@@ -515,10 +620,26 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
             invalidProductPaths.push(imagePath);
           }
         } else {
-          // For categories that require pack size multiples
-          if (total % packSize !== 0) {
-            errors.push(`${imagePath}: Total must be a multiple of ${packSize}`);
-            invalidProductPaths.push(imagePath);
+          // For categories that require pack size multiples, check minimum and multiple
+          // Get Set Pack from ratios to use as minimum
+          const ratio = getGarmentRatioSync(categoryPath, undefined);
+          const setPack = ratio?.["Set Pack"];
+          
+          if (setPack !== null && setPack !== undefined) {
+            // Has Set Pack: minimum is Set Pack value, and must be multiple of Set Pack
+            if (total < setPack) {
+              errors.push(`${imagePath}: Minimum quantity is ${setPack} (Set Pack)`);
+              invalidProductPaths.push(imagePath);
+            } else if (total % packSize !== 0) {
+              errors.push(`${imagePath}: Total must be a multiple of ${packSize}`);
+              invalidProductPaths.push(imagePath);
+            }
+          } else {
+            // No Set Pack: just check multiple
+            if (total % packSize !== 0) {
+              errors.push(`${imagePath}: Total must be a multiple of ${packSize}`);
+              invalidProductPaths.push(imagePath);
+            }
           }
         }
       }
