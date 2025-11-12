@@ -36,7 +36,8 @@ const OrderNotesSection: React.FC<OrderNotesSectionProps> = ({ formData, onFormD
             background: 'var(--color-input-bg)',
             fontFamily: 'inherit',
             resize: 'vertical',
-            lineHeight: '1.5'
+            lineHeight: '1.5',
+            boxSizing: 'border-box'
           }}
         />
       </div>
