@@ -178,8 +178,21 @@ export async function getPackSizeFromRatios(
 
 /**
  * Synchronous version for backward compatibility
+ * Supports college-specific ratios if collegeKey is provided and cache is available
  */
-export function getPackSizeFromRatiosSync(categoryPath: string, version?: string): number | null {
+export function getPackSizeFromRatiosSync(categoryPath: string, version?: string, collegeKey?: string): number | null {
+  // If college key provided, try to get from college-specific cache
+  if (collegeKey && ratiosCache[collegeKey]) {
+    const garmentName = getGarmentName(categoryPath, version);
+    if (garmentName) {
+      const collegeRatio = ratiosCache[collegeKey].find(ratio => ratio.Name.toLowerCase() === garmentName.toLowerCase());
+      if (collegeRatio?.["Set Pack"] !== null && collegeRatio?.["Set Pack"] !== undefined) {
+        return collegeRatio["Set Pack"];
+      }
+    }
+  }
+  
+  // Fall back to default
   const ratio = getGarmentRatioSync(categoryPath, version);
   return ratio?.["Set Pack"] ?? null;
 }
@@ -199,8 +212,21 @@ export async function getSizeScaleFromRatios(
 
 /**
  * Synchronous version for backward compatibility
+ * Supports college-specific ratios if collegeKey is provided and cache is available
  */
-export function getSizeScaleFromRatiosSync(categoryPath: string, version?: string): string | null {
+export function getSizeScaleFromRatiosSync(categoryPath: string, version?: string, collegeKey?: string): string | null {
+  // If college key provided, try to get from college-specific cache
+  if (collegeKey && ratiosCache[collegeKey]) {
+    const garmentName = getGarmentName(categoryPath, version);
+    if (garmentName) {
+      const collegeRatio = ratiosCache[collegeKey].find(ratio => ratio.Name.toLowerCase() === garmentName.toLowerCase());
+      if (collegeRatio?.["Size Scale"]) {
+        return collegeRatio["Size Scale"];
+      }
+    }
+  }
+  
+  // Fall back to default
   const ratio = getGarmentRatioSync(categoryPath, version);
   return ratio?.["Size Scale"] ?? null;
 }
@@ -325,6 +351,11 @@ export function getSizeDistributionRatiosSync(
  */
 export function parseSizeScale(sizeScale: string): string[] {
   if (sizeScale === 'N/A' || !sizeScale) return [];
+  
+  // Handle infant sizes special case
+  if (sizeScale.includes('6M')) {
+    return ['6M', '12M'];
+  }
   
   // Handle socks special case
   if (sizeScale === 'SM-XL') {

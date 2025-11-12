@@ -740,9 +740,9 @@ export function getQuantityMultiples(
   return multiples;
 }
 
-export function getSizeOptions(categoryPath: string, version?: string): Size[] {
-  // First try to get size scale from JSON (using sync version)
-  const sizeScale = getSizeScaleFromRatiosSync(categoryPath, version);
+export function getSizeOptions(categoryPath: string, version?: string, collegeKey?: string): Size[] {
+  // First try to get size scale from JSON (using sync version with college key support)
+  const sizeScale = getSizeScaleFromRatiosSync(categoryPath, version, collegeKey);
   if (sizeScale) {
     const parsedSizes = parseSizeScale(sizeScale);
     if (parsedSizes.length > 0) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import { getPackSizeFromRatiosSync, getSizeScaleFromRatiosSync } from '../../config/garmentRatios';
 import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
@@ -145,6 +146,61 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   // Determine which configuration panel to render
   const renderConfigurationPanel = () => {
+    // Determine version for size scale check
+    let versionForCheck = 'tshirt'; // default fallback
+    if (category.shirtVersions && category.shirtVersions.length > 0) {
+      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages);
+      versionForCheck = filteredVersions.length > 0 ? filteredVersions[0] : category.shirtVersions[0];
+    } else if (category.path.includes('jacket')) {
+      versionForCheck = 'jacket';
+    } else if (category.path.includes('sweatpant')) {
+      versionForCheck = 'sweatpants';
+    } else if (category.path.includes('short')) {
+      versionForCheck = 'shorts';
+    } else if (category.path.includes('flannel')) {
+      versionForCheck = 'flannels';
+    } else if (category.path.includes('sock')) {
+      versionForCheck = 'socks';
+    }
+    
+    // Check if size scale is "N/A" - if so, use quantity selector interface
+    const sizeScale = getSizeScaleFromRatiosSync(category.path, versionForCheck, college);
+    if (sizeScale === 'N/A') {
+      const setPack = getPackSizeFromRatiosSync(category.path, versionForCheck, college);
+      // If Set Pack is 0 or 1, step should be 1. Otherwise use Set Pack value
+      const packSize = (setPack === 0 || setPack === 1) ? 1 : (setPack || 1);
+      
+      // Check if this product has color options (for non-shirt items like hats)
+      const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
+      const hasColors = colors.length > 0;
+      
+      if (hasColors) {
+        // For non-shirt items with colors (like hats), show ColorQuantitySelector
+        const colorQuantities = formData.colorOptions?.[imagePath] || {};
+        return (
+          <ColorQuantitySelector
+            colors={colors}
+            colorQuantities={colorQuantities}
+            onChange={(color, value) => onColorOptionChange?.(imagePath, color, value)}
+            packSize={packSize}
+          />
+        );
+      } else {
+        // Regular quantity selector
+        const quantity = formData.quantities?.[imagePath] || '';
+        return (
+          <ProductCard
+            {...cardProps}
+            categoryName={category.name}
+            quantity={quantity}
+            onQuantityChange={onQuantityChange}
+            college={college}
+            packSize={packSize}
+          />
+        );
+      }
+    }
+    
     // Check if this is an infant product - only if image name contains "infant" or "onsie"
     // Youth products have "youth" in the name and should NOT use infant sizes
     // (For "Youth & Infant" category, we distinguish by image name, not category name)
@@ -189,6 +245,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           onChange={(option) => onPantOptionChange?.(imagePath, option)}
           pantStyles={category.pantStyles}
           categoryPath={category.path}
+          collegeKey={college}
         />
       );
     } else if (category.hasDisplayOptions) {
@@ -254,7 +311,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               if (hasColors) {
                 // For products with colors, show ColorSizeSelector
                 const colorSizeCounts = (formData.shirtColorSizeCounts?.[imagePath] as any)?.[versionKey] || {};
-                const sizesArray = getSizeOptions(category.path, version);
+                const sizesArray = getSizeOptions(category.path, version, college);
                 return (
                   <div
                     key={version}
@@ -278,7 +335,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 // For single-color products, show regular SizePackSelector
                 const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
                 const packSize = packSizes[version] || packSizes['default'] || 6;
-                const sizesArray = getSizeOptions(category.path, version);
+                const sizesArray = getSizeOptions(category.path, version, college);
                 return (
                   <div
                     key={version}
@@ -325,7 +382,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       const versionKey = version;
       const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
       const packSize = packSizes[version] || packSizes['default'] || 6;
-      const sizesArray = getSizeOptions(category.path, version);
+      const sizesArray = getSizeOptions(category.path, version, college);
 
       return (
         <>

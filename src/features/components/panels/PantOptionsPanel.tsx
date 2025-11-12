@@ -13,6 +13,7 @@ interface PantOptionsPanelProps {
   disabled?: boolean;
   categoryPath?: string;
   allowAnyQuantity?: boolean;
+  collegeKey?: string;
 }
 
 const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
@@ -22,10 +23,11 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
   disabled = false,
   categoryPath = 'pants',
   allowAnyQuantity = false,
+  collegeKey,
 }) => {
   const [activeTab, setActiveTab] = useState<string>(pantStyles[0] || 'sweatpants');
   const packSize = getPackSizeSync(categoryPath);
-  const sizes = getSizeOptions(categoryPath);
+  const sizes = getSizeOptions(categoryPath, undefined, collegeKey);
 
   const handleSizeCountsChange = (style: 'sweatpants' | 'joggers', color: 'steel' | 'black' | 'darkHeather' | 'darkNavy', counts: SizeCounts) => {
     const newOption = { ...pantOption };

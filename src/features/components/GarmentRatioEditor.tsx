@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
+import { parseSizeScale } from '../../config/garmentRatios';
 import { GarmentRatio } from '../../services/firebaseGarmentRatioService';
 
 interface GarmentRatioEditorProps {
@@ -29,8 +30,118 @@ const GarmentRatioEditor: React.FC<GarmentRatioEditorProps> = ({
     }
   }, [ratio]);
 
+  // Available size scales
+  const availableSizeScales = useMemo(() => [
+    'XS-XL',
+    'S-XL',
+    'S-XXL',
+    'S-XXXL',
+    'SM-XL',
+    '6M-12M',
+    'N/A'
+  ], []);
+
+  // Size to field mapping configuration - single source of truth
+  type SizeFieldAccessor = {
+    get: (ratio: Partial<GarmentRatio>) => number;
+    set: (ratio: Partial<GarmentRatio>, value: number) => void;
+  };
+
+  const sizeFieldMap: Record<string, SizeFieldAccessor> = useMemo(() => ({
+    'XS': {
+      get: (r) => typeof r.XS === 'number' ? r.XS : 0,
+      set: (r, v) => { r.XS = v; }
+    },
+    'S': {
+      get: (r) => typeof r.Small === 'number' ? r.Small : 0,
+      set: (r, v) => { r.Small = v; }
+    },
+    'M': {
+      get: (r) => typeof r.Medium === 'number' ? r.Medium : 0,
+      set: (r, v) => { r.Medium = v; }
+    },
+    'L': {
+      get: (r) => typeof r.Large === 'number' ? r.Large : 0,
+      set: (r, v) => { r.Large = v; }
+    },
+    'XL': {
+      get: (r) => typeof r.XL === 'number' ? r.XL : 0,
+      set: (r, v) => { r.XL = v; }
+    },
+    'XXL': {
+      get: (r) => typeof r["2X"] === 'number' ? r["2X"] : 0,
+      set: (r, v) => { r["2X"] = v; }
+    },
+    'XXXL': {
+      get: (r) => typeof r["3X"] === 'number' ? r["3X"] : 0,
+      set: (r, v) => { r["3X"] = v; }
+    },
+    '6M': {
+      get: (r) => typeof r["6M"] === 'number' ? r["6M"] : 0,
+      set: (r, v) => { r["6M"] = v; }
+    },
+    '12M': {
+      get: (r) => typeof r["12M"] === 'number' ? r["12M"] : 0,
+      set: (r, v) => { r["12M"] = v; }
+    },
+    'SM': {
+      get: (r) => r.Sizes?.SM || 0,
+      set: (r, v) => { r.Sizes = { ...r.Sizes, SM: v }; }
+    },
+    'L/XL': {
+      get: (r) => r.Sizes?.LXL || 0,
+      set: (r, v) => { r.Sizes = { ...r.Sizes, LXL: v }; }
+    }
+  }), []);
+
+  // Reusable function to get size value from any ratio
+  const getSizeValue = useCallback((size: string, ratioToCheck: Partial<GarmentRatio> = editedRatio): number => {
+    const accessor = sizeFieldMap[size];
+    return accessor ? accessor.get(ratioToCheck) : 0;
+  }, [sizeFieldMap, editedRatio]);
+
+  // Reusable function to set size value in a ratio object
+  const setSizeValue = useCallback((size: string, value: number, ratioToUpdate: Partial<GarmentRatio>): void => {
+    const accessor = sizeFieldMap[size];
+    if (accessor) {
+      accessor.set(ratioToUpdate, value);
+    }
+  }, [sizeFieldMap]);
+
+  // Helper function to validate Set Pack matches Size Distribution
+  const validateSetPackMatchesDistribution = useCallback((ratioToValidate: Partial<GarmentRatio>): boolean => {
+    const setPack = ratioToValidate["Set Pack"];
+    const sizeScale = ratioToValidate["Size Scale"] || ratio?.["Size Scale"] || '';
+    
+    // If size scale is "N/A", no validation needed (Set Pack is just the increment step)
+    if (sizeScale === 'N/A') {
+      return true;
+    }
+    
+    const sizesToValidate = parseSizeScale(sizeScale);
+    
+    if (setPack === null || setPack === undefined) {
+      return false;
+    }
+    
+    const distributionTotal = sizesToValidate.reduce((total, size) => {
+      return total + getSizeValue(size, ratioToValidate);
+    }, 0);
+    
+    return setPack === distributionTotal;
+  }, [ratio, getSizeValue]);
+
   const handleSave = async () => {
     if (!ratio) return;
+    
+    // Get current size scale to check if validation is needed
+    const currentSizeScale = editedRatio["Size Scale"] || ratio["Size Scale"] || '';
+    
+    // Only validate if size scale is not "N/A"
+    if (currentSizeScale !== 'N/A' && !validateSetPackMatchesDistribution(editedRatio)) {
+      alert('Cannot save: Set Pack value must match the total of Size Distribution values.');
+      return;
+    }
     
     setSaving(true);
     try {
@@ -93,77 +204,54 @@ const GarmentRatioEditor: React.FC<GarmentRatioEditorProps> = ({
     }
   };
 
-  const updateSizeDistribution = (size: string, value: number) => {
+  const handleSizeScaleChange = useCallback((newScale: string) => {
     setEditedRatio(prev => {
       const updated = { ...prev };
+      updated["Size Scale"] = newScale;
       
-      // Map size codes to JSON fields
-      if (size === 'XS') {
-        updated.XS = value;
-      } else if (size === 'S') {
-        updated.Small = value;
-      } else if (size === 'M') {
-        updated.Medium = value;
-      } else if (size === 'L') {
-        updated.Large = value;
-      } else if (size === 'XL') {
-        updated.XL = value;
-      } else if (size === 'XXL') {
-        updated["2X"] = value;
-      } else if (size === 'XXXL') {
-        updated["3X"] = value;
-      } else if (size === '6M') {
-        updated["6M"] = value;
-      } else if (size === '12M') {
-        updated["12M"] = value;
-      } else if (size === 'SM') {
-        updated.Sizes = { ...updated.Sizes, SM: value };
-      } else if (size === 'L/XL') {
-        updated.Sizes = { ...updated.Sizes, LXL: value };
-      }
+      // Get the new sizes for this scale
+      const newSizes = parseSizeScale(newScale);
+      const oldSizes = parseSizeScale(prev["Size Scale"] || ratio?.["Size Scale"] || '');
+      
+      // Remove sizes that are no longer in the scale (set to 0)
+      const sizesToRemove = oldSizes.filter(size => !newSizes.includes(size));
+      sizesToRemove.forEach(size => {
+        setSizeValue(size, 0, updated);
+      });
+      
+      // Initialize new sizes to 0 if they don't exist
+      const sizesToAdd = newSizes.filter(size => !oldSizes.includes(size));
+      sizesToAdd.forEach(size => {
+        setSizeValue(size, 0, updated);
+      });
       
       return updated;
     });
-  };
+  }, [ratio, setSizeValue]);
 
-  const getSizeValue = (size: string): number => {
-    if (size === 'XS') return typeof editedRatio.XS === 'number' ? editedRatio.XS : 0;
-    if (size === 'S') return typeof editedRatio.Small === 'number' ? editedRatio.Small : 0;
-    if (size === 'M') return typeof editedRatio.Medium === 'number' ? editedRatio.Medium : 0;
-    if (size === 'L') return typeof editedRatio.Large === 'number' ? editedRatio.Large : 0;
-    if (size === 'XL') return typeof editedRatio.XL === 'number' ? editedRatio.XL : 0;
-    if (size === 'XXL') return typeof editedRatio["2X"] === 'number' ? editedRatio["2X"] : 0;
-    if (size === 'XXXL') return typeof editedRatio["3X"] === 'number' ? editedRatio["3X"] : 0;
-    if (size === '6M') return typeof editedRatio["6M"] === 'number' ? editedRatio["6M"] : 0;
-    if (size === '12M') return typeof editedRatio["12M"] === 'number' ? editedRatio["12M"] : 0;
-    if (size === 'SM') return editedRatio.Sizes?.SM || 0;
-    if (size === 'L/XL') return editedRatio.Sizes?.LXL || 0;
-    return 0;
-  };
-
-  if (!ratio) return null;
+  const updateSizeDistribution = useCallback((size: string, value: number) => {
+    setEditedRatio(prev => {
+      const updated = { ...prev };
+      setSizeValue(size, value, updated);
+      return updated;
+    });
+  }, [setSizeValue]);
 
   // Determine which sizes to show based on size scale
-  const sizeScale = editedRatio["Size Scale"] || ratio["Size Scale"] || '';
-  const sizesToShow: string[] = [];
-  
-  if (sizeScale.includes('6M')) {
-    sizesToShow.push('6M', '12M');
-  } else if (sizeScale === 'SM-XL') {
-    sizesToShow.push('SM', 'L/XL');
-  } else {
-    const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-    if (sizeScale.includes('-')) {
-      const parts = sizeScale.split('-');
-      const start = parts[0].trim();
-      const end = parts[1].trim();
-      const startIdx = sizeOrder.indexOf(start);
-      const endIdx = sizeOrder.indexOf(end);
-      if (startIdx >= 0 && endIdx >= 0) {
-        sizesToShow.push(...sizeOrder.slice(startIdx, endIdx + 1));
-      }
-    }
-  }
+  const sizeScale = editedRatio["Size Scale"] || ratio?.["Size Scale"] || '';
+  const sizesToShow = useMemo(() => parseSizeScale(sizeScale), [sizeScale]);
+
+  // Calculate total of size distribution
+  const calculateSizeDistributionTotal = useCallback((): number => {
+    return sizesToShow.reduce((total, size) => total + getSizeValue(size), 0);
+  }, [sizesToShow, getSizeValue]);
+
+  // Validate that Set Pack matches Size Distribution total
+  const isValid = useCallback((): boolean => {
+    return validateSetPackMatchesDistribution(editedRatio);
+  }, [editedRatio, validateSetPackMatchesDistribution]);
+
+  if (!ratio) return null;
 
   return (
     <div className="single-option-panel">
@@ -203,19 +291,27 @@ const GarmentRatioEditor: React.FC<GarmentRatioEditorProps> = ({
       <div className="field">
         <div className="field-label">Size Scale</div>
         <div className="field-control">
-          <input
-            type="text"
+          <select
             value={editedRatio["Size Scale"] ?? ratio["Size Scale"] ?? ''}
-            onChange={(e) => setEditedRatio(prev => ({ ...prev, "Size Scale": e.target.value }))}
+            onChange={(e) => handleSizeScaleChange(e.target.value)}
             style={{
               padding: '0.5rem',
               border: '2px solid var(--color-border)',
               borderRadius: 'var(--radius)',
               fontSize: 'var(--font-size-base)',
               width: '100%',
-              maxWidth: '200px'
+              maxWidth: '200px',
+              background: 'var(--color-bg)',
+              color: 'var(--color-text)',
+              cursor: 'pointer'
             }}
-          />
+          >
+            {availableSizeScales.map((scale) => (
+              <option key={scale} value={scale}>
+                {scale}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -270,13 +366,33 @@ const GarmentRatioEditor: React.FC<GarmentRatioEditorProps> = ({
         </div>
       )}
 
+      {sizesToShow.length > 0 && !isValid() && (
+        <div style={{
+          padding: '0.75rem 1rem',
+          background: 'rgba(220, 38, 38, 0.1)',
+          border: '1px solid rgba(220, 38, 38, 0.3)',
+          borderRadius: 'var(--radius)',
+          marginTop: '1rem',
+          fontSize: 'var(--font-size-sm)',
+          color: 'rgba(220, 38, 38, 0.9)',
+          textAlign: 'center',
+          lineHeight: '1.5'
+        }}>
+          <strong>Validation Error:</strong> Set Pack ({editedRatio["Set Pack"] ?? 'not set'}) must equal the total of Size Distribution ({calculateSizeDistributionTotal()}). Please adjust the values to match.
+        </div>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <button
             onClick={handleSave}
-            disabled={saving || reverting}
+            disabled={saving || reverting || (sizesToShow.length > 0 && !isValid())}
             className="done-btn"
-            style={{ flex: 1 }}
+            style={{ 
+              flex: 1,
+              opacity: (saving || reverting || (sizesToShow.length > 0 && !isValid())) ? 0.5 : 1,
+              cursor: (saving || reverting || (sizesToShow.length > 0 && !isValid())) ? 'not-allowed' : 'pointer'
+            }}
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>

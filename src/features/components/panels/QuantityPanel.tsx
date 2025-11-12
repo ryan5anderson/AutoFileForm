@@ -19,6 +19,7 @@ interface ProductCardProps {
   onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   hideImage?: boolean;
   college?: string;
+  packSize?: number; // Optional override for pack size from garment ratios
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -32,11 +33,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   sweatpantJoggerOption,
   onSweatpantJoggerOptionChange,
   hideImage = false,
-  college
+  college,
+  packSize: packSizeOverride
 }) => {
   const imagePath = `${categoryPath}/${imageName}`;
   const productName = categoryName === 'Display Options' ? getRackDisplayName(imageName) : getProductName(imageName);
-  const packSize = getPackSizeSync(categoryPath, undefined, imageName);
+  const packSize = packSizeOverride ?? getPackSizeSync(categoryPath, undefined, imageName);
 
   // When hideImage is true (used in configuration panel), return just the field structure
   if (hideImage) {
