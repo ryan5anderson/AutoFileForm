@@ -6,11 +6,7 @@
       "name": "Display Options",
       "path": "displays",
       "hasDisplayOptions": true,
-      "images": [
-        "Arizona_State_3FT_Inline_1000.jpg",
-        "Arizona_State_Premium Floor Display 2.0_1000.jpg",
-        "Arizona_State_Tier2_Display_Floor_1000.jpg"
-      ]
+      "images": []
     },
     {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
@@ -60,7 +56,9 @@
         "M103826167_SDDRUB_Druid_DTF_on_Black.png",
         "M103842644_SDOLAC_Overlay_DTF_on_Maroon.png",
         "M103842779_SH2FDS_Custom_Forks_Up_DTF_on_Gold.png",
-        "M103847986_SH2FDS_Forks_Up_DTF_on_Steel_or_White.png"
+        "M103847986_SH2FDS_Forks_Up_DTF_on_Steel_or_White.png",
+        "M103954586_SH2FDC_Custom_Forks_Up_DTF_on_Maroon.png",
+        "M103954653_SH2FDC_Custom_Forks_Up_DTF_on_Black.png"
       ]
     },
     {
@@ -74,7 +72,8 @@
         "M102073749_SDMAIC_Jr_Magician_DTF_on_Maroon.png",
         "M102074486_SDSORS_Jr_Socrates_DTF_on_Steel.png",
         "M103825931_SDMAIB_Jr_Magicia_DTF_on_Black.png",
-        "M103826467_SDTILS_Jr_Tilting_DTF_on_Black.png"
+        "M103826467_SDTILS_Jr_Tilting_DTF_on_Black.png",
+        "M103954441_SH2FDS_Jr_Forks_up_DTF_on_Steel_or_White.png"
       ]
     },
     {
