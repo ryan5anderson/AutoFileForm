@@ -467,7 +467,7 @@ const TestApiOrderPage: React.FC = () => {
                           <div style={{
                             display: 'grid',
                             gridTemplateColumns: sizes.length <= 3 ? `repeat(${sizes.length}, 1fr)` : 'repeat(3, 1fr)',
-                            gap: 'var(--space-2)'
+                            gap: 'var(--space-4)'
                           }}>
                             {sizes.map((size) => (
                               <div key={size.key} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
