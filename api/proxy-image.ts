@@ -24,22 +24,42 @@ export default async function handler(
       return res.status(400).json({ error: 'Image URL is required' });
     }
 
-    // Validate that the URL is from the expected domain
+    // Validate that the URL is from an allowed domain
     const imageUrl = new URL(url);
-    const allowedDomain = 'ohiopyleprints.com';
+    const allowedDomains = ['ohiopyleprints.com', 'mytownoriginals.com'];
     
-    if (!imageUrl.hostname.includes(allowedDomain)) {
-      return res.status(403).json({ error: 'Invalid image domain' });
+    const isAllowed = allowedDomains.some(domain => imageUrl.hostname.includes(domain));
+    
+    if (!isAllowed) {
+      console.error(`Image domain not allowed: ${imageUrl.hostname}. Allowed domains: ${allowedDomains.join(', ')}`);
+      return res.status(403).json({ 
+        error: 'Invalid image domain',
+        message: `Domain ${imageUrl.hostname} is not allowed. Allowed domains: ${allowedDomains.join(', ')}`,
+        hostname: imageUrl.hostname,
+        allowedDomains: allowedDomains
+      });
     }
 
     console.log(`Proxying image from: ${url}`);
+    console.log(`Image hostname: ${imageUrl.hostname}`);
 
     const response = await fetch(url, {
       method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; ImageProxy/1.0)',
+      },
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.status}`);
+      console.error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+      const errorText = await response.text().catch(() => 'Could not read error response');
+      return res.status(response.status).json({
+        error: `Failed to fetch image from source`,
+        status: response.status,
+        statusText: response.statusText,
+        url: url,
+        message: errorText.substring(0, 200)
+      });
     }
 
     const contentType = response.headers.get('content-type') || 'image/jpeg';
