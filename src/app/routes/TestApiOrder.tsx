@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
-import { fetchCollegeOrder, type OrderItem } from '../../services/collegeApiService';
+import { fetchCollegeOrder, getProxiedImageUrl, type OrderItem } from '../../services/collegeApiService';
 import Header from '../layout/Header';
 
 // Type for tracking ORDERED fields per product
@@ -146,41 +146,6 @@ const TestApiOrderPage: React.FC = () => {
 
   const totalItems = useMemo(() => calculateTotalItems(), [orderedFields]);
 
-  // Get proxy URL for image proxying (if needed)
-  const PROXY_URL = process.env.REACT_APP_PROXY_URL || 'http://localhost:5000';
-  
-  const getProxiedImageUrl = (url: string | null | undefined): string | null => {
-    if (!url || url.trim() === '') {
-      return null;
-    }
-    
-    const trimmedUrl = url.trim();
-    
-    // Fix malformed URLs (http: instead of http://)
-    let fixedUrl = trimmedUrl;
-    if (trimmedUrl.startsWith('http:') && !trimmedUrl.startsWith('http://')) {
-      fixedUrl = trimmedUrl.replace('http:', 'http://');
-    }
-    
-    // If it's already a data URL or blob URL, return as-is
-    if (fixedUrl.startsWith('data:') || fixedUrl.startsWith('blob:')) {
-      return fixedUrl;
-    }
-    
-    // If it's from the same origin, no need to proxy
-    try {
-      const urlObj = new URL(fixedUrl);
-      if (urlObj.origin === window.location.origin) {
-        return fixedUrl;
-      }
-    } catch (e) {
-      // Invalid URL, try to proxy it anyway
-    }
-    
-    // Use proxy for external images
-    const encodedUrl = encodeURIComponent(fixedUrl);
-    return `${PROXY_URL}/api/proxy-image?url=${encodedUrl}`;
-  };
 
   return (
     <div className="summary-page-container">

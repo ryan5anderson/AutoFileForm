@@ -24,9 +24,7 @@
     "deploy": "CI=false npm run build && gh-pages -d build -b gh-pages --cname ohiopylecollege.com --nojekyll",
     "check:unused": "ts-prune",
     "check:deps": "depcheck",
-    "lint:css": "stylelint 'src/**/*.{css,scss}'",
-    "server": "cd server && npm start",
-    "dev": "concurrently \"npm start\" \"npm run server\""
+    "lint:css": "stylelint 'src/**/*.{css,scss}'"
   },
   "eslintConfig": {
     "extends": [
@@ -47,7 +45,6 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "depcheck": "^1.4.7",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-import": "^2.32.0",

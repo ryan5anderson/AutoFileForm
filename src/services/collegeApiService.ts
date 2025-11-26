@@ -14,6 +14,15 @@ export interface CollegeListItem {
   // Add other fields as needed
 }
 
+// Type for the actual API response data structure
+export interface CollegeData {
+  school_ID: string;
+  schoolName: string;
+  logoUrl?: string | null;
+  orderNumTemplate: string;
+  [key: string]: any; // Allow for additional fields from the API
+}
+
 export interface CollegeOrder {
   orderTemplateId: string;
   collegeName: string;
@@ -27,10 +36,30 @@ export interface CollegeOrder {
   // Add other order fields
 }
 
+// Type for individual order items returned from the API
+export interface OrderItem {
+  Expr1?: string;
+  ORDER_NUM: string;
+  DESIGN_NUM: string;
+  ITEM_ID: string;
+  SHIRTNAME?: string | null;
+  DESCRIPT?: string | null;
+  productUrl?: string | null;
+  size1?: string | null;
+  size2?: string | null;
+  size3?: string | null;
+  size4?: string | null;
+  size5?: string | null;
+  STYLE_NUM?: string | null;
+  COLOR_INIT?: string | null;
+  UNITPRICE?: number | null;
+  [key: string]: any; // Allow for additional fields from the API
+}
+
 /**
  * Fetches the list of all available colleges
  */
-export async function fetchColleges(): Promise<CollegeListItem[]> {
+export async function fetchColleges(): Promise<CollegeData[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/colleges`, {
       method: 'GET',
@@ -54,7 +83,7 @@ export async function fetchColleges(): Promise<CollegeListItem[]> {
 /**
  * Fetches a specific college order by ID
  */
-export async function fetchCollegeOrder(orderTemplateId: string): Promise<CollegeOrder> {
+export async function fetchCollegeOrder(orderTemplateId: string): Promise<OrderItem[]> {
   try {
     if (!orderTemplateId) {
       throw new Error('Order template ID is required');
@@ -82,17 +111,40 @@ export async function fetchCollegeOrder(orderTemplateId: string): Promise<Colleg
 /**
  * Gets a proxied image URL to bypass CORS restrictions
  */
-export function getProxiedImageUrl(originalUrl: string): string {
+export function getProxiedImageUrl(originalUrl: string | null | undefined): string | null {
   if (!originalUrl) {
-    return '';
+    return null;
   }
 
-  // If the URL is already relative or doesn't need proxying, return as-is
-  if (originalUrl.startsWith('/') || originalUrl.startsWith('data:')) {
-    return originalUrl;
+  const trimmedUrl = originalUrl.trim();
+  if (trimmedUrl === '') {
+    return null;
   }
 
-  return `${API_BASE_URL}/proxy-image?url=${encodeURIComponent(originalUrl)}`;
+  // Fix malformed URLs (http: instead of http://)
+  let fixedUrl = trimmedUrl;
+  if (trimmedUrl.startsWith('http:') && !trimmedUrl.startsWith('http://')) {
+    fixedUrl = trimmedUrl.replace('http:', 'http://');
+  }
+
+  // If it's already a data URL or blob URL, return as-is
+  if (fixedUrl.startsWith('data:') || fixedUrl.startsWith('blob:')) {
+    return fixedUrl;
+  }
+
+  // If it's from the same origin, no need to proxy
+  try {
+    const urlObj = new URL(fixedUrl);
+    if (urlObj.origin === window.location.origin) {
+      return fixedUrl;
+    }
+  } catch (e) {
+    // Invalid URL, try to proxy it anyway
+  }
+
+  // Use proxy for external images
+  const encodedUrl = encodeURIComponent(fixedUrl);
+  return `${API_BASE_URL}/proxy-image?url=${encodedUrl}`;
 }
 
 /**

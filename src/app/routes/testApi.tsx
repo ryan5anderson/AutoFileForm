@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
-import { fetchColleges, checkProxyHealth, type CollegeData } from '../../services/collegeApiService';
+import { fetchColleges, getProxiedImageUrl, checkApiHealth, type CollegeData } from '../../services/collegeApiService';
 
 interface LogoError {
   schoolId: string;
@@ -20,36 +20,6 @@ const TestApiPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [logoErrors, setLogoErrors] = useState<Map<string, LogoError>>(new Map());
 
-  // Get proxy URL from environment or use default
-  const PROXY_URL = process.env.REACT_APP_PROXY_URL || 'http://localhost:5000';
-
-  // Convert image URL to use proxy (to bypass CORS)
-  const getProxiedImageUrl = (url: string | null | undefined): string | null => {
-    if (!url || url.trim() === '') {
-      return null;
-    }
-    
-    const trimmedUrl = url.trim();
-    
-    // If it's already a data URL or blob URL, return as-is
-    if (trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('blob:')) {
-      return trimmedUrl;
-    }
-    
-    // If it's from the same origin, no need to proxy
-    try {
-      const urlObj = new URL(trimmedUrl);
-      if (urlObj.origin === window.location.origin) {
-        return trimmedUrl;
-      }
-    } catch (e) {
-      // Invalid URL, try to proxy it anyway
-    }
-    
-    // Use proxy for external images
-    const encodedUrl = encodeURIComponent(trimmedUrl);
-    return `${PROXY_URL}/api/proxy-image?url=${encodedUrl}`;
-  };
 
   // Fetch API Data
   useEffect(() => {
@@ -58,15 +28,10 @@ const TestApiPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // First check if proxy server is running
-        const isProxyHealthy = await checkProxyHealth();
-        if (!isProxyHealthy) {
-          throw new Error(
-            'Proxy server is not responding. Please:\n' +
-            '1. Open a terminal in the "server" folder\n' +
-            '2. Run "npm install" (first time only)\n' +
-            '3. Run "npm start" to start the proxy server'
-          );
+        // Check if API is responding
+        const isHealthy = await checkApiHealth();
+        if (!isHealthy) {
+          throw new Error('API is not responding. Please check your connection.');
         }
         
         const data = await fetchColleges();
