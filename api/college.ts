@@ -4,16 +4,30 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
   // Only allow GET requests
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const targetApiUrl = process.env.TARGET_API_URL || 'http://ohiopyleprints.com';
-    const apiEndpoint = `${targetApiUrl}/api/colleges`;
+    const { id } = req.query;
 
-    console.log(`Fetching colleges from: ${apiEndpoint}`);
+    if (!id || typeof id !== 'string') {
+      return res.status(400).json({ error: 'Order template ID is required' });
+    }
+
+    const targetApiUrl = process.env.TARGET_API_URL || 'http://ohiopyleprints.com';
+    const apiEndpoint = `${targetApiUrl}/api/college?id=${encodeURIComponent(id)}`;
+
+    console.log(`Fetching college order from: ${apiEndpoint}`);
 
     const response = await fetch(apiEndpoint, {
       method: 'GET',
@@ -35,10 +49,11 @@ export default async function handler(
 
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Error fetching colleges:', error);
+    console.error('Error fetching college order:', error);
     return res.status(500).json({ 
-      error: 'Failed to fetch colleges',
+      error: 'Failed to fetch college order',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 }
+
