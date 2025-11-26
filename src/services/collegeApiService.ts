@@ -154,7 +154,27 @@ export async function fetchCollegeOrder(orderTemplateId: string): Promise<OrderI
     }
 
     const data = await response.json();
-    return data;
+    
+    // Log what we received for debugging
+    console.log('Raw API response for college order:', data);
+    console.log('Response type:', typeof data);
+    console.log('Is array?', Array.isArray(data));
+    
+    // Handle different response formats
+    if (Array.isArray(data)) {
+      console.log(`Received ${data.length} order items`);
+      return data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      console.log(`Response wrapped in data property, found ${data.data.length} order items`);
+      return data.data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.items)) {
+      console.log(`Response wrapped in items property, found ${data.items.length} order items`);
+      return data.items;
+    } else {
+      console.warn('Unexpected response format for college order:', data);
+      // Return empty array if format is unexpected
+      return [];
+    }
   } catch (error) {
     console.error('Error fetching college order:', error);
     throw error;

@@ -106,6 +106,14 @@ const TestApiOrderPage: React.FC = () => {
         setLoading(true);
         setError(null);
         const data = await fetchCollegeOrder(orderTemplateId);
+        
+        // Ensure data is an array before filtering
+        if (!Array.isArray(data)) {
+          console.error('Expected array but received:', typeof data, data);
+          setError(`Invalid data format: expected array but received ${typeof data}`);
+          return;
+        }
+        
         // Filter out ORDER REVIEW items
         const filteredData = data.filter(item => 
           item.SHIRTNAME && !item.SHIRTNAME.trim().toUpperCase().includes('ORDER REVIEW')
