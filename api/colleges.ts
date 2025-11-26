@@ -18,10 +18,21 @@ export default async function handler(
   }
 
   try {
-    const targetApiUrl = process.env.TARGET_API_URL || 'http://ohiopyleprints.com';
-    const apiEndpoint = `${targetApiUrl}/api/colleges`;
+    // Get base URL - ensure it doesn't end with a slash
+    let targetApiUrl = process.env.TARGET_API_URL || 'http://ohiopyleprints.com';
+    targetApiUrl = targetApiUrl.replace(/\/$/, ''); // Remove trailing slash
+    
+    // If the URL already contains /api/colleges, use it as-is, otherwise append /api/colleges
+    let apiEndpoint: string;
+    if (targetApiUrl.includes('/api/colleges')) {
+      apiEndpoint = targetApiUrl;
+    } else {
+      apiEndpoint = `${targetApiUrl}/api/colleges`;
+    }
 
     console.log(`Fetching colleges from: ${apiEndpoint}`);
+    console.log(`TARGET_API_URL env var: ${process.env.TARGET_API_URL || 'not set'}`);
+    console.log(`Constructed endpoint: ${apiEndpoint}`);
 
     const response = await fetch(apiEndpoint, {
       method: 'GET',

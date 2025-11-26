@@ -24,10 +24,22 @@ export default async function handler(
       return res.status(400).json({ error: 'Order template ID is required' });
     }
 
-    const targetApiUrl = process.env.TARGET_API_URL || 'http://ohiopyleprints.com';
-    const apiEndpoint = `${targetApiUrl}/api/college?id=${encodeURIComponent(id)}`;
+    // Get base URL - ensure it doesn't end with a slash
+    let targetApiUrl = process.env.TARGET_API_URL || 'http://ohiopyleprints.com';
+    targetApiUrl = targetApiUrl.replace(/\/$/, ''); // Remove trailing slash
+    
+    // If the URL already contains /api/college, use it as base and add query param
+    // Otherwise, construct the full endpoint URL
+    let apiEndpoint: string;
+    if (targetApiUrl.includes('/api/college')) {
+      apiEndpoint = `${targetApiUrl}?id=${encodeURIComponent(id)}`;
+    } else {
+      apiEndpoint = `${targetApiUrl}/api/college?id=${encodeURIComponent(id)}`;
+    }
 
     console.log(`Fetching college order from: ${apiEndpoint}`);
+    console.log(`TARGET_API_URL env var: ${process.env.TARGET_API_URL || 'not set'}`);
+    console.log(`Constructed endpoint: ${apiEndpoint}`);
 
     const response = await fetch(apiEndpoint, {
       method: 'GET',
