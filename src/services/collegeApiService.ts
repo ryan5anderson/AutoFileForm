@@ -111,12 +111,19 @@ export async function checkApiHealth(): Promise<boolean> {
   }
 }
 
+/**
+ * Legacy alias for checkApiHealth (for backward compatibility)
+ * @deprecated Use checkApiHealth instead
+ */
+export const checkProxyHealth = checkApiHealth;
+
 // Export a default object with all methods
 const collegeApiService = {
   fetchColleges,
   fetchCollegeOrder,
   getProxiedImageUrl,
   checkApiHealth,
+  checkProxyHealth, // Include legacy name
 };
 
 export default collegeApiService;
