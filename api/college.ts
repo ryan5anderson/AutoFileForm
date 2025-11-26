@@ -36,11 +36,54 @@ export default async function handler(
       },
     });
 
+    // Check content type before parsing
+    const contentType = response.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+
+    // Get response text first to check if it's valid JSON
+    const responseText = await response.text();
+
     if (!response.ok) {
-      throw new Error(`API responded with status: ${response.status}`);
+      console.error(`API error response (${response.status}):`, responseText.substring(0, 500));
+      return res.status(response.status).json({
+        error: 'Failed to fetch college order from external API',
+        status: response.status,
+        statusText: response.statusText,
+        url: apiEndpoint,
+        responsePreview: responseText.substring(0, 200),
+        contentType: contentType,
+      });
     }
 
-    const data = await response.json();
+    // Validate that response is JSON
+    if (!isJson) {
+      console.error('API returned non-JSON response:', {
+        contentType,
+        preview: responseText.substring(0, 200),
+      });
+      return res.status(500).json({
+        error: 'API returned non-JSON response',
+        contentType: contentType,
+        responsePreview: responseText.substring(0, 200),
+        url: apiEndpoint,
+      });
+    }
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse JSON response:', {
+        error: parseError instanceof Error ? parseError.message : String(parseError),
+        preview: responseText.substring(0, 500),
+      });
+      return res.status(500).json({
+        error: 'Failed to parse API response as JSON',
+        message: parseError instanceof Error ? parseError.message : 'Unknown parse error',
+        responsePreview: responseText.substring(0, 500),
+        url: apiEndpoint,
+      });
+    }
 
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -50,9 +93,11 @@ export default async function handler(
     return res.status(200).json(data);
   } catch (error) {
     console.error('Error fetching college order:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return res.status(500).json({ 
       error: 'Failed to fetch college order',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: errorMessage,
+      details: error instanceof Error ? error.stack : undefined,
     });
   }
 }
