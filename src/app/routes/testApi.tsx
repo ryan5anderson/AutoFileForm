@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
-import { fetchColleges, getProxiedImageUrl, checkApiHealth, type CollegeData } from '../../services/collegeApiService';
+import { fetchColleges, getProxiedImageUrl, checkApiHealth, type CollegeData, type ApiErrorInfo } from '../../services/collegeApiService';
 
 interface LogoError {
   schoolId: string;
@@ -18,7 +18,9 @@ const TestApiPage: React.FC = () => {
   const [colleges, setColleges] = useState<CollegeData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<ApiErrorInfo | null>(null);
   const [logoErrors, setLogoErrors] = useState<Map<string, LogoError>>(new Map());
+  const [showDebugInfo, setShowDebugInfo] = useState<boolean>(false);
 
 
   // Fetch API Data
@@ -27,17 +29,37 @@ const TestApiPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
+        setErrorDetails(null);
+        setShowDebugInfo(false);
         
         // Check if API is responding
-        const isHealthy = await checkApiHealth();
-        if (!isHealthy) {
-          throw new Error('API is not responding. Please check your connection.');
+        const healthCheck = await checkApiHealth();
+        if (!healthCheck.healthy) {
+          setError('API is not responding. Please check your connection.');
+          setErrorDetails(healthCheck.error || {
+            message: 'Unknown error during health check',
+            url: '/api/health',
+          });
+          setShowDebugInfo(true);
+          return;
         }
         
         const data = await fetchColleges();
         setColleges(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+        setError(errorMessage);
+        
+        // Extract API error details if available
+        if (err && typeof err === 'object' && 'apiError' in err) {
+          setErrorDetails(err.apiError as ApiErrorInfo);
+        } else {
+          setErrorDetails({
+            message: errorMessage,
+            error: errorMessage,
+          });
+        }
+        setShowDebugInfo(true);
         console.error('Error:', err);
       } finally {
         setLoading(false);
@@ -139,7 +161,119 @@ const TestApiPage: React.FC = () => {
             color: 'var(--color-danger)',
             marginBottom: 'var(--space-4)'
           }}>
-            {error}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'flex-start',
+              marginBottom: errorDetails ? 'var(--space-2)' : 0
+            }}>
+              <div style={{ flex: 1 }}>
+                <strong style={{ fontSize: 'var(--font-size-lg)', display: 'block', marginBottom: 'var(--space-2)' }}>
+                  ⚠️ Error: {error}
+                </strong>
+              </div>
+              {errorDetails && (
+                <button
+                  onClick={() => setShowDebugInfo(!showDebugInfo)}
+                  style={{
+                    padding: 'var(--space-1) var(--space-2)',
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--color-danger)',
+                    borderRadius: 'var(--radius)',
+                    color: 'var(--color-danger)',
+                    cursor: 'pointer',
+                    fontSize: 'var(--font-size-sm)',
+                    marginLeft: 'var(--space-2)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {showDebugInfo ? 'Hide' : 'Show'} Debug Info
+                </button>
+              )}
+            </div>
+            
+            {showDebugInfo && errorDetails && (
+              <div style={{
+                marginTop: 'var(--space-4)',
+                padding: 'var(--space-3)',
+                backgroundColor: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius)',
+                fontFamily: 'monospace',
+                fontSize: 'var(--font-size-sm)',
+                color: 'var(--color-text)',
+                maxHeight: '400px',
+                overflow: 'auto'
+              }}>
+                <div style={{ marginBottom: 'var(--space-2)', fontWeight: 'bold', color: 'var(--color-danger)' }}>
+                  Debug Information:
+                </div>
+                
+                {errorDetails.url && (
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <strong>API URL:</strong> <span style={{ color: 'var(--color-gray-700)' }}>{errorDetails.url}</span>
+                  </div>
+                )}
+                
+                {errorDetails.status !== undefined && (
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <strong>Status Code:</strong> <span style={{ color: 'var(--color-gray-700)' }}>{errorDetails.status}</span>
+                    {errorDetails.statusText && (
+                      <span style={{ color: 'var(--color-gray-700)', marginLeft: 'var(--space-1)' }}>
+                        ({errorDetails.statusText})
+                      </span>
+                    )}
+                  </div>
+                )}
+                
+                {errorDetails.message && (
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <strong>Error Message:</strong> <span style={{ color: 'var(--color-gray-700)' }}>{errorDetails.message}</span>
+                  </div>
+                )}
+                
+                {errorDetails.error && (
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <strong>Error Details:</strong> <span style={{ color: 'var(--color-gray-700)' }}>{errorDetails.error}</span>
+                  </div>
+                )}
+                
+                {errorDetails.responseText && (
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <strong>Response Body:</strong>
+                    <pre style={{
+                      marginTop: 'var(--space-1)',
+                      padding: 'var(--space-2)',
+                      backgroundColor: 'var(--color-gray-100)',
+                      borderRadius: 'var(--radius)',
+                      overflow: 'auto',
+                      maxHeight: '200px',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                      fontSize: '0.85em'
+                    }}>
+                      {errorDetails.responseText}
+                    </pre>
+                  </div>
+                )}
+                
+                <div style={{ 
+                  marginTop: 'var(--space-3)', 
+                  paddingTop: 'var(--space-2)',
+                  borderTop: '1px solid var(--color-border)',
+                  fontSize: '0.85em',
+                  color: 'var(--color-gray-600)'
+                }}>
+                  <strong>Environment:</strong>
+                  <ul style={{ margin: 'var(--space-1) 0', paddingLeft: 'var(--space-4)' }}>
+                    <li>Current URL: {window.location.href}</li>
+                    <li>API Base URL: {process.env.REACT_APP_API_BASE_URL || '/api'}</li>
+                    <li>Protocol: {window.location.protocol}</li>
+                    <li>Host: {window.location.host}</li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

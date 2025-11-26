@@ -60,8 +60,9 @@ export interface OrderItem {
  * Fetches the list of all available colleges
  */
 export async function fetchColleges(): Promise<CollegeData[]> {
+  const collegesUrl = `${API_BASE_URL}/colleges`;
   try {
-    const response = await fetch(`${API_BASE_URL}/colleges`, {
+    const response = await fetch(collegesUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -69,14 +70,46 @@ export async function fetchColleges(): Promise<CollegeData[]> {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch colleges: ${response.status} ${response.statusText}`);
+      let responseText = '';
+      try {
+        responseText = await response.text();
+      } catch (e) {
+        responseText = 'Could not read response';
+      }
+
+      const errorInfo: ApiErrorInfo = {
+        message: `Failed to fetch colleges: ${response.status} ${response.statusText}`,
+        status: response.status,
+        statusText: response.statusText,
+        url: collegesUrl,
+        responseText: responseText.substring(0, 500),
+      };
+
+      const error = new Error(errorInfo.message) as Error & { apiError?: ApiErrorInfo };
+      error.apiError = errorInfo;
+      throw error;
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error fetching colleges:', error);
-    throw error;
+    
+    // If it's already an error with apiError, re-throw it
+    if (error instanceof Error && 'apiError' in error) {
+      throw error;
+    }
+
+    // Otherwise, wrap it with API error info
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const apiError: ApiErrorInfo = {
+      message: errorMessage,
+      url: collegesUrl,
+      error: errorMessage,
+    };
+    const wrappedError = new Error(`Failed to fetch colleges: ${errorMessage}`) as Error & { apiError?: ApiErrorInfo };
+    wrappedError.apiError = apiError;
+    throw wrappedError;
   }
 }
 
@@ -148,18 +181,59 @@ export function getProxiedImageUrl(originalUrl: string | null | undefined): stri
 }
 
 /**
- * Checks if the API is healthy
+ * Detailed API error information
  */
-export async function checkApiHealth(): Promise<boolean> {
+export interface ApiErrorInfo {
+  message: string;
+  status?: number;
+  statusText?: string;
+  url?: string;
+  responseText?: string;
+  error?: string;
+}
+
+/**
+ * Checks if the API is healthy and returns detailed error info if it fails
+ */
+export async function checkApiHealth(): Promise<{ healthy: boolean; error?: ApiErrorInfo }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`, {
+    const healthUrl = `${API_BASE_URL}/health`;
+    const response = await fetch(healthUrl, {
       method: 'GET',
     });
 
-    return response.ok;
+    if (!response.ok) {
+      let responseText = '';
+      try {
+        responseText = await response.text();
+      } catch (e) {
+        responseText = 'Could not read response';
+      }
+
+      return {
+        healthy: false,
+        error: {
+          message: `API health check failed with status ${response.status}`,
+          status: response.status,
+          statusText: response.statusText,
+          url: healthUrl,
+          responseText: responseText.substring(0, 500), // Limit to 500 chars
+        }
+      };
+    }
+
+    return { healthy: true };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('API health check failed:', error);
-    return false;
+    return {
+      healthy: false,
+      error: {
+        message: 'Failed to connect to API',
+        error: errorMessage,
+        url: `${API_BASE_URL}/health`,
+      }
+    };
   }
 }
 
