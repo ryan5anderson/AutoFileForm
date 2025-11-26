@@ -77,6 +77,17 @@ export default async function handler(
     let data;
     try {
       data = JSON.parse(responseText);
+      console.log(`Successfully parsed JSON. Type: ${typeof data}, Is Array: ${Array.isArray(data)}`);
+      if (data && typeof data === 'object') {
+        console.log(`Response keys: ${Object.keys(data).join(', ')}`);
+        // Check if data is wrapped in a 'data' property
+        if (data.data && Array.isArray(data.data)) {
+          console.log(`Found data.data array with ${data.data.length} items`);
+          data = data.data; // Unwrap the data
+        } else if (Array.isArray(data)) {
+          console.log(`Response is array with ${data.length} items`);
+        }
+      }
     } catch (parseError) {
       console.error('Failed to parse JSON response:', {
         error: parseError instanceof Error ? parseError.message : String(parseError),
@@ -90,6 +101,20 @@ export default async function handler(
       });
     }
 
+    // Ensure we return an array
+    if (!Array.isArray(data)) {
+      console.error('Response is not an array:', typeof data, data);
+      return res.status(500).json({
+        error: 'API response is not in expected format',
+        expected: 'Array of colleges',
+        received: typeof data,
+        responsePreview: JSON.stringify(data).substring(0, 500),
+        url: apiEndpoint,
+      });
+    }
+
+    console.log(`Returning ${data.length} colleges`);
+    
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');

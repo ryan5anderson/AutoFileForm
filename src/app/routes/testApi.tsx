@@ -45,6 +45,8 @@ const TestApiPage: React.FC = () => {
         }
         
         const data = await fetchColleges();
+        console.log('Fetched colleges data:', data);
+        console.log('Number of colleges:', Array.isArray(data) ? data.length : 'Not an array');
         setColleges(data);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -289,6 +291,21 @@ const TestApiPage: React.FC = () => {
           }}>
             <strong>⚠️ Logo Loading Issues:</strong> {logoErrors.size} out of {colleges.length} logos failed to load. 
             Check individual cards below for details. See browser console for more information.
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && colleges.length === 0 && (
+          <div style={{
+            marginTop: 'var(--space-6)',
+            padding: 'var(--space-6)',
+            textAlign: 'center',
+            color: 'var(--color-gray-600)'
+          }}>
+            <p>No colleges found.</p>
+            <p style={{ fontSize: '0.9em', marginTop: 'var(--space-2)' }}>
+              The API returned an empty list. Check the browser console for details.
+            </p>
           </div>
         )}
 

@@ -91,7 +91,27 @@ export async function fetchColleges(): Promise<CollegeData[]> {
     }
 
     const data = await response.json();
-    return data;
+    
+    // Log what we received for debugging
+    console.log('Raw API response:', data);
+    console.log('Response type:', typeof data);
+    console.log('Is array?', Array.isArray(data));
+    
+    // Handle different response formats
+    if (Array.isArray(data)) {
+      console.log(`Received ${data.length} colleges`);
+      return data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      console.log(`Response wrapped in data property, found ${data.data.length} colleges`);
+      return data.data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.colleges)) {
+      console.log(`Response wrapped in colleges property, found ${data.colleges.length} colleges`);
+      return data.colleges;
+    } else {
+      console.warn('Unexpected response format:', data);
+      // Return empty array if format is unexpected
+      return [];
+    }
   } catch (error) {
     console.error('Error fetching colleges:', error);
     
