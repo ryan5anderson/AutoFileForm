@@ -4,11 +4,6 @@
   "installCommand": "npm install --legacy-peer-deps",
   "outputDirectory": "build",
   "framework": "create-react-app",
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "@vercel/node"
-    }
-  },
   "rewrites": [
     {
       "source": "/((?!api|static).*)",
