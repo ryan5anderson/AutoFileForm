@@ -107,7 +107,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   // Scroll to top when product page loads
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [imageName, categoryPath]);
 
   // Early return AFTER all hooks

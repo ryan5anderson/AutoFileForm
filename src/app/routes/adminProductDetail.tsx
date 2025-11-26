@@ -70,7 +70,7 @@ const AdminProductDetail: React.FC = () => {
 
   // Scroll to top when product page loads
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [imageName, categoryPath]);
 
   // Load ratios data on mount
