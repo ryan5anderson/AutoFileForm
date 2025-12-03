@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
 import Header from './app/layout/Header';
@@ -23,14 +23,12 @@ import './styles/global.css';
 import './styles/tokens.css';
 import './styles/components.css';
 
-// HashRouter handles all routing via hash fragments, compatible with GitHub Pages
+// BrowserRouter for clean URLs - Vercel handles client-side routing via rewrites
 
 // eslint-disable-next-line no-console
 console.log('React app starting...');
 // eslint-disable-next-line no-console
 console.log('Current URL:', window.location.href);
-// eslint-disable-next-line no-console
-console.log('Hash:', window.location.hash);
 
 const root = document.getElementById('root');
 // eslint-disable-next-line no-console
@@ -39,9 +37,9 @@ console.log('Root element found:', !!root);
 if (root) {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
-      <HashRouter>
+      <BrowserRouter>
         <AppShell />
-      </HashRouter>
+      </BrowserRouter>
     </React.StrictMode>
   );
   // eslint-disable-next-line no-console

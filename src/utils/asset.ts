@@ -2,7 +2,7 @@ export function asset(path: string) {
   // Remove leading slash to make it relative
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   
-  // For GitHub Pages, use relative paths without PUBLIC_URL
+  // Use relative paths for asset resolution
   return cleanPath;
 }
 

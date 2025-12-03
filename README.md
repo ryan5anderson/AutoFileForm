@@ -34,19 +34,18 @@ A comprehensive React-based order management system for college retail stores to
 
 ## Technology Stack
 - **Frontend Framework**: React 19.1.0 with TypeScript 5.9.3
-- **Routing**: React Router DOM 7.7.0 (HashRouter for GitHub Pages compatibility)
+- **Routing**: React Router DOM 7.7.0 (BrowserRouter for clean URLs)
 - **State Management**: React Context API with custom hooks
 - **Database**: Firebase Firestore 12.4.0 for order and garment ratio storage
 - **Email Service**: EmailJS 3.2.0
 - **Styling**: CSS Custom Properties (CSS Variables) with responsive design
 - **Build Tool**: Create React App 5.0.1
 - **Testing Framework**: React Testing Library (configured, tests to be added)
-- **Deployment**: GitHub Pages with custom domain support (ohiopylecollege.com)
+- **Deployment**: Vercel with custom domain support (ohiopylecollege.com)
 
 ## Development
 - `npm start` - Development server
 - `npm run build` - Production build
-- `npm run deploy` - Deploy to GitHub Pages
 
 ## Quick Start
 
@@ -104,8 +103,8 @@ A comprehensive React-based order management system for college retail stores to
 
 6. **Open in browser**
    - Navigate to `http://localhost:3000/` to select your college
-   - The app uses HashRouter, so routes will be like `http://localhost:3000/#/michiganstate`
-   - Access admin dashboard at `http://localhost:3000/#/admin`
+   - Routes will be like `http://localhost:3000/michiganstate`
+   - Access admin dashboard at `http://localhost:3000/admin`
 
 ## Usage
 
@@ -270,21 +269,20 @@ npm run build
 ```
 This creates an optimized production build in the `build/` directory.
 
-### Deploy to GitHub Pages
-```bash
-npm run deploy
-```
-This command:
-- Builds the application
-- Deploys to the `gh-pages` branch
-- Configures custom domain (ohiopylecollege.com)
-- Sets up proper routing for HashRouter
+### Deploy to Vercel
+The application is configured for automatic deployment on Vercel. Simply push to your main branch and Vercel will automatically build and deploy.
+
+For manual deployment:
+1. Install Vercel CLI: `npm i -g vercel`
+2. Run `vercel` in the project directory
+3. Follow the prompts to deploy
 
 ### Environment Variables in Production
-For production deployment, ensure all environment variables are set in your hosting platform:
-- GitHub Actions secrets (if using CI/CD)
-- Netlify/Vercel environment variables
-- Or your preferred hosting platform's environment variable configuration
+For production deployment, ensure all environment variables are set in Vercel:
+- Go to your Vercel project settings
+- Navigate to Environment Variables
+- Add all required `REACT_APP_*` variables
+- Redeploy after adding variables
 
 ### Firebase Security Rules
 Ensure your Firestore security rules are properly configured:
@@ -307,7 +305,7 @@ service cloud.firestore {
 
 ## Additional Notes
 
-- **HashRouter**: The application uses HashRouter for GitHub Pages compatibility. All routes are prefixed with `#/`
+- **BrowserRouter**: The application uses BrowserRouter for clean URLs. Vercel handles client-side routing via rewrites in `vercel.json`
 - **Firebase Initialization**: Garment ratios are automatically initialized from `garment_ratios_final.json` on first access
 - **College Configuration**: Each college has its own JSON configuration file with product categories and options
 - **Image Assets**: Product images are stored in the `public/` directory organized by college and category
