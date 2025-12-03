@@ -11,23 +11,6 @@
       content="College Product Order Form"
     />
     <title>College Order Form</title>
-    <script type="text/javascript">
-      // Redirect to HashRouter base when accessing root directly
-      (function() {
-        var currentPath = window.location.pathname;
-        var currentHash = window.location.hash;
-        
-        // If we're at root without a hash, redirect to /#/
-        if (currentPath === '/' && !currentHash) {
-          window.location.replace('/#/');
-        }
-        // If we're at a deeper path, convert to hash
-        else if (currentPath !== '/' && !currentHash) {
-          var pathAfterRoot = currentPath.replace(/^\//, '');
-          window.location.replace('/#/' + pathAfterRoot);
-        }
-      })();
-    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
