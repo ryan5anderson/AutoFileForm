@@ -311,6 +311,28 @@ const AdminPage: React.FC = () => {
           <h1>Welcome, Admin</h1>
           <p>Manage your application from the admin dashboard</p>
         </div>
+        
+        <div className="firebase-warning-banner" style={{
+          backgroundColor: '#fff3cd',
+          border: '1px solid #ffc107',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <span style={{ fontSize: '24px' }}>⚠️</span>
+          <div>
+            <strong style={{ color: '#856404', display: 'block', marginBottom: '4px' }}>
+              Firebase Database Not Connected
+            </strong>
+            <p style={{ color: '#856404', margin: 0, fontSize: '14px' }}>
+              The Firebase database connection is currently disabled. Orders are being sent via email only and will not appear in this dashboard. Please connect Firebase to enable order tracking and management.
+            </p>
+          </div>
+        </div>
+
         <div className="admin-stats-grid">
           <div className="admin-stat-card">
             <div className="stat-icon">📊</div>
