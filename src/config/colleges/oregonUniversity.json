@@ -6,11 +6,7 @@
       "name": "Display Options",
       "path": "displays",
       "hasDisplayOptions": true,
-      "images": [
-        "University of Oregon-3FT_Inline_500.jpg",
-        "University of Oregon-Premium Floor Display 2.0_500.jpg",
-        "University of Oregon-Tier2_Display_Floor_500.jpg"
-      ]
+      "images": []
     },
     {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
@@ -21,6 +17,9 @@
         "longsleeve",
         "hoodie",
         "crewneck"
+      ],
+      "crewOnlyImages": [
+        "M103287559_SDFLNS_Flinch_DTF_on_Steel.png"
       ],
       "images": [
         "M103287148_SH2FDC_Custom_DTF_on_Kelly_Green.png",
@@ -82,6 +81,48 @@
       "path": "sticker",
       "images": [
         "M103467322_SHSTPK_Custom_Logo_Sticker_Pack.png"
+      ]
+    },
+    {
+      "name": "Jacket",
+      "path": "jacket",
+      "images": [
+        "M103291491_SHE1CJ_Custom_Logo_Kelly_Green_Jacket.png",
+        "M103291637_SHE1CJ_Custom_Logo_Kelly_Green_Jacket.png",
+        "M103292720_SHE1CJ_Custom_Logo_Black_Jacket.png",
+        "M103297550_SHE1CJ_Custom_Logo_Black_Jacket.png"
+      ]
+    },
+    {
+      "name": "Pants",
+      "path": "pants",
+      "images": [
+        "M103293017_SHPHDS_Custom_DTF_Steel_Pants.png"
+      ]
+    },
+    {
+      "name": "Shorts",
+      "path": "shorts",
+      "images": [
+        "M103293136_SDSPSS_Custom_DTF_Side_Print_Shorts.png",
+        "M103293295_SDSKSS_Skill_Check_DTF_Oxford_Shorts.png"
+      ]
+    },
+    {
+      "name": "Socks",
+      "path": "socks",
+      "images": [
+        "M103293339_SS8052_Custom_Logo_Socks.png"
+      ]
+    },
+    {
+      "name": "Signage",
+      "path": "signage",
+      "images": [
+        "M103296942_SHWGCH_Custom_PFD_Header_Card.png",
+        "M103297095_SHWGCS_Custom_Spinner_Header_Card.png",
+        "M103490425_SHMH24_Custom_4ft_Shelf_Magnet.png",
+        "M103490861_SHMH23_Custom_3ft_Shelf_Magnet.png"
       ]
     }
   ]

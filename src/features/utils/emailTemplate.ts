@@ -22,7 +22,7 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
         // For shirt categories, check for color-based size counts first, then regular size counts
         const colorSizeCountsByVersion = formData.shirtColorSizeCounts?.[imagePath];
         const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
-        const filteredVersions = getFilteredShirtVersions(img, cat.shirtVersions, cat.tieDyeImages);
+        const filteredVersions = getFilteredShirtVersions(img, cat.shirtVersions, cat.tieDyeImages, cat.crewOnlyImages);
 
         // Check for color-based size counts first
         if (colorSizeCountsByVersion) {

@@ -149,7 +149,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     // Determine version for size scale check
     let versionForCheck = 'tshirt'; // default fallback
     if (category.shirtVersions && category.shirtVersions.length > 0) {
-      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages);
+      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages);
       versionForCheck = filteredVersions.length > 0 ? filteredVersions[0] : category.shirtVersions[0];
     } else if (category.path.includes('jacket')) {
       versionForCheck = 'jacket';
@@ -283,16 +283,85 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if (category.hasShirtVersions && category.shirtVersions && (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).length > 1 : false)) {
+    } else if (category.hasShirtVersions && category.shirtVersions && getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages).length > 0) {
       // Check if this product has color options
       const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
       const hasColors = colors.length > 0;
+      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages);
+      const hasMultipleVersions = filteredVersions.length > 1;
+      
+      // If only one version, display it as static text (not a tab) and show sizes immediately
+      if (!hasMultipleVersions) {
+        const version = filteredVersions[0];
+        const versionKey = version;
+        const packSize = packSizes[version] || packSizes['default'] || 6;
+
+        if (hasColors) {
+          // For products with colors, show ColorSizeSelector
+          const colorSizeCounts = (formData.shirtColorSizeCounts?.[imagePath] as any)?.[versionKey] || {};
+          const sizesArray = getSizeOptions(category.path, version, college);
+          return (
+            <>
+              <div style={{ 
+                textAlign: 'center', 
+                fontSize: '1rem',
+                fontWeight: '500',
+                color: 'var(--color-text)',
+                marginBottom: 'var(--space-3)'
+              }}>
+                {getVersionDisplayName(version, imageName)}
+              </div>
+              <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
+              <ColorSizeSelector
+                colors={colors}
+                colorSizeCounts={colorSizeCounts}
+                onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey, color, counts)}
+                categoryPath={category.path}
+                version={version}
+                sizes={sizesArray}
+                packSize={packSize}
+                allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+                collegeKey={college}
+              />
+            </>
+          );
+        } else {
+          // For single-color products, show regular SizePackSelector
+          const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+          const packSize = packSizes[version] || packSizes['default'] || 6;
+          const sizesArray = getSizeOptions(category.path, version, college);
+          return (
+            <>
+              <div style={{ 
+                textAlign: 'center', 
+                fontSize: '1rem',
+                fontWeight: '500',
+                color: 'var(--color-text)',
+                marginBottom: 'var(--space-3)'
+              }}>
+                {getVersionDisplayName(version, imageName)}
+              </div>
+              <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
+              <SizePackSelector
+                counts={counts}
+                sizes={sizesArray}
+                onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                packSize={packSize}
+                allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+                categoryPath={category.path}
+                version={version}
+                collegeKey={college}
+              />
+            </>
+          );
+        }
+      }
       
       // Render with tabs - each tab shows its own content when active (only if more than 1 version)
       return (
         <>
           <div className="product-detail-tabs">
-            {getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).map((version: string) => (
+            {filteredVersions.map((version: string) => (
               <button
                 key={version}
                 className={`product-detail-tab ${activeTab === version ? 'product-detail-tab--active' : ''}`}
@@ -304,7 +373,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
           <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
           <div className="product-detail-tab-content">
-            {getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).map((version: string) => {
+            {filteredVersions.map((version: string) => {
               const versionKey = version;
               const packSize = packSizes[version] || packSizes['default'] || 6;
 
@@ -359,12 +428,12 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if ((category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length === 1) || (category.shirtVersions ? getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages).length <= 1 : false) || category.hasSizeOptions) {
+    } else if (category.hasSizeOptions) {
       // Single shirt version OR applique OR size options - render without tabs, show "Quantity" label with size selector
       let version = 'tshirt'; // default fallback
 
       if (category.shirtVersions && category.shirtVersions.length > 0) {
-        const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages);
+        const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages);
         version = filteredVersions.length > 0 ? filteredVersions[0] : category.shirtVersions[0];
       } else if (category.path.includes('jacket')) {
         version = 'jacket';

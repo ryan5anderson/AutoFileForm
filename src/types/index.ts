@@ -9,6 +9,7 @@ export interface Category {
   hasPantOptions?: boolean; // Property for pants with style/color options
   pantStyles?: string[]; // Array of available pant styles (e.g., ['sweatpants', 'joggers'])
   tieDyeImages?: string[]; // Array of image filenames that are tiedye (crew neck not available for these)
+  crewOnlyImages?: string[]; // Array of image filenames that only have crewneck available
 }
 
 export interface College {

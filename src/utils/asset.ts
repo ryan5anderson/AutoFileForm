@@ -1,9 +1,10 @@
 export function asset(path: string) {
-  // Remove leading slash to make it relative
+  // Remove leading slash if present, then add it back to make it absolute
+  // This ensures images work correctly on nested routes (product detail, summary pages)
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   
-  // Use relative paths for asset resolution
-  return cleanPath;
+  // Use absolute paths from root for proper asset resolution
+  return `/${cleanPath}`;
 }
 
 /**

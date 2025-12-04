@@ -3,7 +3,7 @@
 Extract images from a PDF, categorize them, and update college configs.
 
 This script:
-1. Prompts user to select a college (Arizona State, Michigan State, West Virginia University, University of Pittsburgh, or Alabama University)
+1. Prompts user to select a college (Arizona State, Michigan State, West Virginia University, University of Pittsburgh, Alabama University, or Oregon University)
 2. Extracts images from PDF and names them using captions
 3. Categorizes images into subfolders (beanie, tshirt/men, etc.)
 4. Cleans existing images in the target college's public folder
@@ -25,7 +25,8 @@ Usage:
     #   3. West Virginia University
     #   4. University of Pittsburgh
     #   5. Alabama University
-    # Enter your choice (1, 2, 3, 4, or 5): 1
+    #   6. Oregon University
+    # Enter your choice (1, 2, 3, 4, 5, or 6): 1
     
     # Then extracts to public/ArizonaState/ and updates arizonastate.json
 
@@ -74,10 +75,11 @@ def prompt_college_selection() -> Tuple[str, str]:
     print("  3. West Virginia University")
     print("  4. University of Pittsburgh")
     print("  5. Alabama University")
+    print("  6. Oregon University")
     print()
     
     while True:
-        choice = input("Enter your choice (1, 2, 3, 4, or 5): ").strip()
+        choice = input("Enter your choice (1, 2, 3, 4, 5, or 6): ").strip()
         if choice == "1":
             return ("ArizonaState", "arizonastate")
         elif choice == "2":
@@ -88,8 +90,10 @@ def prompt_college_selection() -> Tuple[str, str]:
             return ("PittsburghUniversity", "pittsburghuniversity")
         elif choice == "5":
             return ("AlabamaUniversity", "alabamauniversity")
+        elif choice == "6":
+            return ("OregonUniversity", "oregonUniversity")
         else:
-            print("Invalid choice. Please enter 1, 2, 3, 4, or 5.")
+            print("Invalid choice. Please enter 1, 2, 3, 4, 5, or 6.")
 
 def clean_existing_images(college_dir: Path) -> int:
     """
@@ -123,7 +127,7 @@ def update_college_config(
     Update the college's JSON config with extracted images.
     
     Args:
-        college_config_name: 'arizonastate' or 'michiganstate' (lowercase)
+        college_config_name: 'arizonastate', 'michiganstate', 'oregonUniversity', etc. (lowercase/camelCase)
         category_image_map: {'beanie': ['file1.png', ...], 'tshirt/men': [...]}
         script_dir: Path to the scripts directory (to navigate to src/)
     """

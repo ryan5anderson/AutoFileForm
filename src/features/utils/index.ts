@@ -4,10 +4,16 @@ export { getDisplayProductName, getProductName, getVersionDisplayName, getRackDi
 export { createTemplateParams } from './emailTemplate';
 
 // Utility function to filter shirt versions for applique and tiedye products
-export const getFilteredShirtVersions = (imageName: string, versions: string[], tieDyeImages?: string[]): string[] => {
+export const getFilteredShirtVersions = (imageName: string, versions: string[], tieDyeImages?: string[], crewOnlyImages?: string[]): string[] => {
   const isApplique = imageName.toLowerCase().includes('applique');
   const isTiedye = tieDyeImages?.includes(imageName) || false;
   const isHoodieOnly = imageName.toLowerCase().includes('hood') || imageName.includes('CM7031');
+  const isCrewOnly = crewOnlyImages?.includes(imageName) || false;
+  
+  if (isCrewOnly) {
+    // Crew-only products only have crewneck
+    return versions.filter(version => version === 'crewneck');
+  }
   
   if (isApplique) {
     // Applique products only have crewneck and hoodie
