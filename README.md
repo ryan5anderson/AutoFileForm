@@ -44,8 +44,129 @@ A comprehensive React-based order management system for college retail stores to
 - **Deployment**: Vercel with custom domain support (ohiopylecollege.com)
 
 ## Development
-- `npm start` - Development server
+
+### Quick Start Guide
+
+**Choose the right command:**
+- **`npm start`** → Frontend only, uses hardcoded values from config files
+  - No API server needed
+  - Use for UI development and testing production routes
+  
+- **`npm run dev:local`** → Full stack with API integration
+  - Requires Vercel CLI (`npm i -g vercel`)
+  - Connects to real API endpoints
+  - Required for `/test-api/*` routes
+
+### Local Development Setup
+
+The application supports two deployment scenarios:
+
+1. **Vercel Deployment** (Production): API routes are handled automatically by Vercel serverless functions
+2. **Local Development**: 
+   - **Frontend only**: `npm start` (uses static config files)
+   - **With API**: `npm run dev:local` (requires Vercel dev server)
+
+### Development Commands
+
+**For Local Testing (Hardcoded Values):**
+- `npm start` - Start React development server with static config files (no API required)
+  - Uses hardcoded college data from `src/config/colleges/*.json`
+  - No Vercel dev server needed
+  - Good for frontend development and testing UI without API dependencies
+
+**For Local Development (API Integration):**
+- `npm run dev:local` - Start both Vercel dev server and React app concurrently (recommended for API testing)
+  - Connects to real API endpoints via Vercel serverless functions
+  - Requires Vercel CLI and API server running
+  - Use this when testing API integration and `/test-api/*` routes
+- `npm run dev:vercel` - Start only Vercel dev server (for API routes)
 - `npm run build` - Production build
+
+### Local Development with API Support
+
+**Important:** Choose the right command based on what you're testing:
+- **`npm start`** → Frontend only, uses static config files (hardcoded values)
+- **`npm run dev:local`** → Full stack, uses real API endpoints
+
+For local development with API functionality, you have two options:
+
+#### Option 1: Use `npm run dev:local` (Recommended)
+This command starts both the Vercel dev server (for API routes) and the React app:
+
+```bash
+npm run dev:local
+```
+
+This will:
+- Start Vercel dev server on `http://localhost:3001` (handles `/api/*` routes)
+- Start React app on `http://localhost:3000` (proxies API requests to Vercel dev server)
+- Automatically wait for the API server to be ready before starting React
+
+#### Option 2: Run Servers Separately
+If you prefer to run servers in separate terminals:
+
+**Terminal 1:**
+```bash
+npm run dev:vercel
+# or: vercel dev
+```
+
+**Terminal 2:**
+```bash
+npm start
+```
+
+### API Configuration
+
+The application uses Vercel serverless functions located in the `/api` directory:
+- `/api/health` - Health check endpoint
+- `/api/colleges` - Fetch list of colleges
+- `/api/college` - Fetch college order data
+- `/api/proxy-image` - Proxy images from external domains
+
+**Environment Variables for API:**
+- `TARGET_API_URL` - External API base URL (default: `http://ohiopyleprints.com`)
+  - Set in Vercel environment variables for production
+  - Can be set in `.env.local` for local development: `TARGET_API_URL=http://ohiopyleprints.com`
+
+**Proxy Configuration:**
+- The `src/setupProxy.js` file automatically proxies `/api/*` requests to the Vercel dev server
+- Proxy target: `http://localhost:3001` (Vercel dev default port)
+- You can change the port by setting `VERCEL_DEV_PORT` environment variable
+
+### Troubleshooting Local API Issues
+
+**Problem: 404 errors on `/api/*` routes**
+
+**Solution:**
+1. Make sure Vercel dev server is running (`npm run dev:vercel` or `vercel dev`)
+2. Or use `npm run dev:local` to start both servers together
+2. Check that the server is running on port 3001 (default)
+3. Verify the proxy is working by checking browser console for proxy logs
+4. Try accessing `http://localhost:3001/api/health` directly to verify the API server
+
+**Problem: "Cannot connect to Vercel dev server" error**
+
+**Solution:**
+- Ensure Vercel CLI is installed: `npm i -g vercel`
+- Make sure port 3001 is not in use by another application
+- Check that `src/setupProxy.js` exists and is properly configured
+
+**Problem: "Project was deleted, transferred, or you don't have access" error**
+
+**Solution:**
+- If you don't have a Vercel project linked, you can still run locally:
+  1. Run `vercel link` to link to an existing project, or
+  2. Run `vercel dev --yes` which will work locally even without a project link
+- The `--yes` flag is already included in the `dev:local` script to skip confirmation prompts
+- For local development, Vercel dev will work with your `/api` directory functions even without a project connection
+
+**Problem: API requests work in production but not locally**
+
+**Solution:**
+- Local development requires the Vercel dev server to run the serverless functions
+- Use `npm run dev` to start both servers, or run `vercel dev` separately
+- Verify `TARGET_API_URL` is set correctly in your environment
 
 ## Quick Start
 
@@ -97,14 +218,28 @@ A comprehensive React-based order management system for college retail stores to
    - Set up Firestore security rules as needed for your use case
 
 5. **Start development server**
+
+   **Option A: Frontend only (hardcoded values)**
    ```bash
    npm start
    ```
+   - Uses static config files from `src/config/colleges/*.json`
+   - No API server required
+   - Good for UI development and testing
+
+   **Option B: Full stack with API (real endpoints)**
+   ```bash
+   npm run dev:local
+   ```
+   - Requires Vercel CLI installed: `npm i -g vercel`
+   - Connects to real API endpoints
+   - Use this for testing `/test-api/*` routes
 
 6. **Open in browser**
    - Navigate to `http://localhost:3000/` to select your college
    - Routes will be like `http://localhost:3000/michiganstate`
    - Access admin dashboard at `http://localhost:3000/admin`
+   - Test API routes at `http://localhost:3000/test-api` (requires `npm run dev:local`)
 
 ## Usage
 

@@ -361,10 +361,10 @@ const TestApiPage: React.FC = () => {
                         src={proxiedUrl || college.logoUrl}
                         alt={`${college.schoolName} logo`}
                         style={{
-                          width: '60px',
-                          height: '60px',
-                          minWidth: '60px',
-                          minHeight: '60px',
+                          width: '80px',
+                          height: '80px',
+                          minWidth: '80px',
+                          minHeight: '80px',
                           objectFit: 'contain',
                           borderRadius: 'var(--radius)',
                           backgroundColor: 'var(--color-gray-50)',
@@ -400,10 +400,10 @@ const TestApiPage: React.FC = () => {
                     </div>
                   ) : (
                     <div style={{
-                      width: '60px',
-                      height: '60px',
-                      minWidth: '60px',
-                      minHeight: '60px',
+                      width: '80px',
+                      height: '80px',
+                      minWidth: '80px',
+                      minHeight: '80px',
                       backgroundColor: 'var(--color-gray-100)',
                       border: '1px solid var(--color-border)',
                       borderRadius: 'var(--radius)',

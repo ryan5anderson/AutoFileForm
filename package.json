@@ -21,6 +21,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "dev:local": "concurrently \"vercel dev --yes\" \"wait-on http://localhost:3001/api/health && react-scripts start\"",
+    "dev:vercel": "vercel dev --yes",
     "check:unused": "ts-prune",
     "check:deps": "depcheck",
     "lint:css": "stylelint 'src/**/*.{css,scss}'"
@@ -44,10 +46,12 @@
     ]
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "depcheck": "^1.4.7",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "http-proxy-middleware": "^2.0.6",
     "stylelint": "^16.25.0",
     "stylelint-config-css-modules": "^4.5.1",
     "stylelint-config-prettier": "^9.0.5",
@@ -55,6 +59,7 @@
     "stylelint-declaration-strict-value": "^1.10.11",
     "stylelint-order": "^6.0.4",
     "ts-prune": "^0.10.3",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "wait-on": "^7.2.0"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
@@ -28,25 +28,99 @@ const TestApiOrderPage: React.FC = () => {
   // State for showing JSON output
   const [showJsonOutput, setShowJsonOutput] = useState<boolean>(false);
 
+  // State for store information
+  const [storeName, setStoreName] = useState<string>('');
+  const [storeNumber, setStoreNumber] = useState<string>('');
+  const [storeManager, setStoreManager] = useState<string>('');
+  const [orderDate, setOrderDate] = useState<string>('');
+
+  // Ref to track if store info has been loaded (prevents saving during initial load)
+  const storeInfoLoadedRef = useRef<boolean>(false);
+  const isInitialLoadRef = useRef<boolean>(true);
+
+  // Storage key for caching quantities
+  const getStorageKey = (): string => {
+    return `testApiOrder_${orderTemplateId}_quantities`;
+  };
+
+  // Storage key for caching store info
+  const getStoreInfoStorageKey = (): string => {
+    return `testApiOrder_${orderTemplateId}_storeInfo`;
+  };
+
   // Get unique key for an item
   const getItemKey = (item: OrderItem, index: number): string => {
     return item.Expr1 || `${item.ORDER_NUM}-${item.DESIGN_NUM}-${item.ITEM_ID}-${index}`;
   };
 
-  // Initialize ORDERED fields to "0" for all items
-  const initializeOrderedFields = (items: OrderItem[]) => {
-    const newMap = new Map<string, OrderedFields>();
-    items.forEach((item, index) => {
-      const key = getItemKey(item, index);
-      newMap.set(key, {
-        ORDERED1: '0',
-        ORDERED2: '0',
-        ORDERED3: '0',
-        ORDERED4: '0',
-        ORDERED5: '0'
+  // Load quantities from localStorage
+  const loadQuantitiesFromStorage = (items: OrderItem[]): Map<string, OrderedFields> => {
+    try {
+      const storageKey = getStorageKey();
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const savedMap = new Map<string, OrderedFields>();
+        
+        // Restore saved quantities, matching by item keys
+        items.forEach((item, index) => {
+          const key = getItemKey(item, index);
+          if (parsed[key]) {
+            savedMap.set(key, parsed[key]);
+          } else {
+            // Default to zeros if not found
+            savedMap.set(key, {
+              ORDERED1: '0',
+              ORDERED2: '0',
+              ORDERED3: '0',
+              ORDERED4: '0',
+              ORDERED5: '0'
+            });
+          }
+        });
+        return savedMap;
+      }
+    } catch (error) {
+      console.error('Error loading quantities from localStorage:', error);
+    }
+    return new Map();
+  };
+
+  // Save quantities to localStorage
+  const saveQuantitiesToStorage = (fields: Map<string, OrderedFields>) => {
+    try {
+      const storageKey = getStorageKey();
+      const obj: Record<string, OrderedFields> = {};
+      fields.forEach((value, key) => {
+        obj[key] = value;
       });
-    });
-    setOrderedFields(newMap);
+      localStorage.setItem(storageKey, JSON.stringify(obj));
+    } catch (error) {
+      console.error('Error saving quantities to localStorage:', error);
+    }
+  };
+
+  // Initialize ORDERED fields to "0" for all items, or load from storage
+  const initializeOrderedFields = (items: OrderItem[]) => {
+    const savedMap = loadQuantitiesFromStorage(items);
+    
+    // If we have saved data, use it; otherwise initialize with zeros
+    if (savedMap.size > 0) {
+      setOrderedFields(savedMap);
+    } else {
+      const newMap = new Map<string, OrderedFields>();
+      items.forEach((item, index) => {
+        const key = getItemKey(item, index);
+        newMap.set(key, {
+          ORDERED1: '0',
+          ORDERED2: '0',
+          ORDERED3: '0',
+          ORDERED4: '0',
+          ORDERED5: '0'
+        });
+      });
+      setOrderedFields(newMap);
+    }
   };
 
   // Update ORDERED field for a specific item
@@ -64,6 +138,8 @@ const TestApiOrderPage: React.FC = () => {
         ...current,
         [fieldName]: value
       });
+      // Save to localStorage whenever quantities change
+      saveQuantitiesToStorage(newMap);
       return newMap;
     });
   };
@@ -94,6 +170,80 @@ const TestApiOrderPage: React.FC = () => {
     );
   };
 
+  // Load store info from localStorage on mount
+  useEffect(() => {
+    if (orderTemplateId) {
+      // Reset flags when orderTemplateId changes
+      storeInfoLoadedRef.current = false;
+      isInitialLoadRef.current = true;
+      
+      try {
+        const storageKey = getStoreInfoStorageKey();
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setStoreName(parsed.storeName || '');
+          setStoreNumber(parsed.storeNumber || '');
+          setStoreManager(parsed.storeManager || '');
+          setOrderDate(parsed.orderDate || '');
+        } else {
+          // No saved data, initialize to empty
+          setStoreName('');
+          setStoreNumber('');
+          setStoreManager('');
+          setOrderDate('');
+        }
+      } catch (error) {
+        console.error('Error loading store info from localStorage:', error);
+        // On error, initialize to empty
+        setStoreName('');
+        setStoreNumber('');
+        setStoreManager('');
+        setOrderDate('');
+      }
+      
+      // Mark as loaded after a brief delay to ensure state updates complete
+      const timer = setTimeout(() => {
+        storeInfoLoadedRef.current = true;
+        isInitialLoadRef.current = false;
+      }, 50);
+      
+      return () => clearTimeout(timer);
+    } else {
+      // Reset the flag if orderTemplateId is not available
+      storeInfoLoadedRef.current = false;
+      isInitialLoadRef.current = true;
+      // Reset store info when orderTemplateId changes
+      setStoreName('');
+      setStoreNumber('');
+      setStoreManager('');
+      setOrderDate('');
+    }
+  }, [orderTemplateId]);
+
+  // Save store info to localStorage whenever it changes (but only after initial load)
+  useEffect(() => {
+    // Only save if:
+    // 1. We have an orderTemplateId
+    // 2. The initial load has completed (to prevent overwriting on mount)
+    // 3. This is not the initial load
+    if (orderTemplateId && storeInfoLoadedRef.current && !isInitialLoadRef.current) {
+      try {
+        const storageKey = getStoreInfoStorageKey();
+        const storeInfo = {
+          storeName: storeName || '',
+          storeNumber: storeNumber || '',
+          storeManager: storeManager || '',
+          orderDate: orderDate || ''
+        };
+        localStorage.setItem(storageKey, JSON.stringify(storeInfo));
+        console.log('Saved store info to localStorage:', storeInfo);
+      } catch (error) {
+        console.error('Error saving store info to localStorage:', error);
+      }
+    }
+  }, [orderTemplateId, storeName, storeNumber, storeManager, orderDate]);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!orderTemplateId) {
@@ -119,7 +269,7 @@ const TestApiOrderPage: React.FC = () => {
           item.SHIRTNAME && !item.SHIRTNAME.trim().toUpperCase().includes('ORDER REVIEW')
         );
         setOrderData(filteredData);
-        // Initialize all ORDERED fields to "0"
+        // Initialize all ORDERED fields to "0" or load from storage
         initializeOrderedFields(filteredData);
         setCurrentPage(1); // Reset to first page when new data loads
       } catch (err) {
@@ -133,7 +283,7 @@ const TestApiOrderPage: React.FC = () => {
     fetchData();
   }, [orderTemplateId]);
 
-  // Generate final JSON with updated ORDERED fields
+  // Generate final JSON with updated ORDERED fields and store information
   const generateOrderJson = (): string => {
     const updatedData = orderData.map((item, index) => {
       const itemKey = getItemKey(item, index);
@@ -149,7 +299,18 @@ const TestApiOrderPage: React.FC = () => {
         ...ordered
       };
     });
-    return JSON.stringify(updatedData, null, 2);
+    
+    const orderOutput = {
+      storeInfo: {
+        storeName: storeName || '',
+        storeNumber: storeNumber || '',
+        storeManager: storeManager || '',
+        date: orderDate || ''
+      },
+      orderItems: updatedData
+    };
+    
+    return JSON.stringify(orderOutput, null, 2);
   };
 
   const totalItems = useMemo(() => calculateTotalItems(), [orderedFields]);
@@ -213,6 +374,141 @@ const TestApiOrderPage: React.FC = () => {
             marginBottom: 'var(--space-4)'
           }}>
             {error}
+          </div>
+        )}
+
+        {/* Store Information Form */}
+        {!loading && !error && (
+          <div style={{
+            marginTop: 'var(--space-6)',
+            marginBottom: 'var(--space-6)',
+            padding: 'var(--space-6)',
+            backgroundColor: 'var(--color-gray-50)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-lg)',
+          }}>
+            <h2 style={{
+              marginTop: 0,
+              marginBottom: 'var(--space-4)',
+              fontSize: 'var(--font-size-lg)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: 'var(--color-text)'
+            }}>
+              Store Information
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: 'var(--space-4)'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <label 
+                  htmlFor="storeName"
+                  style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text)'
+                  }}
+                >
+                  Store Name
+                </label>
+                <input
+                  id="storeName"
+                  type="text"
+                  value={storeName}
+                  onChange={(e) => setStoreName(e.target.value)}
+                  placeholder="Enter store name"
+                  style={{
+                    padding: 'var(--space-2) var(--space-3)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--font-size-base)',
+                    backgroundColor: 'var(--color-bg)',
+                    color: 'var(--color-text)'
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <label 
+                  htmlFor="storeNumber"
+                  style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text)'
+                  }}
+                >
+                  Store Number
+                </label>
+                <input
+                  id="storeNumber"
+                  type="text"
+                  value={storeNumber}
+                  onChange={(e) => setStoreNumber(e.target.value)}
+                  placeholder="Enter store number"
+                  style={{
+                    padding: 'var(--space-2) var(--space-3)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--font-size-base)',
+                    backgroundColor: 'var(--color-bg)',
+                    color: 'var(--color-text)'
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <label 
+                  htmlFor="storeManager"
+                  style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text)'
+                  }}
+                >
+                  Store Manager
+                </label>
+                <input
+                  id="storeManager"
+                  type="text"
+                  value={storeManager}
+                  onChange={(e) => setStoreManager(e.target.value)}
+                  placeholder="Enter store manager name"
+                  style={{
+                    padding: 'var(--space-2) var(--space-3)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--font-size-base)',
+                    backgroundColor: 'var(--color-bg)',
+                    color: 'var(--color-text)'
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <label 
+                  htmlFor="orderDate"
+                  style={{
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: 'var(--color-text)'
+                  }}
+                >
+                  Date
+                </label>
+                <input
+                  id="orderDate"
+                  type="date"
+                  value={orderDate}
+                  onChange={(e) => setOrderDate(e.target.value)}
+                  style={{
+                    padding: 'var(--space-2) var(--space-3)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--font-size-base)',
+                    backgroundColor: 'var(--color-bg)',
+                    color: 'var(--color-text)'
+                  }}
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -461,6 +757,7 @@ const TestApiOrderPage: React.FC = () => {
                                     // Allow empty string temporarily for editing, but store as "0" if empty
                                     updateOrderedField(itemKey, size.orderedKey, val === '' ? '0' : val);
                                   }}
+                                  onFocus={(e) => e.target.select()}
                                   onBlur={(e) => {
                                     // Ensure value is at least 0 when field loses focus
                                     const val = parseInt(e.target.value) || 0;

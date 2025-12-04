@@ -118,15 +118,85 @@ const imageUrl = getProxiedImageUrl('http://ohiopyleprints.com/image.png');
 
 ## Configuration
 
-**Environment Variables:**
+### Environment Variables
 
+**Frontend:**
 - `REACT_APP_API_BASE_URL` (Frontend)
   - Default: `/api`
-  - Set in: `vercel.json`
+  - Set in: `vercel.json` for production
+  - Used by: `src/services/collegeApiService.ts`
 
+**Backend (Vercel Serverless Functions):**
 - `TARGET_API_URL` (Backend)
   - Default: `http://ohiopyleprints.com`
-  - Set in: Vercel environment variables
+  - Set in: Vercel environment variables for production
+  - For local development: Set in `.env.local` or `.env` file
+  - Used by: All API route handlers in `/api` directory
+
+### Local Development Setup
+
+**Important Distinction:**
+- **`npm start`** → Frontend only, uses static config files (hardcoded values from `src/config/colleges/*.json`)
+  - No API server required
+  - Good for UI development without API dependencies
+  - Production routes work normally
+  
+- **`npm run dev:local`** → Full stack with API integration
+  - Connects to real API endpoints via Vercel serverless functions
+  - Required for testing `/test-api/*` routes
+  - Requires Vercel CLI and API server
+
+**Prerequisites for API Development:**
+- Vercel CLI installed: `npm i -g vercel`
+- Node.js 16+ and npm
+
+**Running Locally with API:**
+
+1. **Option 1: Use `npm run dev:local` (Recommended for API testing)**
+   ```bash
+   npm run dev:local
+   ```
+   This starts both Vercel dev server (port 3001) and React app (port 3000) concurrently.
+   - Use this when you need to test API endpoints
+   - Required for `/test-api/*` routes
+
+2. **Option 2: Run servers separately**
+   ```bash
+   # Terminal 1: Start Vercel dev server
+   npm run dev:vercel
+   # or: vercel dev --yes
+   
+   # Terminal 2: Start React app
+   npm start
+   ```
+
+**Running Locally without API (Frontend Only):**
+```bash
+npm start
+```
+- Uses static config files from `src/config/colleges/*.json`
+- No Vercel dev server needed
+- Production routes work normally
+- API routes (`/test-api/*`) will not work
+
+**How It Works:**
+- Vercel dev server runs on `http://localhost:3001` and handles `/api/*` routes
+- React app runs on `http://localhost:3000` 
+- `src/setupProxy.js` automatically proxies `/api/*` requests from React app to Vercel dev server
+- Proxy configuration can be customized via `VERCEL_DEV_PORT` environment variable
+
+**Local Environment Variables:**
+Create `.env.local` file in project root:
+```env
+TARGET_API_URL=http://ohiopyleprints.com
+VERCEL_DEV_PORT=3001  # Optional: change Vercel dev server port
+```
+
+### Production Deployment
+
+**Vercel Environment Variables:**
+- Set `TARGET_API_URL` in Vercel project settings → Environment Variables
+- No need to set `REACT_APP_API_BASE_URL` (handled by `vercel.json`)
 
 **Future:** Environment-specific URLs (dev/staging/prod) - not yet implemented.
 
@@ -134,14 +204,18 @@ const imageUrl = getProxiedImageUrl('http://ohiopyleprints.com/image.png');
 
 ## Usage
 
-### Current Usage (Testing Only)
+### Current Usage
 
-**Test Routes:**
+**Test Routes (API Required):**
 - `/test-api` → Uses `fetchColleges()`, `checkApiHealth()`
 - `/test-api/{orderTemplateId}` → Uses `fetchCollegeOrder()`
 - `/test-api/{orderTemplateId}/product/{itemId}` → Uses `fetchCollegeOrder()`
+- **Requires:** `npm run dev:local` (Vercel dev server must be running)
 
-**Production Routes:** Use static config files (`src/config/colleges/*.json`), NOT the API.
+**Production Routes (No API Required):**
+- All other routes use static config files (`src/config/colleges/*.json`)
+- Work with `npm start` (no API server needed)
+- Examples: `/michiganstate`, `/arizonastate`, `/admin`, etc.
 
 ### Fetching Behavior
 - **No polling:** Fetches only on component mount or route parameter changes
@@ -282,3 +356,5 @@ src/services/
 
 **Status:** Testing Phase  
 **Last Updated:** 2024-01-15
+
+Quick update on the API integration testing. I now have a test version connecting directly to our backend API instead of using hardcoded files. The functionality works well, but images are loading slowly because they're being routed through a proxy server due to browser security restrictions that prevent direct loading from external domains. This adds about 100-300ms delay on first load, though subsequent loads are cached and instant.
