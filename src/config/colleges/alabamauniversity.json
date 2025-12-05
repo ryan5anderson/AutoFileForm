@@ -3,16 +3,6 @@
   "logo": "/logo/alabamalogo.png",
   "categories": [
     {
-      "name": "Display Options",
-      "path": "displays",
-      "hasDisplayOptions": true,
-      "images": [
-        "The_University_of_Alabama_CrimsonTide_3ft Inline_500PX.jpg",
-        "The_University_of_Alabama_CrimsonTide_Premium Floor Display 2.0_500PX.jpg",
-        "The_University_of_Alabama_CrimsonTide_Tier2_Display_Floor_500PX.jpg"
-      ]
-    },
-    {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
       "path": "tshirt/men",
       "hasShirtVersions": true,

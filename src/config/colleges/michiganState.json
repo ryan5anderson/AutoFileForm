@@ -3,16 +3,6 @@
   "logo": "/logo/michiganstatelogo.png",
   "categories": [
     {
-      "name": "Display Options",
-      "path": "displays",
-      "hasDisplayOptions": true,
-      "images": [
-        "Michigan_State_University_3FT_Inline_500px.jpg",
-        "Michigan_state_University_Premium Floor Display 2.0_500px.jpg",
-        "Michigan_State_University_Tier2_Display_Floor_500px.jpg"
-      ]
-    },
-    {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
       "path": "tshirt/men",
       "hasShirtVersions": true,

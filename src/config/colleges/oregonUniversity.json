@@ -3,12 +3,6 @@
   "logo": "/logo/oregonlogo.png",
   "categories": [
     {
-      "name": "Display Options",
-      "path": "displays",
-      "hasDisplayOptions": true,
-      "images": []
-    },
-    {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
       "path": "tshirt/men",
       "hasShirtVersions": true,

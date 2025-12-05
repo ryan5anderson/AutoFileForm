@@ -3,18 +3,6 @@
   "logo": "/logo/pittlogo.png",
   "categories": [
     {
-      "name": "Display Options",
-      "path": "displays",
-      "hasDisplayOptions": true,
-      "images": [
-        "University-of-Pittsburgh_Mini_Tower_500PX.jpg",
-        "University-of-Pittsburgh_Premium Floor Display 2.0_500PX.jpg",
-        "University-of-Pittsburgh_Tier2_Display_Floor_500PX.jpg",
-        "University-of-Pittsburgh_Tier3_Display_Floor_V2_PlushOnly_500PX.jpg",
-        "University_of_Pittsburgh_3ft Inline_500PX.jpg"
-      ]
-    },
-    {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
       "path": "tshirt/men",
       "hasShirtVersions": true,

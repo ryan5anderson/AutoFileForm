@@ -3,18 +3,6 @@
   "logo": "/logo/wvulogo.png",
   "categories": [
     {
-      "name": "Display Options",
-      "path": "displays",
-      "hasDisplayOptions": true,
-      "images": [
-        "WVU_3ft Inline_500PX.jpg",
-        "WVU_Mini_Tower_500PX.jpg",
-        "WVU_Premium Floor Display 2.0_500PX.jpg",
-        "WVU_Tier2_Display_Floor_500PX.jpg",
-        "WVU_Tier3_Display_Floor_500PX.jpg"
-      ]
-    },
-    {
       "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
       "path": "tshirt/men",
       "hasShirtVersions": true,
@@ -35,7 +23,11 @@
         "M102612120_SH2FDS_Custom_DTF_on_White.png",
         "M103575514_SH2FDC_Custom_Logo_DTF_on_Black.png",
         "M103575853_SDNIEB_Nietzsche_DTF_on_Black.png",
-        "M103581810_SH2FDC_Custom_Coal_Days_on_Black.png",
+        "M103581810_SH2FDC_Coal_Days_DTF_on_Black.png",
+        "M104022620_SDFOFS_Fork_DTF_on_Steel.png",
+        "M104022840_SDFOFC_Fork_DTF_on_Navy.png",
+        "M104022990_SDFOFC_Fork_DTF_on_Gold.png",
+        "M104068558_SDFLNC_Flinch_DTF_on_Gold.png",
         "M89672118_SH2FDC_Custom_WV_DTF_Logo_on_Navy.png",
         "M89672286_SH2FDC_Custom_DTF_Logo_on_Navy.png",
         "M89686053_SDSOCR_Socrates_DTF_on_Navy.png",
@@ -77,6 +69,7 @@
         "M103282092_CM6982_Custom_WVU_Navy_Hat.png",
         "M103282163_CM6983_Custom_WV_Logo_Navy_Hat.png",
         "M103327838_CM7069_Custom_WV_Logo_Navy_Hat.png",
+        "M103964634_SHE1CH_Custom_WV_Gray_Hat.png",
         "M89676992_SHE1CH_Custom_WV_Logo_Navy_Hat.png",
         "M89677078_SHE1CH_Custom_WV_Logo_Gold_Hat.png"
       ]
@@ -93,7 +86,8 @@
       "path": "jacket",
       "hasSizeOptions": true,
       "images": [
-        "M100330126_SHE1CJ_Custom_Logo_Navy_Jacket.png"
+        "M100330126_SHE1CJ_Custom_Logo_Navy_Jacket.png",
+        "M103273278_SHE1CJ_Custom_WV_Navy_Fleece_FZ.png"
       ]
     },
     {
@@ -101,6 +95,7 @@
       "path": "flannels",
       "hasSizeOptions": true,
       "images": [
+        "M103955044_SH2BWF_Custom_Side_Leg_DTF_Flannels.png",
         "M89677268_SHPHFD_Custom_WV_DTF_Flannels.png"
       ]
     },
@@ -127,9 +122,9 @@
       "hasSizeOptions": true,
       "images": [
         "M100729952_SHSHDS_Custom_Logo_DTF_Gray_Shorts.png",
-        "M100729649_SHSHDS_Custom_WVU_Logo_DTF_Gray_Shorts.png",
         "M100730047_SHSHDS_Jr_Custom_DTF_Shorts.png",
         "M100735267_SDSPSC_Custom_Side_DTF_on_Navy_Shorts.png",
+        "M101421643_SHPHDS_Custom_WVU_DTF_Gray_Pants (2).png",
         "M102318426_SDSPSS_Custom_Side_Print_DTF_Gray_Stripe.png",
         "M103097917_SDSHES_Jr_Sheared_DTF_Shorts.png"
       ]
