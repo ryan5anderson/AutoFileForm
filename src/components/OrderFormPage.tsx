@@ -38,6 +38,8 @@ const OrderFormPage: React.FC = () => {
     validProductPaths,
     page,
     sending,
+    showConfirmModal,
+    confirmationError,
     handleQuantityChange,
     handleShirtVersionChange,
     handleSizeCountsChange,
@@ -47,7 +49,9 @@ const OrderFormPage: React.FC = () => {
     handleBack,
     handleBackToSummary,
     handleExit,
-    handleConfirm
+    handleConfirm,
+    handleConfirmSubmit,
+    handleConfirmCancel
   } = context;
   const handleFormDataChange = context.handleFormDataChange;
 
@@ -63,6 +67,10 @@ const OrderFormPage: React.FC = () => {
       sending={sending}
       categories={categories}
       college={college}
+      showConfirmModal={showConfirmModal}
+      confirmationError={confirmationError}
+      onConfirmSubmit={handleConfirmSubmit}
+      onConfirmCancel={handleConfirmCancel}
     />;
   }
 

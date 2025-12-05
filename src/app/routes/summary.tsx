@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { colleges } from '../../config';
 import CategorySection from '../../features/components/CategorySection';
 import { useOrderForm } from '../../features/hooks';
@@ -16,6 +17,10 @@ interface SummaryPageProps {
   sending?: boolean;
   categories?: Category[];
   college?: string;
+  showConfirmModal?: boolean;
+  confirmationError?: string | null;
+  onConfirmSubmit?: () => void;
+  onConfirmCancel?: () => void;
 }
 
 const SummaryPage: React.FC<SummaryPageProps> = ({
@@ -24,7 +29,11 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
   onConfirm: propOnConfirm,
   sending: propSending,
   categories: propCategories,
-  college: propCollege
+  college: propCollege,
+  showConfirmModal: propShowConfirmModal,
+  confirmationError: propConfirmationError,
+  onConfirmSubmit: propOnConfirmSubmit,
+  onConfirmCancel: propOnConfirmCancel
 }) => {
   // URL parameter handling
   const { college: urlCollege } = useParams();
@@ -38,6 +47,13 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
   const onConfirm = propOnConfirm || hookData.handleConfirm;
   const sending = propSending || hookData.sending;
   const college = propCollege || urlCollege;
+  const showConfirmModal = propShowConfirmModal !== undefined ? propShowConfirmModal : hookData.showConfirmModal;
+  const confirmationError = propConfirmationError !== undefined ? propConfirmationError : hookData.confirmationError;
+  const onConfirmSubmit = propOnConfirmSubmit || hookData.handleConfirmSubmit;
+  const onConfirmCancel = propOnConfirmCancel || hookData.handleConfirmCancel;
+  
+  // Touch feedback state
+  const [isTouched, setIsTouched] = useState(false);
 
   // Dynamically set --color-primary for college branding
   React.useEffect(() => {
@@ -202,6 +218,11 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
           <button
             type="button"
             onClick={onConfirm}
+            onTouchStart={() => !sending && setIsTouched(true)}
+            onTouchEnd={() => setIsTouched(false)}
+            onMouseDown={() => !sending && setIsTouched(true)}
+            onMouseUp={() => setIsTouched(false)}
+            onMouseLeave={() => setIsTouched(false)}
             disabled={sending}
             style={{
               background: 'var(--color-primary)',
@@ -213,13 +234,49 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
               fontWeight: '500',
               cursor: sending ? 'not-allowed' : 'pointer',
               minWidth: '150px',
-              opacity: sending ? 0.6 : 1
+              minHeight: '44px', // iOS recommended tap target size
+              opacity: sending ? 0.6 : (isTouched ? 0.85 : 1),
+              transform: isTouched ? 'scale(0.98)' : 'scale(1)',
+              transition: 'all 0.15s ease',
+              WebkitTapHighlightColor: 'rgba(0, 0, 0, 0.1)',
+              touchAction: 'manipulation',
+              userSelect: 'none'
             }}
+            aria-label="Send Order"
           >
             {sending ? 'Sending...' : 'Send Order'}
           </button>
         </div>
+        
+        {/* Error message display */}
+        {confirmationError && !showConfirmModal && (
+          <div style={{
+            background: 'rgb(239 68 68 / 10%)',
+            border: '1px solid rgb(239 68 68 / 30%)',
+            borderRadius: 'var(--radius-lg)',
+            color: '#dc2626',
+            marginTop: 'var(--space-4)',
+            padding: 'var(--space-3) var(--space-4)',
+            textAlign: 'center',
+            fontSize: '0.9375rem'
+          }}>
+            {confirmationError}
+          </div>
+        )}
       </main>
+      
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onConfirm={onConfirmSubmit}
+        onCancel={onConfirmCancel}
+        title="Confirm Order Submission"
+        message="Are you sure you want to submit this order? This action cannot be undone."
+        confirmText="Yes, Send Order"
+        cancelText="Cancel"
+        isProcessing={sending}
+        error={confirmationError}
+      />
       
       <Footer />
     </div>

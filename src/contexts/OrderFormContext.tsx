@@ -10,6 +10,8 @@ interface OrderFormContextType {
   validProductPaths: string[];
   page: string;
   sending: boolean;
+  showConfirmModal: boolean;
+  confirmationError: string | null;
   handleFormDataChange: (updates: Partial<FormData>) => void;
   handleQuantityChange: (imagePath: string, value: string) => void;
   handleShirtVersionChange: (imagePath: string, version: any, value: string) => void;
@@ -25,6 +27,8 @@ interface OrderFormContextType {
   handleBackToSummary: () => void;
   handleExit: () => void;
   handleConfirm: () => void;
+  handleConfirmSubmit: () => void;
+  handleConfirmCancel: () => void;
 }
 
 const OrderFormContext = createContext<OrderFormContextType | null>(null);

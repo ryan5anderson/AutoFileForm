@@ -47,6 +47,8 @@ export const useOrderForm = (categories: Category[]) => {
   const [validProductPaths, setValidProductPaths] = useState<string[]>([]);
   const [page, setPage] = useState<Page>('form');
   const [sending, setSending] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmationError, setConfirmationError] = useState<string | null>(null);
 
   // Reset page state when URL changes
   useEffect(() => {
@@ -283,15 +285,24 @@ export const useOrderForm = (categories: Category[]) => {
     }
   };
 
-  const handleConfirm = async () => {
-    if (!window.confirm('Are you sure you want to submit this order?')) return;
-
-    // Final check to ensure order is not empty
+  // Open confirmation modal
+  const handleConfirm = () => {
+    // Clear any previous errors
+    setConfirmationError(null);
+    
+    // Final check to ensure order is not empty before showing modal
     if (!hasOrderProducts(formData)) {
-      alert('Cannot submit an empty order. Please select at least one product before submitting.');
+      setConfirmationError('Cannot submit an empty order. Please select at least one product before submitting.');
       return;
     }
 
+    // Show the confirmation modal
+    setShowConfirmModal(true);
+  };
+
+  // Actually submit the order (called from modal)
+  const handleConfirmSubmit = async () => {
+    setConfirmationError(null);
     setSending(true);
 
     try {
@@ -306,6 +317,9 @@ export const useOrderForm = (categories: Category[]) => {
       const storageKey = `orderFormData_${college || 'default'}`;
       localStorage.removeItem(storageKey);
       
+      // Close modal before navigation
+      setShowConfirmModal(false);
+      
       setPage('receipt');
       // Navigate to receipt URL
       if (college) {
@@ -313,10 +327,17 @@ export const useOrderForm = (categories: Category[]) => {
       }
     } catch (err) {
       console.error('Email error:', err);
-      alert('Failed to send email. Please check your EmailJS configuration and try again.');
+      setConfirmationError('Failed to send email. Please check your EmailJS configuration and try again.');
+      // Keep modal open to show error
     } finally {
       setSending(false);
     }
+  };
+
+  // Cancel confirmation
+  const handleConfirmCancel = () => {
+    setShowConfirmModal(false);
+    setConfirmationError(null);
   };
 
   return {
@@ -326,6 +347,8 @@ export const useOrderForm = (categories: Category[]) => {
     validProductPaths,
     page,
     sending,
+    showConfirmModal,
+    confirmationError,
     handleFormDataChange,
     handleQuantityChange,
     handleShirtVersionChange,
@@ -340,6 +363,8 @@ export const useOrderForm = (categories: Category[]) => {
     handleBack,
     handleBackToSummary,
     handleExit,
-    handleConfirm
+    handleConfirm,
+    handleConfirmSubmit,
+    handleConfirmCancel
   };
 }; 
