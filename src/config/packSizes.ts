@@ -53,8 +53,8 @@ const PACK_SIZES: PackSizeConfig = {
   // Accessories
   'socks': 6,       // Packs of 6
   'bottle': 1,       // Any quantity allowed
-  'sticker': 6,
-  'plush': 6,
+  'sticker': 7,      // Packs of 7 (like bags/default)
+  'plush': 6,       // Packs of 6
   'signage': 1,      // Signage items - any quantity allowed
 
   // Youth & Infant

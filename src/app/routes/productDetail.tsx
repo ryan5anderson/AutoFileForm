@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { getPackSizeFromRatiosSync, getSizeScaleFromRatiosSync } from '../../config/garmentRatios';
-import { getPackSize, allowsAnyQuantity } from '../../config/packSizes';
+import { getPackSize, allowsAnyQuantity, getPackSizeSync } from '../../config/packSizes';
 import ColorQuantitySelector from '../../features/components/panels/ColorQuantitySelector';
 import ColorSizeSelector from '../../features/components/panels/ColorSizeSelector';
 import DisplayOptionCard from '../../features/components/panels/DisplayOptionsPanel';
@@ -167,8 +167,13 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     const sizeScale = getSizeScaleFromRatiosSync(category.path, versionForCheck, college);
     if (sizeScale === 'N/A') {
       const setPack = getPackSizeFromRatiosSync(category.path, versionForCheck, college);
+      // If Set Pack is null/undefined, fall back to packSizes config (for stickers, plush, etc.)
       // If Set Pack is 0 or 1, step should be 1. Otherwise use Set Pack value
-      const packSize = (setPack === 0 || setPack === 1) ? 1 : (setPack || 1);
+      let packSize = (setPack === 0 || setPack === 1) ? 1 : (setPack || null);
+      if (packSize === null) {
+        // Fall back to packSizes config when Set Pack is null (e.g., stickers, plush)
+        packSize = getPackSizeSync(category.path, versionForCheck, imageName);
+      }
       
       // Check if this product has color options (for non-shirt items like hats)
       const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];

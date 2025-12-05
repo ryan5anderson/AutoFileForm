@@ -1,4 +1,5 @@
 import { getSizeScaleFromRatiosSync, parseSizeScale, getPackSizeFromRatiosSync, getGarmentRatioSync } from '../../config/garmentRatios';
+import { getPackSizeSync } from '../../config/packSizes';
 import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } from '../../types';
 
 /**
@@ -120,7 +121,15 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     }
   }
 
-  // Fallback to default values for categories not in ratios
+  // Fallback to packSizes config when Set Pack is null (e.g., stickers, plush)
+  // This ensures we get the correct pack size from PACK_SIZES configuration
+  const packSizeFromConfig = getPackSizeSync(categoryPath, version, productName);
+  if (packSizeFromConfig !== undefined && packSizeFromConfig !== null) {
+    console.log(`DEBUG: Found pack size from packSizes config: ${packSizeFromConfig}`);
+    return packSizeFromConfig;
+  }
+
+  // Fallback to default values for categories not in ratios or config
   switch (normalizedCategory) {
     case 'tshirt/men':
       console.log(`DEBUG: tshirt/men with version ${normalizedVersion}, returning pack size`);
