@@ -89,16 +89,6 @@
       ]
     },
     {
-      "name": "Water Bottles",
-      "path": "bottle",
-      "images": [
-        "M101866926_SHSSUV_Custom_Logo_Steel_Bottle.png",
-        "M102068212_SHWBOT_Custom_Logo_Water_Bottle.png",
-        "M102105119_SHSSUV_Custom_Logo_Steel_Bottle.png",
-        "M89676743_SHWBOT_Custom_Logo_Water_Bottle.png"
-      ]
-    },
-    {
       "name": "Jackets",
       "path": "jacket",
       "hasSizeOptions": true,
@@ -107,16 +97,11 @@
       ]
     },
     {
-      "name": "Shorts",
-      "path": "shorts",
+      "name": "Flannel Pajama Pants",
+      "path": "flannels",
       "hasSizeOptions": true,
       "images": [
-        "M100729952_SHSHDS_Custom_Logo_DTF_Gray_Shorts.png",
-        "M100729649_SHSHDS_Custom_WVU_Logo_DTF_Gray_Shorts.png",
-        "M100730047_SHSHDS_Jr_Custom_DTF_Shorts.png",
-        "M100735267_SDSPSC_Custom_Side_DTF_on_Navy_Shorts.png",
-        "M102318426_SDSPSS_Custom_Side_Print_DTF_Gray_Stripe.png",
-        "M103097917_SDSHES_Jr_Sheared_DTF_Shorts.png"
+        "M89677268_SHPHFD_Custom_WV_DTF_Flannels.png"
       ]
     },
     {
@@ -137,11 +122,34 @@
       ]
     },
     {
+      "name": "Shorts",
+      "path": "shorts",
+      "hasSizeOptions": true,
+      "images": [
+        "M100729952_SHSHDS_Custom_Logo_DTF_Gray_Shorts.png",
+        "M100729649_SHSHDS_Custom_WVU_Logo_DTF_Gray_Shorts.png",
+        "M100730047_SHSHDS_Jr_Custom_DTF_Shorts.png",
+        "M100735267_SDSPSC_Custom_Side_DTF_on_Navy_Shorts.png",
+        "M102318426_SDSPSS_Custom_Side_Print_DTF_Gray_Stripe.png",
+        "M103097917_SDSHES_Jr_Sheared_DTF_Shorts.png"
+      ]
+    },
+    {
       "name": "Socks",
       "path": "socks",
       "hasSizeOptions": true,
       "images": [
         "M89676826_SS8052_Custom_Logo_Socks.png"
+      ]
+    },
+    {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M101866926_SHSSUV_Custom_Logo_Steel_Bottle.png",
+        "M102068212_SHWBOT_Custom_Logo_Water_Bottle.png",
+        "M102105119_SHSSUV_Custom_Logo_Steel_Bottle.png",
+        "M89676743_SHWBOT_Custom_Logo_Water_Bottle.png"
       ]
     },
     {
@@ -153,14 +161,6 @@
         "M101434630_SHPG3P_Pre_Game_Sticker_Pack.png",
         "M101435449_SHMFIS_Midfielder_Stickers.png",
         "M101435998_SHRIOS_Riot_Mascot_Stickers.png"
-      ]
-    },
-    {
-      "name": "Flannel Pajama Pants",
-      "path": "flannels",
-      "hasSizeOptions": true,
-      "images": [
-        "M89677268_SHPHFD_Custom_WV_DTF_Flannels.png"
       ]
     },
     {

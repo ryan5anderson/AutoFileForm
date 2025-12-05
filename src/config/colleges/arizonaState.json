@@ -77,16 +77,29 @@
       ]
     },
     {
-      "name": "Water Bottles",
-      "path": "bottle",
+      "name": "Hat",
+      "path": "hat",
       "images": [
-        "M102821852_SHSSUV_Custom_UV_Steel_Bottle.png",
-        "M102822680_SHWBUV_Custom_UV_Water_Bottle.png",
-        "M102983468_SHSSUV_Custom_UV_Steel_Bottle.png",
-        "M102983866_SHWBUV_Custom_UV_Water_Bottle.png",
-        "M102983914_SHWBUV_Custom_UV_Water_Bottle.png",
-        "M103092441_SHWBUV_Custom_UV_Water_Bottle.png",
-        "M103092526_SHSSUV_Custom_UV_Water_Bottle.png"
+        "M102300329_SHE1CH_Custom_Gray_Hale_Hat.png",
+        "M102542418_SHE2CH_Custom_Gray_Hale_or_Fly_Hat.png"
+      ]
+    },
+    {
+      "name": "Beanie",
+      "path": "beanie",
+      "images": [
+        "M102300460_SHE1CB_Custom_Logo_Maroon_Beanie.png",
+        "M102300567_SHE1CB_Custom_Logo_Gray_Beanie.png",
+        "M102542759_SHE2CB_Custom_Logo_Gray_Beanie.png"
+      ]
+    },
+    {
+      "name": "Jackets",
+      "path": "jacket",
+      "hasSizeOptions": true,
+      "images": [
+        "M102133660_SHE1CJ_Custom_Logo_Maroon_Jacket.png",
+        "M102260434_SHE1CJ_Custom_Logo_Charcoal_Jacket.png"
       ]
     },
     {
@@ -99,24 +112,17 @@
       ]
     },
     {
-      "name": "Plush",
-      "path": "plush",
+      "name": "Sweatpants & Joggers",
+      "path": "pants",
+      "hasPantOptions": true,
+      "pantStyles": [
+        "sweatpants",
+        "joggers"
+      ],
       "images": [
-        "M102812532_SHPLUD_Custom_DTF_Plush.png",
-        "M103424752_SDBESP_Beary_Special_DTF_Plush.png",
-        "M103425057_SDCARI_Carino_DTF_Plush.png",
-        "M103425261_SDBOUN_Bouncy_DTF_Plush.png",
-        "M103425721_SDCORA_Corazon_DTF_Plush.png",
-        "M103493133_SDSBUD_Study_Buddy_DTF_Plush.png"
-      ]
-    },
-    {
-      "name": "Jackets",
-      "path": "jacket",
-      "hasSizeOptions": true,
-      "images": [
-        "M102133660_SHE1CJ_Custom_Logo_Maroon_Jacket.png",
-        "M102260434_SHE1CJ_Custom_Logo_Charcoal_Jacket.png"
+        "M102076247_SDINPC_Initiative_DTF_Black_Pants.png",
+        "M102310221_SHPHDS_Custom_DTF_Steel_Pants.png",
+        "M102332956_SDGMPS_Game_Master_DTF_Steel_Pants.png"
       ]
     },
     {
@@ -138,6 +144,31 @@
       ]
     },
     {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M102821852_SHSSUV_Custom_UV_Steel_Bottle.png",
+        "M102822680_SHWBUV_Custom_UV_Water_Bottle.png",
+        "M102983468_SHSSUV_Custom_UV_Steel_Bottle.png",
+        "M102983866_SHWBUV_Custom_UV_Water_Bottle.png",
+        "M102983914_SHWBUV_Custom_UV_Water_Bottle.png",
+        "M103092441_SHWBUV_Custom_UV_Water_Bottle.png",
+        "M103092526_SHSSUV_Custom_UV_Water_Bottle.png"
+      ]
+    },
+    {
+      "name": "Plush",
+      "path": "plush",
+      "images": [
+        "M102812532_SHPLUD_Custom_DTF_Plush.png",
+        "M103424752_SDBESP_Beary_Special_DTF_Plush.png",
+        "M103425057_SDCARI_Carino_DTF_Plush.png",
+        "M103425261_SDBOUN_Bouncy_DTF_Plush.png",
+        "M103425721_SDCORA_Corazon_DTF_Plush.png",
+        "M103493133_SDSBUD_Study_Buddy_DTF_Plush.png"
+      ]
+    },
+    {
       "name": "Stickers",
       "path": "sticker",
       "images": [
@@ -150,17 +181,11 @@
       ]
     },
     {
-      "name": "Sweatpants & Joggers",
-      "path": "pants",
-      "hasPantOptions": true,
-      "pantStyles": [
-        "sweatpants",
-        "joggers"
-      ],
+      "name": "Backpack",
+      "path": "backpack",
       "images": [
-        "M102076247_SDINPC_Initiative_DTF_Black_Pants.png",
-        "M102310221_SHPHDS_Custom_DTF_Steel_Pants.png",
-        "M102332956_SDGMPS_Game_Master_DTF_Steel_Pants.png"
+        "M103842871_SDBAPA_Custom_DTF_Black_Cinch_Backpac.png",
+        "M103843288_SDBAPA_Custom_Logo_Gold_Cinch_Backpac.png"
       ]
     },
     {
@@ -170,31 +195,6 @@
         "M102313692_SHWGCH_Custom_PFD_Header_Card.png",
         "M102313972_SHWGCS_Custom_Spinner_Header_Card.png",
         "M102630540_SHMH24_Custom_4ft_Shelf_Magnet.png"
-      ]
-    },
-    {
-      "name": "Hat",
-      "path": "hat",
-      "images": [
-        "M102300329_SHE1CH_Custom_Gray_Hale_Hat.png",
-        "M102542418_SHE2CH_Custom_Gray_Hale_or_Fly_Hat.png"
-      ]
-    },
-    {
-      "name": "Beanie",
-      "path": "beanie",
-      "images": [
-        "M102300460_SHE1CB_Custom_Logo_Maroon_Beanie.png",
-        "M102300567_SHE1CB_Custom_Logo_Gray_Beanie.png",
-        "M102542759_SHE2CB_Custom_Logo_Gray_Beanie.png"
-      ]
-    },
-    {
-      "name": "Backpack",
-      "path": "backpack",
-      "images": [
-        "M103842871_SDBAPA_Custom_DTF_Black_Cinch_Backpac.png",
-        "M103843288_SDBAPA_Custom_Logo_Gold_Cinch_Backpac.png"
       ]
     }
   ]

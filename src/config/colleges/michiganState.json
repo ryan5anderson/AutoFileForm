@@ -88,13 +88,6 @@
       ]
     },
     {
-      "name": "Water Bottle",
-      "path": "bottle",
-      "images": [
-        "M100454089_SHWBOT_Custom_Water_Bottle.png"
-      ]
-    },
-    {
       "name": "Jacket",
       "path": "jacket",
       "hasSizeOptions": true,
@@ -144,6 +137,13 @@
       "images": [
         "M100415850_SS8052_Custom_Logo_Socks.png",
         "M100497935_SS8052_Custom_Michigan_State_Socks.png"
+      ]
+    },
+    {
+      "name": "Water Bottle",
+      "path": "bottle",
+      "images": [
+        "M100454089_SHWBOT_Custom_Water_Bottle.png"
       ]
     },
     {

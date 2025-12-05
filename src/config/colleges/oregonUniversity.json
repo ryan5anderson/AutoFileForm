@@ -62,28 +62,6 @@
       ]
     },
     {
-      "name": "Water Bottles",
-      "path": "bottle",
-      "images": [
-        "M103293417_SHWBUV_Custom_Logo_Water_Bottle.png",
-        "M103293585_SHSSUV_Stainless_Steel_Water_Bottle.png"
-      ]
-    },
-    {
-      "name": "Plush",
-      "path": "plush",
-      "images": [
-        "M103467569_SHPLUD_Custom_DTF_Plush.png"
-      ]
-    },
-    {
-      "name": "Stickers",
-      "path": "sticker",
-      "images": [
-        "M103467322_SHSTPK_Custom_Logo_Sticker_Pack.png"
-      ]
-    },
-    {
       "name": "Jacket",
       "path": "jacket",
       "images": [
@@ -113,6 +91,28 @@
       "path": "socks",
       "images": [
         "M103293339_SS8052_Custom_Logo_Socks.png"
+      ]
+    },
+    {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M103293417_SHWBUV_Custom_Logo_Water_Bottle.png",
+        "M103293585_SHSSUV_Stainless_Steel_Water_Bottle.png"
+      ]
+    },
+    {
+      "name": "Plush",
+      "path": "plush",
+      "images": [
+        "M103467569_SHPLUD_Custom_DTF_Plush.png"
+      ]
+    },
+    {
+      "name": "Stickers",
+      "path": "sticker",
+      "images": [
+        "M103467322_SHSTPK_Custom_Logo_Sticker_Pack.png"
       ]
     },
     {

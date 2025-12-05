@@ -87,18 +87,6 @@
       ]
     },
     {
-      "name": "Youth & Infant",
-      "path": "youth&infant",
-      "hasSizeOptions": true,
-      "images": [
-        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png",
-        "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
-        "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
-        "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Steel.png",
-        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png"
-      ]
-    },
-    {
       "name": "Jackets",
       "path": "jacket",
       "hasSizeOptions": true,
@@ -163,6 +151,18 @@
       ]
     },
     {
+      "name": "Youth & Infant",
+      "path": "youth&infant",
+      "hasSizeOptions": true,
+      "images": [
+        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png",
+        "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
+        "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
+        "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Steel.png",
+        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png"
+      ]
+    },
+    {
       "name": "Signage",
       "path": "signage",
       "images": [
@@ -172,4 +172,3 @@
     }
   ]
 }
-

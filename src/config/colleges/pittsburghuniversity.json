@@ -84,15 +84,6 @@
       ]
     },
     {
-      "name": "Water Bottles",
-      "path": "bottle",
-      "images": [
-        "M101255759_SHWBUV_Custom_Logo_Water_Bottle.png",
-        "M101857496_SHWBUV_Custom_Logo_Water_Bottle.png",
-        "M101867058_SHSSUV_Custom_Logo_Water_Bottle.png"
-      ]
-    },
-    {
       "name": "Jackets",
       "path": "jacket",
       "hasSizeOptions": true,
@@ -113,20 +104,6 @@
       ]
     },
     {
-      "name": "Shorts",
-      "path": "shorts",
-      "hasSizeOptions": true,
-      "images": [
-        "M102060456_SDAVSS_Avery_DTF_Steel_Side_Shorts.png",
-        "M90492230_SHSHDC_Custom_DTF_Royal_Shorts.png",
-        "M90528160_SHSIDS_Similar_DTF_Charcoal_Shorts.png",
-        "M90528568_SHSHDS_Custom_DTF_Charcoal_Shorts.png",
-        "M90528863_SHPSDC_Power_Hitter_DTF_Royal_Shorts.png",
-        "M90529945_SDBUMS_Jr_Buinton_DTF_Ash_Shorts.png",
-        "M90530099_SDSTMS_Jr_Strelka_DTF_Ash_Shorts.png"
-      ]
-    },
-    {
       "name": "Sweatpants & Joggers",
       "path": "pants",
       "hasPantOptions": true,
@@ -141,12 +118,35 @@
       ]
     },
     {
+      "name": "Shorts",
+      "path": "shorts",
+      "hasSizeOptions": true,
+      "images": [
+        "M102060456_SDAVSS_Avery_DTF_Steel_Side_Shorts.png",
+        "M90492230_SHSHDC_Custom_DTF_Royal_Shorts.png",
+        "M90528160_SHSIDS_Similar_DTF_Charcoal_Shorts.png",
+        "M90528568_SHSHDS_Custom_DTF_Charcoal_Shorts.png",
+        "M90528863_SHPSDC_Power_Hitter_DTF_Royal_Shorts.png",
+        "M90529945_SDBUMS_Jr_Buinton_DTF_Ash_Shorts.png",
+        "M90530099_SDSTMS_Jr_Strelka_DTF_Ash_Shorts.png"
+      ]
+    },
+    {
       "name": "Socks",
       "path": "socks",
       "hasSizeOptions": true,
       "images": [
         "M90386189_SS8052_Custom_Logo_Socks.png",
         "M90475568_SHOCMS_Octane_Logo_Socks.png"
+      ]
+    },
+    {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M101255759_SHWBUV_Custom_Logo_Water_Bottle.png",
+        "M101857496_SHWBUV_Custom_Logo_Water_Bottle.png",
+        "M101867058_SHSSUV_Custom_Logo_Water_Bottle.png"
       ]
     },
     {
