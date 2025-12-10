@@ -1,7 +1,9 @@
+import { collection, getDocs, query, limit } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import { adminConfig } from '../../config/env';
+import { db } from '../../config/firebase';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 
 const AdminPage: React.FC = () => {
@@ -20,6 +22,15 @@ const AdminPage: React.FC = () => {
     pendingOrders: 0,
     totalProducts: 0,
   });
+  const [firebaseConnected, setFirebaseConnected] = useState<boolean | null>(null);
+  const [connectionError, setConnectionError] = useState<string>('');
+
+  // Check Firebase connection status
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkFirebaseConnection();
+    }
+  }, [isAuthenticated]);
 
   // Load orders and stats when authenticated
   useEffect(() => {
@@ -65,6 +76,48 @@ const AdminPage: React.FC = () => {
   const loadStats = async () => {
     const stats = await firebaseOrderService.getOrderStats();
     setOrderStats(stats);
+  };
+
+  const checkFirebaseConnection = async () => {
+    try {
+      // Directly test Firebase connection by querying the orders collection
+      // This will throw an error if Firebase is not properly connected
+      const ordersRef = collection(db, 'orders');
+      await getDocs(query(ordersRef, limit(1)));
+      
+      // If we get here, the connection is working
+      setFirebaseConnected(true);
+      setConnectionError('');
+      return true;
+    } catch (error: any) {
+      // Connection failed
+      setFirebaseConnected(false);
+      
+      // Check if it's a permissions error
+      const isPermissionError = error?.code === 'permission-denied' || 
+                                error?.message?.toLowerCase().includes('permission') ||
+                                error?.message?.toLowerCase().includes('insufficient');
+      
+      let errorMessage = error?.message || error?.code || 'Failed to connect to Firebase';
+      
+      if (isPermissionError) {
+        errorMessage = `Permission Denied: ${errorMessage}. Please update your Firestore security rules to allow read/write access to the 'orders' collection.`;
+      }
+      
+      setConnectionError(errorMessage);
+      console.error('Firebase connection error:', error);
+      return false;
+    }
+  };
+
+  const handleReconnectFirebase = async () => {
+    setFirebaseConnected(null);
+    setConnectionError('');
+    const connected = await checkFirebaseConnection();
+    if (connected) {
+      loadOrders();
+      loadStats();
+    }
   };
 
   const handleStatusChange = async (orderId: string, newStatus: Order['status']) => {
@@ -312,26 +365,114 @@ const AdminPage: React.FC = () => {
           <p>Manage your application from the admin dashboard</p>
         </div>
         
-        <div className="firebase-warning-banner" style={{
-          backgroundColor: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: '8px',
-          padding: '16px',
-          marginBottom: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <span style={{ fontSize: '24px' }}>⚠️</span>
-          <div>
-            <strong style={{ color: '#856404', display: 'block', marginBottom: '4px' }}>
-              Firebase Database Not Connected
-            </strong>
-            <p style={{ color: '#856404', margin: 0, fontSize: '14px' }}>
-              The Firebase database connection is currently disabled. Orders are being sent via email only and will not appear in this dashboard. Please connect Firebase to enable order tracking and management.
-            </p>
+        {firebaseConnected === false && (
+          <div className="firebase-warning-banner" style={{
+            backgroundColor: '#fff3cd',
+            border: '1px solid #ffc107',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <span style={{ fontSize: '24px' }}>⚠️</span>
+            <div style={{ flex: 1 }}>
+              <strong style={{ color: '#856404', display: 'block', marginBottom: '4px' }}>
+                Firebase Database Not Connected
+              </strong>
+              <p style={{ color: '#856404', margin: '0 0 8px 0', fontSize: '14px' }}>
+                The Firebase database connection is currently disabled. Orders are being sent via email only and will not appear in this dashboard.
+              </p>
+              {connectionError && (
+                <div style={{ marginBottom: '12px' }}>
+                  <p style={{ color: '#dc2626', margin: '0 0 8px 0', fontSize: '12px', fontFamily: 'monospace' }}>
+                    Error: {connectionError}
+                  </p>
+                  {connectionError.includes('Permission Denied') && (
+                    <div style={{ 
+                      backgroundColor: '#fef3c7', 
+                      padding: '12px', 
+                      borderRadius: '6px', 
+                      marginTop: '8px',
+                      fontSize: '12px',
+                      color: '#92400e'
+                    }}>
+                      <strong>How to fix:</strong>
+                      <ol style={{ margin: '8px 0 0 20px', padding: 0 }}>
+                        <li>Go to Firebase Console → Firestore Database → Rules</li>
+                        <li>Update your security rules to allow access:</li>
+                      </ol>
+                      <pre style={{ 
+                        backgroundColor: '#1f2937', 
+                        color: '#10b981', 
+                        padding: '8px', 
+                        borderRadius: '4px', 
+                        marginTop: '8px',
+                        fontSize: '11px',
+                        overflow: 'auto'
+                      }}>
+{`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /orders/{orderId} {
+      allow read, write: if true; // For testing
+      // In production, use: allow read, write: if request.auth != null;
+    }
+    match /garmentRatios/{docId} {
+      allow read: if true;
+      allow write: if true; // For testing
+    }
+  }
+}`}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
+              <button
+                onClick={handleReconnectFirebase}
+                disabled={firebaseConnected === null}
+                style={{
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: firebaseConnected === null ? 'wait' : 'pointer',
+                  opacity: firebaseConnected === null ? 0.6 : 1
+                }}
+              >
+                {firebaseConnected === null ? 'Connecting...' : 'Reconnect Firebase'}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {firebaseConnected === true && (
+          <div className="firebase-success-banner" style={{
+            backgroundColor: '#d1fae5',
+            border: '1px solid #10b981',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <span style={{ fontSize: '24px' }}>✅</span>
+            <div>
+              <strong style={{ color: '#065f46', display: 'block', marginBottom: '4px' }}>
+                Firebase Database Connected
+              </strong>
+              <p style={{ color: '#065f46', margin: 0, fontSize: '14px' }}>
+                Orders are being saved to Firebase and will appear in this dashboard.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="admin-stats-grid">
           <div className="admin-stat-card">
