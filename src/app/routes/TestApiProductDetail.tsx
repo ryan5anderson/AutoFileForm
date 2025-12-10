@@ -201,17 +201,17 @@ const TestApiProductDetailPage: React.FC = () => {
               color: 'var(--color-text)',
               marginBottom: 'var(--space-4)'
             }}>
-              {currentItem.SHIRTNAME || 'Unnamed Product'}
+              {[currentItem.STYLE_NUM, currentItem.DESIGN_NUM, currentItem.COLOR_INIT].filter(Boolean).join(' ') || 'Unnamed Product'}
             </h1>
 
-            {currentItem.DESCRIPT && (
+            {currentItem.Expr1 && (
               <div style={{
                 fontSize: 'var(--font-size-lg)',
                 color: 'var(--color-text)',
                 marginBottom: 'var(--space-6)',
                 lineHeight: 'var(--line-height-relaxed)'
               }}>
-                {currentItem.DESCRIPT.trim()}
+                {currentItem.Expr1}
               </div>
             )}
 

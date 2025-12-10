@@ -699,11 +699,11 @@ const TestApiOrderPage: React.FC = () => {
                         textAlign: 'center',
                         padding: '0 var(--space-2)'
                       }}>
-                        {item.SHIRTNAME || 'Unnamed Product'}
+                        {[item.STYLE_NUM, item.DESIGN_NUM, item.COLOR_INIT].filter(Boolean).join(' ') || 'Unnamed Product'}
                       </div>
                       
                       {/* Description */}
-                      {item.DESCRIPT && (
+                      {item.Expr1 && (
                         <div style={{ 
                           fontSize: '0.75rem', 
                           color: 'var(--color-gray-600)',
@@ -711,7 +711,7 @@ const TestApiOrderPage: React.FC = () => {
                           padding: '0 var(--space-2)',
                           marginTop: 'var(--space-1)'
                         }}>
-                          {item.DESCRIPT.trim()}
+                          {item.Expr1}
                         </div>
                       )}
                       
