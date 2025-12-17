@@ -182,7 +182,6 @@ class FirebaseGarmentRatioService {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         });
-        console.log('Default garment ratios initialized in Firebase');
       }
     } catch (error) {
       console.error('Error initializing default ratios:', error);

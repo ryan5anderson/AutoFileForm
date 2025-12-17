@@ -79,8 +79,6 @@ See .env.example for reference.
     
     throw new Error(errorMessage);
   }
-  
-  console.log('✅ All required environment variables are set');
 }
 
 // Validate environment variables at startup

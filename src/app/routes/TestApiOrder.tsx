@@ -237,7 +237,6 @@ const TestApiOrderPage: React.FC = () => {
           orderDate: orderDate || ''
         };
         localStorage.setItem(storageKey, JSON.stringify(storeInfo));
-        console.log('Saved store info to localStorage:', storeInfo);
       } catch (error) {
         console.error('Error saving store info to localStorage:', error);
       }

@@ -45,8 +45,6 @@ const TestApiPage: React.FC = () => {
         }
         
         const data = await fetchColleges();
-        console.log('Fetched colleges data:', data);
-        console.log('Number of colleges:', Array.isArray(data) ? data.length : 'Not an array');
         setColleges(data);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -132,7 +130,6 @@ const TestApiPage: React.FC = () => {
       newMap.delete(college.school_ID);
       return newMap;
     });
-    console.log(`Logo loaded successfully for ${college.schoolName}:`, college.logoUrl);
   };
 
   return (

@@ -10,7 +10,6 @@ export async function initializeDefaultGarmentRatios(): Promise<void> {
     await firebaseGarmentRatioService.initializeDefaultRatios(
       garmentRatiosData as GarmentRatio[]
     );
-    console.log('✅ Default garment ratios initialized successfully');
     return Promise.resolve();
   } catch (error) {
     console.error('❌ Error initializing default garment ratios:', error);
