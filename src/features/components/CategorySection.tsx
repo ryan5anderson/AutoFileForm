@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Card } from '../../components/ui';
-import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
+import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts, InfantSizeCounts, SizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions, getVersionDisplayName } from '../utils';
 
@@ -242,9 +242,9 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     if (category.hasPantOptions) {
       const pOptions = pantOptions[imagePath];
       if (pOptions) {
-        const calculateTotal = (styleOptions: any) => {
+        const calculateTotal = (styleOptions: Record<string, SizeCounts> | undefined) => {
           if (!styleOptions) return 0;
-          return Object.values(styleOptions).reduce((styleTotal: number, colorOptions: any) => {
+          return Object.values(styleOptions).reduce((styleTotal: number, colorOptions) => {
             if (!colorOptions || typeof colorOptions !== 'object') return styleTotal;
             return styleTotal + Object.values(colorOptions).reduce((colorTotal: number, sizeCount: unknown) => colorTotal + (typeof sizeCount === 'number' ? sizeCount : 0), 0);
           }, 0);

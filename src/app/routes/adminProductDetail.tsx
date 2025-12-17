@@ -12,9 +12,18 @@ import {
 } from '../../config/garmentRatios';
 import GarmentRatioEditor from '../../features/components/GarmentRatioEditor';
 import { getDisplayProductName, getRackDisplayName, getVersionDisplayName } from '../../features/utils';
+import { GarmentRatio } from '../../services/firebaseGarmentRatioService';
 import { Category } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import '../../styles/product-detail.css';
+
+interface RatioInfo {
+  ratio: GarmentRatio | null;
+  packSize: number | null;
+  sizeScale: string | null;
+  sizeDistribution: Record<string, number> | null;
+  version?: string;
+}
 
 const AdminProductDetail: React.FC = () => {
   const { collegeKey, category: categoryPath, productId } = useParams();
@@ -35,7 +44,7 @@ const AdminProductDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('default');
   
   // State for ratios and edit mode
-  const [ratiosData, setRatiosData] = useState<{ [key: string]: any }>({});
+  const [ratiosData, setRatiosData] = useState<Record<string, RatioInfo>>({});
   const [editingVersion, setEditingVersion] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -85,7 +94,7 @@ const AdminProductDetail: React.FC = () => {
           ? category.shirtVersions 
           : [undefined];
         
-        const data: { [key: string]: any } = {};
+        const data: Record<string, RatioInfo> = {};
         for (const version of versionsToCheck) {
           const ratio = await getGarmentRatio(categoryPathToUse, version, collegeKey);
           const packSize = await getPackSizeFromRatios(categoryPathToUse, version, collegeKey);
@@ -133,7 +142,7 @@ const AdminProductDetail: React.FC = () => {
   };
 
   // Get garment ratio data (now from state)
-  const getRatioInfo = (version?: string) => {
+  const getRatioInfo = (version?: string): RatioInfo => {
     return ratiosData[version || 'default'] || {
       ratio: null,
       packSize: null,

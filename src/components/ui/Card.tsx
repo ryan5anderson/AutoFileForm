@@ -64,7 +64,43 @@ const CardHeader: React.FC<CardHeaderProps> = ({ children, onClick }) => {
       onKeyDown={onClick ? (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onClick(e as any);
+          // Create a synthetic mouse event for keyboard accessibility
+          const syntheticEvent = {
+            ...e,
+            button: 0,
+            buttons: 0,
+            clientX: 0,
+            clientY: 0,
+            pageX: 0,
+            pageY: 0,
+            screenX: 0,
+            screenY: 0,
+            altKey: false,
+            ctrlKey: false,
+            metaKey: false,
+            shiftKey: false,
+            getModifierState: () => false,
+            movementX: 0,
+            movementY: 0,
+            nativeEvent: e.nativeEvent,
+            currentTarget: e.currentTarget,
+            target: e.target,
+            bubbles: true,
+            cancelable: true,
+            defaultPrevented: false,
+            eventPhase: 0,
+            isTrusted: false,
+            timeStamp: Date.now(),
+            type: 'click',
+            preventDefault: () => {},
+            stopPropagation: () => {},
+            stopImmediatePropagation: () => {},
+            isDefaultPrevented: () => false,
+            isPropagationStopped: () => false,
+            isImmediatePropagationStopped: () => false,
+            persist: () => {},
+          } as unknown as React.MouseEvent<HTMLDivElement>;
+          onClick(syntheticEvent);
         }
       } : undefined}
       role={onClick ? "button" : undefined}

@@ -25,14 +25,7 @@ import './styles/components.css';
 
 // BrowserRouter for clean URLs - Vercel handles client-side routing via rewrites
 
-// eslint-disable-next-line no-console
-console.log('React app starting...');
-// eslint-disable-next-line no-console
-console.log('Current URL:', window.location.href);
-
 const root = document.getElementById('root');
-// eslint-disable-next-line no-console
-console.log('Root element found:', !!root);
 
 if (root) {
   ReactDOM.createRoot(root).render(
@@ -42,10 +35,7 @@ if (root) {
       </BrowserRouter>
     </React.StrictMode>
   );
-  // eslint-disable-next-line no-console
-  console.log('React app rendered');
 } else {
-  // eslint-disable-next-line no-console
   console.error('Root element not found!');
 }
 
@@ -67,7 +57,7 @@ function AppShell() {
   const categories: Category[] = React.useMemo(() => {
     const segments = location.pathname.split('/').filter(Boolean);
     const maybeCollege = segments[0];
-    const config = maybeCollege ? (colleges as any)[maybeCollege] : undefined;
+    const config = maybeCollege ? colleges[maybeCollege as keyof typeof colleges] : undefined;
     return config?.categories ?? [];
   }, [location.pathname]);
 
@@ -82,7 +72,7 @@ function AppShell() {
     // Don't show categories in global sidebar for admin routes (they have their own sidebar)
     if (isAdminRoute) return false;
     // Show categories on college routes (form, summary, receipt, thankyou)
-    return segments.length >= 1 && (colleges as any)[segments[0]] !== undefined;
+    return segments.length >= 1 && colleges[segments[0] as keyof typeof colleges] !== undefined;
   }, [segments, isAdminRoute]);
 
   return (

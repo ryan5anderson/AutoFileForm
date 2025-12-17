@@ -11,26 +11,21 @@ const getTemplateId = (): string => {
   
   // Check if we're on localhost or development environment
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('localhost')) {
-    console.log('Development environment detected, using dev template');
     return EMAILJS_TEMPLATE_ID_DEV;
   }
   
   // Check if we're on the production domain
   if (hostname === 'ohiopylecollege.com' || hostname.includes('ohiopylecollege.com')) {
-    console.log('Production environment detected, using prod template');
     return EMAILJS_TEMPLATE_ID_PROD;
   }
   
   // Default to dev template for any other environment (staging, etc.)
-  console.log('Unknown environment detected, defaulting to dev template');
   return EMAILJS_TEMPLATE_ID_DEV;
 };
 
 export const sendOrderEmail = async (templateParams: TemplateParams): Promise<void> => {
   try {
     const templateId = getTemplateId();
-    console.log('Sending email with params:', templateParams);
-    console.log('Using template ID:', templateId);
 
     await emailjs.send(
       EMAILJS_SERVICE_ID,

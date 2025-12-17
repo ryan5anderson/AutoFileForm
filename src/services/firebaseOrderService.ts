@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '../config/firebase';
+import { FormData } from '../types';
 
 export interface OrderProduct {
   category: string;
@@ -41,7 +42,7 @@ export interface Order {
   emailSent: boolean;
   adminNotes?: string;
   products?: OrderProduct[]; // New: detailed product information
-  formData?: any; // Store the original form data for detailed receipt generation
+  formData?: FormData; // Store the original form data for detailed receipt generation
 }
 
 class FirebaseOrderService {

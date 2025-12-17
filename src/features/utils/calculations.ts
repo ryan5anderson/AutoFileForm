@@ -10,13 +10,8 @@ import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } fro
  */
 const getCategoryPathForImage = (imagePath: string, categories?: Category[]): string => {
   if (!categories) {
-    // eslint-disable-next-line no-console
-    console.log(`DEBUG: getCategoryPathForImage - no categories provided for ${imagePath}`);
     return '';
   }
-
-  // eslint-disable-next-line no-console
-  console.log(`DEBUG: getCategoryPathForImage called with imagePath=${imagePath}, categories=${categories.length}`);
 
   // Handle image paths that might include category prefixes
   // e.g., "tshirt/women/M102074486_SDSORS_Jr_Socrates_DTF_on_Steel.png"
@@ -27,7 +22,6 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
     const parts = imagePath.split('/');
     if (parts.length >= 2) {
       const potentialCategory = parts[0];
-      console.log(`DEBUG: Checking potential category: ${potentialCategory} for image: ${imagePath}`);
 
       // Check if this is a valid category path
       if (potentialCategory === 'tshirt/men' || potentialCategory === 'tshirt/women' ||
@@ -39,40 +33,30 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
           potentialCategory === 'signage' ||
           potentialCategory === 'displays' ||
           potentialCategory === 'youth&infant') {
-        console.log(`DEBUG: Found matching category path: ${potentialCategory}`);
         return potentialCategory;
       } else {
-        console.log(`DEBUG: ${potentialCategory} is not a recognized category path`);
         // If the first part is not a category path, assume the whole thing is the filename
         searchImagePath = imagePath;
       }
     }
   }
 
-  console.log(`DEBUG: Searching for image ${searchImagePath} in categories`);
-
   // Search through categories for the image
   for (const category of categories) {
-    console.log(`DEBUG: Checking category: ${category.path}, images: ${category.images?.length || 0}`);
     if (category.images && category.images.includes(searchImagePath)) {
-      console.log(`DEBUG: Found image in category: ${category.path}`);
       return category.path;
     }
   }
 
   // Fallback: try searching for just the filename part
   const filename = searchImagePath.split('/').pop() || searchImagePath;
-  console.log(`DEBUG: Trying to find just filename: ${filename}`);
 
   for (const category of categories) {
-    console.log(`DEBUG: Checking category: ${category.path} for filename ${filename}`);
     if (category.images && category.images.includes(filename)) {
-      console.log(`DEBUG: Found filename in category: ${category.path}`);
       return category.path;
     }
   }
 
-  console.log(`DEBUG: Image ${imagePath} not found in any category, returning empty string`);
   return '';
 };
 
@@ -85,18 +69,13 @@ const getCategoryPathForImage = (imagePath: string, categories?: Category[]): st
  * @returns The pack size for this category/version
  */
 const getCorrectPackSize = (categoryPath: string, version?: string, productName?: string): number => {
-  console.log(`DEBUG: getCorrectPackSize called with categoryPath=${categoryPath}, version=${version}, productName=${productName}`);
-
   // Normalize inputs
   const normalizedCategory = categoryPath.trim().toLowerCase();
   const normalizedVersion = version?.trim().toLowerCase();
 
-  console.log(`DEBUG: Normalized category: '${normalizedCategory}', version: '${normalizedVersion}'`);
-
   // Try to get pack size from garment ratios first
   const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, version);
   if (ratioPackSize !== null && ratioPackSize !== undefined) {
-    console.log(`DEBUG: Found pack size from ratios: ${ratioPackSize}`);
     return ratioPackSize;
   }
 
@@ -104,19 +83,15 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
   if (productName) {
     const lowerName = productName.toLowerCase();
     if (lowerName.includes('applique')) {
-      console.log(`DEBUG: Special product applique, returning 6`);
       return 6;
     }
     if (lowerName.includes('tie-dye') || lowerName.includes('tie dye')) {
-      console.log(`DEBUG: Special product tie-dye, returning 8`);
       return 8;
     }
     if (lowerName.includes('fleece short')) {
-      console.log(`DEBUG: Special product fleece short, returning 4`);
       return 4;
     }
     if (lowerName.includes('fleece zip') || lowerName.includes('fleece_zip')) {
-      console.log(`DEBUG: Special product fleece zip, returning 6`);
       return 6;
     }
   }
@@ -125,22 +100,17 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
   // This ensures we get the correct pack size from PACK_SIZES configuration
   const packSizeFromConfig = getPackSizeSync(categoryPath, version, productName);
   if (packSizeFromConfig !== undefined && packSizeFromConfig !== null) {
-    console.log(`DEBUG: Found pack size from packSizes config: ${packSizeFromConfig}`);
     return packSizeFromConfig;
   }
 
   // Fallback to default values for categories not in ratios or config
   switch (normalizedCategory) {
     case 'tshirt/men':
-      console.log(`DEBUG: tshirt/men with version ${normalizedVersion}, returning pack size`);
       if (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck') {
-        console.log(`DEBUG: tshirt/men ${normalizedVersion} allows any quantity, returning 6`);
         return 6; // allowsAny = true
       }
-      console.log(`DEBUG: tshirt/men unknown version ${normalizedVersion}, returning default 6`);
       return 6; // default
     case 'tshirt/women':
-      console.log(`DEBUG: tshirt/women, returning 4`);
       return 4;
     case 'hat':
     case 'beanie':
@@ -149,7 +119,6 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     case 'signage':
       return 1;
     default:
-      console.log(`DEBUG: Unknown categoryPath: ${normalizedCategory}, version: ${normalizedVersion}, returning default 7`);
       return 7; // fallback
   }
 };
@@ -162,25 +131,20 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
  * @returns true if any quantity is allowed
  */
 const getAllowsAnyQuantity = (categoryPath: string, version?: string, productName?: string): boolean => {
-  console.log(`DEBUG: getAllowsAnyQuantity called with categoryPath="${categoryPath}", version="${version}"`);
-
   // Normalize inputs
   const normalizedCategory = categoryPath.trim().toLowerCase();
   const normalizedVersion = version?.trim().toLowerCase();
 
   // Only T-Shirt (Unisex) tshirt and longsleeve allow any quantity
   if (normalizedCategory === 'tshirt/men' && (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck')) {
-    console.log(`DEBUG: T-Shirt (Unisex) ${normalizedVersion} allows any quantity`);
     return true;
   }
 
   // Also check for accessories that allow any quantity
   if (normalizedCategory === 'bottle' || normalizedCategory === 'signage') {
-    console.log(`DEBUG: Accessory ${normalizedCategory} allows any quantity`);
     return true;
   }
 
-  console.log(`DEBUG: ${normalizedCategory}/${normalizedVersion} does NOT allow any quantity`);
   return false;
 };
 
@@ -339,7 +303,6 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
             const packSize = getCorrectPackSize(categoryPath, version, imagePath);
             const allowsAny = getAllowsAnyQuantity(categoryPath, version, imagePath);
 
-            console.log(`VALIDATION: ${imagePath} (${version}): categoryPath=${categoryPath}, packSize=${packSize}, allowsAny=${allowsAny}, total=${total}`);
 
             if (allowsAny) {
               // For categories that allow any quantity (tshirt, longsleeve, hoodie, crewneck), only check minimum
@@ -679,7 +642,7 @@ export const validateQuantities = (formData: FormData, categories?: Category[]):
 
 export const calculateTotalUnits = (emailCategories: EmailCategory[]): number => {
   return emailCategories.reduce((sum: number, cat: EmailCategory) => 
-    sum + cat.items.reduce((catSum: number, item: any) => 
+    sum + cat.items.reduce((catSum: number, item) => 
       catSum + Number(item.qty), 0
     ), 0
   );
@@ -762,7 +725,7 @@ export function getSizeOptions(categoryPath: string, version?: string, collegeKe
   // Fall back to existing logic if JSON doesn't have the size scale
   // Socks use different sizing
   if (categoryPath.includes('sock')) {
-    return ['SM', 'XL'] as any;
+    return ['SM', 'XL'] as Size[];
   }
 
   // Youth products get XS-XL sizes

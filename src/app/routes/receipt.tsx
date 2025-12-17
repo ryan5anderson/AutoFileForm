@@ -340,7 +340,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                     let totalPantQty = 0;
 
                     // Helper function to process size counts for a specific style and color
-                    const processSizeCounts = (styleName: string, colorName: string, sizeCounts: any) => {
+                    const processSizeCounts = (styleName: string, colorName: string, sizeCounts: SizeCounts | undefined) => {
                       if (!sizeCounts || typeof sizeCounts !== 'object') return;
 
                       // Format sizes as "S: 1 M: 2 XL: 3" etc.

@@ -18,7 +18,7 @@ const OrderReceiptPage: React.FC = () => {
       if (orderId) {
         try {
           // Try to get order from location state first (if navigating from allOrders)
-          const stateOrder = (location.state as any)?.order;
+          const stateOrder = (location.state as { order?: Order } | null)?.order;
           if (stateOrder) {
             setOrder(stateOrder);
             setLoading(false);

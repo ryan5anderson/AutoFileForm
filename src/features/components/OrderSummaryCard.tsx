@@ -68,13 +68,13 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
     if (hasPantOptions) {
       const pOptions = pantOptions[imagePath];
       if (pOptions) {
-        const processStyleCounts = (styleOptions: any, styleName: string) => {
+        const processStyleCounts = (styleOptions: Record<string, SizeCounts> | undefined, styleName: string) => {
           if (!styleOptions) return { total: 0, details: [] };
 
           let styleTotal = 0;
           const details: string[] = [];
 
-          Object.entries(styleOptions).forEach(([colorName, sizeCounts]: [string, any]) => {
+          Object.entries(styleOptions).forEach(([colorName, sizeCounts]) => {
             if (sizeCounts && typeof sizeCounts === 'object') {
               const colorTotal = Object.values(sizeCounts).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0);
               if (colorTotal > 0) {
@@ -192,7 +192,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
                   const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
                   
                   sizeOrder.forEach(sz => {
-                    const val = (counts as any)[sz] || 0;
+                    const val = counts[sz] || 0;
                     if (val > 0) {
                       if (!colorGroups.has(colorName)) {
                         colorGroups.set(colorName, []);
@@ -276,7 +276,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
                     const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
                     const sizePieces = sizeOrder
                       .map(sz => {
-                        const val = (counts as any)[sz] || 0;
+                        const val = counts[sz] || 0;
                         return val > 0 ? `${sz}${val}` : '';
                       })
                       .filter(Boolean)

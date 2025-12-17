@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 
 import { useOrderForm } from '../features/hooks';
-import { Category, FormData, PantOption, InfantSizeCounts } from '../types';
+import { Category, FormData, PantOption, InfantSizeCounts, ShirtVersion, SizeCounts, DisplayOption, SweatpantJoggerOption } from '../types';
 
 interface OrderFormContextType {
   formData: FormData;
@@ -14,13 +14,13 @@ interface OrderFormContextType {
   confirmationError: string | null;
   handleFormDataChange: (updates: Partial<FormData>) => void;
   handleQuantityChange: (imagePath: string, value: string) => void;
-  handleShirtVersionChange: (imagePath: string, version: any, value: string) => void;
-  handleSizeCountsChange: (imagePath: string, version: any, counts: any) => void;
-  handleDisplayOptionChange: (imagePath: string, option: any, value: string) => void;
-  handleSweatpantJoggerOptionChange: (imagePath: string, option: any, value: string) => void;
+  handleShirtVersionChange: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
+  handleSizeCountsChange: (imagePath: string, version: keyof ShirtVersion, counts: SizeCounts) => void;
+  handleDisplayOptionChange: (imagePath: string, option: keyof DisplayOption, value: string) => void;
+  handleSweatpantJoggerOptionChange: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   handlePantOptionChange: (imagePath: string, option: PantOption) => void;
   handleColorOptionChange: (imagePath: string, color: string, value: string) => void;
-  handleShirtColorSizeCountsChange: (imagePath: string, version: any, color: string, counts: any) => void;
+  handleShirtColorSizeCountsChange: (imagePath: string, version: keyof ShirtVersion, color: string, counts: SizeCounts) => void;
   handleInfantSizeCountsChange: (imagePath: string, counts: InfantSizeCounts) => void;
   handleFormSubmit: (e: React.FormEvent) => void;
   handleBack: () => void;

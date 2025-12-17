@@ -11,21 +11,21 @@ import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel'
 import ProductCard from '../../features/components/panels/QuantityPanel';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
 import { getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
-import { Category, SizeCounts, PantOption, InfantSizeCounts } from '../../types';
+import { Category, SizeCounts, PantOption, InfantSizeCounts, FormData, ShirtVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import '../../styles/product-detail.css';
 
 interface ProductDetailPageProps {
   categories: Category[];
-  formData: any;
+  formData: FormData;
   onQuantityChange?: (imagePath: string, value: string) => void;
-  onShirtVersionChange?: (imagePath: string, version: any, value: string) => void;
-  onSizeCountsChange?: (imagePath: string, version: any, counts: any) => void;
-  onDisplayOptionChange?: (imagePath: string, option: any, value: string) => void;
-  onSweatpantJoggerOptionChange?: (imagePath: string, option: any, value: string) => void;
+  onShirtVersionChange?: (imagePath: string, version: keyof ShirtVersion, value: string) => void;
+  onSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, counts: SizeCounts) => void;
+  onDisplayOptionChange?: (imagePath: string, option: keyof DisplayOption, value: string) => void;
+  onSweatpantJoggerOptionChange?: (imagePath: string, option: keyof SweatpantJoggerOption, value: string) => void;
   onPantOptionChange?: (imagePath: string, option: PantOption) => void;
   onColorOptionChange?: (imagePath: string, color: string, value: string) => void;
-  onShirtColorSizeCountsChange?: (imagePath: string, version: any, color: string, counts: any) => void;
+  onShirtColorSizeCountsChange?: (imagePath: string, version: keyof ShirtVersion, color: string, counts: SizeCounts) => void;
   onInfantSizeCountsChange?: (imagePath: string, counts: InfantSizeCounts) => void;
 }
 
@@ -303,7 +303,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
         if (hasColors) {
           // For products with colors, show ColorSizeSelector
-          const colorSizeCounts = (formData.shirtColorSizeCounts?.[imagePath] as any)?.[versionKey] || {};
+          const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || {};
           const sizesArray = getSizeOptions(category.path, version, college);
           return (
             <>
@@ -320,7 +320,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               <ColorSizeSelector
                 colors={colors}
                 colorSizeCounts={colorSizeCounts}
-                onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey, color, counts)}
+                onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, color, counts)}
                 categoryPath={category.path}
                 version={version}
                 sizes={sizesArray}
@@ -332,7 +332,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           );
         } else {
           // For single-color products, show regular SizePackSelector
-          const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+          const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
           const packSize = packSizes[version] || packSizes['default'] || 6;
           const sizesArray = getSizeOptions(category.path, version, college);
           return (
@@ -350,7 +350,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               <SizePackSelector
                 counts={counts}
                 sizes={sizesArray}
-                onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, c)}
                 packSize={packSize}
                 allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
                 categoryPath={category.path}
@@ -384,7 +384,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
               if (hasColors) {
                 // For products with colors, show ColorSizeSelector
-                const colorSizeCounts = (formData.shirtColorSizeCounts?.[imagePath] as any)?.[versionKey] || {};
+                const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || {};
                 const sizesArray = getSizeOptions(category.path, version, college);
                 return (
                   <div
@@ -395,7 +395,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   <ColorSizeSelector
                     colors={colors}
                     colorSizeCounts={colorSizeCounts}
-                    onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey, color, counts)}
+                    onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, color, counts)}
                     categoryPath={category.path}
                     version={version}
                     sizes={sizesArray}
@@ -407,7 +407,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 );
               } else {
                 // For single-color products, show regular SizePackSelector
-                const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+                const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
                 const packSize = packSizes[version] || packSizes['default'] || 6;
                 const sizesArray = getSizeOptions(category.path, version, college);
                 return (
@@ -419,7 +419,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     <SizePackSelector
                       counts={counts}
                       sizes={sizesArray}
-                      onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                      onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, c)}
                       packSize={packSize}
                       allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
                       categoryPath={category.path}
@@ -454,7 +454,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         version = 'stickers';
       }
       const versionKey = version;
-      const counts: SizeCounts = (formData.shirtSizeCounts?.[imagePath] as any)?.[versionKey] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+      const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
       const packSize = packSizes[version] || packSizes['default'] || 6;
       const sizesArray = getSizeOptions(category.path, version, college);
 
@@ -468,7 +468,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <SizePackSelector
                   counts={counts}
                   sizes={sizesArray}
-                  onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey, c)}
+                  onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, c)}
                   packSize={packSize}
                   allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
                   categoryPath={category.path}

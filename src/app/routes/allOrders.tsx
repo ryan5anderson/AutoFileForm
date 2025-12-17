@@ -62,9 +62,7 @@ const AllOrdersPage: React.FC = () => {
 
   const loadAllOrders = async () => {
     try {
-      console.log('Loading all orders...');
       const allOrders = await firebaseOrderService.getAllOrders();
-      console.log('Orders loaded:', allOrders);
       setOrders(allOrders);
     } catch (error) {
       console.error('Error loading orders:', error);
@@ -272,7 +270,6 @@ const AllOrdersPage: React.FC = () => {
     );
   }
 
-  console.log('AllOrdersPage rendering, isAuthenticated:', isAuthenticated, 'loading:', loading, 'orders:', orders.length);
 
   return (
     <div className="all-orders-page">
@@ -290,7 +287,7 @@ const AllOrdersPage: React.FC = () => {
             <select 
               id="status-filter"
               value={filterStatus} 
-              onChange={(e) => setFilterStatus(e.target.value as any)}
+              onChange={(e) => setFilterStatus(e.target.value as Order['status'] | 'all')}
               className="filter-select"
             >
               <option value="all">All Statuses</option>

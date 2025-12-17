@@ -89,16 +89,17 @@ const AdminPage: React.FC = () => {
       setFirebaseConnected(true);
       setConnectionError('');
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Connection failed
       setFirebaseConnected(false);
       
       // Check if it's a permissions error
-      const isPermissionError = error?.code === 'permission-denied' || 
-                                error?.message?.toLowerCase().includes('permission') ||
-                                error?.message?.toLowerCase().includes('insufficient');
+      const errorObj = error && typeof error === 'object' ? error as { code?: string; message?: string } : null;
+      const isPermissionError = errorObj?.code === 'permission-denied' || 
+                                errorObj?.message?.toLowerCase().includes('permission') ||
+                                errorObj?.message?.toLowerCase().includes('insufficient');
       
-      let errorMessage = error?.message || error?.code || 'Failed to connect to Firebase';
+      let errorMessage = errorObj?.message || errorObj?.code || 'Failed to connect to Firebase';
       
       if (isPermissionError) {
         errorMessage = `Permission Denied: ${errorMessage}. Please update your Firestore security rules to allow read/write access to the 'orders' collection.`;
