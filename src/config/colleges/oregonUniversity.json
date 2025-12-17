@@ -19,7 +19,13 @@
         "M103287148_SH2FDC_Custom_DTF_on_Kelly_Green.png",
         "M103287376_SDNIET_Nietzsche_DTF_on_Kelly_Green.png",
         "M103287462_SH2FDS_Custom_DTF_on_Steel.png",
-        "M103287559_SDFLNS_Flinch_DTF_on_Steel.png"
+        "M103287559_SDFLNS_Flinch_DTF_on_Steel.png",
+        "M104167110_SDAOMC_Alley_Oop_DTF_on_Black.png",
+        "M104167646_SDSMMS_Sixth_Man_DTF_on_White.png",
+        "M104167839_SDHMAS_Hail_Mary_DTF_on_White.png",
+        "M104171988_SDDDMS_Dime_Defense_DTF_on_Charcoal.png",
+        "M104172760_SDWSMS_Wheel_Spin_DTF_on_Charcoal.png",
+        "M104183894_SDBBMS_Buzzer_Beater_DTF_on_Black.png"
       ]
     },
     {
@@ -52,7 +58,11 @@
         "M103294896_SHE2CB_Custom_Kelly_Green_Beanie.png",
         "M103295096_SHE1CB_Custom_Kellly_Green_Beanie.png",
         "M103295192_SHE1CB_Custom_Gray_Beanie.png",
-        "M103295333_SHE1CB_Custom_Gray_Beanie.png"
+        "M103295333_SHE1CB_Custom_Gray_Beanie.png",
+        "M104168052_SEAQBC_American_Quailty_Black_Beanie.png",
+        "M104168363_SHE1CB_Custom_Black_Beanie.png",
+        "M104170130_SHE1CB_Custom_White_Beanie.png",
+        "M104170245_SHE1CB_Custom_White_Beanie.png"
       ]
     },
     {
@@ -69,7 +79,9 @@
       "name": "Pants",
       "path": "pants",
       "images": [
-        "M103293017_SHPHDS_Custom_DTF_Steel_Pants.png"
+        "M103293017_SHPHDS_Custom_DTF_Steel_Pants.png",
+        "M104166449_SDGMPS_Game_Master_DTF_DKH_Pants.png",
+        "M104166733_SDOCPS_Octane_DTF_Black_Pants.png"
       ]
     },
     {
