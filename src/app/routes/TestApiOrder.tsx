@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
@@ -39,14 +39,14 @@ const TestApiOrderPage: React.FC = () => {
   const isInitialLoadRef = useRef<boolean>(true);
 
   // Storage key for caching quantities
-  const getStorageKey = (): string => {
+  const getStorageKey = useCallback((): string => {
     return `testApiOrder_${orderTemplateId}_quantities`;
-  };
+  }, [orderTemplateId]);
 
   // Storage key for caching store info
-  const getStoreInfoStorageKey = (): string => {
+  const getStoreInfoStorageKey = useCallback((): string => {
     return `testApiOrder_${orderTemplateId}_storeInfo`;
-  };
+  }, [orderTemplateId]);
 
   // Get unique key for an item
   const getItemKey = (item: OrderItem, index: number): string => {
@@ -54,7 +54,7 @@ const TestApiOrderPage: React.FC = () => {
   };
 
   // Load quantities from localStorage
-  const loadQuantitiesFromStorage = (items: OrderItem[]): Map<string, OrderedFields> => {
+  const loadQuantitiesFromStorage = useCallback((items: OrderItem[]): Map<string, OrderedFields> => {
     try {
       const storageKey = getStorageKey();
       const saved = localStorage.getItem(storageKey);
@@ -84,7 +84,7 @@ const TestApiOrderPage: React.FC = () => {
       console.error('Error loading quantities from localStorage:', error);
     }
     return new Map();
-  };
+  }, [getStorageKey]);
 
   // Save quantities to localStorage
   const saveQuantitiesToStorage = (fields: Map<string, OrderedFields>) => {
@@ -101,7 +101,7 @@ const TestApiOrderPage: React.FC = () => {
   };
 
   // Initialize ORDERED fields to "0" for all items, or load from storage
-  const initializeOrderedFields = (items: OrderItem[]) => {
+  const initializeOrderedFields = useCallback((items: OrderItem[]) => {
     const savedMap = loadQuantitiesFromStorage(items);
     
     // If we have saved data, use it; otherwise initialize with zeros
@@ -121,7 +121,7 @@ const TestApiOrderPage: React.FC = () => {
       });
       setOrderedFields(newMap);
     }
-  };
+  }, [loadQuantitiesFromStorage]);
 
   // Update ORDERED field for a specific item
   const updateOrderedField = (itemKey: string, fieldName: keyof OrderedFields, value: string) => {
@@ -145,7 +145,7 @@ const TestApiOrderPage: React.FC = () => {
   };
 
   // Calculate total items across all products
-  const calculateTotalItems = (): number => {
+  const calculateTotalItems = useCallback((): number => {
     let total = 0;
     orderedFields.forEach(fields => {
       total += parseInt(fields.ORDERED1) || 0;
@@ -155,7 +155,7 @@ const TestApiOrderPage: React.FC = () => {
       total += parseInt(fields.ORDERED5) || 0;
     });
     return total;
-  };
+  }, [orderedFields]);
 
   // Check if product has any quantities > 0
   const hasAnyQuantity = (itemKey: string): boolean => {
@@ -219,7 +219,7 @@ const TestApiOrderPage: React.FC = () => {
       setStoreManager('');
       setOrderDate('');
     }
-  }, [orderTemplateId]);
+  }, [orderTemplateId, getStoreInfoStorageKey]);
 
   // Save store info to localStorage whenever it changes (but only after initial load)
   useEffect(() => {
@@ -242,7 +242,7 @@ const TestApiOrderPage: React.FC = () => {
         console.error('Error saving store info to localStorage:', error);
       }
     }
-  }, [orderTemplateId, storeName, storeNumber, storeManager, orderDate]);
+  }, [orderTemplateId, storeName, storeNumber, storeManager, orderDate, getStoreInfoStorageKey]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -281,7 +281,7 @@ const TestApiOrderPage: React.FC = () => {
     };
 
     fetchData();
-  }, [orderTemplateId]);
+  }, [orderTemplateId, initializeOrderedFields]);
 
   // Generate final JSON with updated ORDERED fields and store information
   const generateOrderJson = (): string => {
@@ -313,7 +313,7 @@ const TestApiOrderPage: React.FC = () => {
     return JSON.stringify(orderOutput, null, 2);
   };
 
-  const totalItems = useMemo(() => calculateTotalItems(), [orderedFields]);
+  const totalItems = useMemo(() => calculateTotalItems(), [calculateTotalItems]);
 
 
   return (
