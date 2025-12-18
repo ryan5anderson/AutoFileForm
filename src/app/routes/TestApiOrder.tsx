@@ -5,6 +5,15 @@ import '../../styles/college-pages.css';
 import { fetchCollegeOrder, getProxiedImageUrl, type OrderItem } from '../../services/collegeApiService';
 import Header from '../layout/Header';
 
+// API configuration - use relative URL for proxy endpoints
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
+
+// Ensure we're using a relative URL (not absolute) to hit our Vercel proxy
+const getSubmitOrderUrl = () => {
+  const base = API_BASE_URL.startsWith('http') ? API_BASE_URL : API_BASE_URL;
+  return `${base}/submitorder`;
+};
+
 // Type for tracking ORDERED fields per product
 type OrderedFields = {
   ORDERED1: string;
@@ -31,8 +40,15 @@ const TestApiOrderPage: React.FC = () => {
   // State for store information
   const [storeName, setStoreName] = useState<string>('');
   const [storeNumber, setStoreNumber] = useState<string>('');
-  const [storeManager, setStoreManager] = useState<string>('');
+  const [poNumber, setPoNumber] = useState<string>('');
   const [orderDate, setOrderDate] = useState<string>('');
+
+  // State for order submission
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'idle' | 'success' | 'error';
+    message: string;
+  }>({ type: 'idle', message: '' });
 
   // Ref to track if store info has been loaded (prevents saving during initial load)
   const storeInfoLoadedRef = useRef<boolean>(false);
@@ -184,13 +200,13 @@ const TestApiOrderPage: React.FC = () => {
           const parsed = JSON.parse(saved);
           setStoreName(parsed.storeName || '');
           setStoreNumber(parsed.storeNumber || '');
-          setStoreManager(parsed.storeManager || '');
+          setPoNumber(parsed.poNumber || '');
           setOrderDate(parsed.orderDate || '');
         } else {
           // No saved data, initialize to empty
           setStoreName('');
           setStoreNumber('');
-          setStoreManager('');
+          setPoNumber('');
           setOrderDate('');
         }
       } catch (error) {
@@ -198,7 +214,7 @@ const TestApiOrderPage: React.FC = () => {
         // On error, initialize to empty
         setStoreName('');
         setStoreNumber('');
-        setStoreManager('');
+        setPoNumber('');
         setOrderDate('');
       }
       
@@ -216,7 +232,7 @@ const TestApiOrderPage: React.FC = () => {
       // Reset store info when orderTemplateId changes
       setStoreName('');
       setStoreNumber('');
-      setStoreManager('');
+      setPoNumber('');
       setOrderDate('');
     }
   }, [orderTemplateId, getStoreInfoStorageKey]);
@@ -233,7 +249,7 @@ const TestApiOrderPage: React.FC = () => {
         const storeInfo = {
           storeName: storeName || '',
           storeNumber: storeNumber || '',
-          storeManager: storeManager || '',
+          poNumber: poNumber || '',
           orderDate: orderDate || ''
         };
         localStorage.setItem(storageKey, JSON.stringify(storeInfo));
@@ -241,7 +257,7 @@ const TestApiOrderPage: React.FC = () => {
         console.error('Error saving store info to localStorage:', error);
       }
     }
-  }, [orderTemplateId, storeName, storeNumber, storeManager, orderDate, getStoreInfoStorageKey]);
+  }, [orderTemplateId, storeName, storeNumber, poNumber, orderDate, getStoreInfoStorageKey]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -303,13 +319,98 @@ const TestApiOrderPage: React.FC = () => {
       storeInfo: {
         storeName: storeName || '',
         storeNumber: storeNumber || '',
-        storeManager: storeManager || '',
+        poNumber: poNumber || '',
         date: orderDate || ''
       },
       orderItems: updatedData
     };
     
     return JSON.stringify(orderOutput, null, 2);
+  };
+
+  // Get order JSON as object (not stringified)
+  const getOrderJsonObject = () => {
+    const updatedData = orderData.map((item, index) => {
+      const itemKey = getItemKey(item, index);
+      const ordered = orderedFields.get(itemKey) || {
+        ORDERED1: '0',
+        ORDERED2: '0',
+        ORDERED3: '0',
+        ORDERED4: '0',
+        ORDERED5: '0'
+      };
+      return {
+        ...item,
+        ...ordered
+      };
+    });
+    
+    return {
+      storeInfo: {
+        storeName: storeName || '',
+        storeNumber: storeNumber || '',
+        poNumber: poNumber || '',
+        date: orderDate || ''
+      },
+      orderItems: updatedData
+    };
+  };
+
+  // Submit order to API
+  const handleSubmitOrder = async () => {
+    setIsSubmitting(true);
+    setSubmitStatus({ type: 'idle', message: '' });
+
+    try {
+      const orderJson = getOrderJsonObject();
+      
+      // Use the proxy endpoint to bypass CORS restrictions
+      // Ensure we're using a relative URL to hit our Vercel proxy
+      const submitUrl = getSubmitOrderUrl();
+      console.log('Submitting order to proxy endpoint:', submitUrl);
+      console.log('API_BASE_URL:', API_BASE_URL);
+      
+      const response = await fetch(submitUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(orderJson),
+      });
+
+      // Check if response is OK (status 200-299)
+      if (!response.ok) {
+        // Try to parse error response as JSON (proxy returns JSON)
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          const errorText = await response.text().catch(() => 'Unknown error');
+          errorData = { error: errorText, message: errorText };
+        }
+        
+        const errorMessage = errorData.message || errorData.error || `Submission failed: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      // Parse JSON response (proxy always returns JSON)
+      const responseData = await response.json();
+
+      setSubmitStatus({
+        type: 'success',
+        message: responseData.message || responseData.success || 'Order submitted successfully!'
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit order';
+      setSubmitStatus({
+        type: 'error',
+        message: errorMessage
+      });
+      console.error('Error submitting order:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const totalItems = useMemo(() => calculateTotalItems(), [calculateTotalItems]);
@@ -456,21 +557,21 @@ const TestApiOrderPage: React.FC = () => {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <label 
-                  htmlFor="storeManager"
+                  htmlFor="poNumber"
                   style={{
                     fontSize: 'var(--font-size-sm)',
                     fontWeight: 'var(--font-weight-medium)',
                     color: 'var(--color-text)'
                   }}
                 >
-                  Store Manager
+                  PO Number
                 </label>
                 <input
-                  id="storeManager"
+                  id="poNumber"
                   type="text"
-                  value={storeManager}
-                  onChange={(e) => setStoreManager(e.target.value)}
-                  placeholder="Enter store manager name"
+                  value={poNumber}
+                  onChange={(e) => setPoNumber(e.target.value)}
+                  placeholder="Enter PO number"
                   style={{
                     padding: 'var(--space-2) var(--space-3)',
                     border: '1px solid var(--color-border)',
@@ -930,6 +1031,73 @@ const TestApiOrderPage: React.FC = () => {
                   }}>
                     {generateOrderJson()}
                   </pre>
+                  
+                  {/* Submit Button */}
+                  <div style={{
+                    marginTop: 'var(--space-4)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-3)',
+                    alignItems: 'center'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={handleSubmitOrder}
+                      disabled={isSubmitting}
+                      style={{
+                        padding: 'var(--space-3) var(--space-6)',
+                        backgroundColor: isSubmitting ? 'var(--color-gray-400)' : 'var(--color-success, #10b981)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius-lg)',
+                        fontSize: 'var(--font-size-base)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        transition: 'all 0.2s ease',
+                        minWidth: '200px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSubmitting) {
+                          e.currentTarget.style.backgroundColor = '#059669';
+                          e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.15)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSubmitting) {
+                          e.currentTarget.style.backgroundColor = 'var(--color-success, #10b981)';
+                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        }
+                      }}
+                    >
+                      {isSubmitting ? 'Submitting...' : 'Submit Order'}
+                    </button>
+
+                    {/* Status Display */}
+                    {submitStatus.type !== 'idle' && (
+                      <div style={{
+                        width: '100%',
+                        padding: 'var(--space-3)',
+                        backgroundColor: submitStatus.type === 'success' 
+                          ? 'var(--color-success-light, #d1fae5)' 
+                          : 'var(--color-danger-light, #fee2e2)',
+                        border: `1px solid ${submitStatus.type === 'success' 
+                          ? 'var(--color-success, #10b981)' 
+                          : 'var(--color-danger, #ef4444)'}`,
+                        borderRadius: 'var(--radius)',
+                        color: submitStatus.type === 'success' 
+                          ? 'var(--color-success-dark, #065f46)' 
+                          : 'var(--color-danger-dark, #991b1b)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        textAlign: 'center'
+                      }}>
+                        {submitStatus.type === 'success' && '✓ '}
+                        {submitStatus.type === 'error' && '✗ '}
+                        {submitStatus.message}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
