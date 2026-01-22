@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
@@ -21,6 +21,7 @@ const TestApiPage: React.FC = () => {
   const [errorDetails, setErrorDetails] = useState<ApiErrorInfo | null>(null);
   const [logoErrors, setLogoErrors] = useState<Map<string, LogoError>>(new Map());
   const [showDebugInfo, setShowDebugInfo] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
 
   // Fetch API Data
@@ -73,6 +74,14 @@ const TestApiPage: React.FC = () => {
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>, college: CollegeData) => {
     const target = e.target as HTMLImageElement;
     const img = target as HTMLImageElement;
+    
+    // Prevent infinite loop: if we've already set the error placeholder, don't try again
+    const errorPlaceholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg==';
+    if (img.src === errorPlaceholder || logoErrors.has(college.school_ID)) {
+      // Already handled this error, prevent re-triggering
+      return;
+    }
+    
     const originalUrl = college.logoUrl || 'No URL provided';
     const proxiedUrl = getProxiedImageUrl(college.logoUrl);
     const isUsingProxy = proxiedUrl && img.src.includes('/api/proxy-image');
@@ -93,7 +102,7 @@ const TestApiPage: React.FC = () => {
       errorMessage = `Failed to load image from: ${originalUrl}`;
     }
     
-    // Log detailed error to console
+    // Log detailed error to console (only once)
     console.error(`Logo load error for ${college.schoolName}:`, {
       schoolId: college.school_ID,
       originalUrl: originalUrl,
@@ -105,8 +114,12 @@ const TestApiPage: React.FC = () => {
       isRelative: img.src.startsWith(window.location.origin) && !img.src.includes('/api/proxy-image')
     });
     
-    // Store error in state
+    // Store error in state (this will trigger a re-render, but we've already checked for duplicates)
     setLogoErrors(prev => {
+      // Don't update if already exists to prevent unnecessary re-renders
+      if (prev.has(college.school_ID)) {
+        return prev;
+      }
       const newMap = new Map(prev);
       newMap.set(college.school_ID, {
         schoolId: college.school_ID,
@@ -117,8 +130,9 @@ const TestApiPage: React.FC = () => {
       return newMap;
     });
     
-    // Replace with error placeholder
-    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg==';
+    // Replace with error placeholder and remove error handler to prevent loop
+    target.onerror = null; // Remove error handler to prevent infinite loop
+    target.src = errorPlaceholder;
     target.alt = `Logo error: ${errorMessage}`;
   };
   
@@ -131,6 +145,40 @@ const TestApiPage: React.FC = () => {
       return newMap;
     });
   };
+
+  // Deduplicate colleges and filter based on search query
+  const filteredColleges = useMemo(() => {
+    // First, deduplicate colleges by school_ID (keep first occurrence)
+    const seen = new Set<string>();
+    const uniqueColleges = colleges.filter((college) => {
+      if (seen.has(college.school_ID)) {
+        console.log(`Duplicate college filtered out: ${college.schoolName} (ID: ${college.school_ID})`);
+        return false;
+      }
+      seen.add(college.school_ID);
+      return true;
+    });
+
+    // Then filter by search query if present
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery) {
+      return uniqueColleges;
+    }
+    
+    const filtered = uniqueColleges.filter((college) => 
+      college.schoolName.toLowerCase().includes(trimmedQuery.toLowerCase())
+    );
+    
+    console.log(`Search query: "${trimmedQuery}", Found ${filtered.length} colleges out of ${uniqueColleges.length}`);
+    
+    return filtered;
+  }, [colleges, searchQuery]);
+
+  // Determine if we should show "no results" message
+  const showNoResults = useMemo(() => {
+    const trimmedQuery = searchQuery.trim();
+    return trimmedQuery.length > 0 && filteredColleges.length === 0;
+  }, [searchQuery, filteredColleges]);
 
   return (
     <div className="summary-page-container">
@@ -317,9 +365,87 @@ const TestApiPage: React.FC = () => {
               maxWidth: '800px'
             }}
           >
-            {colleges.map((college) => (
+            {/* Search Bar */}
+            <div
+              style={{
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-4)',
+                backgroundColor: 'var(--color-bg)',
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-4)',
+                marginBottom: 'var(--space-2)'
+              }}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ flexShrink: 0, color: 'var(--color-gray-600)' }}
+              >
+                <path
+                  d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M19 19L14.65 14.65"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <input
+                key="college-search-input"
+                type="text"
+                placeholder="Search colleges..."
+                value={searchQuery}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setSearchQuery(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  // Prevent any key handlers from interfering
+                  e.stopPropagation();
+                }}
+                autoComplete="off"
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  backgroundColor: 'transparent',
+                  fontSize: 'var(--font-size-base)',
+                  color: 'var(--color-text)',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+
+            {/* Show "no results" message if search has no matches */}
+            {showNoResults ? (
+              <div style={{
+                padding: 'var(--space-6)',
+                textAlign: 'center',
+                color: 'var(--color-gray-600)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: 'var(--color-bg)',
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+              }}>
+                No colleges found matching "{searchQuery.trim()}"
+              </div>
+            ) : (
+              <>
+                {filteredColleges.map((college, index) => (
               <button
-                key={college.school_ID}
+                key={`${college.school_ID}-${college.orderNumTemplate || index}`}
                 type="button"
                 style={{
                   border: '1px solid var(--color-border)',
@@ -334,7 +460,9 @@ const TestApiPage: React.FC = () => {
                   fontFamily: 'inherit',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 'var(--space-4)'
+                  gap: 'var(--space-4)',
+                  position: 'relative',
+                  zIndex: 1
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
@@ -345,18 +473,27 @@ const TestApiPage: React.FC = () => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 aria-label={`View details for ${college.schoolName}`}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   navigate(`/test-api/${college.orderNumTemplate}`);
                 }}
               >
                 {(() => {
                   const proxiedUrl = getProxiedImageUrl(college.logoUrl);
+                  // Log college name and logo URL from mytownoriginals.com
+                  if (college.logoUrl && college.logoUrl.includes('mytownoriginals.com')) {
+                    console.log(`College: ${college.schoolName} | Logo URL: ${college.logoUrl}`);
+                  }
+                  const hasError = logoErrors.has(college.school_ID);
+                  const errorPlaceholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg==';
+                  
                   return college.logoUrl ? (
-                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <div style={{ position: 'relative', flexShrink: 0, pointerEvents: 'none' }}>
                       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
                       <img
-                        src={proxiedUrl || college.logoUrl}
-                        alt={`${college.schoolName} logo`}
+                        src={hasError ? errorPlaceholder : (proxiedUrl || college.logoUrl)}
+                        alt={hasError ? `Logo error for ${college.schoolName}` : `${college.schoolName} logo`}
                         style={{
                           width: '80px',
                           height: '80px',
@@ -365,13 +502,14 @@ const TestApiPage: React.FC = () => {
                           objectFit: 'contain',
                           borderRadius: 'var(--radius)',
                           backgroundColor: 'var(--color-gray-50)',
-                          border: logoErrors.has(college.school_ID) 
+                          border: hasError 
                             ? '2px solid var(--color-danger)' 
                             : '1px solid var(--color-border)',
-                          padding: 'var(--space-1)'
+                          padding: 'var(--space-1)',
+                          pointerEvents: 'none'
                         }}
-                        onError={(e) => handleImageError(e, college)}
-                        onLoad={() => handleImageLoad(college)}
+                        onError={hasError ? undefined : (e) => handleImageError(e, college)}
+                        onLoad={hasError ? undefined : () => handleImageLoad(college)}
                         loading="lazy"
                       />
                       {logoErrors.has(college.school_ID) && (
@@ -389,7 +527,8 @@ const TestApiPage: React.FC = () => {
                           justifyContent: 'center',
                           fontSize: '10px',
                           fontWeight: 'bold',
-                          cursor: 'help'
+                          cursor: 'help',
+                          pointerEvents: 'auto'
                         }} title={logoErrors.get(college.school_ID)?.error}>
                           !
                         </div>
@@ -411,7 +550,8 @@ const TestApiPage: React.FC = () => {
                       color: 'var(--color-gray-500)',
                       textAlign: 'center',
                       padding: 'var(--space-1)',
-                      flexShrink: 0
+                      flexShrink: 0,
+                      pointerEvents: 'none'
                     }}>
                       No Logo
                     </div>
@@ -422,12 +562,15 @@ const TestApiPage: React.FC = () => {
                   fontSize: 'var(--font-size-lg)',
                   fontWeight: 'var(--font-weight-semibold)',
                   color: 'var(--color-text)',
-                  flex: 1
+                  flex: 1,
+                  pointerEvents: 'none'
                 }}>
                   {college.schoolName}
                 </h2>
               </button>
-            ))}
+                ))}
+              </>
+            )}
           </div>
         )}
 
