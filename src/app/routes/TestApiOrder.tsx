@@ -367,8 +367,8 @@ const TestApiOrderPage: React.FC = () => {
       // Use the proxy endpoint to bypass CORS restrictions
       // Ensure we're using a relative URL to hit our Vercel proxy
       const submitUrl = getSubmitOrderUrl();
-      console.log('Submitting order to proxy endpoint:', submitUrl);
-      console.log('API_BASE_URL:', API_BASE_URL);
+      console.warn('Submitting order to proxy endpoint:', submitUrl);
+      console.warn('API_BASE_URL:', API_BASE_URL);
       
       const response = await fetch(submitUrl, {
         method: 'POST',

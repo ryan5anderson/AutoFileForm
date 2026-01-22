@@ -20,7 +20,7 @@ export interface CollegeData {
   schoolName: string;
   logoUrl?: string | null;
   orderNumTemplate: string;
-  [key: string]: any; // Allow for additional fields from the API
+  [key: string]: unknown; // Allow for additional fields from the API
 }
 
 export interface CollegeOrder {
@@ -53,7 +53,7 @@ export interface OrderItem {
   STYLE_NUM?: string | null;
   COLOR_INIT?: string | null;
   UNITPRICE?: number | null;
-  [key: string]: any; // Allow for additional fields from the API
+  [key: string]: unknown; // Allow for additional fields from the API
 }
 
 /**

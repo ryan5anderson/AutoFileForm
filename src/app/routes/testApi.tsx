@@ -152,7 +152,7 @@ const TestApiPage: React.FC = () => {
     const seen = new Set<string>();
     const uniqueColleges = colleges.filter((college) => {
       if (seen.has(college.school_ID)) {
-        console.log(`Duplicate college filtered out: ${college.schoolName} (ID: ${college.school_ID})`);
+        console.warn(`Duplicate college filtered out: ${college.schoolName} (ID: ${college.school_ID})`);
         return false;
       }
       seen.add(college.school_ID);
@@ -169,7 +169,7 @@ const TestApiPage: React.FC = () => {
       college.schoolName.toLowerCase().includes(trimmedQuery.toLowerCase())
     );
     
-    console.log(`Search query: "${trimmedQuery}", Found ${filtered.length} colleges out of ${uniqueColleges.length}`);
+    console.warn(`Search query: "${trimmedQuery}", Found ${filtered.length} colleges out of ${uniqueColleges.length}`);
     
     return filtered;
   }, [colleges, searchQuery]);
@@ -483,7 +483,7 @@ const TestApiPage: React.FC = () => {
                   const proxiedUrl = getProxiedImageUrl(college.logoUrl);
                   // Log college name and logo URL from mytownoriginals.com
                   if (college.logoUrl && college.logoUrl.includes('mytownoriginals.com')) {
-                    console.log(`College: ${college.schoolName} | Logo URL: ${college.logoUrl}`);
+                    console.warn(`College: ${college.schoolName} | Logo URL: ${college.logoUrl}`);
                   }
                   const hasError = logoErrors.has(college.school_ID);
                   const errorPlaceholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg==';

@@ -43,7 +43,7 @@ module.exports = function(app) {
       onProxyReq: (proxyReq, req, res) => {
         // Log proxied requests in development
         if (process.env.NODE_ENV === 'development') {
-          console.log(`[Proxy] ${req.method} ${req.url} -> ${vercelDevUrl}${req.url}`);
+          console.warn(`[Proxy] ${req.method} ${req.url} -> ${vercelDevUrl}${req.url}`);
         }
       }
     })
