@@ -77,6 +77,7 @@
       "hasSizeOptions": true,
       "images": [
         "M102986071_SHE2CJ_Custom_Logo_Royal_Jacket.png",
+        "M104257389_SHE2CJ_Custom_Mark_Black_Jacket.png",
         "M90385710_SDLCJA_Custom_DTF_on_Royal_Jacket.png",
         "M90493367_SDLCJA_Custom_DTF_on_Black_Jacket.png"
       ]
@@ -148,10 +149,10 @@
       "name": "Signage",
       "path": "signage",
       "images": [
-        "M11000288_SHWGCS_Custom_Spinner_Header.png",
-        "M11000381_SHWGCH_Custom_PFD_Header.png",
         "M100845983_SHMH24_Custom_4FT_Shelf_Magnet.png",
-        "M100846268_SHMH23_Custom_3FT_Shelf_Magnet.png"
+        "M100846268_SHMH23_Custom_3FT_Shelf_Magnet.png",
+        "M11000288_SHWGCS_Custom_Spinner_Header.png",
+        "M11000381_SHWGCH_Custom_PFD_Header.png"
       ]
     }
   ]

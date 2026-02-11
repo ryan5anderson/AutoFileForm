@@ -10,6 +10,7 @@ export interface Category {
   pantStyles?: string[]; // Array of available pant styles (e.g., ['sweatpants', 'joggers'])
   tieDyeImages?: string[]; // Array of image filenames that are tiedye (crew neck not available for these)
   crewOnlyImages?: string[]; // Array of image filenames that only have crewneck available
+  hoodOnlyImages?: string[]; // Array of image filenames that only have hoodie available (overrides applique)
 }
 
 export interface College {

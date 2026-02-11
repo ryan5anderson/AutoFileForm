@@ -149,7 +149,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     // Determine version for size scale check
     let versionForCheck = 'tshirt'; // default fallback
     if (category.shirtVersions && category.shirtVersions.length > 0) {
-      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages);
+      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages);
       versionForCheck = filteredVersions.length > 0 ? filteredVersions[0] : category.shirtVersions[0];
     } else if (category.path.includes('jacket')) {
       versionForCheck = 'jacket';
@@ -288,11 +288,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </>
       );
-    } else if (category.hasShirtVersions && category.shirtVersions && getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages).length > 0) {
+    } else if (category.hasShirtVersions && category.shirtVersions && getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages).length > 0) {
       // Check if this product has color options
       const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
       const hasColors = colors.length > 0;
-      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages);
+      const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages);
       const hasMultipleVersions = filteredVersions.length > 1;
       
       // If only one version, display it as static text (not a tab) and show sizes immediately
@@ -438,7 +438,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       let version = 'tshirt'; // default fallback
 
       if (category.shirtVersions && category.shirtVersions.length > 0) {
-        const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages);
+        const filteredVersions = getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages);
         version = filteredVersions.length > 0 ? filteredVersions[0] : category.shirtVersions[0];
       } else if (category.path.includes('jacket')) {
         version = 'jacket';

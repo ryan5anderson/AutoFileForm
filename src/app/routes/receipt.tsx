@@ -479,7 +479,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                 if (category.hasShirtVersions && category.shirtVersions) {
                   const colorSizeCountsByVersion = formData.shirtColorSizeCounts?.[imagePath];
                   if (colorSizeCountsByVersion) {
-                    const filteredVersions = getFilteredShirtVersions(img, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages);
+                    const filteredVersions = getFilteredShirtVersions(img, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages);
                     let totalShirtQty = 0;
                     
                     // Group by color first
@@ -568,7 +568,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
 
                   // Handle Shirt Versions (regular size breakdown - no colors) - combine into one line
                   const sizeByVersion = formData.shirtSizeCounts?.[imagePath] || {};
-                  const filteredVersions = getFilteredShirtVersions(img, category.shirtVersions);
+                  const filteredVersions = getFilteredShirtVersions(img, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages);
                   const versionDetails: string[] = [];
                   let totalQty = 0;
 

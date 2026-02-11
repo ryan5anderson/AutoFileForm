@@ -30,6 +30,8 @@
         "M100082512_SHRIDC_Rise_DTF_on_Crimson.png",
         "M100083212_SDRENC_Renown_DTF_Crimson_or_Black.png",
         "M100084780_SHLJOB_Love_Jones_DTF_on_Black.png",
+        "M100085023_SH2FDC_Full_Front_DTF_on_Black.png",
+        "M100085284_SHHODC_Hover_DTF_on_Black.png",
         "M100113956_SDSOCR_Socrates_DTF_on_Black.png",
         "M100114591_SH2FDW_Custom_DTF_Crimson.png",
         "M100114845_SH2FDS_Full_Front_DTF_on_SteelWhite.png",
@@ -48,15 +50,15 @@
         "tshirt"
       ],
       "images": [
+        "M100082210_SH2FDS_Full_Custom_DTFN_SteelWhite.png",
         "M100085689_SHBMDC_Jr_Backer_DTF_on_Black.png",
         "M100086269_SDABSC_Jr_Absent_DTF_on_Black.png",
+        "M100108378_SDLOCK_Neutral_Locke_DTF_on_Black.png",
         "M100109174_SDBIOS_Jr_Bionic_DTF_on_Steel.png",
         "M100109716_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png",
         "M100110295_SDMULS_Jr_Multipler_DTF_on_Steel.png",
         "M100133741_SH2FDS_Jr_Full_Front_DTF_on_SteelWhite.png",
-        "M101003278_SH2FDC_Jr_Crimson_A_DTF_on_Black.png",
-        "M100082210_SH2FDS_Full_Custom_DTFN_SteelWhite.png",
-        "M100108378_SDLOCK_Neutral_Locke_DTF_on_Black.png"
+        "M101003278_SH2FDC_Jr_Crimson_A_DTF_on_Black.png"
       ]
     },
     {
@@ -84,7 +86,8 @@
         "M100110796_SEUCBJ_Revere_Emb_Black_Jacket.png",
         "M100327761_SDLCJA_Custom_DTF_Gray_Jacket.png",
         "M100328372_SEUHBJ_Overhand_Black_Jacket.png",
-        "M103746362_SHE1CJ_Custom_Fleece_Jacket.png"
+        "M103746362_SHE1CJ_Custom_Fleece_Jacket.png",
+        "M204413147_SHE1CJ_Crimson_A_Black_or_Gray_Jacket.png"
       ]
     },
     {
@@ -145,11 +148,11 @@
       "path": "youth&infant",
       "hasSizeOptions": true,
       "images": [
-        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png",
-        "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
+        "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Stee.png",
         "M102145493_SHISFD_Superfan_DTF_Onsie_on_Steel.png",
-        "M102144567_SHY2DC_Custom_Big_Al_Youth_DTF_on_Steel.png",
-        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png"
+        "M102145648_SDYBXS_Youth_Braxton_DTF_on_Steel.png",
+        "M102145983_SDINTO_Custom_Infant_DTF_on_SteelWhite.png",
+        "M102153239_SDINTO_Custom_Infant_DTF_on_Steel.png"
       ]
     },
     {
@@ -157,7 +160,8 @@
       "path": "signage",
       "images": [
         "M100327125_SHWGCS_Spinner_Header_Card.png",
-        "M100330026_SHWGCH_PFD_Header_Card.png"
+        "M100330026_SHWGCH_PFD_Header_Card.png",
+        "M103922133_SHMH24_4ft_Shelf_Magnet.png"
       ]
     }
   ]

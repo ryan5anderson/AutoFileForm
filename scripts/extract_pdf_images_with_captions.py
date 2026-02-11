@@ -121,7 +121,8 @@ def clean_existing_images(college_dir: Path) -> int:
 def update_college_config(
     college_config_name: str,
     category_image_map: Dict[str, List[str]],
-    script_dir: Path
+    script_dir: Path,
+    hood_only_images: Optional[Set[str]] = None
 ) -> None:
     """
     Update the college's JSON config with extracted images.
@@ -130,6 +131,7 @@ def update_college_config(
         college_config_name: 'arizonastate', 'michiganstate', 'oregonUniversity', etc. (lowercase/camelCase)
         category_image_map: {'beanie': ['file1.png', ...], 'tshirt/men': [...]}
         script_dir: Path to the scripts directory (to navigate to src/)
+        hood_only_images: Set of image filenames that should only have hoodie option (no crew sweatshirt)
     """
     # Navigate from scripts/ to src/config/colleges/
     project_root = script_dir.parent
@@ -160,6 +162,25 @@ def update_college_config(
             # Update existing category
             idx = path_to_category_idx[category_path]
             config['categories'][idx]['images'] = sorted(image_files)
+            
+            # Handle hood-only items for tshirt/men category
+            if category_path == "tshirt/men":
+                if hood_only_images:
+                    # Check if any images in this category are hood-only
+                    hood_images_in_category = [img for img in image_files if img in hood_only_images]
+                    if hood_images_in_category:
+                        # Add or update hoodOnlyImages field (similar to tieDyeImages)
+                        config['categories'][idx]['hoodOnlyImages'] = sorted(hood_images_in_category)
+                        print(f"  ℹ Added {len(hood_images_in_category)} images to hoodOnlyImages (hoodie-only option)")
+                    else:
+                        # Remove hoodOnlyImages if no hood items in this category
+                        if 'hoodOnlyImages' in config['categories'][idx]:
+                            del config['categories'][idx]['hoodOnlyImages']
+                else:
+                    # Remove hoodOnlyImages if no hood items at all
+                    if 'hoodOnlyImages' in config['categories'][idx]:
+                        del config['categories'][idx]['hoodOnlyImages']
+            
             processed_paths.add(category_path)
         else:
             # Create new category entry
@@ -169,6 +190,14 @@ def update_college_config(
                 "path": category_path,
                 "images": sorted(image_files)
             }
+            
+            # If this is tshirt/men category with hood-only items, add hoodOnlyImages field
+            if category_path == "tshirt/men" and hood_only_images:
+                hood_images_in_category = [img for img in image_files if img in hood_only_images]
+                if hood_images_in_category:
+                    new_category['hoodOnlyImages'] = sorted(hood_images_in_category)
+                    print(f"  ℹ Created category with {len(hood_images_in_category)} hood-only images")
+            
             config['categories'].append(new_category)
             processed_paths.add(category_path)
             print(f"  ℹ Created new category: {category_name} (path: {category_path})")
@@ -222,31 +251,52 @@ def categorize_image(caption: str) -> Optional[str]:
     
     Rules applied in order (first match wins):
     1. banner → None (ignored)
-    2. Backpack/Backpac → backpack/
-    3. Beanie → beanie/
-    4. Bottle → bottle/
-    5. Magnet → signage/
-    6. header → signage/
-    7. card → signage/
-    8. hat → hat/
-    9. flannels → flannels/
-    10. plush → plush/
-    11. fleece → jacket/
-    12. jacket → jacket/
-    13. side_print → shorts/
-    14. shorts → shorts/
-    15. socks → socks/
-    16. sticker → sticker/
-    17. jogger → pants/
-    18. pants → pants/
-    19. jr (as word) → tshirt/women/
-    20. default → tshirt/men/
+    2. Youth/Infant/Onsie → youth&infant/
+    3. M100436060, M100438383, M100438745, M100439889 → tshirt/women/ (special cases)
+    4. M100485992_SHE2CH_Custom_Spartan_on_Green → hat/ (special case)
+    5. 6606 or no mesh → hat/
+    6. "or" with "logo" (with colors/numbers) → hat/
+    7. Backpack/Backpac → backpack/
+    8. Beanie → beanie/
+    9. Bottle → bottle/
+    10. Magnet → signage/
+    11. header → signage/
+    12. card → signage/
+    13. hat → hat/
+    14. flannels → flannels/
+    15. plush → plush/
+    16. fleece → jacket/
+    17. jacket → jacket/
+    18. side_print → shorts/
+    19. side stripe → shorts/
+    20. shorts → shorts/
+    21. socks → socks/
+    22. sticker → sticker/
+    23. jogger → pants/
+    24. pant → pants/
+    25. pants → pants/
+    26. Hood → tshirt/men/ (hoodie only)
+    27. jr (as word) → tshirt/women/
+    28. default → tshirt/men/
     """
     caption_lower = caption.lower()
     
     # Ignore banner items (must check first)
     if "banner" in caption_lower:
         return None
+    
+    # Check for youth/infant/onsie items
+    if "youth" in caption_lower or "infant" in caption_lower or "onsie" in caption_lower:
+        return "youth&infant"
+    
+    # Check for 6606 or no mesh → hat
+    if "6606" in caption_lower or "no mesh" in caption_lower:
+        return "hat"
+    
+    # Check for "or" pattern with "logo" (e.g., "Logo White or Gray", "Custom Logo 6235 or 6606") → hat
+    # Pattern: must contain both "logo" and "or" pattern (word "or" followed by another word)
+    if "logo" in caption_lower and re.search(r'\s+or\s+', caption_lower):
+        return "hat"
     
     # Check each rule in order (more specific rules first)
     if "backpac" in caption_lower or "backpack" in caption_lower:
@@ -273,6 +323,8 @@ def categorize_image(caption: str) -> Optional[str]:
         return "jacket"
     if "side_print" in caption_lower or "side print" in caption_lower:
         return "shorts"
+    if "side stripe" in caption_lower or "side_stripe" in caption_lower:
+        return "shorts"
     if "shorts" in caption_lower:
         return "shorts"
     if "socks" in caption_lower:
@@ -281,8 +333,14 @@ def categorize_image(caption: str) -> Optional[str]:
         return "sticker"
     if "jogger" in caption_lower:
         return "pants"
+    if "pant" in caption_lower:
+        return "pants"
     if "pants" in caption_lower:
         return "pants"
+    
+    # Check for "Hood" → tshirt/men (hoodie only option)
+    if "hood" in caption_lower:
+        return "tshirt/men"
     
     # Check for "jr" as a word (with word boundaries)
     if re.search(r'\bjr\b', caption_lower):
@@ -539,6 +597,9 @@ def extract_images_with_captions(
             
             print(f"  ✓ Saved: {out_path.name} → {category}/")
 
+            # Check if this item has "Hood" in caption (for hoodie-only restriction)
+            has_hood = "hood" in caption.lower()
+            
             manifest_rows.append({
                 "page": pno + 1,
                 "image_index_on_page": idx,
@@ -547,7 +608,8 @@ def extract_images_with_captions(
                 "category_subfolder": category,
                 "output_path": str(out_path.relative_to(outdir)),
                 "image_hash": img_hash,
-                "image_size_bytes": img["size"]
+                "image_size_bytes": img["size"],
+                "has_hood": has_hood
             })
 
     # Write manifest
@@ -631,6 +693,7 @@ def main():
     if manifest_csv.exists():
         df = pd.read_csv(manifest_csv)
         category_image_map: Dict[str, List[str]] = {}
+        hood_only_images: Set[str] = set()
         
         for _, row in df.iterrows():
             category = row['category_subfolder']
@@ -639,10 +702,16 @@ def main():
             if category not in category_image_map:
                 category_image_map[category] = []
             category_image_map[category].append(filename)
+            
+            # Track hood-only items (check has_hood column if it exists, otherwise check caption)
+            if 'has_hood' in df.columns and row.get('has_hood', False):
+                hood_only_images.add(filename)
+            elif 'caption' in df.columns and 'hood' in str(row.get('caption', '')).lower():
+                hood_only_images.add(filename)
         
         # Step 7: Update JSON config
         print("\n⚙️  Updating JSON configuration...")
-        update_college_config(college_config, category_image_map, script_dir)
+        update_college_config(college_config, category_image_map, script_dir, hood_only_images)
         
         # Step 8: Success message
         print("\n" + "="*50)

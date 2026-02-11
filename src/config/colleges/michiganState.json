@@ -32,7 +32,8 @@
         "M100965141_SHDCDW_Dad_Club_DTF_on_Forest.png",
         "M100965414_SHOUDC_OU_Go_Green_DTF_on_Forest.png",
         "M101005933_SDOLAS_Overlay_DTF_on_Steel.png",
-        "M101010777_SH2FDC_Custom_Go_Green_DTF_of_Forest.png"
+        "M101010777_SH2FDC_Custom_Go_Green_DTF_of_Forest.png",
+        "M103998480_SDBMCS_Battle_Master_DTF_on_Steel.png"
       ]
     },
     {
@@ -43,28 +44,28 @@
         "tshirt"
       ],
       "images": [
+        "M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png",
+        "M100438383_SH2FDW_Custom_DTFN_on_Forest.png",
+        "M100438745_SDLOCS_Locke_DTFN_on_Steel.png",
+        "M100439889_SDABSC_Absent_DTF_on_Forest.png",
         "M100963545_SHMCDW_Jr_Mom_Club_DTF_on_Green.png",
         "M100963714_SDFAMW_Jr_Family_DTF_on_Forest.png",
         "M100964663_SDFAMS_Jr_Family_DTF_on_Steel.png",
         "M100964847_SHMCDS_Jr_Mom_Club_DTF_on_Steel.png",
         "M100965923_SDVGIS_Jr_Valley_Girl_DTF_on_Steel.png",
-        "M100966592_SDVGIC_Jr_Valley_Girl_DTF_on_Forest.png",
-        "M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png",
-        "M100438383_SH2FDW_Custom_DTFN_on_Forest.png",
-        "M100438745_SDLOCS_Locke_DTFN_on_Steel.png",
-        "M100439889_SDABSC_Absent_DTF_on_Forest.png"
+        "M100966592_SDVGIC_Jr_Valley_Girl_DTF_on_Forest.png"
       ]
     },
     {
       "name": "Caps",
       "path": "hat",
       "images": [
+        "M100485992_SHE2CH_Custom_Spartan_on_Green.png",
         "M100487428_SECHHC_Chirp_Gray_Hat.png",
+        "M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png",
         "M100489153_SHE1CH_Custom_Hat_on_White_or_Grays.png",
         "M100489250_SHE1CH_Custom_Hat_on_Forest.png",
-        "M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png",
-        "M100485992_SHE2CH_Custom_Spartan_on_Green.png",
-        "M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png"
+        "M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png"
       ]
     },
     {
@@ -117,7 +118,12 @@
       "hasSizeOptions": true,
       "images": [
         "M100453381_SHCCDS_Carbon_Copy_DTF_Gray_Shorts.png",
-        "M100453813_SHSHDS_Custom_DTF_Gray_Shorts.png"
+        "M100453813_SHSHDS_Custom_DTF_Gray_Shorts.png",
+        "M204746441_SHSHDS_Custom_DTF_Gray_Shorts.png",
+        "M204746582_SHSHDS_Custom_Logo_DTF_Gray_Shorts.png",
+        "M204746653_SHSHDC_Custom_Logo_DTF_Green_Shorts.png",
+        "M204746750_SDSPSS_Custom_DTF_Side_Stripe_Gray.png",
+        "M204746823_SDSPSS_Custom_DTF_Gray_Side_Stripe.png"
       ]
     },
     {
@@ -133,7 +139,8 @@
       "name": "Water Bottle",
       "path": "bottle",
       "images": [
-        "M100454089_SHWBOT_Custom_Water_Bottle.png"
+        "M100454089_SHWBOT_Custom_Water_Bottle.png",
+        "M204670774_SHWBUV_Custom_Logo_WaterBottle.png"
       ]
     },
     {

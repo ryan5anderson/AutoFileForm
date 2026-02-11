@@ -39,7 +39,9 @@
         "M103290394_SH2FDC_Jr_Custom_DTF_on_Black.png",
         "M103290611_SHOTDC_Jr_On_Track_DTF_on_Black.png",
         "M103290731_SH2FDS_Jr_Custom_DTF_on_Steel.png",
-        "M103290996_SDDLAS_Jr_Dreamland_DTF_on_Steel.png"
+        "M103290996_SDDLAS_Jr_Dreamland_DTF_on_Steel.png",
+        "M204695876_SH2FDC_Jr_Custom_DTF_on_Kelly.png",
+        "M204696045_SDCDOC_Jr_Check_Down_DTF_on_Kelly.png"
       ]
     },
     {
@@ -129,6 +131,24 @@
         "M103297095_SHWGCS_Custom_Spinner_Header_Card.png",
         "M103490425_SHMH24_Custom_4ft_Shelf_Magnet.png",
         "M103490861_SHMH23_Custom_3ft_Shelf_Magnet.png"
+      ]
+    },
+    {
+      "name": "Flannels",
+      "path": "flannels",
+      "images": [
+        "M103292982_SHPHFD_Custom_DTF_Flannels.png",
+        "M204742353_SDGMPF_Game_Master_DTF_Flannels.png",
+        "M204742558_SHPHFD_Custom_DTF_Flannels.png",
+        "M204742827_SDGMPF_Game_Master_DTF_Flannels.png"
+      ]
+    },
+    {
+      "name": "Backpack",
+      "path": "backpack",
+      "images": [
+        "M103467678_SDBAPA_Custom_DTF_Backpack.png",
+        "M104251862_SDCABP_Cambre_DTF_Backpack.png"
       ]
     }
   ]

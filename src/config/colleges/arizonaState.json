@@ -52,7 +52,13 @@
         "M103842779_SH2FDS_Custom_Forks_Up_DTF_on_Gold.png",
         "M103847986_SH2FDS_Forks_Up_DTF_on_Steel_or_White.png",
         "M103954586_SH2FDC_Custom_Forks_Up_DTF_on_Maroon.png",
-        "M103954653_SH2FDC_Custom_Forks_Up_DTF_on_Black.png"
+        "M103954653_SH2FDC_Custom_Forks_Up_DTF_on_Black.png",
+        "M104127930_SH2FDW_DTF_Distressed_Blush_Pink_Hood.png",
+        "M204660118_CM7097_Blush_Pink_Applique_Hood.png"
+      ],
+      "hoodOnlyImages": [
+        "M104127930_SH2FDW_DTF_Distressed_Blush_Pink_Hood.png",
+        "M204660118_CM7097_Blush_Pink_Applique_Hood.png"
       ]
     },
     {
@@ -74,8 +80,15 @@
       "name": "Hat",
       "path": "hat",
       "images": [
-        "M102300329_SHE1CH_Custom_Gray_Hale_Hat.png",
-        "M102542418_SHE2CH_Custom_Gray_Hale_or_Fly_Hat.png"
+        "M102300177_SHE1CH_Custom_Maroon_6235_or_6606.png",
+        "M102300329_SHE1CH_Gray_FlyGold_White_-_no_mesh.png",
+        "M102349699_SHE1CH_Custom_Maroon_6606.png",
+        "M102542014_SHE2CH_GrayGoldWhite_PE102-no_mesh.png",
+        "M102542418_SHE2CH_Custom_Gray_Fly_Hat_5973.png",
+        "M102542536_SHE2CH_Custom_Gold_6235_Hat.png",
+        "M204457186_SHE2CH_Pitch_WhtPE102Gry_Fly-no_mesh.png",
+        "M204457349_SHE2CH_Custom_AS_Gray_FlyWhite_Hat.png",
+        "M204458312_SHE1CH_Gold_Pfork-No_mesh_or_gold_hat.png"
       ]
     },
     {
@@ -93,7 +106,8 @@
       "hasSizeOptions": true,
       "images": [
         "M102133660_SHE1CJ_Custom_Logo_Maroon_Jacket.png",
-        "M102260434_SHE1CJ_Custom_Logo_Charcoal_Jacket.png"
+        "M102260434_SHE1CJ_Custom_Logo_Charcoal_Jacket.png",
+        "M204460751_SHE2CJ_Custom_AS_Black_or_Gray_Jacket.png"
       ]
     },
     {
@@ -116,7 +130,8 @@
       "images": [
         "M102076247_SDINPC_Initiative_DTF_Black_Pants.png",
         "M102310221_SHPHDS_Custom_DTF_Steel_Pants.png",
-        "M102332956_SDGMPS_Game_Master_DTF_Steel_Pants.png"
+        "M102332956_SDGMPS_Game_Master_DTF_Steel_Pants.png",
+        "M204509370_SHPHDC_Custom_Pitchfork_DTF_Dark_Pant.png"
       ]
     },
     {
@@ -134,7 +149,10 @@
       "path": "socks",
       "hasSizeOptions": true,
       "images": [
-        "M102076380_SS8052_Custom_Logo_Socks.png"
+        "M102076380_SS8052_Custom_Logo_Socks.png",
+        "M204459326_SHTUSS_Tuscaloosa_Socks.png",
+        "M204460014_SS8052_Custom_Fork_Socks.png",
+        "M204462250_SHSTDS_Soft_Tie_Dye_Socks.png"
       ]
     },
     {

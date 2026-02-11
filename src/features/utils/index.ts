@@ -4,15 +4,21 @@ export { getDisplayProductName, getProductName, getVersionDisplayName, getRackDi
 export { createTemplateParams } from './emailTemplate';
 
 // Utility function to filter shirt versions for applique and tiedye products
-export const getFilteredShirtVersions = (imageName: string, versions: string[], tieDyeImages?: string[], crewOnlyImages?: string[]): string[] => {
+export const getFilteredShirtVersions = (imageName: string, versions: string[], tieDyeImages?: string[], crewOnlyImages?: string[], hoodOnlyImages?: string[]): string[] => {
   const isApplique = imageName.toLowerCase().includes('applique');
   const isTiedye = tieDyeImages?.includes(imageName) || false;
-  const isHoodieOnly = imageName.toLowerCase().includes('hood') || imageName.includes('CM7031');
+  const isHoodieOnly = hoodOnlyImages?.includes(imageName) || imageName.toLowerCase().includes('hood') || imageName.includes('CM7031');
   const isCrewOnly = crewOnlyImages?.includes(imageName) || false;
   
   if (isCrewOnly) {
     // Crew-only products only have crewneck
     return versions.filter(version => version === 'crewneck');
+  }
+  
+  // Check hoodOnlyImages BEFORE applique - hood-only takes precedence
+  if (isHoodieOnly) {
+    // Hoodie-only products only have hoodie
+    return versions.filter(version => version === 'hoodie');
   }
   
   if (isApplique) {
@@ -23,11 +29,6 @@ export const getFilteredShirtVersions = (imageName: string, versions: string[], 
   if (isTiedye) {
     // Tiedye products cannot have crew neck
     return versions.filter(version => version !== 'crewneck');
-  }
-  
-  if (isHoodieOnly) {
-    // Hoodie-only products only have hoodie
-    return versions.filter(version => version === 'hoodie');
   }
   
   return versions;
