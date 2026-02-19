@@ -3,8 +3,9 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import { colleges } from '../../config';
 import { sendOrderEmail } from '../../services/emailService';
+import { firebaseOrderService } from '../../services/firebaseOrderService';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
-import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts } from '../utils/index';
+import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts, calculateTotalItems } from '../utils/index';
 
 export const useOrderForm = (categories: Category[]) => {
   // Store categories for validation
@@ -307,27 +308,46 @@ export const useOrderForm = (categories: Category[]) => {
 
     try {
       // Get school name from college config
-      const schoolName = college && colleges[college as keyof typeof colleges] 
-        ? colleges[college as keyof typeof colleges].name 
+      const schoolName = college && colleges[college as keyof typeof colleges]
+        ? colleges[college as keyof typeof colleges].name
         : '';
+
+      // Save order to Firebase first (so it appears in admin and persists even if email fails)
+      await firebaseOrderService.addOrder({
+        college: college || 'default',
+        storeNumber: formData.storeNumber,
+        storeManager: formData.storeManager,
+        date: formData.date,
+        status: 'pending',
+        totalItems: calculateTotalItems(formData),
+        orderNotes: formData.orderNotes,
+        formData,
+      });
+
       const templateParams = createTemplateParams(formData, categories, schoolName);
       await sendOrderEmail(templateParams);
-      
+
       // Clear saved form data after successful submission
       const storageKey = `orderFormData_${college || 'default'}`;
       localStorage.removeItem(storageKey);
-      
+
       // Close modal before navigation
       setShowConfirmModal(false);
-      
+
       setPage('receipt');
       // Navigate to receipt URL
       if (college) {
         navigate(`/${college}/receipt`);
       }
     } catch (err) {
-      console.error('Email error:', err);
-      setConfirmationError('Failed to send email. Please check your EmailJS configuration and try again.');
+      console.error('Order submit error:', err);
+      const message = err instanceof Error ? err.message : String(err);
+      const isFirebaseError = message.toLowerCase().includes('firebase') || message.toLowerCase().includes('permission');
+      setConfirmationError(
+        isFirebaseError
+          ? 'Failed to save order. Please check your Firebase connection and Firestore rules.'
+          : 'Failed to send email. Please check your EmailJS configuration and try again.'
+      );
       // Keep modal open to show error
     } finally {
       setSending(false);
