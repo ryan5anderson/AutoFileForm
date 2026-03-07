@@ -1,0 +1,5 @@
+-for XXXL size selector doesnt show
+-add go back button product page
+-womens page needs fixed
+- quantity selector for non size items needs fixed
+- sweatpants for mutlile colors neds fixed

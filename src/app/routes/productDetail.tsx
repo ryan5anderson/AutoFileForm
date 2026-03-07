@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { getPackSizeFromRatiosSync, getSizeScaleFromRatiosSync } from '../../config/garmentRatios';
@@ -11,7 +11,7 @@ import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel'
 import ProductCard from '../../features/components/panels/QuantityPanel';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
 import StyleCardSelector from '../../features/components/panels/StyleCardSelector';
-import { getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
+import { calculateTotalItems, getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
 import { Category, SizeCounts, PantOption, InfantSizeCounts, FormData, ShirtVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
 import '../../styles/product-detail.css';
@@ -62,11 +62,18 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       return 'displayOnly';
     }
     if (category?.hasShirtVersions && category.shirtVersions) {
-      // For applique products, default to hoodie. For others, use first available version
-      if (isApplique) {
-        return 'hoodie';
+      const filteredVersions = getFilteredShirtVersions(
+        imageName,
+        category.shirtVersions,
+        category.tieDyeImages,
+        category.crewOnlyImages,
+        category.hoodOnlyImages
+      );
+      // Require user selection when more than one style is available.
+      if (filteredVersions.length > 1) {
+        return '';
       }
-      return category.shirtVersions[0];
+      return filteredVersions[0] || category.shirtVersions[0] || '';
     }
     return '';
   });
@@ -111,6 +118,90 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [imageName, categoryPath]);
 
+  const imagePath = category ? `${category.path}/${imageName}` : '';
+  const productName = category
+    ? (category.name === 'Display Options'
+      ? getRackDisplayName(imageName)
+      : getDisplayProductName(imageName))
+    : '';
+  const orderTotalItems = useMemo(() => calculateTotalItems(formData), [formData]);
+  const selectedGarmentTotal = useMemo(() => {
+    if (!imagePath) return 0;
+
+    if (category?.hasShirtVersions) {
+      if (!activeTab) return 0;
+
+      let versionTotal = 0;
+      const versionKey = activeTab as keyof ShirtVersion;
+
+      const sizeCountsForVersion = formData.shirtSizeCounts?.[imagePath]?.[versionKey];
+      if (sizeCountsForVersion) {
+        versionTotal += Object.values(sizeCountsForVersion).reduce((sum, value) => sum + value, 0);
+      }
+
+      const colorCountsForVersion = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey];
+      if (colorCountsForVersion) {
+        Object.values(colorCountsForVersion).forEach((counts) => {
+          if (!counts) return;
+          versionTotal += Object.values(counts).reduce((sum, value) => sum + value, 0);
+        });
+      }
+
+      return versionTotal;
+    }
+
+    let total = 0;
+
+    total += parseInt(formData.quantities?.[imagePath] || '0', 10) || 0;
+
+    Object.values(formData.colorOptions?.[imagePath] || {}).forEach((qty) => {
+      total += parseInt(qty || '0', 10) || 0;
+    });
+
+    Object.values(formData.shirtSizeCounts?.[imagePath] || {}).forEach((counts) => {
+      if (!counts) return;
+      total += Object.values(counts).reduce((sum, value) => sum + value, 0);
+    });
+
+    Object.values(formData.shirtColorSizeCounts?.[imagePath] || {}).forEach((colorMap) => {
+      if (!colorMap) return;
+      Object.values(colorMap).forEach((counts) => {
+        if (!counts) return;
+        total += Object.values(counts).reduce((sum, value) => sum + value, 0);
+      });
+    });
+
+    Object.values(formData.infantSizeCounts?.[imagePath] || {}).forEach((qty) => {
+      total += qty || 0;
+    });
+
+    const pantOption = formData.pantOptions?.[imagePath];
+    if (pantOption?.sweatpants) {
+      Object.values(pantOption.sweatpants).forEach((counts) => {
+        if (!counts) return;
+        total += Object.values(counts).reduce((sum, value) => sum + value, 0);
+      });
+    }
+    if (pantOption?.joggers) {
+      Object.values(pantOption.joggers).forEach((counts) => {
+        if (!counts) return;
+        total += Object.values(counts).reduce((sum, value) => sum + value, 0);
+      });
+    }
+
+    Object.values(formData.sweatpantJoggerOptions?.[imagePath] || {}).forEach((qty) => {
+      total += parseInt(qty || '0', 10) || 0;
+    });
+
+    const displayOption = formData.displayOptions?.[imagePath];
+    if (displayOption) {
+      total += parseInt(displayOption.displayOnly || '0', 10) || 0;
+      total += parseInt(displayOption.displayStandardCasePack || '0', 10) || 0;
+    }
+
+    return total;
+  }, [activeTab, category?.hasShirtVersions, formData, imagePath]);
+
   // Early return AFTER all hooks
   if (!category || !imageName) {
     return (
@@ -122,11 +213,6 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       </div>
     );
   }
-
-  const imagePath = `${category.path}/${imageName}`;
-  const productName = category.name === 'Display Options'
-    ? getRackDisplayName(imageName)
-    : getDisplayProductName(imageName);
 
   const handleDone = () => {
     // Navigate back and pass state to restore scroll position
@@ -367,10 +453,17 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       
       // Render with style cards - large visual selector (only if more than 1 version)
       const productImageSrc = asset(`${getCollegeFolderName(college || '')}/${imagePath}`);
+      const getStyleIconType = (version: string): 'hoodie' | 'longsleeve' | 'crewneck' | undefined => {
+        if (version === 'hoodie' || version === 'longsleeve' || version === 'crewneck') {
+          return version;
+        }
+        return undefined;
+      };
       const styleOptions = filteredVersions.map((v) => ({
         id: v,
         label: getVersionDisplayName(v, imageName),
         imageSrc: productImageSrc,
+        iconType: getStyleIconType(v),
       }));
 
       return (
@@ -380,61 +473,65 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             selectedId={activeTab}
             onSelect={setActiveTab}
           />
-          <div className="product-detail-size-label">Choose your sizes or select a curated pack</div>
-          <div className="product-detail-tab-content">
-            {filteredVersions.map((version: string) => {
-              const versionKey = version;
-              const packSize = packSizes[version] || packSizes['default'] || 6;
+          {activeTab && (
+            <>
+              <div className="product-detail-size-label">Choose your sizes or select a curated pack</div>
+              <div className="product-detail-tab-content">
+                {filteredVersions.map((version: string) => {
+                  const versionKey = version;
+                  const packSize = packSizes[version] || packSizes['default'] || 6;
 
-              if (hasColors) {
-                // For products with colors, show ColorSizeSelector
-                const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || {};
-                const sizesArray = getSizeOptions(category.path, version, college);
-                return (
-                  <div
-                    key={version}
-                    className="product-detail-tab-panel"
-                    style={{ display: activeTab === version ? 'block' : 'none' }}
-                  >
-                  <ColorSizeSelector
-                    colors={colors}
-                    colorSizeCounts={colorSizeCounts}
-                    onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, color, counts)}
-                    categoryPath={category.path}
-                    version={version}
-                    sizes={sizesArray}
-                    packSize={packSize}
-                    allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
-                    collegeKey={college}
-                  />
-                  </div>
-                );
-              } else {
-                // For single-color products, show regular SizePackSelector
-                const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
-                const packSize = packSizes[version] || packSizes['default'] || 6;
-                const sizesArray = getSizeOptions(category.path, version, college);
-                return (
-                  <div
-                    key={version}
-                    className="product-detail-tab-panel"
-                    style={{ display: activeTab === version ? 'block' : 'none' }}
-                  >
-                    <SizePackSelector
-                      counts={counts}
-                      sizes={sizesArray}
-                      onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, c)}
-                      packSize={packSize}
-                      allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
-                      categoryPath={category.path}
-                      version={version}
-                      collegeKey={college}
-                    />
-                  </div>
-                );
-              }
-            })}
-          </div>
+                  if (hasColors) {
+                    // For products with colors, show ColorSizeSelector
+                    const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || {};
+                    const sizesArray = getSizeOptions(category.path, version, college);
+                    return (
+                      <div
+                        key={version}
+                        className="product-detail-tab-panel"
+                        style={{ display: activeTab === version ? 'block' : 'none' }}
+                      >
+                      <ColorSizeSelector
+                        colors={colors}
+                        colorSizeCounts={colorSizeCounts}
+                        onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, color, counts)}
+                        categoryPath={category.path}
+                        version={version}
+                        sizes={sizesArray}
+                        packSize={packSize}
+                        allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+                        collegeKey={college}
+                      />
+                      </div>
+                    );
+                  } else {
+                    // For single-color products, show regular SizePackSelector
+                    const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
+                    const packSize = packSizes[version] || packSizes['default'] || 6;
+                    const sizesArray = getSizeOptions(category.path, version, college);
+                    return (
+                      <div
+                        key={version}
+                        className="product-detail-tab-panel"
+                        style={{ display: activeTab === version ? 'block' : 'none' }}
+                      >
+                        <SizePackSelector
+                          counts={counts}
+                          sizes={sizesArray}
+                          onChange={(c: SizeCounts) => onSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, c)}
+                          packSize={packSize}
+                          allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+                          categoryPath={category.path}
+                          version={version}
+                          collegeKey={college}
+                        />
+                      </div>
+                    );
+                  }
+                })}
+              </div>
+            </>
+          )}
         </>
       );
     } else if (category.hasSizeOptions) {
@@ -523,63 +620,73 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   return (
     <div className="product-detail-container">
       <div className="product-detail-content">
-        <div className="product-detail-left-section">
-          <div className="product-detail-header-inline">
-            <button onClick={handleDone} className="product-detail-back">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/>
-              </svg>
-              Back to Form
-            </button>
-            <h2 className="product-detail-category">{category.name}</h2>
-          </div>
-          
-          <div className="product-detail-image-section">
-            {category.hasShirtVersions && category.shirtVersions && getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages).length > 1 && (
-              <div className="product-detail-selected-style" aria-live="polite">
-                {getVersionDisplayName(activeTab, imageName)}
-              </div>
-            )}
-            <div className="product-detail-image-container">
-              <img
-                src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
-                alt={imageName}
-                className="product-detail-image"
-              />
-            </div>
-          </div>
+        <div className="product-detail-header-inline">
+          <button onClick={handleDone} className="product-detail-back">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/>
+            </svg>
+            Back
+          </button>
+          <h2 className="product-detail-category">{category.name}</h2>
         </div>
 
-        <div className="product-detail-right-section">
-          <h1 className="product-detail-title">{productName}</h1>
-          <div className="product-detail-options-section">
-            <div className="product-detail-options-header">
-              <h3>Configure Options</h3>
-            </div>
-            {category.hasDisplayOptions && (
-              <div style={{
-                marginBottom: 'var(--space-4)',
-                padding: 'var(--space-3)',
-                background: 'var(--color-bg)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius)',
-                fontSize: '0.875rem',
-                color: 'var(--color-text)',
-                lineHeight: '1.5'
-              }}>
-                <strong>Display Only:</strong> Just the display unit without products.<br />
-                <strong>Display Standard Case Pack:</strong> Display unit includes products.
-              </div>
-            )}
-            <div className="product-detail-options-content">
-              {renderConfigurationPanel()}
+        <section className="product-detail-image-section">
+          <div className="product-detail-image-container">
+            <img
+              src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
+              alt={imageName}
+              className="product-detail-image"
+            />
+            <div className="product-detail-hero-overlay">
+              <h1 className="product-detail-title">{productName}</h1>
+              {activeTab && category.hasShirtVersions && category.shirtVersions && getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages).length > 1 && (
+                <div className="product-detail-selected-style" aria-live="polite">
+                  {getVersionDisplayName(activeTab, imageName)}
+                </div>
+              )}
             </div>
           </div>
-          
-          <button onClick={handleDone} className="done-btn">
-            Done
-          </button>
+        </section>
+
+        <section className="product-detail-options-section">
+          <div className="product-detail-options-header">
+            <h3>Customize</h3>
+          </div>
+          {category.hasDisplayOptions && (
+            <div style={{
+              marginBottom: 'var(--space-4)',
+              padding: 'var(--space-3)',
+              background: 'var(--color-bg)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius)',
+              fontSize: '0.875rem',
+              color: 'var(--color-text)',
+              lineHeight: '1.5'
+            }}>
+              <strong>Display Only:</strong> Just the display unit without products.<br />
+              <strong>Display Standard Case Pack:</strong> Display unit includes products.
+            </div>
+          )}
+          <div className="product-detail-options-content">
+            {renderConfigurationPanel()}
+          </div>
+        </section>
+      </div>
+
+      <div className="product-detail-bottom-stack">
+        <div className="product-detail-summary-bar" aria-live="polite">
+          <div className="product-detail-summary-item">
+            <span>Item Count</span>
+            <strong>{selectedGarmentTotal}</strong>
+          </div>
+          <div className="product-detail-summary-item">
+            <span>Total</span>
+            <strong>{orderTotalItems}</strong>
+          </div>
         </div>
+        <button onClick={handleDone} className="done-btn">
+          Add to Order
+        </button>
       </div>
     </div>
   );

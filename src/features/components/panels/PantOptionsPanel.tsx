@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 import { getPackSizeSync } from '../../../config/packSizes';
-import { asset, getCollegeFolderName } from '../../../utils/asset';
 import { PantOption, SizeCounts } from '../../../types';
+import { asset, getCollegeFolderName } from '../../../utils/asset';
 import { getSizeOptions } from '../../utils/calculations';
 
 import SizePackSelector from './SizePackSelector';

@@ -112,43 +112,29 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
     }
   };
 
-  const handleBulkFill = (qty: number) => {
-    const next = SIZE_LIST.reduce((acc: SizeCounts, s: Size) => ({ ...acc, [s]: qty }), {} as SizeCounts);
-    onChange(next);
-  };
-
   return (
-    <div className="size-pack" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'hidden', boxSizing: 'border-box' }}>
+    <div className="size-pack">
       {label ? (
-        <div style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+        <div className="size-pack__label-text">{label}</div>
       ) : null}
-      <div className="size-pack__grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${SIZE_LIST.length}, minmax(0, 1fr))`,
-          gap: '0.4rem',
-          alignItems: 'stretch',
-          width: '100%',
-          maxWidth: '100%',
-          minWidth: 0,
-          boxSizing: 'border-box'
-        }}
-      >
+      <div className="size-pack__grid" style={{ gridTemplateColumns: `repeat(${SIZE_LIST.length}, minmax(0, 1fr))` }}>
         {SIZE_LIST.map((size: Size) => (
           <div key={size} className="size-pack__cell">
             <div className="size-pack__cell-content">
-              <button type="button" className="size-pack__btn" onClick={() => handleDelta(size, +1)} aria-label={`Increase ${size}`} disabled={disabled}>+</button>
               <div className="size-pack__label">{size}</div>
-              <input
-                aria-label={`${size} quantity`}
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={counts[size] || 0}
-                onChange={(e) => handleInput(size, e.target.value)}
-                disabled={disabled}
-                className="size-pack__input"
-              />
-              <button type="button" className="size-pack__btn" onClick={() => handleDelta(size, -1)} aria-label={`Decrease ${size}`} disabled={disabled}>-</button>
+              <div className="size-pack__controls">
+                <button type="button" className="size-pack__btn size-pack__btn--decrease" onClick={() => handleDelta(size, -1)} aria-label={`Decrease ${size}`} disabled={disabled}>-</button>
+                <input
+                  aria-label={`${size} quantity`}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={counts[size] || 0}
+                  onChange={(e) => handleInput(size, e.target.value)}
+                  disabled={disabled}
+                  className="size-pack__input"
+                />
+                <button type="button" className="size-pack__btn size-pack__btn--increase" onClick={() => handleDelta(size, +1)} aria-label={`Increase ${size}`} disabled={disabled}>+</button>
+              </div>
             </div>
           </div>
         ))}
@@ -157,17 +143,7 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
       {!hideTotal && (
         <div
           className="size-pack__total size-pack__helper"
-          style={{
-            width: '100%',
-            maxWidth: '100%',
-            color: allowAnyQuantity ? 'var(--color-text)' : (totals.total > 0 && !totals.isValid ? 'var(--color-danger)' : totals.isValid ? 'var(--color-success)' : undefined),
-            fontSize: 'var(--font-size-base)',
-            fontWeight: 600,
-            padding: '0.75rem',
-            background: 'var(--color-slate-50)',
-            borderRadius: 'var(--radius)',
-            border: '1px solid var(--color-border)'
-          }}
+          style={{ color: allowAnyQuantity ? 'var(--color-text)' : (totals.total > 0 && !totals.isValid ? 'var(--color-danger)' : totals.isValid ? 'var(--color-success)' : undefined) }}
           role="status"
           aria-live="polite"
           data-valid={allowAnyQuantity ? 'true' : (totals.isValid ? 'true' : 'false')}
@@ -181,10 +157,9 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
         </div>
       )}
 
-      <div className="size-pack__actions" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '100%' }}>
+      <div className="size-pack__actions">
         <button type="button" className="btn-ghost-sm" onClick={handleClear}>Clear</button>
         <button type="button" className="btn-ghost-sm" onClick={handleEvenSplit}>Pack of {packSize}</button>
-        <button type="button" className="btn-ghost-sm size-pack__bulk-fill" onClick={() => handleBulkFill(12)}>12 each</button>
       </div>
     </div>
   );
