@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 
 import { getPackSizeSync } from '../../../config/packSizes';
+import { asset, getCollegeFolderName } from '../../../utils/asset';
 import { PantOption, SizeCounts } from '../../../types';
 import { getSizeOptions } from '../../utils/calculations';
 
 import SizePackSelector from './SizePackSelector';
+import StyleCardSelector from './StyleCardSelector';
 
 interface PantOptionsPanelProps {
   pantOption: PantOption;
@@ -14,6 +16,8 @@ interface PantOptionsPanelProps {
   categoryPath?: string;
   allowAnyQuantity?: boolean;
   collegeKey?: string;
+  imagePath?: string;
+  college?: string;
 }
 
 const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
@@ -24,6 +28,8 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
   categoryPath = 'pants',
   allowAnyQuantity = false,
   collegeKey,
+  imagePath,
+  college,
 }) => {
   const [activeTab, setActiveTab] = useState<string>(pantStyles[0] || 'sweatpants');
   const packSize = getPackSizeSync(categoryPath);
@@ -179,28 +185,29 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
     }
   };
 
+  const previewSrc = imagePath && college
+    ? asset(`${getCollegeFolderName(college)}/${imagePath}`)
+    : '';
+
+  const styleOptions = pantStyles.map((style) => ({
+    id: style,
+    label: style === 'sweatpants' ? 'Sweatpants' : 'Joggers',
+    imageSrc: previewSrc,
+  }));
+
   return (
     <div style={{ width: '100%' }}>
-      {/* Tab Navigation - matching t-shirt style */}
-      <div className="product-detail-tabs">
-        {pantStyles.map((style) => (
-          <button
-            key={style}
-            type="button"
-            onClick={() => setActiveTab(style)}
-            className={`product-detail-tab ${activeTab === style ? 'product-detail-tab--active' : ''}`}
-            disabled={disabled}
-          >
-            {style === 'sweatpants' ? 'Sweatpants' : 'Joggers'}
-          </button>
-        ))}
-      </div>
-      <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
+      <StyleCardSelector
+        options={styleOptions}
+        selectedId={activeTab}
+        onSelect={setActiveTab}
+        disabled={disabled}
+      />
+      <div style={{ textAlign: 'center', marginBottom: '1rem' }}>Choose your sizes or select a curated pack</div>
 
-      {/* Tab Content */}
       <div className="product-detail-tab-content">
         {pantStyles.map((style) => (
-          <div 
+          <div
             key={style}
             className="product-detail-tab-panel"
             style={{ display: activeTab === style ? 'block' : 'none' }}

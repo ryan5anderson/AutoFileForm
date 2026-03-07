@@ -112,6 +112,11 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
     }
   };
 
+  const handleBulkFill = (qty: number) => {
+    const next = SIZE_LIST.reduce((acc: SizeCounts, s: Size) => ({ ...acc, [s]: qty }), {} as SizeCounts);
+    onChange(next);
+  };
+
   return (
     <div className="size-pack" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'hidden', boxSizing: 'border-box' }}>
       {label ? (
@@ -151,11 +156,17 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
 
       {!hideTotal && (
         <div
-          className="size-pack__helper"
+          className="size-pack__total size-pack__helper"
           style={{
             width: '100%',
             maxWidth: '100%',
-            color: allowAnyQuantity ? 'var(--color-text)' : (totals.total > 0 && !totals.isValid ? 'var(--color-danger)' : totals.isValid ? 'var(--color-success)' : undefined)
+            color: allowAnyQuantity ? 'var(--color-text)' : (totals.total > 0 && !totals.isValid ? 'var(--color-danger)' : totals.isValid ? 'var(--color-success)' : undefined),
+            fontSize: 'var(--font-size-base)',
+            fontWeight: 600,
+            padding: '0.75rem',
+            background: 'var(--color-slate-50)',
+            borderRadius: 'var(--radius)',
+            border: '1px solid var(--color-border)'
           }}
           role="status"
           aria-live="polite"
@@ -170,9 +181,10 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '100%' }}>
+      <div className="size-pack__actions" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '100%' }}>
         <button type="button" className="btn-ghost-sm" onClick={handleClear}>Clear</button>
         <button type="button" className="btn-ghost-sm" onClick={handleEvenSplit}>Pack of {packSize}</button>
+        <button type="button" className="btn-ghost-sm size-pack__bulk-fill" onClick={() => handleBulkFill(12)}>12 each</button>
       </div>
     </div>
   );

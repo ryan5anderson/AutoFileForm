@@ -150,6 +150,16 @@
   transform: scale(1.02);
 }
 
+.product-detail-selected-style {
+  background: var(--color-primary);
+  border-radius: var(--radius);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 1rem;
+  text-align: center;
+}
 
 .product-detail-options-section {
   animation: slide-in-right 0.3s ease-out;
@@ -200,7 +210,73 @@
   margin: 0;
 }
 
-/* Tabs for shirt versions */
+/* Style cards - large, visual garment selector (replaces small text tabs) */
+.style-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: clamp(0.75rem, 2vw, 1rem);
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.style-card {
+  align-items: center;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+  text-align: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.style-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  transform: translateY(-2px);
+}
+
+.style-card:active {
+  transform: translateY(0);
+}
+
+.style-card--selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(22 101 52 / 20%);
+}
+
+.style-card__image-wrap {
+  aspect-ratio: 1;
+  background: var(--color-slate-50);
+  overflow: hidden;
+  width: 100%;
+}
+
+.style-card__image {
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.style-card__label {
+  color: var(--color-text);
+  font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+  font-weight: var(--font-weight-semibold);
+  padding: 0.5rem 0.75rem;
+}
+
+.style-card--selected .style-card__label {
+  color: var(--color-primary);
+}
+
+/* Tabs for shirt versions (legacy - display options still use tabs) */
 .product-detail-tabs {
   border-bottom: 2px solid var(--color-border);
   display: flex;
@@ -259,23 +335,24 @@
 
 .done-btn {
   align-items: center;
-  background: var(--color-bg);
-  border: 2px solid var(--color-border);
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary);
   border-radius: var(--radius-lg);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
-  color: var(--color-primary);
+  box-shadow: 0 4px 12px rgb(22 101 52 / 25%);
+  color: white;
   cursor: pointer;
   display: flex;
   font-size: clamp(var(--font-size-lg), 2vw, var(--font-size-xl));
   font-weight: var(--font-weight-bold);
   gap: 0.5rem;
   justify-content: center;
-  margin-left: auto;
+  margin-top: auto;
+  margin-left: 0;
   margin-right: 0;
-  max-width: 250px;
-  padding: clamp(0.875rem, 2.5vw, 1.125rem) clamp(1.5rem, 4vw, 2rem);
+  max-width: 100%;
+  padding: clamp(1rem, 2.5vw, 1.25rem) clamp(1.5rem, 4vw, 2rem);
   transition: all 0.2s ease;
-  width: fit-content;
+  width: 100%;
 }
 
 .done-btn:hover {
@@ -498,6 +575,20 @@
     min-width: fit-content;
     padding: clamp(0.5rem, 2vw, 0.75rem);
     white-space: nowrap;
+  }
+
+  /* Style cards - mobile: 2 columns, larger touch targets */
+  .style-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.75rem, 2vw, 1rem);
+  }
+
+  .style-card {
+    min-height: 120px;
+  }
+
+  .style-card__label {
+    font-size: var(--font-size-base);
   }
 }
 

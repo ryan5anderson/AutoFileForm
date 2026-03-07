@@ -10,6 +10,7 @@ import InfantSizeSelector from '../../features/components/panels/InfantSizeSelec
 import PantOptionsPanel from '../../features/components/panels/PantOptionsPanel';
 import ProductCard from '../../features/components/panels/QuantityPanel';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
+import StyleCardSelector from '../../features/components/panels/StyleCardSelector';
 import { getDisplayProductName, getRackDisplayName, getVersionDisplayName, hasColorOptions, getColorOptions, getSizeOptions, getFilteredShirtVersions } from '../../features/utils';
 import { Category, SizeCounts, PantOption, InfantSizeCounts, FormData, ShirtVersion, DisplayOption, SweatpantJoggerOption } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
@@ -251,6 +252,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           pantStyles={category.pantStyles}
           categoryPath={category.path}
           collegeKey={college}
+          imagePath={imagePath}
+          college={college}
         />
       );
     } else if (category.hasDisplayOptions) {
@@ -362,21 +365,22 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         }
       }
       
-      // Render with tabs - each tab shows its own content when active (only if more than 1 version)
+      // Render with style cards - large visual selector (only if more than 1 version)
+      const productImageSrc = asset(`${getCollegeFolderName(college || '')}/${imagePath}`);
+      const styleOptions = filteredVersions.map((v) => ({
+        id: v,
+        label: getVersionDisplayName(v, imageName),
+        imageSrc: productImageSrc,
+      }));
+
       return (
         <>
-          <div className="product-detail-tabs">
-            {filteredVersions.map((version: string) => (
-              <button
-                key={version}
-                className={`product-detail-tab ${activeTab === version ? 'product-detail-tab--active' : ''}`}
-                onClick={() => setActiveTab(version)}
-              >
-                {getVersionDisplayName(version, imageName)}
-              </button>
-            ))}
-          </div>
-          <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
+          <StyleCardSelector
+            options={styleOptions}
+            selectedId={activeTab}
+            onSelect={setActiveTab}
+          />
+          <div className="product-detail-size-label">Choose your sizes or select a curated pack</div>
           <div className="product-detail-tab-content">
             {filteredVersions.map((version: string) => {
               const versionKey = version;
@@ -531,6 +535,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
           
           <div className="product-detail-image-section">
+            {category.hasShirtVersions && category.shirtVersions && getFilteredShirtVersions(imageName, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages).length > 1 && (
+              <div className="product-detail-selected-style" aria-live="polite">
+                {getVersionDisplayName(activeTab, imageName)}
+              </div>
+            )}
             <div className="product-detail-image-container">
               <img
                 src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
