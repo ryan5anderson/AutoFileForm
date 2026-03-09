@@ -391,6 +391,10 @@ const AllOrdersPage: React.FC = () => {
                     <span className="value">{order.storeManager}</span>
                   </div>
                   <div className="info-row">
+                    <span className="label">Ordered By:</span>
+                    <span className="value">{order.orderedBy || order.storeManager}</span>
+                  </div>
+                  <div className="info-row">
                     <span className="label">Date:</span>
                     <span className="value">{new Date(order.date).toLocaleDateString()}</span>
                   </div>

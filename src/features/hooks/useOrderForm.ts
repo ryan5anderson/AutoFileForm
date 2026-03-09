@@ -14,13 +14,15 @@ export const useOrderForm = (categories: Category[]) => {
   const { college } = useParams();
   const location = useLocation();
   const [formData, setFormData] = useState<FormData>(() => {
+    const today = new Date().toISOString().split('T')[0];
     const storageKey = `orderFormData_${college || 'default'}`;
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Ensure date is set if missing
-        if (!parsed.date) parsed.date = new Date().toISOString().split('T')[0];
+        // Always default date to today for each new session.
+        parsed.date = today;
+        if (!parsed.orderedBy) parsed.orderedBy = '';
         return parsed;
       } catch (e) {
         console.error('Failed to load saved form data:', e);
@@ -31,7 +33,8 @@ export const useOrderForm = (categories: Category[]) => {
       company: '',
       storeNumber: '',
       storeManager: '',
-      date: new Date().toISOString().split('T')[0],
+      orderedBy: '',
+      date: today,
       orderNotes: '',
       quantities: {} as Record<string, string>,
       shirtVersions: {} as Record<string, ShirtVersion>,
@@ -317,6 +320,7 @@ export const useOrderForm = (categories: Category[]) => {
         college: college || 'default',
         storeNumber: formData.storeNumber,
         storeManager: formData.storeManager,
+        orderedBy: formData.orderedBy,
         date: formData.date,
         status: 'pending',
         totalItems: calculateTotalItems(formData),

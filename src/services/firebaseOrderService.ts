@@ -33,6 +33,7 @@ export interface Order {
   college: string;
   storeNumber: string;
   storeManager: string;
+  orderedBy: string;
   date: string;
   status: 'pending' | 'completed' | 'cancelled';
   totalItems: number;

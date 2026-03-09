@@ -72,6 +72,7 @@ export interface FormData {
   company: string;
   storeNumber: string;
   storeManager: string;
+  orderedBy: string;
   date: string;
   orderNotes: string;
   quantities: Record<string, string>;
@@ -105,6 +106,7 @@ export interface TemplateParams extends Record<string, unknown> {
   company: string;
   store_number: string;
   manager_name: string;
+  ordered_by: string;
   date: string;
   order_notes: string;
   categories: EmailCategory[];

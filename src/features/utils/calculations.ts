@@ -212,7 +212,7 @@ export const hasOrderProducts = (formData: FormData): boolean => {
 
 export const validateFormData = (formData: FormData, categories?: Category[]): ValidationResult => {
   // Check all required fields
-  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.date.trim()) {
+  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.orderedBy.trim() || !formData.date.trim()) {
     return {
       isValid: false,
       errorMessage: 'Please fill out all store information fields.',

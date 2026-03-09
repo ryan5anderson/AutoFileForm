@@ -91,6 +91,33 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           required
         />
       </div>
+      <div style={{ marginBottom: 'var(--space-4)' }}>
+        <label htmlFor="orderedBy" style={{ 
+          display: 'block', 
+          marginBottom: 'var(--space-2)', 
+          fontWeight: '600',
+          color: 'var(--color-text)'
+        }}>
+          Ordered By
+        </label>
+        <input
+          type="text"
+          id="orderedBy"
+          value={formData.orderedBy}
+          onChange={(e) => onFormDataChange({ orderedBy: e.target.value })}
+          style={{
+            width: '100%',
+            padding: 'var(--space-3)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius)',
+            fontSize: '1rem',
+            background: 'var(--color-input-bg)',
+            color: '#000000',
+            boxSizing: 'border-box'
+          }}
+          required
+        />
+      </div>
       <div>
         <label htmlFor="date" style={{ 
           display: 'block', 
