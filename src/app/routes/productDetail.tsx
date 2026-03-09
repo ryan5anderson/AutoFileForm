@@ -123,6 +123,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }
 
   const imagePath = `${category.path}/${imageName}`;
+  const isMensTshirtSection = category.path === 'tshirt/men';
   const productName = category.name === 'Display Options'
     ? getRackDisplayName(imageName)
     : getDisplayProductName(imageName);
@@ -531,11 +532,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
           
           <div className="product-detail-image-section">
-            <div className="product-detail-image-container">
+            <div className={`product-detail-image-container ${isMensTshirtSection ? 'product-detail-image-container--mens-tshirt' : ''}`}>
               <img
                 src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
                 alt={imageName}
-                className="product-detail-image"
+                className={`product-detail-image ${isMensTshirtSection ? 'product-detail-image--mens-tshirt' : ''}`}
               />
             </div>
           </div>

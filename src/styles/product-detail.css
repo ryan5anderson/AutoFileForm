@@ -150,6 +150,25 @@
   transform: scale(1.02);
 }
 
+.product-detail-image-container--mens-tshirt {
+  aspect-ratio: 1 / 1;
+  max-width: 480px;
+  padding: 0;
+}
+
+.product-detail-image--mens-tshirt {
+  border-radius: 0;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 24%;
+  transform: scale(2.3);
+  transform-origin: center 24%;
+}
+
+.product-detail-image-container--mens-tshirt:hover .product-detail-image--mens-tshirt {
+  transform: scale(2.34);
+}
+
 
 .product-detail-options-section {
   animation: slide-in-right 0.3s ease-out;
@@ -459,6 +478,12 @@
     max-width: 100%;
     object-fit: contain;
     width: 100%;
+  }
+
+  .product-detail-image--mens-tshirt {
+    height: 100%;
+    object-fit: cover;
+    transform: scale(2.2);
   }
 
   .product-detail-name {

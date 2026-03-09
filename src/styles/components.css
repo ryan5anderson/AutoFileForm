@@ -63,16 +63,33 @@
   height: 160px;
   justify-content: center;
   margin-bottom: var(--space-3);
-  padding: var(--space-10);
+  overflow: hidden;
+  padding: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 160px;
 }
 
 .card__image {
-  border-radius: var(--radius);
+  border-radius: 0;
   height: 100%;
   object-fit: contain;
+  object-position: center;
+  transform: none;
+  transform-origin: center;
   width: 100%;
+}
+
+.card__image--mens-tshirt {
+  object-fit: cover;
+  object-position: center 24%;
+  transform: scale(2.22);
+  transform-origin: center 24%;
+}
+
+@media (width <= 768px) {
+  .card__image--mens-tshirt {
+    transform: scale(2.12);
+  }
 }
 
 .card__action-text {

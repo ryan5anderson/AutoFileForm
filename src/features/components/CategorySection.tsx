@@ -435,6 +435,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <div className="section__grid" style={{ alignItems: 'start' }}>
         {filteredImages.map((img: string) => {
           const imagePath = `${category.path}/${img}`;
+          const isMensTshirtSection = category.path === 'tshirt/men';
           
           const handleCardClick = () => {
             if (!readOnly) {
@@ -590,7 +591,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   <img
                     src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
                     alt={img}
-                    className="card__image"
+                    className={`card__image ${isMensTshirtSection ? 'card__image--mens-tshirt' : ''}`}
                   />
                 </div>
 
