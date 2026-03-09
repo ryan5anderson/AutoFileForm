@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FormData } from '../../types';
+import { sanitizeMultiLineInput } from '../utils/sanitize';
 
 interface OrderNotesSectionProps {
   formData: FormData;
@@ -24,7 +25,7 @@ const OrderNotesSection: React.FC<OrderNotesSectionProps> = ({ formData, onFormD
         <textarea
           id="orderNotes"
           value={formData.orderNotes}
-          onChange={(e) => onFormDataChange({ orderNotes: e.target.value })}
+          onChange={(e) => onFormDataChange({ orderNotes: sanitizeMultiLineInput(e.target.value) })}
           placeholder="Enter any additional comments, special requests, or notes for this order..."
           style={{
             width: '100%',

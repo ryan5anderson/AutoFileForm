@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FormData } from '../../types';
+import { sanitizeSingleLineInput } from '../utils/sanitize';
 
 interface StoreInfoFormProps {
   formData: FormData;
@@ -23,7 +24,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           type="text"
           id="company"
           value={formData.company}
-          onChange={(e) => onFormDataChange({ company: e.target.value })}
+          onChange={(e) => onFormDataChange({ company: sanitizeSingleLineInput(e.target.value) })}
           style={{
             width: '100%',
             padding: 'var(--space-3)',
@@ -50,7 +51,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           type="text"
           id="storeNumber"
           value={formData.storeNumber}
-          onChange={(e) => onFormDataChange({ storeNumber: e.target.value })}
+          onChange={(e) => onFormDataChange({ storeNumber: sanitizeSingleLineInput(e.target.value) })}
           style={{
             width: '100%',
             padding: 'var(--space-3)',
@@ -77,7 +78,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           type="text"
           id="storeManager"
           value={formData.storeManager}
-          onChange={(e) => onFormDataChange({ storeManager: e.target.value })}
+          onChange={(e) => onFormDataChange({ storeManager: sanitizeSingleLineInput(e.target.value) })}
           style={{
             width: '100%',
             padding: 'var(--space-3)',
@@ -104,7 +105,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           type="text"
           id="orderedBy"
           value={formData.orderedBy}
-          onChange={(e) => onFormDataChange({ orderedBy: e.target.value })}
+          onChange={(e) => onFormDataChange({ orderedBy: sanitizeSingleLineInput(e.target.value) })}
           style={{
             width: '100%',
             padding: 'var(--space-3)',
