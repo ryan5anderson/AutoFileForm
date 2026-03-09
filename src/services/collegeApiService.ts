@@ -5,6 +5,8 @@
  * through Vercel serverless functions.
  */
 
+import { ApiOrderCategoryModel, ApiOrderProduct, Category } from '../types';
+
 // API configuration
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
@@ -267,6 +269,73 @@ export async function checkApiHealth(): Promise<{ healthy: boolean; error?: ApiE
  */
 export const checkProxyHealth = checkApiHealth;
 
+const sanitizeApiKey = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+
+export const getApiOrderProductKey = (item: OrderItem): string => {
+  const base = [
+    item.ORDER_NUM || '',
+    item.DESIGN_NUM || '',
+    item.ITEM_ID || '',
+    item.Expr1 || '',
+  ].join('_');
+  return sanitizeApiKey(base || `${Date.now()}`);
+};
+
+export const getApiOrderImageKey = (item: OrderItem): string =>
+  `${getApiOrderProductKey(item)}_image`;
+
+export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
+  const sizeLabels = [item.size1, item.size2, item.size3, item.size4, item.size5]
+    .map((size) => (size || '').trim())
+    .filter((size): size is string => size.length > 0);
+
+  const productName = [item.STYLE_NUM, item.DESIGN_NUM, item.COLOR_INIT]
+    .map((part) => (part || '').trim())
+    .filter(Boolean)
+    .join(' ');
+
+  return {
+    productKey: getApiOrderProductKey(item),
+    imageKey: getApiOrderImageKey(item),
+    productName: productName || item.SHIRTNAME?.trim() || 'Unnamed Product',
+    subtitle: item.Expr1?.trim() || item.SHIRTNAME?.trim(),
+    imageUrl: item.productUrl || null,
+    orderNum: item.ORDER_NUM,
+    designNum: item.DESIGN_NUM,
+    itemId: item.ITEM_ID,
+    expr1: item.Expr1 || null,
+    color: item.COLOR_INIT || null,
+    sizeLabels,
+  };
+};
+
+export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategoryModel => {
+  const filteredItems = items.filter(
+    (item) => item.SHIRTNAME && !item.SHIRTNAME.trim().toUpperCase().includes('ORDER REVIEW')
+  );
+
+  const normalized = filteredItems.map(normalizeApiOrderItem);
+  const productMap: Record<string, ApiOrderProduct> = {};
+  normalized.forEach((product) => {
+    productMap[product.imageKey] = product;
+  });
+
+  const category: Category = {
+    name: 'Products',
+    path: 'api-products',
+    images: normalized.map((product) => product.imageKey),
+  };
+
+  return {
+    categories: [category],
+    productMap,
+  };
+};
+
 // Export a default object with all methods
 const collegeApiService = {
   fetchColleges,
@@ -274,6 +343,10 @@ const collegeApiService = {
   getProxiedImageUrl,
   checkApiHealth,
   checkProxyHealth, // Include legacy name
+  buildApiOrderCategoryModel,
+  normalizeApiOrderItem,
+  getApiOrderProductKey,
+  getApiOrderImageKey,
 };
 
 export default collegeApiService;

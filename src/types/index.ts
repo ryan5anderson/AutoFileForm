@@ -19,6 +19,25 @@ export interface College {
   categories: Category[];
 }
 
+export interface ApiOrderProduct {
+  productKey: string;
+  imageKey: string;
+  productName: string;
+  subtitle?: string;
+  imageUrl?: string | null;
+  orderNum: string;
+  designNum: string;
+  itemId: string;
+  expr1?: string | null;
+  color?: string | null;
+  sizeLabels: string[];
+}
+
+export interface ApiOrderCategoryModel {
+  categories: Category[];
+  productMap: Record<string, ApiOrderProduct>;
+}
+
 export interface ShirtVersion {
   tshirt: string;
   longsleeve?: string;

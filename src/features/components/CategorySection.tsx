@@ -30,6 +30,10 @@ interface CategorySectionProps {
   readOnly?: boolean;
   college?: string;
   isAdmin?: boolean;
+  imageSrcResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
+  productTitleResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
+  productDetailPathResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
+  showTapToSelectText?: boolean;
 }
 
 
@@ -53,7 +57,11 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onSweatpantJoggerOptionChange,
   readOnly = false,
   college,
-  isAdmin = false
+  isAdmin = false,
+  imageSrcResolver,
+  productTitleResolver,
+  productDetailPathResolver,
+  showTapToSelectText = true,
 }) => {
   const navigate = useNavigate();
 
@@ -439,10 +447,14 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           
           const handleCardClick = () => {
             if (!readOnly) {
-              // Navigate to product detail page
-              const encodedCategory = encodeURIComponent(category.path);
-              const encodedProductId = encodeURIComponent(img);
-              navigate(`/${college}/product/${encodedCategory}/${encodedProductId}`);
+              if (productDetailPathResolver) {
+                navigate(productDetailPathResolver(category.path, img, imagePath));
+              } else {
+                // Navigate to product detail page
+                const encodedCategory = encodeURIComponent(category.path);
+                const encodedProductId = encodeURIComponent(img);
+                navigate(`/${college}/product/${encodedCategory}/${encodedProductId}`);
+              }
             } else if (isAdmin && college) {
               // Navigate to admin product detail page
               const encodedCategory = encodeURIComponent(category.path);
@@ -584,18 +596,24 @@ const CategorySection: React.FC<CategorySectionProps> = ({
               )}
               <Card.Header>
                 <h3 className="card__title">
-                  {category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img)}
+                  {productTitleResolver
+                    ? productTitleResolver(category.path, img, imagePath)
+                    : (category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img))}
                 </h3>
 
                 <div className="card__image-container">
                   <img
-                    src={asset(`${getCollegeFolderName(college || '')}/${imagePath}`)}
+                    src={
+                      imageSrcResolver
+                        ? imageSrcResolver(category.path, img, imagePath)
+                        : asset(`${getCollegeFolderName(college || '')}/${imagePath}`)
+                    }
                     alt={img}
                     className={`card__image ${isMensTshirtSection ? 'card__image--mens-tshirt' : ''}`}
                   />
                 </div>
 
-                {!readOnly && (
+                {!readOnly && showTapToSelectText && (
                   <p className="card__action-text">
                     Tap to select options
                   </p>
