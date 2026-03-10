@@ -1,14 +1,31 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import SizePackSelector from '../../features/components/panels/SizePackSelector';
+import { getVersionDisplayName } from '../../features/utils';
 import {
-  getDefaultOrderedFields,
+  normalizeApiProductSelection,
+  type ApiProductSelection,
+  type ApiVariantQuantities,
   loadApiSchoolOrderState,
   saveApiSchoolOrderState,
-  type ApiOrderedFields,
 } from '../../features/utils/apiOrderState';
-import { buildApiOrderCategoryModel, fetchCollegeOrder, getProxiedImageUrl } from '../../services/collegeApiService';
+import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl } from '../../services/collegeApiService';
+import { Size, SizeCounts } from '../../types';
 import '../../styles/product-detail.css';
+
+const ZERO_COUNTS: SizeCounts = {
+  XS: 0,
+  S: 0,
+  M: 0,
+  L: 0,
+  XL: 0,
+  XXL: 0,
+  XXXL: 0,
+  'S/M': 0,
+  'L/XL': 0,
+  SM: 0,
+};
 
 const ApiCollegeProductDetail: React.FC = () => {
   const { orderTemplateId, productId } = useParams<{ orderTemplateId: string; productId: string }>();
@@ -16,11 +33,9 @@ const ApiCollegeProductDetail: React.FC = () => {
 
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [productName, setProductName] = React.useState('');
-  const [subtitle, setSubtitle] = React.useState('');
-  const [imageUrl, setImageUrl] = React.useState<string | null>(null);
-  const [sizeLabels, setSizeLabels] = React.useState<string[]>([]);
-  const [orderedFields, setOrderedFields] = React.useState<ApiOrderedFields>(getDefaultOrderedFields());
+  const [product, setProduct] = React.useState<ReturnType<typeof buildApiOrderCategoryModel>['productMap'][string] | null>(null);
+  const [selection, setSelection] = React.useState<ApiProductSelection | null>(null);
+  const [activeVariant, setActiveVariant] = React.useState<string>('');
 
   React.useEffect(() => {
     const load = async () => {
@@ -34,8 +49,8 @@ const ApiCollegeProductDetail: React.FC = () => {
       setError(null);
       try {
         const decodedProductId = decodeURIComponent(productId);
-        const items = await fetchCollegeOrder(orderTemplateId);
-        const model = buildApiOrderCategoryModel(items);
+        const schoolPageData = await fetchApiSchoolPageData(orderTemplateId);
+        const model = buildApiOrderCategoryModel(schoolPageData.items);
         const product = model.productMap[decodedProductId];
 
         if (!product) {
@@ -43,14 +58,20 @@ const ApiCollegeProductDetail: React.FC = () => {
           return;
         }
 
-        setProductName(product.productName);
-        setSubtitle(product.subtitle || '');
-        setImageUrl(getProxiedImageUrl(product.imageUrl));
-        setSizeLabels(product.sizeLabels.length > 0 ? product.sizeLabels : ['SM', 'MD', 'LG', 'XL', 'XXL']);
+        setProduct(product);
 
+        const defaultVariant = product.defaultVariant || product.variantOptions?.[0] || 'default';
+        const sizeLabelsByVariant = product.sizeOptionsByVariant || {
+          [defaultVariant]: product.sizeLabels,
+        };
         const stored = loadApiSchoolOrderState(orderTemplateId);
-        const existing = stored?.orderedByProduct?.[decodedProductId] || getDefaultOrderedFields();
-        setOrderedFields(existing);
+        const existing = normalizeApiProductSelection(
+          stored?.orderedByProduct?.[decodedProductId],
+          defaultVariant,
+          sizeLabelsByVariant
+        );
+        setSelection(existing);
+        setActiveVariant(existing.activeVariant || defaultVariant);
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : 'Failed to load product.');
       } finally {
@@ -61,19 +82,63 @@ const ApiCollegeProductDetail: React.FC = () => {
     void load();
   }, [orderTemplateId, productId]);
 
-  const updateField = (index: number, value: string) => {
-    const safeValue = value === '' ? '0' : String(Math.max(0, parseInt(value, 10) || 0));
-    const next: ApiOrderedFields = { ...orderedFields };
-    if (index === 0) next.ORDERED1 = safeValue;
-    if (index === 1) next.ORDERED2 = safeValue;
-    if (index === 2) next.ORDERED3 = safeValue;
-    if (index === 3) next.ORDERED4 = safeValue;
-    if (index === 4) next.ORDERED5 = safeValue;
-    setOrderedFields(next);
+  const getVariantSizes = React.useCallback(
+    (variant: string): string[] => {
+      if (!product) return [];
+      return product.sizeOptionsByVariant?.[variant] || product.sizeLabels || [];
+    },
+    [product]
+  );
+
+  const toSizeCounts = React.useCallback(
+    (quantities: ApiVariantQuantities, sizes: string[]): SizeCounts => {
+      const next: SizeCounts = { ...ZERO_COUNTS };
+      sizes.forEach((size) => {
+        const typedSize = size as Size;
+        next[typedSize] = quantities[size] || 0;
+      });
+      return next;
+    },
+    []
+  );
+
+  const updateVariantCounts = React.useCallback(
+    (variant: string, counts: SizeCounts) => {
+      if (!selection || !product) return;
+      const sizes = getVariantSizes(variant);
+      const nextVariantQuantities = sizes.reduce<ApiVariantQuantities>((acc, size) => {
+        const typedSize = size as Size;
+        acc[size] = Math.max(0, Number(counts[typedSize] || 0));
+        return acc;
+      }, {});
+
+      setSelection({
+        ...selection,
+        activeVariant: variant,
+        variantQuantities: {
+          ...selection.variantQuantities,
+          [variant]: nextVariantQuantities,
+        },
+      });
+    },
+    [getVariantSizes, product, selection]
+  );
+
+  const handleVariantChange = (variant: string) => {
+    if (!selection || !product) return;
+    const sizes = getVariantSizes(variant);
+    const defaultVariant = product.defaultVariant || variant;
+    const normalized = normalizeApiProductSelection(selection, defaultVariant, {
+      ...(product.sizeOptionsByVariant || { [defaultVariant]: product.sizeLabels }),
+      [variant]: sizes,
+    });
+    normalized.activeVariant = variant;
+    setSelection(normalized);
+    setActiveVariant(variant);
   };
 
   const handleSaveAndReturn = () => {
-    if (!orderTemplateId || !productId) {
+    if (!orderTemplateId || !productId || !selection) {
       return;
     }
     const decodedProductId = decodeURIComponent(productId);
@@ -88,7 +153,7 @@ const ApiCollegeProductDetail: React.FC = () => {
       },
       orderedByProduct: {
         ...(current?.orderedByProduct || {}),
-        [decodedProductId]: orderedFields,
+        [decodedProductId]: selection,
       },
     });
     navigate(`/api-school/${encodeURIComponent(orderTemplateId)}`);
@@ -109,49 +174,77 @@ const ApiCollegeProductDetail: React.FC = () => {
     );
   }
 
-  const sizeValues = [
-    orderedFields.ORDERED1,
-    orderedFields.ORDERED2,
-    orderedFields.ORDERED3,
-    orderedFields.ORDERED4,
-    orderedFields.ORDERED5,
-  ];
+  if (!product || !selection) {
+    return null;
+  }
+
+  const variantOptions = product.variantOptions && product.variantOptions.length > 0
+    ? product.variantOptions
+    : [product.defaultVariant || 'default'];
+  const currentVariant = variantOptions.includes(activeVariant) ? activeVariant : variantOptions[0];
+  const currentSizes = getVariantSizes(currentVariant);
+  const currentQuantities = selection.variantQuantities[currentVariant] || {};
+  const currentCounts = toSizeCounts(currentQuantities, currentSizes);
+  const packSize = product.packSizeByVariant?.[currentVariant] || 1;
+  const allowAnyQuantity = product.allowAnyQuantityByVariant?.[currentVariant] || false;
+  const imageUrl = getProxiedImageUrl(product.imageUrl);
+  const isMensTshirtSection = product.categoryPath === 'tshirt/men';
 
   return (
     <div className="product-detail-container">
-      <button
-        className="product-detail-back"
-        type="button"
-        onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}
-      >
-        Back to products
-      </button>
+      <div className="product-detail-content">
+        <div className="product-detail-left-section">
+          <div className="product-detail-header-inline">
+            <button
+              className="product-detail-back"
+              type="button"
+              onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}
+            >
+              Back to Form
+            </button>
+            <h2 className="product-detail-category">{product.categoryName || 'Products'}</h2>
+          </div>
 
-      <div className="api-product-detail-main-card">
-        <div className="api-product-detail-image-wrap">
-          <img className="api-product-detail-image" src={imageUrl || ''} alt={productName} />
-        </div>
-        <div className="api-product-detail-info">
-          <h1 className="api-product-detail-title">{productName}</h1>
-          {subtitle && <p className="api-product-detail-subtitle">{subtitle}</p>}
-          <div className="api-product-detail-sizes">
-            <h3>Quantities</h3>
-            <div className="api-product-detail-size-grid">
-              {sizeLabels.slice(0, 5).map((label, index) => (
-                <div key={label} className="api-product-detail-size-input">
-                  <label>{label}</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={sizeValues[index] || '0'}
-                    onChange={(e) => updateField(index, e.target.value)}
-                  />
-                </div>
-              ))}
+          <div className="product-detail-image-section">
+            <div className={`product-detail-image-container ${isMensTshirtSection ? 'product-detail-image-container--mens-tshirt' : ''}`}>
+              <img className={`product-detail-image ${isMensTshirtSection ? 'product-detail-image--mens-tshirt' : ''}`} src={imageUrl || ''} alt={product.productName} />
             </div>
           </div>
-          <button className="btn-primary" type="button" onClick={handleSaveAndReturn}>
-            Save and Return
+        </div>
+
+        <div className="product-detail-right-section">
+          <h1 className="product-detail-title">{product.productName}</h1>
+          <div className="product-detail-options-section">
+            <div className="product-detail-options-header">
+              <h3>Configure Options</h3>
+            </div>
+            <div className="product-detail-options-content">
+              {variantOptions.length > 1 && (
+                <div className="product-detail-tabs">
+                  {variantOptions.map((variant) => (
+                    <button
+                      key={variant}
+                      className={`product-detail-tab ${currentVariant === variant ? 'product-detail-tab--active' : ''}`}
+                      onClick={() => handleVariantChange(variant)}
+                    >
+                      {getVersionDisplayName(variant)}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
+              <SizePackSelector
+                counts={currentCounts}
+                sizes={currentSizes as Size[]}
+                onChange={(counts) => updateVariantCounts(currentVariant, counts)}
+                packSize={packSize}
+                allowAnyQuantity={allowAnyQuantity}
+              />
+            </div>
+          </div>
+
+          <button className="done-btn" type="button" onClick={handleSaveAndReturn}>
+            Done
           </button>
         </div>
       </div>

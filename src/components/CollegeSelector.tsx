@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { colleges } from '../config';
 import { fetchColleges, getProxiedImageUrl, type CollegeData } from '../services/collegeApiService';
@@ -8,6 +8,7 @@ import './CollegeSelector.css';
 
 const CollegeSelector: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [showApiSchools, setShowApiSchools] = React.useState(false);
   const [apiColleges, setApiColleges] = React.useState<CollegeData[]>([]);
@@ -49,6 +50,14 @@ const CollegeSelector: React.FC = () => {
       setIsLoadingApiColleges(false);
     }
   }, []);
+
+  React.useEffect(() => {
+    if ((location.state as { showApiSchools?: boolean } | null)?.showApiSchools) {
+      setShowApiSchools(true);
+      void fetchApiColleges();
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [fetchApiColleges, location.pathname, location.state, navigate]);
 
   const handleApiToggleChange = async (enabled: boolean) => {
     setShowApiSchools(enabled);

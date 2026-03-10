@@ -10,7 +10,14 @@ export interface ApiOrderedFields {
 
 export interface ApiSchoolOrderState {
   formData: Pick<FormData, 'company' | 'storeNumber' | 'storeManager' | 'orderedBy' | 'date'>;
-  orderedByProduct: Record<string, ApiOrderedFields>;
+  orderedByProduct: Record<string, ApiProductSelection | ApiOrderedFields>;
+}
+
+export type ApiVariantQuantities = Record<string, number>;
+
+export interface ApiProductSelection {
+  activeVariant: string;
+  variantQuantities: Record<string, ApiVariantQuantities>;
 }
 
 export const getApiSchoolStorageKey = (orderTemplateId: string): string =>
@@ -51,3 +58,76 @@ export const getOrderedFieldsTotal = (fields: ApiOrderedFields): number =>
   (parseInt(fields.ORDERED3, 10) || 0) +
   (parseInt(fields.ORDERED4, 10) || 0) +
   (parseInt(fields.ORDERED5, 10) || 0);
+
+const sanitizeNumber = (value: unknown): number => {
+  const parsed = typeof value === 'number' ? value : parseInt(String(value ?? '0'), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+};
+
+const buildEmptyQuantities = (sizeLabels: string[]): ApiVariantQuantities =>
+  sizeLabels.reduce<ApiVariantQuantities>((acc, size) => {
+    acc[size] = 0;
+    return acc;
+  }, {});
+
+export const getDefaultProductSelection = (defaultVariant: string, sizeLabels: string[]): ApiProductSelection => ({
+  activeVariant: defaultVariant,
+  variantQuantities: {
+    [defaultVariant]: buildEmptyQuantities(sizeLabels),
+  },
+});
+
+export const normalizeApiProductSelection = (
+  rawSelection: ApiProductSelection | ApiOrderedFields | undefined,
+  defaultVariant: string,
+  sizeLabelsByVariant: Record<string, string[]>
+): ApiProductSelection => {
+  const defaultSizes = sizeLabelsByVariant[defaultVariant] || [];
+  const fallback = getDefaultProductSelection(defaultVariant, defaultSizes);
+
+  if (!rawSelection) {
+    return fallback;
+  }
+
+  // Legacy migration from ORDERED1..ORDERED5
+  if ('ORDERED1' in rawSelection) {
+    const next = getDefaultProductSelection(defaultVariant, defaultSizes);
+    const legacyValues = [
+      rawSelection.ORDERED1,
+      rawSelection.ORDERED2,
+      rawSelection.ORDERED3,
+      rawSelection.ORDERED4,
+      rawSelection.ORDERED5,
+    ];
+    defaultSizes.forEach((size, index) => {
+      next.variantQuantities[defaultVariant][size] = sanitizeNumber(legacyValues[index]);
+    });
+    return next;
+  }
+
+  const activeVariant = rawSelection.activeVariant || defaultVariant;
+  const next: ApiProductSelection = {
+    activeVariant,
+    variantQuantities: {},
+  };
+
+  Object.entries(sizeLabelsByVariant).forEach(([variant, labels]) => {
+    const existing = rawSelection.variantQuantities?.[variant] || {};
+    next.variantQuantities[variant] = labels.reduce<ApiVariantQuantities>((acc, size) => {
+      acc[size] = sanitizeNumber(existing[size]);
+      return acc;
+    }, {});
+  });
+
+  if (!next.variantQuantities[activeVariant]) {
+    next.variantQuantities[activeVariant] = buildEmptyQuantities(sizeLabelsByVariant[activeVariant] || defaultSizes);
+  }
+
+  return next;
+};
+
+export const getProductSelectionTotal = (selection: ApiProductSelection): number =>
+  Object.values(selection.variantQuantities).reduce(
+    (variantTotal, sizeMap) => variantTotal + Object.values(sizeMap).reduce((sum, qty) => sum + sanitizeNumber(qty), 0),
+    0
+  );

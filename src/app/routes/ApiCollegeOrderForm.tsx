@@ -4,13 +4,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CategorySection from '../../features/components/CategorySection';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
 import {
-  getDefaultOrderedFields,
-  getOrderedFieldsTotal,
+  getDefaultProductSelection,
+  getProductSelectionTotal,
   loadApiSchoolOrderState,
+  normalizeApiProductSelection,
   saveApiSchoolOrderState,
-  type ApiOrderedFields,
+  type ApiProductSelection,
 } from '../../features/utils/apiOrderState';
-import { buildApiOrderCategoryModel, fetchCollegeOrder, getProxiedImageUrl } from '../../services/collegeApiService';
+import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl } from '../../services/collegeApiService';
 import { ApiOrderProduct, Category, FormData } from '../../types';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
@@ -36,7 +37,7 @@ const ApiCollegeOrderForm: React.FC = () => {
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [productMap, setProductMap] = React.useState<Record<string, ApiOrderProduct>>({});
   const [formData, setFormData] = React.useState<FormData>(createInitialFormData());
-  const [orderedByProduct, setOrderedByProduct] = React.useState<Record<string, ApiOrderedFields>>({});
+  const [orderedByProduct, setOrderedByProduct] = React.useState<Record<string, ApiProductSelection>>({});
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -50,8 +51,8 @@ const ApiCollegeOrderForm: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const items = await fetchCollegeOrder(orderTemplateId);
-        const model = buildApiOrderCategoryModel(items);
+        const schoolPageData = await fetchApiSchoolPageData(orderTemplateId);
+        const model = buildApiOrderCategoryModel(schoolPageData.items);
         setCategories(model.categories);
         setProductMap(model.productMap);
 
@@ -61,7 +62,19 @@ const ApiCollegeOrderForm: React.FC = () => {
             ...prev,
             ...stored.formData,
           }));
-          setOrderedByProduct(stored.orderedByProduct || {});
+          const normalizedState: Record<string, ApiProductSelection> = {};
+          Object.keys(model.productMap).forEach((productId) => {
+            const product = model.productMap[productId];
+            const sizeLabelsByVariant = product.sizeOptionsByVariant || {
+              [product.defaultVariant || 'default']: product.sizeLabels,
+            };
+            normalizedState[productId] = normalizeApiProductSelection(
+              stored.orderedByProduct?.[productId],
+              product.defaultVariant || 'default',
+              sizeLabelsByVariant
+            );
+          });
+          setOrderedByProduct(normalizedState);
         } else {
           setFormData(createInitialFormData());
           setOrderedByProduct({});
@@ -96,12 +109,17 @@ const ApiCollegeOrderForm: React.FC = () => {
     const next: Record<string, string> = {};
     categories.forEach((category) => {
       category.images.forEach((imageName) => {
-        const fields = orderedByProduct[imageName] || getDefaultOrderedFields();
-        next[`${category.path}/${imageName}`] = String(getOrderedFieldsTotal(fields));
+        const product = productMap[imageName];
+        const defaultVariant = product?.defaultVariant || 'default';
+        const sizeLabelsByVariant = product?.sizeOptionsByVariant || {
+          [defaultVariant]: product?.sizeLabels || [],
+        };
+        const selection = orderedByProduct[imageName] || getDefaultProductSelection(defaultVariant, sizeLabelsByVariant[defaultVariant] || []);
+        next[`${category.path}/${imageName}`] = String(getProductSelectionTotal(selection));
       });
     });
     return next;
-  }, [categories, orderedByProduct]);
+  }, [categories, orderedByProduct, productMap]);
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
@@ -138,6 +156,14 @@ const ApiCollegeOrderForm: React.FC = () => {
 
       <main className="college-page-main">
         <div className="college-page-title">
+          <button
+            className="btn-secondary"
+            type="button"
+            onClick={() => navigate('/', { state: { showApiSchools: true } })}
+            style={{ marginBottom: 'var(--space-3)' }}
+          >
+            Back to API Schools
+          </button>
           <h1>School Product Order Form</h1>
           <p>Select your merchandise and quantities below</p>
         </div>

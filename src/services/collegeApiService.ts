@@ -5,10 +5,16 @@
  * through Vercel serverless functions.
  */
 
+import { getPackSizeFromRatiosSync, getSizeScaleFromRatiosSync, parseSizeScale } from '../config/garmentRatios';
+import { getPackSizeSync } from '../config/packSizes';
 import { ApiOrderCategoryModel, ApiOrderProduct, Category } from '../types';
 
 // API configuration
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
+const COLLEGES_CACHE_TTL_MS = 30 * 60 * 1000;
+const COLLEGES_CACHE_KEY = 'api_colleges_cache_v1';
+
+let inMemoryCollegesCache: { data: CollegeData[]; expiresAt: number } | null = null;
 
 export interface CollegeListItem {
   orderTemplateId: string;
@@ -38,6 +44,70 @@ export interface CollegeOrder {
   // Add other order fields
 }
 
+const readCollegesCache = (): CollegeData[] | null => {
+  const now = Date.now();
+  if (inMemoryCollegesCache && inMemoryCollegesCache.expiresAt > now) {
+    return inMemoryCollegesCache.data;
+  }
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(COLLEGES_CACHE_KEY);
+    if (!raw) {
+      return null;
+    }
+    const parsed = JSON.parse(raw) as { data?: unknown; expiresAt?: unknown };
+    if (!Array.isArray(parsed.data) || typeof parsed.expiresAt !== 'number' || parsed.expiresAt <= now) {
+      window.localStorage.removeItem(COLLEGES_CACHE_KEY);
+      return null;
+    }
+    inMemoryCollegesCache = {
+      data: parsed.data as CollegeData[],
+      expiresAt: parsed.expiresAt,
+    };
+    return inMemoryCollegesCache.data;
+  } catch {
+    return null;
+  }
+};
+
+const writeCollegesCache = (data: CollegeData[]): void => {
+  const expiresAt = Date.now() + COLLEGES_CACHE_TTL_MS;
+  inMemoryCollegesCache = { data, expiresAt };
+
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(
+      COLLEGES_CACHE_KEY,
+      JSON.stringify({
+        data,
+        expiresAt,
+      })
+    );
+  } catch {
+    // Best effort cache write only.
+  }
+};
+
+export interface ApiSchoolPageData {
+  orderTemplateId: string;
+  school: {
+    schoolId: string | null;
+    schoolName: string | null;
+    logoUrl: string | null;
+    orderTemplateId: string;
+  } | null;
+  items: OrderItem[];
+  fetchedAt: string;
+  expiresAt: string;
+}
+
 // Type for individual order items returned from the API
 export interface OrderItem {
   Expr1?: string;
@@ -62,6 +132,11 @@ export interface OrderItem {
  * Fetches the list of all available colleges
  */
 export async function fetchColleges(): Promise<CollegeData[]> {
+  const cached = readCollegesCache();
+  if (cached) {
+    return cached;
+  }
+
   const collegesUrl = `${API_BASE_URL}/colleges`;
   try {
     const response = await fetch(collegesUrl, {
@@ -96,10 +171,13 @@ export async function fetchColleges(): Promise<CollegeData[]> {
     
     // Handle different response formats
     if (Array.isArray(data)) {
+      writeCollegesCache(data);
       return data;
     } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      writeCollegesCache(data.data);
       return data.data;
     } else if (data && typeof data === 'object' && Array.isArray(data.colleges)) {
+      writeCollegesCache(data.colleges);
       return data.colleges;
     } else {
       console.warn('Unexpected response format:', data);
@@ -125,6 +203,52 @@ export async function fetchColleges(): Promise<CollegeData[]> {
     wrappedError.apiError = apiError;
     throw wrappedError;
   }
+}
+
+/**
+ * Fetches all data required for an API school page.
+ * Response is cached server-side for 30 minutes.
+ */
+export async function fetchApiSchoolPageData(orderTemplateId: string): Promise<ApiSchoolPageData> {
+  if (!orderTemplateId) {
+    throw new Error('Order template ID is required');
+  }
+
+  const schoolPageUrl = `${API_BASE_URL}/school-page?id=${encodeURIComponent(orderTemplateId)}`;
+  const response = await fetch(schoolPageUrl, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch school page data: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  // Backward-compatible fallback if endpoint returns a bare array.
+  if (Array.isArray(data)) {
+    return {
+      orderTemplateId,
+      school: null,
+      items: data as OrderItem[],
+      fetchedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    };
+  }
+
+  const payload = data as Partial<ApiSchoolPageData>;
+  const items = Array.isArray(payload.items) ? payload.items : [];
+
+  return {
+    orderTemplateId: payload.orderTemplateId || orderTemplateId,
+    school: payload.school || null,
+    items: items as OrderItem[],
+    fetchedAt: payload.fetchedAt || new Date().toISOString(),
+    expiresAt: payload.expiresAt || new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+  };
 }
 
 /**
@@ -288,10 +412,199 @@ export const getApiOrderProductKey = (item: OrderItem): string => {
 export const getApiOrderImageKey = (item: OrderItem): string =>
   `${getApiOrderProductKey(item)}_image`;
 
+const SHIRT_MEN_VERSIONS = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+
+const getRuleSourceText = (item: OrderItem): string =>
+  [
+    item.productUrl || '',
+    item.Expr1 || '',
+    item.SHIRTNAME || '',
+    item.DESCRIPT || '',
+    item.STYLE_NUM || '',
+    item.DESIGN_NUM || '',
+    item.COLOR_INIT || '',
+  ]
+    .join(' ')
+    .toLowerCase();
+
+const parseUrlPathTokens = (productUrl?: string | null): string[] => {
+  if (!productUrl) {
+    return [];
+  }
+
+  const trimmed = productUrl.trim();
+  if (!trimmed) {
+    return [];
+  }
+
+  const normalized = trimmed.startsWith('http:') && !trimmed.startsWith('http://')
+    ? trimmed.replace('http:', 'http://')
+    : trimmed;
+
+  try {
+    const url = new URL(normalized);
+    return url.pathname.toLowerCase().split('/').filter(Boolean);
+  } catch {
+    return normalized.toLowerCase().split('/').filter(Boolean);
+  }
+};
+
+const inferCategoryPath = (item: OrderItem): string => {
+  const source = getRuleSourceText(item);
+  const pathTokens = parseUrlPathTokens(item.productUrl);
+  const tokenPath = pathTokens.join('/');
+
+  if (tokenPath.includes('tshirt/women') || (source.includes('women') && source.includes('tshirt'))) {
+    return 'tshirt/women';
+  }
+  if (tokenPath.includes('tshirt/men') || tokenPath.includes('tshirt') || source.includes('tshirt') || source.includes('tee')) {
+    return 'tshirt/men';
+  }
+  if (tokenPath.includes('jacket') || source.includes('jacket')) {
+    return 'jacket';
+  }
+  if (tokenPath.includes('flannel') || source.includes('flannel')) {
+    return 'flannels';
+  }
+  if (
+    tokenPath.includes('pants') ||
+    tokenPath.includes('sweatpant') ||
+    tokenPath.includes('jogger') ||
+    source.includes('pants') ||
+    source.includes('sweatpant') ||
+    source.includes('jogger')
+  ) {
+    return 'pants';
+  }
+  if (tokenPath.includes('short') || source.includes(' short')) {
+    return 'shorts';
+  }
+  if (tokenPath.includes('sock') || source.includes('sock')) {
+    return 'socks';
+  }
+  if (tokenPath.includes('youth') || tokenPath.includes('infant') || source.includes('youth') || source.includes('infant') || source.includes('onsie')) {
+    return 'youth&infant';
+  }
+  if (tokenPath.includes('sticker') || source.includes('sticker')) {
+    return 'sticker';
+  }
+  if (tokenPath.includes('plush') || source.includes('plush')) {
+    return 'plush';
+  }
+  if (tokenPath.includes('bottle') || source.includes('bottle')) {
+    return 'bottle';
+  }
+  if (tokenPath.includes('display') || tokenPath.includes('signage') || source.includes('display') || source.includes('signage')) {
+    return 'signage';
+  }
+  return 'api-products';
+};
+
+const getCategoryName = (categoryPath: string): string => {
+  const names: Record<string, string> = {
+    'tshirt/men': 'T-Shirt (Unisex)',
+    'tshirt/women': 'T-Shirt (Women)',
+    jacket: 'Jackets',
+    flannels: 'Flannels',
+    pants: 'Sweatpants/Joggers',
+    shorts: 'Shorts',
+    socks: 'Socks',
+    'youth&infant': 'Youth & Infant',
+    sticker: 'Stickers',
+    plush: 'Plush',
+    bottle: 'Bottles',
+    signage: 'Display Options',
+    'api-products': 'Products',
+  };
+  return names[categoryPath] || 'Products';
+};
+
+const inferVariantOptions = (categoryPath: string, sourceText: string): string[] => {
+  if (categoryPath === 'tshirt/men') {
+    let versions = [...SHIRT_MEN_VERSIONS];
+
+    if (/\bcrew(?:neck)?\b/.test(sourceText)) {
+      versions = ['crewneck'];
+    } else if (sourceText.includes('hood') || sourceText.includes('cm7031')) {
+      versions = ['hoodie'];
+    } else {
+      if (sourceText.includes('applique')) {
+        versions = versions.filter((version) => version === 'crewneck' || version === 'hoodie');
+      }
+      if (sourceText.includes('tie-dye') || sourceText.includes('tie dye')) {
+        versions = versions.filter((version) => version !== 'crewneck');
+      }
+    }
+
+    if (sourceText.includes('long sleeve') || sourceText.includes('longsleeve')) {
+      versions = versions.filter((version) => version === 'longsleeve');
+    } else if (sourceText.includes('crewneck')) {
+      versions = versions.filter((version) => version === 'crewneck');
+    } else if (sourceText.includes('hoodie')) {
+      versions = versions.filter((version) => version === 'hoodie');
+    }
+
+    return versions.length > 0 ? versions : ['tshirt'];
+  }
+
+  if (categoryPath === 'pants') {
+    return sourceText.includes('jogger') ? ['joggers'] : ['sweatpants'];
+  }
+  if (categoryPath === 'tshirt/women') return ['tshirt'];
+  if (categoryPath === 'jacket') return ['jacket'];
+  if (categoryPath === 'flannels') return ['flannels'];
+  if (categoryPath === 'shorts') return ['shorts'];
+  if (categoryPath === 'socks') return ['socks'];
+  if (categoryPath === 'youth&infant') return sourceText.includes('infant') || sourceText.includes('onsie') ? ['infant'] : ['youth'];
+  if (categoryPath === 'sticker') return ['sticker'];
+  if (categoryPath === 'plush') return ['plush'];
+  if (categoryPath === 'bottle') return ['bottle'];
+  if (categoryPath === 'signage') return ['signage'];
+  return ['default'];
+};
+
+const getFallbackSizesForVariant = (variant: string): string[] => {
+  if (variant === 'infant') return ['6M', '12M'];
+  if (variant === 'socks') return ['SM', 'L/XL'];
+  if (variant === 'youth') return ['XS', 'S', 'M', 'L', 'XL'];
+  if (variant === 'shorts' || variant === 'flannels' || variant === 'sweatpants' || variant === 'joggers') return ['S', 'M', 'L', 'XL'];
+  if (variant === 'jacket' || variant === 'crewneck' || variant === 'longsleeve' || variant === 'tshirt') return ['S', 'M', 'L', 'XL', 'XXL'];
+  if (variant === 'hoodie') return ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+  return [];
+};
+
+const allowsAnyQuantityForVariant = (categoryPath: string, variant: string): boolean => {
+  if (categoryPath === 'tshirt/men' && SHIRT_MEN_VERSIONS.includes(variant)) {
+    return true;
+  }
+  return categoryPath === 'bottle' || categoryPath === 'signage';
+};
+
 export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
-  const sizeLabels = [item.size1, item.size2, item.size3, item.size4, item.size5]
+  const apiSizeLabels = [item.size1, item.size2, item.size3, item.size4, item.size5]
     .map((size) => (size || '').trim())
     .filter((size): size is string => size.length > 0);
+  const sourceText = getRuleSourceText(item);
+  const categoryPath = inferCategoryPath(item);
+  const categoryName = getCategoryName(categoryPath);
+  const variantOptions = inferVariantOptions(categoryPath, sourceText);
+  const defaultVariant = variantOptions[0];
+  const sizeOptionsByVariant: Record<string, string[]> = {};
+  const packSizeByVariant: Record<string, number> = {};
+  const allowAnyQuantityByVariant: Record<string, boolean> = {};
+
+  variantOptions.forEach((variant) => {
+    const ratioScale = getSizeScaleFromRatiosSync(categoryPath, variant);
+    const ratioSizes = ratioScale ? parseSizeScale(ratioScale) : [];
+    const resolvedSizes = ratioSizes.length > 0 ? ratioSizes : (apiSizeLabels.length > 0 ? apiSizeLabels : getFallbackSizesForVariant(variant));
+    sizeOptionsByVariant[variant] = resolvedSizes;
+
+    const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, variant);
+    const fallbackPackSize = getPackSizeSync(categoryPath, variant, sourceText);
+    const packSize = ratioPackSize ?? fallbackPackSize ?? 1;
+    packSizeByVariant[variant] = packSize > 0 ? packSize : 1;
+    allowAnyQuantityByVariant[variant] = allowsAnyQuantityForVariant(categoryPath, variant);
+  });
 
   const productName = [item.STYLE_NUM, item.DESIGN_NUM, item.COLOR_INIT]
     .map((part) => (part || '').trim())
@@ -309,7 +622,14 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
     itemId: item.ITEM_ID,
     expr1: item.Expr1 || null,
     color: item.COLOR_INIT || null,
-    sizeLabels,
+    sizeLabels: sizeOptionsByVariant[defaultVariant] || apiSizeLabels,
+    categoryPath,
+    categoryName,
+    variantOptions,
+    defaultVariant,
+    sizeOptionsByVariant: sizeOptionsByVariant as Record<string, import('../types').Size[]>,
+    packSizeByVariant,
+    allowAnyQuantityByVariant,
   };
 };
 
@@ -320,18 +640,46 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
 
   const normalized = filteredItems.map(normalizeApiOrderItem);
   const productMap: Record<string, ApiOrderProduct> = {};
+  const categoriesByPath = new Map<string, Category>();
   normalized.forEach((product) => {
     productMap[product.imageKey] = product;
+    const categoryPath = product.categoryPath || 'api-products';
+    const existing = categoriesByPath.get(categoryPath);
+    if (existing) {
+      existing.images.push(product.imageKey);
+    } else {
+      categoriesByPath.set(categoryPath, {
+        name: product.categoryName || getCategoryName(categoryPath),
+        path: categoryPath,
+        images: [product.imageKey],
+      });
+    }
+  });
+  const categoryOrder = [
+    'tshirt/men',
+    'tshirt/women',
+    'jacket',
+    'flannels',
+    'pants',
+    'shorts',
+    'socks',
+    'youth&infant',
+    'sticker',
+    'plush',
+    'bottle',
+    'signage',
+    'api-products',
+  ];
+  const categories = Array.from(categoriesByPath.values()).sort((a, b) => {
+    const aIndex = categoryOrder.indexOf(a.path);
+    const bIndex = categoryOrder.indexOf(b.path);
+    const safeA = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex;
+    const safeB = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex;
+    return safeA - safeB;
   });
 
-  const category: Category = {
-    name: 'Products',
-    path: 'api-products',
-    images: normalized.map((product) => product.imageKey),
-  };
-
   return {
-    categories: [category],
+    categories,
     productMap,
   };
 };
@@ -339,6 +687,7 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
 // Export a default object with all methods
 const collegeApiService = {
   fetchColleges,
+  fetchApiSchoolPageData,
   fetchCollegeOrder,
   getProxiedImageUrl,
   checkApiHealth,

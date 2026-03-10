@@ -31,6 +31,13 @@ export interface ApiOrderProduct {
   expr1?: string | null;
   color?: string | null;
   sizeLabels: string[];
+  categoryPath?: string;
+  categoryName?: string;
+  variantOptions?: string[];
+  defaultVariant?: string;
+  sizeOptionsByVariant?: Record<string, Size[]>;
+  packSizeByVariant?: Record<string, number>;
+  allowAnyQuantityByVariant?: Record<string, boolean>;
 }
 
 export interface ApiOrderCategoryModel {
