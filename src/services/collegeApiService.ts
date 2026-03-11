@@ -9,6 +9,12 @@ import { getPackSizeFromRatiosSync, getSizeScaleFromRatiosSync, parseSizeScale }
 import { getPackSizeSync } from '../config/packSizes';
 import { ApiOrderCategoryModel, ApiOrderProduct, Category } from '../types';
 
+import {
+  API_COLLEGE_CATEGORIES,
+  categorizeApiCollegeProduct,
+  getCategoryPathForApiCollegeCategory,
+} from './apiCollegeCategorization';
+
 // API configuration
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 const COLLEGES_CACHE_TTL_MS = 30 * 60 * 1000;
@@ -427,96 +433,26 @@ const getRuleSourceText = (item: OrderItem): string =>
     .join(' ')
     .toLowerCase();
 
-const parseUrlPathTokens = (productUrl?: string | null): string[] => {
-  if (!productUrl) {
-    return [];
-  }
-
-  const trimmed = productUrl.trim();
-  if (!trimmed) {
-    return [];
-  }
-
-  const normalized = trimmed.startsWith('http:') && !trimmed.startsWith('http://')
-    ? trimmed.replace('http:', 'http://')
-    : trimmed;
-
-  try {
-    const url = new URL(normalized);
-    return url.pathname.toLowerCase().split('/').filter(Boolean);
-  } catch {
-    return normalized.toLowerCase().split('/').filter(Boolean);
-  }
-};
-
-const inferCategoryPath = (item: OrderItem): string => {
-  const source = getRuleSourceText(item);
-  const pathTokens = parseUrlPathTokens(item.productUrl);
-  const tokenPath = pathTokens.join('/');
-
-  if (tokenPath.includes('tshirt/women') || (source.includes('women') && source.includes('tshirt'))) {
-    return 'tshirt/women';
-  }
-  if (tokenPath.includes('tshirt/men') || tokenPath.includes('tshirt') || source.includes('tshirt') || source.includes('tee')) {
-    return 'tshirt/men';
-  }
-  if (tokenPath.includes('jacket') || source.includes('jacket')) {
-    return 'jacket';
-  }
-  if (tokenPath.includes('flannel') || source.includes('flannel')) {
-    return 'flannels';
-  }
-  if (
-    tokenPath.includes('pants') ||
-    tokenPath.includes('sweatpant') ||
-    tokenPath.includes('jogger') ||
-    source.includes('pants') ||
-    source.includes('sweatpant') ||
-    source.includes('jogger')
-  ) {
-    return 'pants';
-  }
-  if (tokenPath.includes('short') || source.includes(' short')) {
-    return 'shorts';
-  }
-  if (tokenPath.includes('sock') || source.includes('sock')) {
-    return 'socks';
-  }
-  if (tokenPath.includes('youth') || tokenPath.includes('infant') || source.includes('youth') || source.includes('infant') || source.includes('onsie')) {
-    return 'youth&infant';
-  }
-  if (tokenPath.includes('sticker') || source.includes('sticker')) {
-    return 'sticker';
-  }
-  if (tokenPath.includes('plush') || source.includes('plush')) {
-    return 'plush';
-  }
-  if (tokenPath.includes('bottle') || source.includes('bottle')) {
-    return 'bottle';
-  }
-  if (tokenPath.includes('display') || tokenPath.includes('signage') || source.includes('display') || source.includes('signage')) {
-    return 'signage';
-  }
-  return 'api-products';
-};
-
 const getCategoryName = (categoryPath: string): string => {
   const names: Record<string, string> = {
-    'tshirt/men': 'T-Shirt (Unisex)',
-    'tshirt/women': 'T-Shirt (Women)',
-    jacket: 'Jackets',
-    flannels: 'Flannels',
-    pants: 'Sweatpants/Joggers',
-    shorts: 'Shorts',
-    socks: 'Socks',
-    'youth&infant': 'Youth & Infant',
-    sticker: 'Stickers',
-    plush: 'Plush',
-    bottle: 'Bottles',
-    signage: 'Display Options',
-    'api-products': 'Products',
+    'tshirt/men': API_COLLEGE_CATEGORIES.UNISEX_TSHIRT,
+    'tshirt/women': API_COLLEGE_CATEGORIES.LADIES_TOPS,
+    cap: API_COLLEGE_CATEGORIES.CAPS_HAT,
+    'knit-cap': API_COLLEGE_CATEGORIES.KNIT_CAPS_BEANIE,
+    jacket: API_COLLEGE_CATEGORIES.JACKETS,
+    flannels: API_COLLEGE_CATEGORIES.FLANNELS,
+    pants: API_COLLEGE_CATEGORIES.PANTS,
+    shorts: API_COLLEGE_CATEGORIES.SHORTS,
+    socks: API_COLLEGE_CATEGORIES.SOCKS,
+    bottle: API_COLLEGE_CATEGORIES.WATER_BOTTLES,
+    plush: API_COLLEGE_CATEGORIES.PLUSH,
+    sticker: API_COLLEGE_CATEGORIES.STICKERS,
+    backpack: API_COLLEGE_CATEGORIES.BACKPACK,
+    signage: API_COLLEGE_CATEGORIES.SIGNAGE,
+    'youth&infant': API_COLLEGE_CATEGORIES.YOUTH_INFANT,
+    'api-products': API_COLLEGE_CATEGORIES.UNCLASSIFIED,
   };
-  return names[categoryPath] || 'Products';
+  return names[categoryPath] || API_COLLEGE_CATEGORIES.UNCLASSIFIED;
 };
 
 const inferVariantOptions = (categoryPath: string, sourceText: string): string[] => {
@@ -551,13 +487,16 @@ const inferVariantOptions = (categoryPath: string, sourceText: string): string[]
     return sourceText.includes('jogger') ? ['joggers'] : ['sweatpants'];
   }
   if (categoryPath === 'tshirt/women') return ['tshirt'];
+  if (categoryPath === 'cap') return ['cap'];
+  if (categoryPath === 'knit-cap') return ['beanie'];
   if (categoryPath === 'jacket') return ['jacket'];
   if (categoryPath === 'flannels') return ['flannels'];
   if (categoryPath === 'shorts') return ['shorts'];
   if (categoryPath === 'socks') return ['socks'];
-  if (categoryPath === 'youth&infant') return sourceText.includes('infant') || sourceText.includes('onsie') ? ['infant'] : ['youth'];
+  if (categoryPath === 'youth&infant') return sourceText.includes('infant') || sourceText.includes('onsie') || sourceText.includes('onesie') ? ['infant'] : ['youth'];
   if (categoryPath === 'sticker') return ['sticker'];
   if (categoryPath === 'plush') return ['plush'];
+  if (categoryPath === 'backpack') return ['backpack'];
   if (categoryPath === 'bottle') return ['bottle'];
   if (categoryPath === 'signage') return ['signage'];
   return ['default'];
@@ -577,7 +516,13 @@ const allowsAnyQuantityForVariant = (categoryPath: string, variant: string): boo
   if (categoryPath === 'tshirt/men' && SHIRT_MEN_VERSIONS.includes(variant)) {
     return true;
   }
-  return categoryPath === 'bottle' || categoryPath === 'signage';
+  return (
+    categoryPath === 'bottle' ||
+    categoryPath === 'signage' ||
+    categoryPath === 'sticker' ||
+    categoryPath === 'plush' ||
+    categoryPath === 'backpack'
+  );
 };
 
 export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
@@ -585,8 +530,13 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
     .map((size) => (size || '').trim())
     .filter((size): size is string => size.length > 0);
   const sourceText = getRuleSourceText(item);
-  const categoryPath = inferCategoryPath(item);
-  const categoryName = getCategoryName(categoryPath);
+  const categorizedAs = categorizeApiCollegeProduct({
+    SHIRT_NAME: item.SHIRTNAME || '',
+    DESCRIPT: item.DESCRIPT || '',
+    STYL_NUM: item.STYLE_NUM || '',
+  });
+  const categoryPath = getCategoryPathForApiCollegeCategory(categorizedAs);
+  const categoryName = categorizedAs;
   const variantOptions = inferVariantOptions(categoryPath, sourceText);
   const defaultVariant = variantOptions[0];
   const sizeOptionsByVariant: Record<string, string[]> = {};
@@ -658,16 +608,19 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
   const categoryOrder = [
     'tshirt/men',
     'tshirt/women',
+    'cap',
+    'knit-cap',
     'jacket',
     'flannels',
     'pants',
     'shorts',
     'socks',
-    'youth&infant',
-    'sticker',
-    'plush',
     'bottle',
+    'plush',
+    'sticker',
+    'backpack',
     'signage',
+    'youth&infant',
     'api-products',
   ];
   const categories = Array.from(categoriesByPath.values()).sort((a, b) => {

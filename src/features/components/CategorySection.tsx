@@ -34,6 +34,7 @@ interface CategorySectionProps {
   productTitleResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
   productDetailPathResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
   showTapToSelectText?: boolean;
+  zoomEnabled?: boolean;
 }
 
 
@@ -62,6 +63,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   productTitleResolver,
   productDetailPathResolver,
   showTapToSelectText = true,
+  zoomEnabled = true,
 }) => {
   const navigate = useNavigate();
 
@@ -534,7 +536,13 @@ const CategorySection: React.FC<CategorySectionProps> = ({
               {/* Cart variations box at bottom of card - always visible */}
               {hasAnyQuantity && !shouldHighlight && !readOnly && (() => {
                 const variations = getCartVariations(imagePath, img);
-                if (variations.length === 0) return null;
+                if (variations.length === 0) {
+                  const fallbackQty = Number(quantities[imagePath] || 0);
+                  if (fallbackQty <= 0) {
+                    return null;
+                  }
+                  variations.push(`Qty: ${fallbackQty}`);
+                }
                 
                 return (
                   <div
@@ -609,7 +617,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                         : asset(`${getCollegeFolderName(college || '')}/${imagePath}`)
                     }
                     alt={img}
-                    className={`card__image ${isMensTshirtSection ? 'card__image--mens-tshirt' : ''}`}
+                    className={`card__image ${isMensTshirtSection && zoomEnabled ? 'card__image--mens-tshirt' : ''}`}
                   />
                 </div>
 

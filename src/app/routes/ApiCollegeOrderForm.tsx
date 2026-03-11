@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import CategorySection from '../../features/components/CategorySection';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
@@ -23,7 +23,7 @@ const createInitialFormData = (): FormData => ({
   storeNumber: '',
   storeManager: '',
   orderedBy: '',
-  date: '',
+  date: new Date().toISOString().split('T')[0] || '',
   orderNotes: '',
   quantities: {},
 });
@@ -31,6 +31,7 @@ const createInitialFormData = (): FormData => ({
 const ApiCollegeOrderForm: React.FC = () => {
   const { orderTemplateId } = useParams<{ orderTemplateId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -39,6 +40,9 @@ const ApiCollegeOrderForm: React.FC = () => {
   const [formData, setFormData] = React.useState<FormData>(createInitialFormData());
   const [orderedByProduct, setOrderedByProduct] = React.useState<Record<string, ApiProductSelection>>({});
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [zoomEnabled, setZoomEnabled] = React.useState(true);
+
+  const isReceiptPage = location.pathname.endsWith('/receipt');
 
   React.useEffect(() => {
     const fetchOrder = async () => {
@@ -125,6 +129,11 @@ const ApiCollegeOrderForm: React.FC = () => {
     setSidebarOpen((prev) => !prev);
   };
 
+  const totalItems = React.useMemo(
+    () => Object.values(quantities).reduce((sum, value) => sum + (parseInt(value, 10) || 0), 0),
+    [quantities]
+  );
+
   const imageSrcResolver = (_categoryPath: string, imageName: string) => {
     const product = productMap[imageName];
     return getProxiedImageUrl(product?.imageUrl) || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y0ZjRmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
@@ -156,22 +165,37 @@ const ApiCollegeOrderForm: React.FC = () => {
 
       <main className="college-page-main">
         <div className="college-page-title">
-          <button
-            className="btn-secondary"
-            type="button"
-            onClick={() => navigate('/', { state: { showApiSchools: true } })}
-            style={{ marginBottom: 'var(--space-3)' }}
-          >
-            Back to API Schools
-          </button>
-          <h1>School Product Order Form</h1>
-          <p>Select your merchandise and quantities below</p>
+          <div className="college-page-title-actions">
+            <button
+              className="college-page-title-btn"
+              type="button"
+              onClick={() => navigate('/', { state: { showApiSchools: true } })}
+            >
+              Back to API Schools
+            </button>
+            <button
+              className="college-page-title-btn"
+              type="button"
+              onClick={() => setZoomEnabled((prev) => !prev)}
+              aria-pressed={zoomEnabled}
+            >
+              Zoom: {zoomEnabled ? 'On' : 'Off'}
+            </button>
+          </div>
+          <h1>
+            {isReceiptPage ? 'API School Receipt' : 'School Product Order Form'}
+          </h1>
+          <p>
+            {isReceiptPage
+              ? 'Receipt confirmation for your submitted API school order'
+              : 'Select your merchandise and quantities below'}
+          </p>
         </div>
 
         {loading && <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>Loading order data...</div>}
         {error && <div className="error-message">{error}</div>}
 
-        {!loading && !error && (
+        {!loading && !error && !isReceiptPage && (
           <form onSubmit={(e) => e.preventDefault()}>
             <StoreInfoForm
               formData={formData}
@@ -194,9 +218,30 @@ const ApiCollegeOrderForm: React.FC = () => {
                 productTitleResolver={productTitleResolver}
                 productDetailPathResolver={productDetailPathResolver}
                 showTapToSelectText={true}
+                zoomEnabled={zoomEnabled}
               />
             ))}
           </form>
+        )}
+
+        {!loading && !error && isReceiptPage && (
+          <div style={{ maxWidth: '800px', margin: '0 auto', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)' }}>
+            <h2 style={{ marginTop: 0 }}>Receipt Sent</h2>
+            <p>The dev receipt email has been sent for this API school order.</p>
+            <p><strong>Store:</strong> {formData.company}</p>
+            <p><strong>Store Number:</strong> {formData.storeNumber}</p>
+            <p><strong>Ordered By:</strong> {formData.orderedBy || formData.storeManager}</p>
+            <p><strong>Date:</strong> {formData.date}</p>
+            <p><strong>Total Items:</strong> {totalItems}</p>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
+              <button className="college-page-title-btn" type="button" onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}>
+                Back to Form
+              </button>
+              <button className="college-page-title-btn" type="button" onClick={() => navigate('/', { state: { showApiSchools: true } })}>
+                Exit to API Schools
+              </button>
+            </div>
+          </div>
         )}
       </main>
 
