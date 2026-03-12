@@ -22,13 +22,14 @@
 
 .card--clickable:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 8px 16px rgb(0 0 0 / 12%), 0 4px 8px rgb(0 0 0 / 8%);
-  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 14%), 0 4px 10px rgb(0 0 0 / 10%);
+  transform: translateY(-4px) scale(1.02);
 }
 
 .card--clickable:active {
-  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
-  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  transform: translateY(-1px) scale(0.98);
 }
 
 .card__header {
@@ -43,14 +44,19 @@
 
 .card__title {
   color: var(--color-text);
+  display: -webkit-box;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-tight);
   line-height: var(--line-height-snug);
   margin: 0 0 var(--space-3) 0;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   overflow-wrap: break-word;
   text-align: center;
-  word-break: break-all;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
 }
 
 .card__image-container {
@@ -75,10 +81,43 @@
   width: 100%;
 }
 
-.card__action-text {
+.card__garment-availability {
   color: var(--color-gray-500);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-snug);
+  margin: 0 0 var(--space-2) 0;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.card__action-btn {
+  appearance: none;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--space-2) var(--space-3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.card__action-btn:hover {
+  filter: brightness(1.05);
+}
+
+.card__action-btn:active {
+  transform: scale(0.98);
+}
+
+.card__action-text {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   margin: 0 0 var(--space-2) 0;
   text-align: center;
 }
@@ -345,6 +384,14 @@
   .card__image-container {
     height: 140px;
     width: 140px;
+  }
+
+  .card__garment-availability {
+    font-size: 0.65rem;
+  }
+
+  .card__action-btn {
+    min-height: 2.75rem;
   }
   
   .section__grid {

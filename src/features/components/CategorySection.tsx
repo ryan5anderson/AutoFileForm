@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui';
 import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts, InfantSizeCounts, SizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
-import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions, getVersionDisplayName } from '../utils';
+import { getDisplayProductName, getRackDisplayName, getFilteredShirtVersions, getShirtVersionTotal, hasColorOptions, getVersionDisplayName } from '../utils';
 
 import OrderSummaryCard from './OrderSummaryCard';
 
@@ -594,10 +594,38 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   />
                 </div>
 
-                {!readOnly && (
-                  <p className="card__action-text">
-                    Tap to select options
-                  </p>
+                {category.hasShirtVersions && !readOnly && (() => {
+                  const availableVersions = getFilteredShirtVersions(
+                    img,
+                    category.shirtVersions ?? [],
+                    category.tieDyeImages,
+                    category.crewOnlyImages,
+                    category.hoodOnlyImages
+                  );
+                  const garmentNames = availableVersions.map((v) => getVersionDisplayName(v));
+                  return (
+                    <p className="card__garment-availability">
+                      Available on<br />
+                      {garmentNames.join(' • ')}
+                    </p>
+                  );
+                })()}
+
+                {!readOnly && category.hasShirtVersions && (
+                  <button
+                    type="button"
+                    className="card__action-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCardClick();
+                    }}
+                  >
+                    Choose Apparel
+                  </button>
+                )}
+
+                {!readOnly && !category.hasShirtVersions && (
+                  <p className="card__action-text">Tap to select options</p>
                 )}
 
                 {readOnly && hasAnyFormData && (
