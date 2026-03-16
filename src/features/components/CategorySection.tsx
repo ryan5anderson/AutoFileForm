@@ -611,7 +611,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   );
                 })()}
 
-                {!readOnly && category.hasShirtVersions && (
+                {!readOnly && (
                   <button
                     type="button"
                     className="card__action-btn"
@@ -620,12 +620,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                       handleCardClick();
                     }}
                   >
-                    Choose Apparel
+                    {category.hasShirtVersions ? 'Choose Apparel' : 'Choose Option'}
                   </button>
-                )}
-
-                {!readOnly && !category.hasShirtVersions && (
-                  <p className="card__action-text">Tap to select options</p>
                 )}
 
                 {readOnly && hasAnyFormData && (
