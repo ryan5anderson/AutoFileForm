@@ -1,11 +1,11 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
 import { getVersionDisplayName } from '../../features/utils';
-import { getDefaultProductSelection, getProductSelectionTotal } from '../../features/utils/apiOrderState';
+import { getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
 import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../services/collegeApiService';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
@@ -14,7 +14,6 @@ import '../../styles/college-pages.css';
 
 const ApiCollegeOrderForm: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const {
     orderTemplateId,
@@ -29,8 +28,6 @@ const ApiCollegeOrderForm: React.FC = () => {
     validProductPaths,
     setFormData,
   } = useApiCollegeOrder();
-
-  const isReceiptPage = location.pathname.endsWith('/receipt');
 
   const quantities = React.useMemo(() => {
     const next: Record<string, string> = {};
@@ -87,11 +84,6 @@ const ApiCollegeOrderForm: React.FC = () => {
       setSendState({ status: 'error', message: result.error });
     }
   }, [orderPayload]);
-
-  const totalItems = React.useMemo(
-    () => Object.values(quantities).reduce((sum, value) => sum + (parseInt(value, 10) || 0), 0),
-    [quantities]
-  );
 
   const imageSrcResolver = React.useCallback(
     (_categoryPath: string, imageName: string) => {
@@ -166,14 +158,8 @@ const ApiCollegeOrderForm: React.FC = () => {
               Back to API Schools
             </button>
           </div>
-          <h1>
-            {isReceiptPage ? 'API School Receipt' : 'School Product Order Form'}
-          </h1>
-          <p>
-            {isReceiptPage
-              ? 'Receipt confirmation for your submitted API school order'
-              : 'Select your merchandise and quantities below'}
-          </p>
+          <h1>School Product Order Form</h1>
+          <p>Select your merchandise and quantities below</p>
         </div>
 
         {loading && categories.length === 0 && (
@@ -181,7 +167,7 @@ const ApiCollegeOrderForm: React.FC = () => {
         )}
         {error && <div className="error-message">{error}</div>}
 
-        {!loading && !error && !isReceiptPage && (
+        {!loading && !error && (
           <form onSubmit={(e) => e.preventDefault()}>
             <StoreInfoForm
               formData={formData}
@@ -211,6 +197,28 @@ const ApiCollegeOrderForm: React.FC = () => {
                 getApiCartItems={getApiCartItems}
               />
             ))}
+
+            <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', marginTop: 'var(--space-6)', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="college-page-title-btn"
+                disabled={invalidProductPaths.length > 0 || !hasApiOrderProducts(orderedByProduct, productMap)}
+                onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`)}
+                style={{
+                  background: 'var(--color-primary)',
+                  color: 'white',
+                  border: 'none',
+                  padding: 'var(--space-3) var(--space-4)',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                  cursor: invalidProductPaths.length > 0 || !hasApiOrderProducts(orderedByProduct, productMap) ? 'not-allowed' : 'pointer',
+                  minWidth: '180px',
+                }}
+              >
+                Continue to Summary
+              </button>
+            </div>
 
             <div className="view-order-json-section" style={{ marginTop: 'var(--space-6)' }}>
               <button
@@ -280,26 +288,6 @@ const ApiCollegeOrderForm: React.FC = () => {
               )}
             </div>
           </form>
-        )}
-
-        {!loading && !error && isReceiptPage && (
-          <div style={{ maxWidth: '800px', margin: '0 auto', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)' }}>
-            <h2 style={{ marginTop: 0 }}>Receipt Sent</h2>
-            <p>The dev receipt email has been sent for this API school order.</p>
-            <p><strong>Store:</strong> {formData.company}</p>
-            <p><strong>Store Number:</strong> {formData.storeNumber}</p>
-            <p><strong>Ordered By:</strong> {formData.orderedBy || formData.storeManager}</p>
-            <p><strong>Date:</strong> {formData.date}</p>
-            <p><strong>Total Items:</strong> {totalItems}</p>
-            <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
-              <button className="college-page-title-btn" type="button" onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}>
-                Back to Form
-              </button>
-              <button className="college-page-title-btn" type="button" onClick={() => navigate('/', { state: { showApiSchools: true } })}>
-                Exit to API Schools
-              </button>
-            </div>
-          </div>
         )}
       </main>
 

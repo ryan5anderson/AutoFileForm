@@ -131,3 +131,14 @@ export const getProductSelectionTotal = (selection: ApiProductSelection): number
     (variantTotal, sizeMap) => variantTotal + Object.values(sizeMap).reduce((sum, qty) => sum + sanitizeNumber(qty), 0),
     0
   );
+
+/** Check if API order has at least one product with quantity > 0 */
+export const hasApiOrderProducts = (
+  orderedByProduct: Record<string, ApiProductSelection | ApiOrderedFields>,
+  productMap: Record<string, { defaultVariant?: string; sizeOptionsByVariant?: Record<string, string[]> }>
+): boolean => {
+  return Object.entries(orderedByProduct).some(([, selection]) => {
+    if ('ORDERED1' in selection) return getOrderedFieldsTotal(selection) > 0;
+    return getProductSelectionTotal(selection as ApiProductSelection) > 0;
+  });
+};

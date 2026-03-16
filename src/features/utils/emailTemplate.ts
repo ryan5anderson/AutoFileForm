@@ -326,3 +326,73 @@ export const createTemplateParams = (formData: FormData, categories: Category[],
     school_name: schoolName,
   };
 };
+
+/** API school mode: build EmailCategory[] from orderedByProduct + productMap for EmailJS */
+export function createApiTemplateParams(
+  formData: Pick<FormData, 'company' | 'storeNumber' | 'storeManager' | 'orderedBy' | 'date' | 'orderNotes'>,
+  categories: Category[],
+  orderedByProduct: Record<string, { variantQuantities: Record<string, Record<string, number>> }>,
+  productMap: Record<string, { productName?: string; defaultVariant?: string; variantOptions?: string[]; sizeOptionsByVariant?: Record<string, string[]> }>,
+  schoolName: string = ''
+): TemplateParams {
+  const emailCategories: EmailCategory[] = [];
+
+  categories.forEach((cat: Category) => {
+    const categoryItems: EmailItem[] = [];
+
+    cat.images.forEach((img: string) => {
+      const product = productMap[img];
+      const selection = orderedByProduct[img];
+      if (!product || !selection) return;
+
+      const sku = img.split(' ')[0];
+      const variantOptions = product.variantOptions?.length ? product.variantOptions : [product.defaultVariant || 'default'];
+
+      let totalQty = 0;
+      const details: string[] = [];
+
+      variantOptions.forEach((variant: string) => {
+        const sizeMap = selection.variantQuantities[variant] || {};
+        const variantTotal = Object.values(sizeMap).reduce((s, q) => s + (Number(q) || 0), 0);
+        if (variantTotal > 0) {
+          totalQty += variantTotal;
+          const sizeParts = Object.entries(sizeMap)
+            .filter(([, q]) => (Number(q) || 0) > 0)
+            .map(([sz, q]) => `${sz}: ${q}`)
+            .join(', ');
+          const displayName = variant === (product.defaultVariant || 'default') && !product.variantOptions?.length
+            ? (sizeParts || 'Qty')
+            : `${getVersionDisplayName(variant)} ${sizeParts}`.trim();
+          details.push(displayName);
+        }
+      });
+
+      if (totalQty > 0) {
+        categoryItems.push({
+          sku,
+          name: details.join(' ; '),
+          qty: String(totalQty),
+        });
+      }
+    });
+
+    if (categoryItems.length > 0) {
+      emailCategories.push({ category: cat.name, items: categoryItems });
+    }
+  });
+
+  const total_units = calculateTotalUnits(emailCategories);
+
+  return {
+    company: formData.company,
+    store_number: formData.storeNumber,
+    manager_name: formData.storeManager,
+    ordered_by: formData.orderedBy,
+    date: formData.date,
+    order_notes: formData.orderNotes || '',
+    categories: emailCategories,
+    total_units: total_units.toString(),
+    provider_email: PROVIDER_EMAIL,
+    school_name: schoolName,
+  };
+}

@@ -1,7 +1,7 @@
 // Re-export specific utilities that are used externally
 export { getSizeOptions, calculateTotalItems, validateFormData, validateQuantities, hasOrderProducts, calcTotals, getQuantityMultiples, getShirtVersionTotal } from './calculations';
 export { getDisplayProductName, getProductName, getVersionDisplayName, getRackDisplayName, hasColorOptions, getColorOptions, getColorDisplayName } from './naming';
-export { createTemplateParams } from './emailTemplate';
+export { createTemplateParams, createApiTemplateParams } from './emailTemplate';
 
 // Utility function to filter shirt versions for applique and tiedye products
 export const getFilteredShirtVersions = (imageName: string, versions: string[], tieDyeImages?: string[], crewOnlyImages?: string[], hoodOnlyImages?: string[]): string[] => {

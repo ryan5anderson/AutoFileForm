@@ -10,13 +10,13 @@ import AdminCollegeSelection from './app/routes/adminCollegeSelection';
 import AdminCollegeView from './app/routes/adminCollegeView';
 import AdminProductDetail from './app/routes/adminProductDetail';
 import AllOrdersPage from './app/routes/allOrders';
-import ApiCollegeOrderForm from './app/routes/ApiCollegeOrderForm';
 import ApiCollegeProductDetail from './app/routes/ApiCollegeProductDetail';
 import ContactPage from './app/routes/contact';
 import OrderReceiptPage from './app/routes/orderReceipt';
 import TestApiPage from './app/routes/testApi';
 import TestApiOrderPage from './app/routes/TestApiOrder';
 import TestApiProductDetailPage from './app/routes/TestApiProductDetail';
+import ApiCollegeOrderPage from './components/ApiCollegeOrderPage';
 import CollegeRouteWrapper from './components/CollegeRouteWrapper';
 import CollegeSelector from './components/CollegeSelector';
 import { colleges } from './config';
@@ -97,7 +97,10 @@ function AppShell() {
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/api-school/:orderTemplateId' element={<ApiCollegeOrderProvider><Outlet /></ApiCollegeOrderProvider>}>
-          <Route index element={<ApiCollegeOrderForm />} />
+          <Route index element={<ApiCollegeOrderPage />} />
+          <Route path='summary' element={<ApiCollegeOrderPage />} />
+          <Route path='receipt' element={<ApiCollegeOrderPage />} />
+          <Route path='thankyou' element={<ApiCollegeOrderPage />} />
           <Route path='product/:productId' element={<ApiCollegeProductDetail />} />
         </Route>
         <Route path='/test-api/:orderTemplateId/product/:itemId' element={<TestApiProductDetailPage />} />
