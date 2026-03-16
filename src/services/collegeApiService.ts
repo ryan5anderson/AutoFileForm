@@ -101,6 +101,14 @@ const writeCollegesCache = (data: CollegeData[]): void => {
   }
 };
 
+/**
+ * Synchronous cache check for colleges list. Use before fetchColleges to avoid
+ * showing loading state when data is already cached.
+ */
+export function getCollegesFromCache(): CollegeData[] | null {
+  return readCollegesCache();
+}
+
 export interface ApiSchoolPageData {
   orderTemplateId: string;
   school: {
@@ -132,6 +140,32 @@ export interface OrderItem {
   COLOR_INIT?: string | null;
   UNITPRICE?: number | null;
   [key: string]: unknown; // Allow for additional fields from the API
+}
+
+// --- Product catalog cache (in-memory, 30 min TTL, cleared on college switch) ---
+const SCHOOL_PAGE_CACHE_TTL_MS = 30 * 60 * 1000;
+const schoolPageCache = new Map<string, { data: ApiSchoolPageData; expiresAt: number }>();
+let activeCollegeId: string | null = null;
+
+function readSchoolPageCache(orderTemplateId: string): ApiSchoolPageData | null {
+  const now = Date.now();
+  const entry = schoolPageCache.get(orderTemplateId);
+  if (!entry || entry.expiresAt <= now) {
+    if (entry) {
+      schoolPageCache.delete(orderTemplateId);
+    }
+    return null;
+  }
+  return entry.data;
+}
+
+function writeSchoolPageCache(orderTemplateId: string, data: ApiSchoolPageData): void {
+  const expiresAt = Date.now() + SCHOOL_PAGE_CACHE_TTL_MS;
+  schoolPageCache.set(orderTemplateId, { data, expiresAt });
+}
+
+function clearSchoolPageCacheForCollege(orderTemplateId: string): void {
+  schoolPageCache.delete(orderTemplateId);
 }
 
 /**
@@ -212,12 +246,40 @@ export async function fetchColleges(): Promise<CollegeData[]> {
 }
 
 /**
- * Fetches all data required for an API school page.
- * Response is cached server-side for 30 minutes.
+ * Synchronous cache check for a college's product catalog. Use before fetchApiSchoolPageData
+ * to avoid showing loading state when data is already cached.
  */
-export async function fetchApiSchoolPageData(orderTemplateId: string): Promise<ApiSchoolPageData> {
+export function getSchoolPageFromCache(orderTemplateId: string): ApiSchoolPageData | null {
+  return readSchoolPageCache(orderTemplateId);
+}
+
+export interface FetchApiSchoolPageResult {
+  data: ApiSchoolPageData;
+  fromCache: boolean;
+}
+
+/**
+ * Fetches all data required for an API school page.
+ * Client-side cache: 30 min TTL, in-memory. When switching to a different college,
+ * the previous college's cache is cleared to free resources.
+ */
+export async function fetchApiSchoolPageData(orderTemplateId: string): Promise<FetchApiSchoolPageResult> {
   if (!orderTemplateId) {
     throw new Error('Order template ID is required');
+  }
+
+  const now = Date.now();
+
+  // When switching to a different college, clear the previous college's cache
+  if (activeCollegeId !== null && activeCollegeId !== orderTemplateId) {
+    clearSchoolPageCacheForCollege(activeCollegeId);
+  }
+  activeCollegeId = orderTemplateId;
+
+  // Check cache on every read (timestamp-based expiration)
+  const cached = readSchoolPageCache(orderTemplateId);
+  if (cached) {
+    return { data: cached, fromCache: true };
   }
 
   const schoolPageUrl = `${API_BASE_URL}/school-page?id=${encodeURIComponent(orderTemplateId)}`;
@@ -234,27 +296,30 @@ export async function fetchApiSchoolPageData(orderTemplateId: string): Promise<A
 
   const data = await response.json();
 
+  let result: ApiSchoolPageData;
   // Backward-compatible fallback if endpoint returns a bare array.
   if (Array.isArray(data)) {
-    return {
+    result = {
       orderTemplateId,
       school: null,
       items: data as OrderItem[],
       fetchedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      expiresAt: new Date(now + SCHOOL_PAGE_CACHE_TTL_MS).toISOString(),
+    };
+  } else {
+    const payload = data as Partial<ApiSchoolPageData>;
+    const items = Array.isArray(payload.items) ? payload.items : [];
+    result = {
+      orderTemplateId: payload.orderTemplateId || orderTemplateId,
+      school: payload.school || null,
+      items: items as OrderItem[],
+      fetchedAt: payload.fetchedAt || new Date().toISOString(),
+      expiresAt: payload.expiresAt || new Date(now + SCHOOL_PAGE_CACHE_TTL_MS).toISOString(),
     };
   }
 
-  const payload = data as Partial<ApiSchoolPageData>;
-  const items = Array.isArray(payload.items) ? payload.items : [];
-
-  return {
-    orderTemplateId: payload.orderTemplateId || orderTemplateId,
-    school: payload.school || null,
-    items: items as OrderItem[],
-    fetchedAt: payload.fetchedAt || new Date().toISOString(),
-    expiresAt: payload.expiresAt || new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-  };
+  writeSchoolPageCache(orderTemplateId, result);
+  return { data: result, fromCache: false };
 }
 
 /**

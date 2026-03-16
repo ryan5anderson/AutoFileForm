@@ -79,19 +79,6 @@
   width: 100%;
 }
 
-.card__image--mens-tshirt {
-  object-fit: cover;
-  object-position: center 24%;
-  transform: scale(2.22);
-  transform-origin: center 24%;
-}
-
-@media (width <= 768px) {
-  .card__image--mens-tshirt {
-    transform: scale(2.12);
-  }
-}
-
 .card__action-text {
   color: var(--color-gray-500);
   font-size: var(--font-size-xs);

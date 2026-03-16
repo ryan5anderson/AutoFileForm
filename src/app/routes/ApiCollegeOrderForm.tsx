@@ -11,7 +11,7 @@ import {
   saveApiSchoolOrderState,
   type ApiProductSelection,
 } from '../../features/utils/apiOrderState';
-import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl } from '../../services/collegeApiService';
+import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl, getSchoolPageFromCache } from '../../services/collegeApiService';
 import { ApiOrderProduct, Category, FormData } from '../../types';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
@@ -33,21 +33,65 @@ const ApiCollegeOrderForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [loading, setLoading] = React.useState(true);
+  // Fallback: extract from path in case useParams lags during navigation (e.g. "Back to Form")
+  const resolvedOrderTemplateId = orderTemplateId ?? (() => {
+    const segs = location.pathname.split('/').filter(Boolean);
+    return segs[0] === 'api-school' && segs[1] ? decodeURIComponent(segs[1]) : undefined;
+  })();
+
+  const [loading, setLoading] = React.useState(() => !(resolvedOrderTemplateId && getSchoolPageFromCache(resolvedOrderTemplateId)));
   const [error, setError] = React.useState<string | null>(null);
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [productMap, setProductMap] = React.useState<Record<string, ApiOrderProduct>>({});
   const [formData, setFormData] = React.useState<FormData>(createInitialFormData());
   const [orderedByProduct, setOrderedByProduct] = React.useState<Record<string, ApiProductSelection>>({});
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [zoomEnabled, setZoomEnabled] = React.useState(true);
 
   const isReceiptPage = location.pathname.endsWith('/receipt');
 
+  // useLayoutEffect: populate from cache before paint so "Back to Form" never shows loading
+  React.useLayoutEffect(() => {
+    const id = resolvedOrderTemplateId ?? orderTemplateId;
+    if (!id) return;
+    const cached = getSchoolPageFromCache(id);
+    if (!cached) return;
+
+    const model = buildApiOrderCategoryModel(cached.items);
+    setCategories(model.categories);
+    setProductMap(model.productMap);
+    const stored = loadApiSchoolOrderState(id);
+    if (stored) {
+      setFormData((prev) => ({ ...prev, ...stored.formData }));
+      const normalizedState: Record<string, ApiProductSelection> = {};
+      Object.keys(model.productMap).forEach((productId) => {
+        const product = model.productMap[productId];
+        const sizeLabelsByVariant = product.sizeOptionsByVariant || { [product.defaultVariant || 'default']: product.sizeLabels };
+        normalizedState[productId] = normalizeApiProductSelection(
+          stored.orderedByProduct?.[productId],
+          product.defaultVariant || 'default',
+          sizeLabelsByVariant
+        );
+      });
+      setOrderedByProduct(normalizedState);
+    } else {
+      setFormData(createInitialFormData());
+      setOrderedByProduct({});
+    }
+    setLoading(false);
+    setError(null);
+  }, [orderTemplateId, resolvedOrderTemplateId]);
+
   React.useEffect(() => {
+    const id = resolvedOrderTemplateId ?? orderTemplateId;
     const fetchOrder = async () => {
-      if (!orderTemplateId) {
+      if (!id) {
         setError('Missing order template ID.');
+        setLoading(false);
+        return;
+      }
+
+      // Skip if already populated from cache in useLayoutEffect (ensures no loading flash)
+      if (getSchoolPageFromCache(id)) {
         setLoading(false);
         return;
       }
@@ -55,12 +99,12 @@ const ApiCollegeOrderForm: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const schoolPageData = await fetchApiSchoolPageData(orderTemplateId);
+        const { data: schoolPageData } = await fetchApiSchoolPageData(id);
         const model = buildApiOrderCategoryModel(schoolPageData.items);
         setCategories(model.categories);
         setProductMap(model.productMap);
 
-        const stored = loadApiSchoolOrderState(orderTemplateId);
+        const stored = loadApiSchoolOrderState(id);
         if (stored) {
           setFormData((prev) => ({
             ...prev,
@@ -91,7 +135,7 @@ const ApiCollegeOrderForm: React.FC = () => {
     };
 
     void fetchOrder();
-  }, [orderTemplateId]);
+  }, [orderTemplateId, resolvedOrderTemplateId]);
 
   React.useEffect(() => {
     if (!orderTemplateId) {
@@ -173,14 +217,6 @@ const ApiCollegeOrderForm: React.FC = () => {
             >
               Back to API Schools
             </button>
-            <button
-              className="college-page-title-btn"
-              type="button"
-              onClick={() => setZoomEnabled((prev) => !prev)}
-              aria-pressed={zoomEnabled}
-            >
-              Zoom: {zoomEnabled ? 'On' : 'Off'}
-            </button>
           </div>
           <h1>
             {isReceiptPage ? 'API School Receipt' : 'School Product Order Form'}
@@ -192,7 +228,9 @@ const ApiCollegeOrderForm: React.FC = () => {
           </p>
         </div>
 
-        {loading && <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>Loading order data...</div>}
+        {loading && categories.length === 0 && (
+          <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>Loading order data...</div>
+        )}
         {error && <div className="error-message">{error}</div>}
 
         {!loading && !error && !isReceiptPage && (
@@ -218,7 +256,6 @@ const ApiCollegeOrderForm: React.FC = () => {
                 productTitleResolver={productTitleResolver}
                 productDetailPathResolver={productDetailPathResolver}
                 showTapToSelectText={true}
-                zoomEnabled={zoomEnabled}
               />
             ))}
           </form>

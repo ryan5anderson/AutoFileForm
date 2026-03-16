@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { colleges } from '../config';
-import { fetchColleges, getProxiedImageUrl, type CollegeData } from '../services/collegeApiService';
+import { fetchColleges, getCollegesFromCache, getProxiedImageUrl, type CollegeData } from '../services/collegeApiService';
 import { asset } from '../utils/asset';
 import './CollegeSelector.css';
 
@@ -29,6 +29,22 @@ const CollegeSelector: React.FC = () => {
   };
 
   const fetchApiColleges = React.useCallback(async () => {
+    // Sync cache check: skip loading state when colleges are already cached
+    const cached = getCollegesFromCache();
+    if (cached) {
+      const seen = new Set<string>();
+      const deduped = cached.filter((college) => {
+        if (seen.has(college.school_ID)) {
+          return false;
+        }
+        seen.add(college.school_ID);
+        return true;
+      });
+      setApiColleges(deduped);
+      setApiError(null);
+      return;
+    }
+
     setIsLoadingApiColleges(true);
     setApiError(null);
     try {

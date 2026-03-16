@@ -10,7 +10,7 @@ import {
   loadApiSchoolOrderState,
   saveApiSchoolOrderState,
 } from '../../features/utils/apiOrderState';
-import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl } from '../../services/collegeApiService';
+import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl, getSchoolPageFromCache } from '../../services/collegeApiService';
 import { Size, SizeCounts } from '../../types';
 import '../../styles/product-detail.css';
 
@@ -45,11 +45,40 @@ const ApiCollegeProductDetail: React.FC = () => {
         return;
       }
 
+      const decodedProductId = decodeURIComponent(productId);
+
+      // Sync cache check: skip loading when data is already cached
+      const cached = getSchoolPageFromCache(orderTemplateId);
+      if (cached) {
+        const model = buildApiOrderCategoryModel(cached.items);
+        const product = model.productMap[decodedProductId];
+        if (!product) {
+          setError('Product not found.');
+          setLoading(false);
+          return;
+        }
+        setProduct(product);
+        const defaultVariant = product.defaultVariant || product.variantOptions?.[0] || 'default';
+        const sizeLabelsByVariant = product.sizeOptionsByVariant || {
+          [defaultVariant]: product.sizeLabels,
+        };
+        const stored = loadApiSchoolOrderState(orderTemplateId);
+        const existing = normalizeApiProductSelection(
+          stored?.orderedByProduct?.[decodedProductId],
+          defaultVariant,
+          sizeLabelsByVariant
+        );
+        setSelection(existing);
+        setActiveVariant(existing.activeVariant || defaultVariant);
+        setLoading(false);
+        setError(null);
+        return;
+      }
+
       setLoading(true);
       setError(null);
       try {
-        const decodedProductId = decodeURIComponent(productId);
-        const schoolPageData = await fetchApiSchoolPageData(orderTemplateId);
+        const { data: schoolPageData } = await fetchApiSchoolPageData(orderTemplateId);
         const model = buildApiOrderCategoryModel(schoolPageData.items);
         const product = model.productMap[decodedProductId];
 
@@ -188,7 +217,6 @@ const ApiCollegeProductDetail: React.FC = () => {
   const packSize = product.packSizeByVariant?.[currentVariant] || 1;
   const allowAnyQuantity = product.allowAnyQuantityByVariant?.[currentVariant] || false;
   const imageUrl = getProxiedImageUrl(product.imageUrl);
-  const isMensTshirtSection = product.categoryPath === 'tshirt/men';
 
   return (
     <div className="product-detail-container">
@@ -206,8 +234,8 @@ const ApiCollegeProductDetail: React.FC = () => {
           </div>
 
           <div className="product-detail-image-section">
-            <div className={`product-detail-image-container ${isMensTshirtSection ? 'product-detail-image-container--mens-tshirt' : ''}`}>
-              <img className={`product-detail-image ${isMensTshirtSection ? 'product-detail-image--mens-tshirt' : ''}`} src={imageUrl || ''} alt={product.productName} />
+            <div className="product-detail-image-container">
+              <img className="product-detail-image" src={imageUrl || ''} alt={product.productName} />
             </div>
           </div>
         </div>
