@@ -702,6 +702,128 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
   };
 };
 
+export interface ApiOrderPayload {
+  orderTemplateId: string;
+  school: ApiSchoolPageData['school'];
+  items: Array<OrderItem & { ORDERED1: string; ORDERED2: string; ORDERED3: string; ORDERED4: string; ORDERED5: string }>;
+  storeInfo: {
+    company: string;
+    storeNumber: string;
+    storeManager: string;
+    orderedBy: string;
+    date: string;
+    orderNotes?: string;
+  };
+  subtotal: number;
+  total: number;
+}
+
+/**
+ * Builds the order payload from raw API data with user quantities merged in.
+ * The JSON is the original API structure with ORDERED1..5 written into each item.
+ */
+export function buildApiOrderPayload(
+  rawPageData: ApiSchoolPageData | null,
+  orderedByProduct: Record<string, import('../features/utils/apiOrderState').ApiProductSelection>,
+  productMap: Record<string, ApiOrderProduct>,
+  formData: { company: string; storeNumber: string; storeManager: string; orderedBy: string; date: string; orderNotes?: string }
+): ApiOrderPayload | null {
+  if (!rawPageData?.items?.length) return null;
+
+  const filteredItems = rawPageData.items.filter(
+    (item) => item.SHIRTNAME && !item.SHIRTNAME.trim().toUpperCase().includes('ORDER REVIEW')
+  );
+
+  let subtotal = 0;
+  const mutatedItems = filteredItems.map((item) => {
+    const imageKey = getApiOrderImageKey(item);
+    const selection = orderedByProduct[imageKey];
+    const product = productMap[imageKey];
+
+    const sizeColumns = [
+      item.size1 || '',
+      item.size2 || '',
+      item.size3 || '',
+      item.size4 || '',
+      item.size5 || '',
+    ].map((s) => (s || '').trim()).filter(Boolean);
+
+    const ordered: Record<string, string> = {
+      ORDERED1: '0',
+      ORDERED2: '0',
+      ORDERED3: '0',
+      ORDERED4: '0',
+      ORDERED5: '0',
+    };
+
+    if (selection?.variantQuantities && product) {
+      for (let i = 0; i < 5; i++) {
+        const sizeLabel = sizeColumns[i];
+        if (!sizeLabel) continue;
+        let qty = 0;
+        Object.values(selection.variantQuantities).forEach((variantMap) => {
+          qty += Number(variantMap[sizeLabel]) || 0;
+        });
+        ordered[`ORDERED${i + 1}` as keyof typeof ordered] = String(qty);
+      }
+    }
+
+    const itemTotal = (ordered.ORDERED1 ? parseInt(ordered.ORDERED1, 10) || 0 : 0) +
+      (ordered.ORDERED2 ? parseInt(ordered.ORDERED2, 10) || 0 : 0) +
+      (ordered.ORDERED3 ? parseInt(ordered.ORDERED3, 10) || 0 : 0) +
+      (ordered.ORDERED4 ? parseInt(ordered.ORDERED4, 10) || 0 : 0) +
+      (ordered.ORDERED5 ? parseInt(ordered.ORDERED5, 10) || 0 : 0);
+    const unitPrice = Number(item.UNITPRICE) || 0;
+    subtotal += itemTotal * unitPrice;
+
+    return { ...item, ...ordered } as ApiOrderPayload['items'][0];
+  });
+
+  return {
+    orderTemplateId: rawPageData.orderTemplateId,
+    school: rawPageData.school,
+    items: mutatedItems,
+    storeInfo: {
+      company: formData.company || '',
+      storeNumber: formData.storeNumber || '',
+      storeManager: formData.storeManager || '',
+      orderedBy: formData.orderedBy || '',
+      date: formData.date || '',
+      orderNotes: formData.orderNotes || '',
+    },
+    subtotal: Math.round(subtotal * 100) / 100,
+    total: Math.round(subtotal * 100) / 100,
+  };
+}
+
+/**
+ * Submits the order payload to the backend API.
+ */
+export async function submitApiOrder(payload: ApiOrderPayload): Promise<{ success: boolean; message?: string; error?: string }> {
+  const submitUrl = `${API_BASE_URL}/submitorder`;
+  try {
+    const response = await fetch(submitUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const text = await response.text();
+    let data: { message?: string; error?: string; success?: boolean };
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text };
+    }
+    if (!response.ok) {
+      return { success: false, error: data.message || data.error || `Submission failed: ${response.status}` };
+    }
+    return { success: true, message: data.message || 'Order submitted successfully!' };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { success: false, error: msg };
+  }
+}
+
 // Export a default object with all methods
 const collegeApiService = {
   fetchColleges,

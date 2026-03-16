@@ -1,16 +1,15 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
 import { getVersionDisplayName } from '../../features/utils';
 import {
   normalizeApiProductSelection,
   type ApiProductSelection,
   type ApiVariantQuantities,
-  loadApiSchoolOrderState,
-  saveApiSchoolOrderState,
 } from '../../features/utils/apiOrderState';
-import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl, getSchoolPageFromCache } from '../../services/collegeApiService';
+import { getProxiedImageUrl } from '../../services/collegeApiService';
 import { Size, SizeCounts } from '../../types';
 import '../../styles/product-detail.css';
 
@@ -30,86 +29,17 @@ const ZERO_COUNTS: SizeCounts = {
 const ApiCollegeProductDetail: React.FC = () => {
   const { orderTemplateId, productId } = useParams<{ orderTemplateId: string; productId: string }>();
   const navigate = useNavigate();
+  const { productMap, orderedByProduct, updateOrderedByProduct, loading, error } = useApiCollegeOrder();
 
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-  const [product, setProduct] = React.useState<ReturnType<typeof buildApiOrderCategoryModel>['productMap'][string] | null>(null);
-  const [selection, setSelection] = React.useState<ApiProductSelection | null>(null);
-  const [activeVariant, setActiveVariant] = React.useState<string>('');
-
-  React.useEffect(() => {
-    const load = async () => {
-      if (!orderTemplateId || !productId) {
-        setError('Missing product information.');
-        setLoading(false);
-        return;
-      }
-
-      const decodedProductId = decodeURIComponent(productId);
-
-      // Sync cache check: skip loading when data is already cached
-      const cached = getSchoolPageFromCache(orderTemplateId);
-      if (cached) {
-        const model = buildApiOrderCategoryModel(cached.items);
-        const product = model.productMap[decodedProductId];
-        if (!product) {
-          setError('Product not found.');
-          setLoading(false);
-          return;
-        }
-        setProduct(product);
-        const defaultVariant = product.defaultVariant || product.variantOptions?.[0] || 'default';
-        const sizeLabelsByVariant = product.sizeOptionsByVariant || {
-          [defaultVariant]: product.sizeLabels,
-        };
-        const stored = loadApiSchoolOrderState(orderTemplateId);
-        const existing = normalizeApiProductSelection(
-          stored?.orderedByProduct?.[decodedProductId],
-          defaultVariant,
-          sizeLabelsByVariant
-        );
-        setSelection(existing);
-        setActiveVariant(existing.activeVariant || defaultVariant);
-        setLoading(false);
-        setError(null);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      try {
-        const { data: schoolPageData } = await fetchApiSchoolPageData(orderTemplateId);
-        const model = buildApiOrderCategoryModel(schoolPageData.items);
-        const product = model.productMap[decodedProductId];
-
-        if (!product) {
-          setError('Product not found.');
-          return;
-        }
-
-        setProduct(product);
-
-        const defaultVariant = product.defaultVariant || product.variantOptions?.[0] || 'default';
-        const sizeLabelsByVariant = product.sizeOptionsByVariant || {
-          [defaultVariant]: product.sizeLabels,
-        };
-        const stored = loadApiSchoolOrderState(orderTemplateId);
-        const existing = normalizeApiProductSelection(
-          stored?.orderedByProduct?.[decodedProductId],
-          defaultVariant,
-          sizeLabelsByVariant
-        );
-        setSelection(existing);
-        setActiveVariant(existing.activeVariant || defaultVariant);
-      } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : 'Failed to load product.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void load();
-  }, [orderTemplateId, productId]);
+  const decodedProductId = productId ? decodeURIComponent(productId) : '';
+  const product = decodedProductId ? productMap[decodedProductId] ?? null : null;
+  const defaultVariant = product?.defaultVariant || product?.variantOptions?.[0] || 'default';
+  const sizeLabelsByVariant = product?.sizeOptionsByVariant || { [defaultVariant]: product?.sizeLabels || [] };
+  const rawSelection = decodedProductId ? orderedByProduct[decodedProductId] : undefined;
+  const selection = rawSelection
+    ? normalizeApiProductSelection(rawSelection, defaultVariant, sizeLabelsByVariant)
+    : null;
+  const activeVariant = selection?.activeVariant || defaultVariant;
 
   const getVariantSizes = React.useCallback(
     (variant: string): string[] => {
@@ -131,6 +61,15 @@ const ApiCollegeProductDetail: React.FC = () => {
     []
   );
 
+  const persistSelection = React.useCallback(
+    (newSelection: ApiProductSelection) => {
+      if (decodedProductId) {
+        updateOrderedByProduct(decodedProductId, newSelection);
+      }
+    },
+    [decodedProductId, updateOrderedByProduct]
+  );
+
   const updateVariantCounts = React.useCallback(
     (variant: string, counts: SizeCounts) => {
       if (!selection || !product) return;
@@ -141,54 +80,36 @@ const ApiCollegeProductDetail: React.FC = () => {
         return acc;
       }, {});
 
-      setSelection({
+      const newSelection: ApiProductSelection = {
         ...selection,
         activeVariant: variant,
         variantQuantities: {
           ...selection.variantQuantities,
           [variant]: nextVariantQuantities,
         },
-      });
+      };
+      persistSelection(newSelection);
     },
-    [getVariantSizes, product, selection]
+    [getVariantSizes, product, selection, persistSelection]
   );
 
   const handleVariantChange = (variant: string) => {
     if (!selection || !product) return;
     const sizes = getVariantSizes(variant);
-    const defaultVariant = product.defaultVariant || variant;
-    const normalized = normalizeApiProductSelection(selection, defaultVariant, {
-      ...(product.sizeOptionsByVariant || { [defaultVariant]: product.sizeLabels }),
+    const defaultV = product.defaultVariant || variant;
+    const normalized = normalizeApiProductSelection(selection, defaultV, {
+      ...(product.sizeOptionsByVariant || { [defaultV]: product.sizeLabels }),
       [variant]: sizes,
     });
     normalized.activeVariant = variant;
-    setSelection(normalized);
-    setActiveVariant(variant);
+    persistSelection(normalized);
   };
 
   const handleSaveAndReturn = () => {
-    if (!orderTemplateId || !productId || !selection) {
-      return;
-    }
-    const decodedProductId = decodeURIComponent(productId);
-    const current = loadApiSchoolOrderState(orderTemplateId);
-    saveApiSchoolOrderState(orderTemplateId, {
-      formData: current?.formData || {
-        company: '',
-        storeNumber: '',
-        storeManager: '',
-        orderedBy: '',
-        date: '',
-      },
-      orderedByProduct: {
-        ...(current?.orderedByProduct || {}),
-        [decodedProductId]: selection,
-      },
-    });
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId)}`);
+    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`);
   };
 
-  if (loading) {
+  if (loading && !product) {
     return <div className="product-detail-container">Loading product details...</div>;
   }
 
@@ -204,7 +125,14 @@ const ApiCollegeProductDetail: React.FC = () => {
   }
 
   if (!product || !selection) {
-    return null;
+    return (
+      <div className="product-detail-container">
+        <div className="error-message">Product not found.</div>
+        <button className="btn-secondary" onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}>
+          Back to Order Form
+        </button>
+      </div>
+    );
   }
 
   const variantOptions = product.variantOptions && product.variantOptions.length > 0

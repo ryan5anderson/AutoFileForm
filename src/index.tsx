@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Outlet } from 'react-router-dom';
 
 import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
 import Header from './app/layout/Header';
@@ -20,6 +20,7 @@ import TestApiProductDetailPage from './app/routes/TestApiProductDetail';
 import CollegeRouteWrapper from './components/CollegeRouteWrapper';
 import CollegeSelector from './components/CollegeSelector';
 import { colleges } from './config';
+import { ApiCollegeOrderProvider } from './contexts/ApiCollegeOrderContext';
 import { Category } from './types';
 import './styles/global.css';
 import './styles/tokens.css';
@@ -95,8 +96,10 @@ function AppShell() {
         <Route path='/' element={<CollegeSelector />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
-        <Route path='/api-school/:orderTemplateId/product/:productId' element={<ApiCollegeProductDetail />} />
-        <Route path='/api-school/:orderTemplateId' element={<ApiCollegeOrderForm />} />
+        <Route path='/api-school/:orderTemplateId' element={<ApiCollegeOrderProvider><Outlet /></ApiCollegeOrderProvider>}>
+          <Route index element={<ApiCollegeOrderForm />} />
+          <Route path='product/:productId' element={<ApiCollegeProductDetail />} />
+        </Route>
         <Route path='/test-api/:orderTemplateId/product/:itemId' element={<TestApiProductDetailPage />} />
         <Route path='/test-api/:orderTemplateId' element={<TestApiOrderPage />} />
         <Route path='/test-api' element={<TestApiPage />} />

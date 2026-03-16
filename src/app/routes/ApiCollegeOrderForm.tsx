@@ -1,157 +1,36 @@
 import React from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
-import {
-  getDefaultProductSelection,
-  getProductSelectionTotal,
-  loadApiSchoolOrderState,
-  normalizeApiProductSelection,
-  saveApiSchoolOrderState,
-  type ApiProductSelection,
-} from '../../features/utils/apiOrderState';
-import { buildApiOrderCategoryModel, fetchApiSchoolPageData, getProxiedImageUrl, getSchoolPageFromCache } from '../../services/collegeApiService';
-import { ApiOrderProduct, Category, FormData } from '../../types';
+import { getVersionDisplayName } from '../../features/utils';
+import { getDefaultProductSelection, getProductSelectionTotal } from '../../features/utils/apiOrderState';
+import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../services/collegeApiService';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
 import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
-const createInitialFormData = (): FormData => ({
-  company: '',
-  storeNumber: '',
-  storeManager: '',
-  orderedBy: '',
-  date: new Date().toISOString().split('T')[0] || '',
-  orderNotes: '',
-  quantities: {},
-});
-
 const ApiCollegeOrderForm: React.FC = () => {
-  const { orderTemplateId } = useParams<{ orderTemplateId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Fallback: extract from path in case useParams lags during navigation (e.g. "Back to Form")
-  const resolvedOrderTemplateId = orderTemplateId ?? (() => {
-    const segs = location.pathname.split('/').filter(Boolean);
-    return segs[0] === 'api-school' && segs[1] ? decodeURIComponent(segs[1]) : undefined;
-  })();
-
-  const [loading, setLoading] = React.useState(() => !(resolvedOrderTemplateId && getSchoolPageFromCache(resolvedOrderTemplateId)));
-  const [error, setError] = React.useState<string | null>(null);
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [productMap, setProductMap] = React.useState<Record<string, ApiOrderProduct>>({});
-  const [formData, setFormData] = React.useState<FormData>(createInitialFormData());
-  const [orderedByProduct, setOrderedByProduct] = React.useState<Record<string, ApiProductSelection>>({});
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const {
+    orderTemplateId,
+    loading,
+    error,
+    categories,
+    productMap,
+    rawPageData,
+    formData,
+    orderedByProduct,
+    invalidProductPaths,
+    validProductPaths,
+    setFormData,
+  } = useApiCollegeOrder();
 
   const isReceiptPage = location.pathname.endsWith('/receipt');
-
-  // useLayoutEffect: populate from cache before paint so "Back to Form" never shows loading
-  React.useLayoutEffect(() => {
-    const id = resolvedOrderTemplateId ?? orderTemplateId;
-    if (!id) return;
-    const cached = getSchoolPageFromCache(id);
-    if (!cached) return;
-
-    const model = buildApiOrderCategoryModel(cached.items);
-    setCategories(model.categories);
-    setProductMap(model.productMap);
-    const stored = loadApiSchoolOrderState(id);
-    if (stored) {
-      setFormData((prev) => ({ ...prev, ...stored.formData }));
-      const normalizedState: Record<string, ApiProductSelection> = {};
-      Object.keys(model.productMap).forEach((productId) => {
-        const product = model.productMap[productId];
-        const sizeLabelsByVariant = product.sizeOptionsByVariant || { [product.defaultVariant || 'default']: product.sizeLabels };
-        normalizedState[productId] = normalizeApiProductSelection(
-          stored.orderedByProduct?.[productId],
-          product.defaultVariant || 'default',
-          sizeLabelsByVariant
-        );
-      });
-      setOrderedByProduct(normalizedState);
-    } else {
-      setFormData(createInitialFormData());
-      setOrderedByProduct({});
-    }
-    setLoading(false);
-    setError(null);
-  }, [orderTemplateId, resolvedOrderTemplateId]);
-
-  React.useEffect(() => {
-    const id = resolvedOrderTemplateId ?? orderTemplateId;
-    const fetchOrder = async () => {
-      if (!id) {
-        setError('Missing order template ID.');
-        setLoading(false);
-        return;
-      }
-
-      // Skip if already populated from cache in useLayoutEffect (ensures no loading flash)
-      if (getSchoolPageFromCache(id)) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      try {
-        const { data: schoolPageData } = await fetchApiSchoolPageData(id);
-        const model = buildApiOrderCategoryModel(schoolPageData.items);
-        setCategories(model.categories);
-        setProductMap(model.productMap);
-
-        const stored = loadApiSchoolOrderState(id);
-        if (stored) {
-          setFormData((prev) => ({
-            ...prev,
-            ...stored.formData,
-          }));
-          const normalizedState: Record<string, ApiProductSelection> = {};
-          Object.keys(model.productMap).forEach((productId) => {
-            const product = model.productMap[productId];
-            const sizeLabelsByVariant = product.sizeOptionsByVariant || {
-              [product.defaultVariant || 'default']: product.sizeLabels,
-            };
-            normalizedState[productId] = normalizeApiProductSelection(
-              stored.orderedByProduct?.[productId],
-              product.defaultVariant || 'default',
-              sizeLabelsByVariant
-            );
-          });
-          setOrderedByProduct(normalizedState);
-        } else {
-          setFormData(createInitialFormData());
-          setOrderedByProduct({});
-        }
-      } catch (fetchError) {
-        setError(fetchError instanceof Error ? fetchError.message : 'Failed to load API order.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void fetchOrder();
-  }, [orderTemplateId, resolvedOrderTemplateId]);
-
-  React.useEffect(() => {
-    if (!orderTemplateId) {
-      return;
-    }
-    saveApiSchoolOrderState(orderTemplateId, {
-      formData: {
-        company: formData.company,
-        storeNumber: formData.storeNumber,
-        storeManager: formData.storeManager,
-        orderedBy: formData.orderedBy,
-        date: formData.date,
-      },
-      orderedByProduct,
-    });
-  }, [formData.company, formData.date, formData.orderedBy, formData.storeManager, formData.storeNumber, orderTemplateId, orderedByProduct]);
 
   const quantities = React.useMemo(() => {
     const next: Record<string, string> = {};
@@ -169,40 +48,109 @@ const ApiCollegeOrderForm: React.FC = () => {
     return next;
   }, [categories, orderedByProduct, productMap]);
 
-  const toggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
-  };
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [orderJsonOpen, setOrderJsonOpen] = React.useState(false);
+  const [copyFeedback, setCopyFeedback] = React.useState(false);
+  const [sendState, setSendState] = React.useState<{ status: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({ status: 'idle' });
+
+  const orderPayload = React.useMemo(
+    () =>
+      buildApiOrderPayload(rawPageData, orderedByProduct, productMap, {
+        company: formData.company,
+        storeNumber: formData.storeNumber,
+        storeManager: formData.storeManager,
+        orderedBy: formData.orderedBy,
+        date: formData.date,
+        orderNotes: formData.orderNotes,
+      }),
+    [rawPageData, orderedByProduct, productMap, formData.company, formData.storeNumber, formData.storeManager, formData.orderedBy, formData.date, formData.orderNotes]
+  );
+
+  const handleCopyJson = React.useCallback(async () => {
+    if (!orderPayload) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(orderPayload, null, 2));
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    } catch {
+      setCopyFeedback(false);
+    }
+  }, [orderPayload]);
+
+  const handleSendOrder = React.useCallback(async () => {
+    if (!orderPayload) return;
+    setSendState({ status: 'loading' });
+    const result = await submitApiOrder(orderPayload);
+    if (result.success) {
+      setSendState({ status: 'success', message: result.message });
+    } else {
+      setSendState({ status: 'error', message: result.error });
+    }
+  }, [orderPayload]);
 
   const totalItems = React.useMemo(
     () => Object.values(quantities).reduce((sum, value) => sum + (parseInt(value, 10) || 0), 0),
     [quantities]
   );
 
-  const imageSrcResolver = (_categoryPath: string, imageName: string) => {
-    const product = productMap[imageName];
-    return getProxiedImageUrl(product?.imageUrl) || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y0ZjRmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
-  };
+  const imageSrcResolver = React.useCallback(
+    (_categoryPath: string, imageName: string) => {
+      const product = productMap[imageName];
+      return getProxiedImageUrl(product?.imageUrl) || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y0ZjRmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+    },
+    [productMap]
+  );
 
-  const productTitleResolver = (_categoryPath: string, imageName: string) => {
-    const product = productMap[imageName];
-    return product?.productName || 'Product';
-  };
+  const productTitleResolver = React.useCallback(
+    (_categoryPath: string, imageName: string) => {
+      const product = productMap[imageName];
+      return product?.productName || 'Product';
+    },
+    [productMap]
+  );
 
-  const productDetailPathResolver = (_categoryPath: string, imageName: string) => {
-    return `/api-school/${encodeURIComponent(orderTemplateId || '')}/product/${encodeURIComponent(imageName)}`;
-  };
+  const productDetailPathResolver = React.useCallback(
+    (_categoryPath: string, imageName: string) => {
+      return `/api-school/${encodeURIComponent(orderTemplateId || '')}/product/${encodeURIComponent(imageName)}`;
+    },
+    [orderTemplateId]
+  );
+
+  const getApiCartItems = React.useCallback(
+    (imagePath: string, imageName: string): { label: string; qty: number }[] => {
+      const product = productMap[imageName];
+      const selection = orderedByProduct[imageName];
+      if (!product || !selection) return [];
+
+      const items: { label: string; qty: number }[] = [];
+      const defaultVariant = product.defaultVariant || 'default';
+
+      Object.entries(selection.variantQuantities || {}).forEach(([variant, sizeMap]) => {
+        const total = Object.values(sizeMap).reduce((s, q) => s + (Number(q) || 0), 0);
+        if (total > 0) {
+          const displayName =
+            variant === defaultVariant && !product.variantOptions?.length
+              ? 'Qty'
+              : getVersionDisplayName(variant);
+          items.push({ label: displayName, qty: total });
+        }
+      });
+      return items;
+    },
+    [productMap, orderedByProduct]
+  );
 
   return (
     <div className="college-page-container">
       <div className="college-page-header">
-        <Header showSidebarToggle={true} onSidebarToggle={toggleSidebar} />
+        <Header showSidebarToggle={true} onSidebarToggle={() => setSidebarOpen((s) => !s)} />
       </div>
 
       <CollapsibleSidebar
         categories={categories}
         activeSection={categories[0]?.name.toLowerCase().replace(/\s+/g, '-') || ''}
         isOpen={sidebarOpen}
-        onToggle={toggleSidebar}
+        onToggle={() => setSidebarOpen((s) => !s)}
         onBackToColleges={() => navigate('/')}
         showCategories={true}
       />
@@ -251,13 +199,86 @@ const ApiCollegeOrderForm: React.FC = () => {
                 category={category}
                 college="api-school"
                 quantities={quantities}
+                invalidProductPaths={invalidProductPaths}
+                validProductPaths={validProductPaths}
                 onQuantityChange={() => {}}
                 imageSrcResolver={imageSrcResolver}
                 productTitleResolver={productTitleResolver}
                 productDetailPathResolver={productDetailPathResolver}
                 showTapToSelectText={true}
+                apiOrderedByProduct={orderedByProduct}
+                apiProductMap={productMap}
+                getApiCartItems={getApiCartItems}
               />
             ))}
+
+            <div className="view-order-json-section" style={{ marginTop: 'var(--space-6)' }}>
+              <button
+                type="button"
+                className="college-page-title-btn"
+                onClick={() => setOrderJsonOpen((o) => !o)}
+              >
+                {orderJsonOpen ? 'Hide Order JSON' : 'View Order JSON'}
+              </button>
+              {orderJsonOpen && (
+                <div
+                  className="view-order-json-panel"
+                  style={{
+                    marginTop: 'var(--space-4)',
+                    padding: 'var(--space-4)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-lg)',
+                    backgroundColor: 'var(--color-surface)',
+                  }}
+                >
+                  <pre
+                    style={{
+                      maxHeight: '400px',
+                      overflow: 'auto',
+                      padding: 'var(--space-4)',
+                      margin: 0,
+                      fontSize: '0.75rem',
+                      backgroundColor: 'var(--color-gray-100)',
+                      borderRadius: 'var(--radius-md)',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                    }}
+                  >
+                    {orderPayload
+                      ? JSON.stringify(orderPayload, null, 2)
+                      : 'No order data available. Add products to your order.'}
+                  </pre>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="college-page-title-btn"
+                      onClick={handleCopyJson}
+                      disabled={!orderPayload}
+                    >
+                      {copyFeedback ? 'Copied!' : 'Copy JSON'}
+                    </button>
+                    <button
+                      type="button"
+                      className="college-page-title-btn"
+                      onClick={handleSendOrder}
+                      disabled={!orderPayload || sendState.status === 'loading'}
+                    >
+                      {sendState.status === 'loading' ? 'Sending...' : 'Send Order'}
+                    </button>
+                  </div>
+                  {sendState.status === 'success' && (
+                    <p style={{ marginTop: 'var(--space-2)', color: 'var(--color-success, #059669)', fontWeight: 500 }}>
+                      {sendState.message}
+                    </p>
+                  )}
+                  {sendState.status === 'error' && (
+                    <p style={{ marginTop: 'var(--space-2)', color: 'var(--color-error, #dc2626)', fontWeight: 500 }}>
+                      {sendState.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </form>
         )}
 

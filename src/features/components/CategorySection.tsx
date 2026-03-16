@@ -34,6 +34,12 @@ interface CategorySectionProps {
   productTitleResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
   productDetailPathResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
   showTapToSelectText?: boolean;
+  /** API school mode: ordered product selections by productId */
+  apiOrderedByProduct?: Record<string, { activeVariant: string; variantQuantities: Record<string, Record<string, number>> }>;
+  /** API school mode: product map by productId */
+  apiProductMap?: Record<string, unknown>;
+  /** API school mode: get cart items for In Cart bar - returns { label, qty }[] */
+  getApiCartItems?: (imagePath: string, imageName: string) => { label: string; qty: number }[];
 }
 
 
@@ -62,6 +68,9 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   productTitleResolver,
   productDetailPathResolver,
   showTapToSelectText = true,
+  apiOrderedByProduct,
+  apiProductMap,
+  getApiCartItems,
 }) => {
   const navigate = useNavigate();
 
@@ -532,8 +541,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
               {/* Cart variations box at bottom of card - always visible */}
               {hasAnyQuantity && !shouldHighlight && !readOnly && (() => {
-                const variations = getCartVariations(imagePath, img);
-                if (variations.length === 0) {
+                const variations = getApiCartItems
+                  ? getApiCartItems(imagePath, img).map((item) => `${item.label}: ${item.qty}`)
+                  : getCartVariations(imagePath, img);
+                if (variations.length === 0 && !getApiCartItems) {
                   const fallbackQty = Number(quantities[imagePath] || 0);
                   if (fallbackQty <= 0) {
                     return null;
