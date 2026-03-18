@@ -72,11 +72,15 @@ const Header: React.FC<HeaderProps> = ({
         </button>
       </div>
 
-      {/* Center: Logos */}
-      <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', pointerEvents: 'none' }}>
+      {/* Center: Logos - click to go to main/home */}
+      <Link
+        to="/"
+        style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', textDecoration: 'none' }}
+        aria-label="Go to home"
+      >
         <img src={asset('logo/campustraditions.png')} alt="Campus Traditions" style={{ height: 32, width: 'auto' }} />
         <img src={asset('logo/opi-logo-no-bg.png')} alt="Ohiopyle Prints" style={{ height: 28, width: 'auto' }} />
-      </div>
+      </Link>
 
       {/* Right: Nav links - Hidden on mobile */}
       <nav aria-label="Primary" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>

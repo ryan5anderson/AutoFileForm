@@ -155,6 +155,33 @@ interface ValidationResult {
   invalidProductPaths: string[];
 }
 
+/** Minimal store info shape for validation */
+interface StoreInfoFields {
+  company: string;
+  storeNumber: string;
+  storeManager: string;
+  orderedBy: string;
+  date: string;
+}
+
+/**
+ * Validate store information fields (company, storeNumber, storeManager, orderedBy, date)
+ * @param formData - Form data containing store info fields
+ * @returns { isValid, errorMessage } - Validation result for store info only
+ */
+export const validateStoreInfo = (formData: StoreInfoFields): { isValid: boolean; errorMessage: string | null } => {
+  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.orderedBy.trim() || !formData.date.trim()) {
+    return {
+      isValid: false,
+      errorMessage: 'Please fill out all store information fields.',
+    };
+  }
+  return {
+    isValid: true,
+    errorMessage: null,
+  };
+};
+
 /**
  * Check if the order form data contains any products (non-empty order)
  * @param formData - The form data to check
@@ -211,11 +238,11 @@ export const hasOrderProducts = (formData: FormData): boolean => {
 };
 
 export const validateFormData = (formData: FormData, categories?: Category[]): ValidationResult => {
-  // Check all required fields
-  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.orderedBy.trim() || !formData.date.trim()) {
+  const storeInfoResult = validateStoreInfo(formData);
+  if (!storeInfoResult.isValid) {
     return {
       isValid: false,
-      errorMessage: 'Please fill out all store information fields.',
+      errorMessage: storeInfoResult.errorMessage,
       invalidProductPaths: []
     };
   }

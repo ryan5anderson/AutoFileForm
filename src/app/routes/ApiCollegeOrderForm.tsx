@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
-import { getVersionDisplayName } from '../../features/utils';
+import { getVersionDisplayName, validateStoreInfo } from '../../features/utils';
 import { getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
 import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../services/collegeApiService';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
@@ -14,6 +14,8 @@ import '../../styles/college-pages.css';
 
 const ApiCollegeOrderForm: React.FC = () => {
   const navigate = useNavigate();
+  const formRef = React.useRef<HTMLFormElement>(null);
+  const productSectionRef = React.useRef<HTMLDivElement>(null);
 
   const {
     orderTemplateId,
@@ -48,7 +50,34 @@ const ApiCollegeOrderForm: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [orderJsonOpen, setOrderJsonOpen] = React.useState(false);
   const [copyFeedback, setCopyFeedback] = React.useState(false);
+  const [formError, setFormError] = React.useState<string | null>(null);
   const [sendState, setSendState] = React.useState<{ status: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({ status: 'idle' });
+
+  const handleFormSubmit = React.useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      setFormError(null);
+
+      // Check products first so we don't scroll to store inputs at top when the real issue is no products
+      if (!hasApiOrderProducts(orderedByProduct, productMap)) {
+        setFormError('Please select at least one product before submitting your order.');
+        return;
+      }
+      if (invalidProductPaths.length > 0) {
+        setFormError('Some products have invalid pack quantities. Please adjust so each variant total is a multiple of the pack size.');
+        return;
+      }
+      // Store fields are validated by native HTML5 (required) before submit fires.
+      // Fallback: if store invalid, trigger native tooltip and stop
+      const storeResult = validateStoreInfo(formData);
+      if (!storeResult.isValid) {
+        formRef.current?.reportValidity();
+        return;
+      }
+      navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`);
+    },
+    [formData, orderTemplateId, navigate, orderedByProduct, productMap, invalidProductPaths]
+  );
 
   const orderPayload = React.useMemo(
     () =>
@@ -168,7 +197,7 @@ const ApiCollegeOrderForm: React.FC = () => {
         {error && <div className="error-message">{error}</div>}
 
         {!loading && !error && (
-          <form onSubmit={(e) => e.preventDefault()}>
+          <form ref={formRef} onSubmit={handleFormSubmit}>
             <StoreInfoForm
               formData={formData}
               onFormDataChange={(updates) =>
@@ -179,6 +208,7 @@ const ApiCollegeOrderForm: React.FC = () => {
               }
             />
 
+            <div ref={productSectionRef}>
             {categories.map((category) => (
               <CategorySection
                 key={category.name}
@@ -197,13 +227,17 @@ const ApiCollegeOrderForm: React.FC = () => {
                 getApiCartItems={getApiCartItems}
               />
             ))}
+            </div>
 
+            {formError && (
+              <div style={{ background: 'rgb(239 68 68 / 10%)', border: '1px solid rgb(239 68 68 / 30%)', borderRadius: 'var(--radius-lg)', color: '#dc2626', marginTop: 'var(--space-4)', padding: 'var(--space-3)' }}>
+                {formError}
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', marginTop: 'var(--space-6)', flexWrap: 'wrap' }}>
               <button
-                type="button"
+                type="submit"
                 className="college-page-title-btn"
-                disabled={invalidProductPaths.length > 0 || !hasApiOrderProducts(orderedByProduct, productMap)}
-                onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`)}
                 style={{
                   background: 'var(--color-primary)',
                   color: 'white',
@@ -212,7 +246,7 @@ const ApiCollegeOrderForm: React.FC = () => {
                   borderRadius: 'var(--radius-lg)',
                   fontSize: '1rem',
                   fontWeight: '500',
-                  cursor: invalidProductPaths.length > 0 || !hasApiOrderProducts(orderedByProduct, productMap) ? 'not-allowed' : 'pointer',
+                  cursor: 'pointer',
                   minWidth: '180px',
                 }}
               >

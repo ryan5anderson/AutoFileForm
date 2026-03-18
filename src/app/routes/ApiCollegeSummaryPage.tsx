@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
-import { createApiTemplateParams, getVersionDisplayName } from '../../features/utils';
+import { createApiTemplateParams, getVersionDisplayName, validateStoreInfo } from '../../features/utils';
 import { getApiSchoolStorageKey, getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
 import { getProxiedImageUrl } from '../../services/collegeApiService';
 import { sendOrderEmail } from '../../services/emailService';
@@ -15,6 +15,8 @@ import '../../styles/college-pages.css';
 
 const ApiCollegeSummaryPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromReceipt = (location.state as { fromReceipt?: boolean })?.fromReceipt ?? false;
   const {
     orderTemplateId,
     categories,
@@ -87,8 +89,17 @@ const ApiCollegeSummaryPage: React.FC = () => {
     navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`);
   }, [navigate, orderTemplateId]);
 
+  const handleBackToReceipt = useCallback(() => {
+    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/receipt`);
+  }, [navigate, orderTemplateId]);
+
   const handleConfirm = useCallback(() => {
     setConfirmationError(null);
+    const storeResult = validateStoreInfo(formData);
+    if (!storeResult.isValid) {
+      setConfirmationError(storeResult.errorMessage ?? 'Please fill out all store information fields.');
+      return;
+    }
     if (!hasApiOrderProducts(orderedByProduct, productMap)) {
       setConfirmationError('Cannot submit an empty order. Please select at least one product before submitting.');
       return;
@@ -98,7 +109,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
       return;
     }
     setShowConfirmModal(true);
-  }, [orderedByProduct, productMap, invalidProductPaths]);
+  }, [formData, orderedByProduct, productMap, invalidProductPaths]);
 
   const handleConfirmSubmit = useCallback(async () => {
     setConfirmationError(null);
@@ -213,8 +224,8 @@ const ApiCollegeSummaryPage: React.FC = () => {
           <button type="button" onClick={handleBack} disabled={sending} className="college-page-title-btn" style={{ background: 'var(--color-bg)', color: 'var(--color-primary)', border: '2px solid var(--color-primary)', minWidth: '150px' }}>
             Back to Form
           </button>
-          <button type="button" onClick={handleConfirm} disabled={sending} className="college-page-title-btn" style={{ background: 'var(--color-primary)', color: 'white', border: 'none', minWidth: '150px' }}>
-            {sending ? 'Sending...' : 'Send Order'}
+          <button type="button" onClick={fromReceipt ? handleBackToReceipt : handleConfirm} disabled={sending} className="college-page-title-btn" style={{ background: 'var(--color-primary)', color: 'white', border: 'none', minWidth: '150px' }}>
+            {fromReceipt ? 'Back to Receipt' : (sending ? 'Sending...' : 'Send Order')}
           </button>
         </div>
 

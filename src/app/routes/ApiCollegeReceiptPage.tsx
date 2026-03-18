@@ -19,7 +19,7 @@ const ApiCollegeReceiptPage: React.FC = () => {
   } = useApiCollegeOrder();
 
   const handleBackToSummary = () => {
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`);
+    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`, { state: { fromReceipt: true } });
   };
 
   const handleExit = () => {
