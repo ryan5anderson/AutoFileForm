@@ -32,7 +32,11 @@ const ApiCollegeOrderPage: React.FC = () => {
   }
 
   if (isThankYouPage) {
-    return <ThankYouPage />;
+    return (
+      <div className="api-schools-flow">
+        <ThankYouPage />
+      </div>
+    );
   }
 
   return <ApiCollegeOrderForm />;

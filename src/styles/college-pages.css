@@ -1,5 +1,21 @@
 /* College Pages Styling - Enhanced to match home page vibe */
 
+/* API Schools flow: uniform blue matching "Back to Colleges" button (#2563eb) */
+.api-schools-flow {
+  --color-primary: #2563eb;
+}
+
+.api-schools-flow .college-page-title-btn--back {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  color: white;
+}
+
+.api-schools-flow .college-page-title-btn--back:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+}
+
 .college-page-container {
   background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-blue-200) 100%);
   display: flex;

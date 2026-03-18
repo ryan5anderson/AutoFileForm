@@ -31,7 +31,7 @@ const ApiCollegeReceiptPage: React.FC = () => {
   };
 
   return (
-    <div style={{
+    <div className="api-schools-flow" style={{
       background: 'var(--color-bg)',
       minHeight: '100vh',
       display: 'flex',

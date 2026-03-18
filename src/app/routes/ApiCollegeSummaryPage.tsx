@@ -153,7 +153,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="summary-page-container">
+    <div className="summary-page-container api-schools-flow">
       <div className="college-page-header">
         <Header showBackButton={true} />
       </div>

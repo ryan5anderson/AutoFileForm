@@ -133,7 +133,7 @@ const ApiCollegeOrderForm: React.FC = () => {
   );
 
   return (
-    <div className="college-page-container">
+    <div className="college-page-container api-schools-flow">
       <div className="college-page-header">
         <Header showSidebarToggle={true} onSidebarToggle={() => setSidebarOpen((s) => !s)} />
       </div>
@@ -151,7 +151,7 @@ const ApiCollegeOrderForm: React.FC = () => {
         <div className="college-page-title">
           <div className="college-page-title-actions">
             <button
-              className="college-page-title-btn"
+              className="college-page-title-btn college-page-title-btn--back"
               type="button"
               onClick={() => navigate('/', { state: { showApiSchools: true } })}
             >
