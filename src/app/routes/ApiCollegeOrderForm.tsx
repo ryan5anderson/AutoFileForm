@@ -188,16 +188,17 @@ const ApiCollegeOrderForm: React.FC = () => {
       />
 
       <main className="college-page-main">
+        <div className="college-page-top-actions">
+          <button
+            className="college-page-title-btn college-page-title-btn--back"
+            type="button"
+            onClick={() => navigate('/')}
+          >
+            ← Back to schools
+          </button>
+        </div>
+
         <div className="college-page-title">
-          <div className="college-page-title-actions">
-            <button
-              className="college-page-title-btn college-page-title-btn--back"
-              type="button"
-              onClick={() => navigate('/', { state: { showApiSchools: true } })}
-            >
-              Back to API Schools
-            </button>
-          </div>
           <h1>School Product Order Form</h1>
           <p>Select your merchandise and quantities below</p>
         </div>
