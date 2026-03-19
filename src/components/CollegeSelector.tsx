@@ -10,7 +10,7 @@ const CollegeSelector: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [showApiSchools, setShowApiSchools] = React.useState(false);
+  const [showApiSchools, setShowApiSchools] = React.useState(true);
   const [apiColleges, setApiColleges] = React.useState<CollegeData[]>([]);
   const [isLoadingApiColleges, setIsLoadingApiColleges] = React.useState(false);
   const [apiError, setApiError] = React.useState<string | null>(null);
@@ -68,21 +68,24 @@ const CollegeSelector: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    if ((location.state as { showApiSchools?: boolean } | null)?.showApiSchools) {
-      setShowApiSchools(true);
-      void fetchApiColleges();
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [fetchApiColleges, location.pathname, location.state, navigate]);
+    const routeState = location.state as { showApiSchools?: boolean } | null;
+    const shouldShowApiSchools = routeState?.showApiSchools;
 
-  const handleApiToggleChange = async (enabled: boolean) => {
-    setShowApiSchools(enabled);
-    if (!enabled) {
-      setApiError(null);
+    if (typeof shouldShowApiSchools === 'boolean') {
+      setShowApiSchools(shouldShowApiSchools);
+      if (shouldShowApiSchools) {
+        void fetchApiColleges();
+      } else {
+        setApiError(null);
+      }
+      navigate(location.pathname, { replace: true, state: null });
       return;
     }
-    await fetchApiColleges();
-  };
+
+    if (showApiSchools) {
+      void fetchApiColleges();
+    }
+  }, [fetchApiColleges, location.pathname, location.state, navigate, showApiSchools]);
 
   const filteredLocalColleges = React.useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -114,16 +117,6 @@ const CollegeSelector: React.FC = () => {
       </div>
 
       <div className="college-controls">
-        <label className="college-toggle">
-          <input
-            type="checkbox"
-            checked={showApiSchools}
-            onChange={(e) => {
-              void handleApiToggleChange(e.target.checked);
-            }}
-          />
-          <span>Show API schools</span>
-        </label>
         <input
           className="college-search"
           type="text"
