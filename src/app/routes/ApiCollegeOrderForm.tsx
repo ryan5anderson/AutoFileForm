@@ -24,6 +24,7 @@ const ApiCollegeOrderForm: React.FC = () => {
     error,
     categories,
     productMap,
+    sourceToGroupKeyMap,
     rawPageData,
     formData,
     orderedByProduct,
@@ -92,7 +93,7 @@ const ApiCollegeOrderForm: React.FC = () => {
 
   const orderPayload = React.useMemo(
     () =>
-      buildApiOrderPayload(rawPageData, orderedByProduct, productMap, {
+      buildApiOrderPayload(rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, {
         company: formData.company,
         storeNumber: formData.storeNumber,
         storeManager: formData.storeManager,
@@ -100,7 +101,7 @@ const ApiCollegeOrderForm: React.FC = () => {
         date: formData.date,
         orderNotes: formData.orderNotes,
       }),
-    [rawPageData, orderedByProduct, productMap, formData.company, formData.storeNumber, formData.storeManager, formData.orderedBy, formData.date, formData.orderNotes]
+    [rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, formData.company, formData.storeNumber, formData.storeManager, formData.orderedBy, formData.date, formData.orderNotes]
   );
 
   const handleCopyJson = React.useCallback(async () => {

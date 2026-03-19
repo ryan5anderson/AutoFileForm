@@ -565,10 +565,149 @@ const allowsAnyQuantityForVariant = (categoryPath: string, variant: string): boo
   );
 };
 
-export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
-  const apiSizeLabels = [item.size1, item.size2, item.size3, item.size4, item.size5]
+const STYLE_VARIANT_SUFFIX_REGEX = /(2X|3X|4X|5X)$/i;
+const EXTENDED_SIZE_REGEX = /^(2X|3X|4X|5X|2XL|3XL|4XL|5XL)$/i;
+
+export interface NormalizedStyleNum {
+  rawStyleNum: string;
+  baseStyleNum: string;
+  variantSuffix: string | null;
+}
+
+const normalizeComparisonToken = (value: string | null | undefined): string =>
+  (value || '').trim().toUpperCase();
+
+const normalizeSizeToken = (value: string | null | undefined): string =>
+  (value || '').trim().toUpperCase().replace(/\s+/g, '');
+
+const CANONICAL_SIZE_BY_TOKEN: Record<string, string> = {
+  S: 'SM',
+  SM: 'SM',
+  M: 'MD',
+  MD: 'MD',
+  L: 'LG',
+  LG: 'LG',
+  XL: 'XL',
+  XXL: '2XL',
+  '2XL': '2XL',
+  '2X': '2XL',
+  XXXL: '3XL',
+  '3XL': '3XL',
+  '3X': '3XL',
+  '4XL': '4XL',
+  '4X': '4XL',
+  OSFA: 'OSFA',
+  AST: 'AST',
+};
+
+export const normalizeApiSizeToCanonical = (
+  value: string | null | undefined
+): string => {
+  const token = normalizeSizeToken(value);
+  if (!token) return '';
+  return CANONICAL_SIZE_BY_TOKEN[token] || token;
+};
+
+const isExtendedSizeLabel = (value: string | null | undefined): boolean => {
+  const normalized = normalizeApiSizeToCanonical(value);
+  if (!normalized) return false;
+  if (EXTENDED_SIZE_REGEX.test(normalized)) return true;
+  return normalized.startsWith('2X') || normalized.startsWith('3X') || normalized.startsWith('4X') || normalized.startsWith('5X');
+};
+
+export const normalizeStyleNum = (styleNum: string | null | undefined): NormalizedStyleNum => {
+  const rawStyleNum = (styleNum || '').trim().toUpperCase();
+  if (!rawStyleNum) {
+    return {
+      rawStyleNum: '',
+      baseStyleNum: '',
+      variantSuffix: null,
+    };
+  }
+
+  const match = rawStyleNum.match(STYLE_VARIANT_SUFFIX_REGEX);
+  if (!match) {
+    return {
+      rawStyleNum,
+      baseStyleNum: rawStyleNum,
+      variantSuffix: null,
+    };
+  }
+
+  const variantSuffix = match[1].toUpperCase();
+  const baseStyleNum = rawStyleNum.slice(0, rawStyleNum.length - variantSuffix.length).trim();
+  return {
+    rawStyleNum,
+    baseStyleNum: baseStyleNum || rawStyleNum,
+    variantSuffix,
+  };
+};
+
+export const extractNonEmptyApiSizes = (item: OrderItem): string[] =>
+  [item.size1, item.size2, item.size3, item.size4, item.size5]
     .map((size) => (size || '').trim())
     .filter((size): size is string => size.length > 0);
+
+const getSourcePriorityScore = (sizeLabel: string, styleInfo: NormalizedStyleNum): number => {
+  const extendedSize = isExtendedSizeLabel(sizeLabel);
+  const suffix = styleInfo.variantSuffix || '';
+  if (extendedSize) {
+    if (suffix && normalizeSizeToken(sizeLabel).startsWith(suffix)) return 8;
+    if (suffix) return 6;
+    return 2;
+  }
+  if (!suffix) return 7;
+  return 1;
+};
+
+const findSelectionSizeKey = (sizeMap: Record<string, number>, targetSize: string): string | null => {
+  if (Object.prototype.hasOwnProperty.call(sizeMap, targetSize)) {
+    return targetSize;
+  }
+  const targetToken = normalizeApiSizeToCanonical(targetSize);
+  const matched = Object.keys(sizeMap).find((size) => normalizeApiSizeToCanonical(size) === targetToken);
+  return matched || null;
+};
+
+const findCanonicalMapKey = (
+  map: Record<string, unknown>,
+  targetSize: string
+): string | null => {
+  if (Object.prototype.hasOwnProperty.call(map, targetSize)) {
+    return targetSize;
+  }
+  const targetToken = normalizeApiSizeToCanonical(targetSize);
+  if (!targetToken) return null;
+  const matched = Object.keys(map).find(
+    (size) => normalizeApiSizeToCanonical(size) === targetToken
+  );
+  return matched || null;
+};
+
+export const getOrderedFieldForRawRowSize = (
+  rawRow: OrderItem,
+  canonicalSize: string
+): 'ORDERED1' | 'ORDERED2' | 'ORDERED3' | 'ORDERED4' | 'ORDERED5' | null => {
+  if (!canonicalSize) return null;
+  for (let index = 1; index <= 5; index += 1) {
+    const slot = `size${index}` as keyof OrderItem;
+    const normalizedSlotSize = normalizeApiSizeToCanonical(
+      (rawRow[slot] || '') as string | null | undefined
+    );
+    if (normalizedSlotSize === canonicalSize) {
+      return `ORDERED${index}` as
+        | 'ORDERED1'
+        | 'ORDERED2'
+        | 'ORDERED3'
+        | 'ORDERED4'
+        | 'ORDERED5';
+    }
+  }
+  return null;
+};
+
+export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
+  const apiSizeLabels = extractNonEmptyApiSizes(item);
   const sourceText = getRuleSourceText(item);
   const categorizedAs = categorizeApiCollegeProduct({
     SHIRT_NAME: item.SHIRTNAME || '',
@@ -632,20 +771,191 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
     (item) => item.SHIRTNAME && !item.SHIRTNAME.trim().toUpperCase().includes('ORDER REVIEW')
   );
 
-  const normalized = filteredItems.map(normalizeApiOrderItem);
+  const normalized = filteredItems.map((item, sourceRecordIndex) => {
+    const normalizedProduct = normalizeApiOrderItem(item);
+    const styleInfo = normalizeStyleNum(item.STYLE_NUM);
+    return {
+      item,
+      sourceRecordIndex,
+      sourceImageKey: normalizedProduct.imageKey,
+      normalizedProduct,
+      styleInfo,
+      apiSizes: extractNonEmptyApiSizes(item),
+    };
+  });
+
+  const groupedByFamily = new Map<string, typeof normalized>();
+  normalized.forEach((record) => {
+    const groupingKey = [
+      normalizeComparisonToken(record.item.DESIGN_NUM),
+      normalizeComparisonToken(record.item.COLOR_INIT),
+      normalizeComparisonToken(record.item.Expr1),
+      normalizeComparisonToken(record.item.productUrl),
+      normalizeComparisonToken(record.item.SHIRTNAME),
+      normalizeComparisonToken(record.normalizedProduct.categoryPath),
+      normalizeComparisonToken(record.styleInfo.baseStyleNum || record.styleInfo.rawStyleNum),
+    ].join('|');
+
+    const existing = groupedByFamily.get(groupingKey);
+    if (existing) {
+      existing.push(record);
+    } else {
+      groupedByFamily.set(groupingKey, [record]);
+    }
+  });
+
   const productMap: Record<string, ApiOrderProduct> = {};
+  const sourceToGroupKeyMap: Record<string, string> = {};
   const categoriesByPath = new Map<string, Category>();
-  normalized.forEach((product) => {
-    productMap[product.imageKey] = product;
-    const categoryPath = product.categoryPath || 'api-products';
+  groupedByFamily.forEach((records) => {
+    const sortedRecords = [...records].sort((a, b) => a.sourceRecordIndex - b.sourceRecordIndex);
+    const primaryRecord =
+      sortedRecords.find((record) => !record.styleInfo.variantSuffix) || sortedRecords[0];
+    if (!primaryRecord) return;
+
+    const groupKey = primaryRecord.sourceImageKey;
+    const mergedProduct: ApiOrderProduct = {
+      ...primaryRecord.normalizedProduct,
+      imageKey: groupKey,
+      groupKey,
+      sizeOptionsByVariant: {},
+      packSizeByVariant: {},
+      allowAnyQuantityByVariant: {},
+      sizeSourceByVariant: {},
+      variantRecords: [],
+      availableSizes: [],
+    };
+
+    const variantOrder: string[] = [];
+    const sizeSourceByVariant: Record<string, Record<string, string>> = {};
+    const sizeOrderByVariant: Record<string, string[]> = {};
+    const sizeTokenToDisplayByVariant: Record<string, Record<string, string>> = {};
+    const sourceStyleByImageKey: Record<string, NormalizedStyleNum> = {};
+
+    sortedRecords.forEach((record) => {
+      sourceToGroupKeyMap[record.sourceImageKey] = groupKey;
+      sourceStyleByImageKey[record.sourceImageKey] = record.styleInfo;
+      mergedProduct.variantRecords?.push({
+        sourceImageKey: record.sourceImageKey,
+        sourceStyleNum: record.styleInfo.rawStyleNum || null,
+        sourceRecordIndex: record.sourceRecordIndex,
+        sourceItemId: (record.item.ITEM_ID || '').trim() || null,
+      });
+
+      const recordVariants =
+        record.normalizedProduct.variantOptions?.length
+          ? record.normalizedProduct.variantOptions
+          : [record.normalizedProduct.defaultVariant || 'default'];
+
+      recordVariants.forEach((variant) => {
+        if (!variantOrder.includes(variant)) variantOrder.push(variant);
+        if (!sizeSourceByVariant[variant]) sizeSourceByVariant[variant] = {};
+        if (!sizeOrderByVariant[variant]) sizeOrderByVariant[variant] = [];
+        if (!sizeTokenToDisplayByVariant[variant]) sizeTokenToDisplayByVariant[variant] = {};
+
+        if (record.normalizedProduct.packSizeByVariant?.[variant] != null) {
+          mergedProduct.packSizeByVariant![variant] = record.normalizedProduct.packSizeByVariant[variant];
+        }
+        if (record.normalizedProduct.allowAnyQuantityByVariant?.[variant] != null) {
+          mergedProduct.allowAnyQuantityByVariant![variant] =
+            record.normalizedProduct.allowAnyQuantityByVariant[variant];
+        }
+
+        const configuredSizes = record.normalizedProduct.sizeOptionsByVariant?.[variant] || [];
+        const sizesForVariant =
+          configuredSizes.length > 0
+            ? [...configuredSizes, ...record.apiSizes]
+            : record.apiSizes;
+        sizesForVariant.forEach((size) => {
+          const displaySize = (size || '').trim();
+          if (!displaySize) return;
+          const sizeToken = normalizeApiSizeToCanonical(displaySize);
+          if (!sizeToken) return;
+
+          if (!sizeTokenToDisplayByVariant[variant][sizeToken]) {
+            sizeTokenToDisplayByVariant[variant][sizeToken] = displaySize;
+            sizeOrderByVariant[variant].push(sizeToken);
+          }
+
+          const currentSource = sizeSourceByVariant[variant][sizeToken];
+          if (!currentSource) {
+            sizeSourceByVariant[variant][sizeToken] = record.sourceImageKey;
+            return;
+          }
+          const currentSourceStyle = sourceStyleByImageKey[currentSource] || normalizeStyleNum(null);
+          const incomingScore = getSourcePriorityScore(displaySize, record.styleInfo);
+          const currentScore = getSourcePriorityScore(displaySize, currentSourceStyle);
+          if (incomingScore > currentScore) {
+            sizeSourceByVariant[variant][sizeToken] = record.sourceImageKey;
+          }
+        });
+      });
+    });
+
+    mergedProduct.variantOptions = variantOrder;
+    mergedProduct.defaultVariant =
+      (primaryRecord.normalizedProduct.defaultVariant &&
+      variantOrder.includes(primaryRecord.normalizedProduct.defaultVariant))
+        ? primaryRecord.normalizedProduct.defaultVariant
+        : variantOrder[0] || 'default';
+
+    variantOrder.forEach((variant) => {
+      const orderedSizeTokens = sizeOrderByVariant[variant] || [];
+      const displaySizes = orderedSizeTokens.map((token) => sizeTokenToDisplayByVariant[variant][token]);
+      if (displaySizes.length > 0) {
+        mergedProduct.sizeOptionsByVariant![variant] = displaySizes as import('../types').Size[];
+      }
+      if (!mergedProduct.packSizeByVariant?.[variant]) {
+        mergedProduct.packSizeByVariant![variant] =
+          primaryRecord.normalizedProduct.packSizeByVariant?.[variant] || 1;
+      }
+      if (mergedProduct.allowAnyQuantityByVariant?.[variant] == null) {
+        mergedProduct.allowAnyQuantityByVariant![variant] =
+          primaryRecord.normalizedProduct.allowAnyQuantityByVariant?.[variant] || false;
+      }
+
+      orderedSizeTokens.forEach((sizeToken) => {
+        const sourceImageKey = sizeSourceByVariant[variant][sizeToken] || groupKey;
+        const sourceRecord = sortedRecords.find((record) => record.sourceImageKey === sourceImageKey) || primaryRecord;
+        mergedProduct.availableSizes?.push({
+          size: sizeTokenToDisplayByVariant[variant][sizeToken],
+          sourceStyleNum: sourceRecord.styleInfo.rawStyleNum || null,
+          sourceRecordIndex: sourceRecord.sourceRecordIndex,
+          sourceItemId: (sourceRecord.item.ITEM_ID || '').trim() || null,
+          sourceImageKey,
+          variant,
+        });
+      });
+    });
+
+    mergedProduct.sizeLabels =
+      mergedProduct.sizeOptionsByVariant?.[mergedProduct.defaultVariant || 'default'] ||
+      primaryRecord.normalizedProduct.sizeLabels;
+
+    const expandedSizeSourceByVariant: Record<string, Record<string, string>> = {};
+    variantOrder.forEach((variant) => {
+      const orderedSizeTokens = sizeOrderByVariant[variant] || [];
+      const mapForVariant: Record<string, string> = {};
+      orderedSizeTokens.forEach((sizeToken) => {
+        const displaySize = sizeTokenToDisplayByVariant[variant][sizeToken];
+        mapForVariant[displaySize] = sizeSourceByVariant[variant][sizeToken] || groupKey;
+      });
+      expandedSizeSourceByVariant[variant] = mapForVariant;
+    });
+    mergedProduct.sizeSourceByVariant = expandedSizeSourceByVariant;
+
+    productMap[groupKey] = mergedProduct;
+    const categoryPath = mergedProduct.categoryPath || 'api-products';
     const existing = categoriesByPath.get(categoryPath);
     if (existing) {
-      existing.images.push(product.imageKey);
+      if (!existing.images.includes(groupKey)) {
+        existing.images.push(groupKey);
+      }
     } else {
       categoriesByPath.set(categoryPath, {
-        name: product.categoryName || getCategoryName(categoryPath),
+        name: mergedProduct.categoryName || getCategoryName(categoryPath),
         path: categoryPath,
-        images: [product.imageKey],
+        images: [groupKey],
       });
     }
   });
@@ -675,9 +985,25 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
     return safeA - safeB;
   });
 
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.debug('[api-school] grouped product families', {
+      rawRecordCount: normalized.length,
+      groupedProductCount: Object.keys(productMap).length,
+      samples: Object.values(productMap)
+        .slice(0, 12)
+        .map((product) => ({
+          groupKey: product.imageKey,
+          variantRecords: product.variantRecords?.length || 0,
+          availableSizes: product.availableSizes?.map((entry) => entry.size) || [],
+        })),
+    });
+  }
+
   return {
     categories,
     productMap,
+    sourceToGroupKeyMap,
   };
 };
 
@@ -705,9 +1031,23 @@ export function buildApiOrderPayload(
   rawPageData: ApiSchoolPageData | null,
   orderedByProduct: Record<string, import('../features/utils/apiOrderState').ApiProductSelection>,
   productMap: Record<string, ApiOrderProduct>,
+  sourceToGroupKeyMap: Record<string, string>,
   formData: { company: string; storeNumber: string; storeManager: string; orderedBy: string; date: string; orderNotes?: string }
 ): ApiOrderPayload | null {
   if (!rawPageData?.items?.length) return null;
+
+  const isProblemStyleDebugEnabled = (
+    product: ApiOrderProduct | undefined,
+    sourceStyleNum: string | null | undefined
+  ): boolean => {
+    if (process.env.NODE_ENV === 'production') return false;
+    const normalizedSourceStyle = normalizeComparisonToken(sourceStyleNum);
+    if (/^3930R(2X|3X)?$/.test(normalizedSourceStyle)) return true;
+    const variantStyles = product?.variantRecords?.map((record) =>
+      normalizeComparisonToken(record.sourceStyleNum)
+    ) || [];
+    return variantStyles.some((style) => /^3930R(2X|3X)?$/.test(style));
+  };
 
   const filteredItems = rawPageData.items.filter(
     (item) => item.SHIRTNAME && !item.SHIRTNAME.trim().toUpperCase().includes('ORDER REVIEW')
@@ -715,17 +1055,10 @@ export function buildApiOrderPayload(
 
   let subtotal = 0;
   const mutatedItems = filteredItems.map((item) => {
-    const imageKey = getApiOrderImageKey(item);
-    const selection = orderedByProduct[imageKey];
-    const product = productMap[imageKey];
-
-    const sizeColumns = [
-      item.size1 || '',
-      item.size2 || '',
-      item.size3 || '',
-      item.size4 || '',
-      item.size5 || '',
-    ].map((s) => (s || '').trim()).filter(Boolean);
+    const sourceImageKey = getApiOrderImageKey(item);
+    const groupKey = sourceToGroupKeyMap[sourceImageKey] || sourceImageKey;
+    const selection = orderedByProduct[groupKey];
+    const product = productMap[groupKey];
 
     const ordered: Record<string, string> = {
       ORDERED1: '0',
@@ -736,15 +1069,105 @@ export function buildApiOrderPayload(
     };
 
     if (selection?.variantQuantities && product) {
-      for (let i = 0; i < 5; i++) {
-        const sizeLabel = sizeColumns[i];
-        if (!sizeLabel) continue;
-        let qty = 0;
-        Object.values(selection.variantQuantities).forEach((variantMap) => {
-          qty += Number(variantMap[sizeLabel]) || 0;
+      const debugProblemStyle = isProblemStyleDebugEnabled(product, item.STYLE_NUM as string | null | undefined);
+      const groupedSelectedSizes = Object.entries(selection.variantQuantities).flatMap(
+        ([variant, variantMap]) =>
+          Object.entries(variantMap)
+            .filter(([, qty]) => Number(qty) > 0)
+            .map(([size, qty]) => ({
+              variant,
+              size,
+              canonicalSize: normalizeApiSizeToCanonical(size),
+              qty: Number(qty) || 0,
+            }))
+      );
+
+      if (debugProblemStyle) {
+        // eslint-disable-next-line no-console
+        console.debug('[api-school] serializer grouped selected sizes', {
+          groupKey,
+          sourceImageKey,
+          sourceStyleNum: (item.STYLE_NUM || '').toString().trim(),
+          groupedSelectedSizes,
         });
-        ordered[`ORDERED${i + 1}` as keyof typeof ordered] = String(qty);
       }
+
+      groupedSelectedSizes.forEach((entry) => {
+        const variantSourceMap = product.sizeSourceByVariant?.[entry.variant] || {};
+        const matchedSizeKey = findCanonicalMapKey(variantSourceMap, entry.size);
+        const mappedSource = matchedSizeKey ? variantSourceMap[matchedSizeKey] : undefined;
+        if (mappedSource && mappedSource !== sourceImageKey) {
+          if (debugProblemStyle) {
+            // eslint-disable-next-line no-console
+            console.debug('[api-school] serializer skip size due to source mismatch', {
+              selectedSize: entry.size,
+              canonicalSelectedSize: entry.canonicalSize,
+              selectedQty: entry.qty,
+              variant: entry.variant,
+              resolvedSourceImageKey: mappedSource,
+              currentSourceImageKey: sourceImageKey,
+            });
+          }
+          return;
+        }
+
+        const orderedField = getOrderedFieldForRawRowSize(item, entry.canonicalSize);
+        if (!orderedField) {
+          if (debugProblemStyle) {
+            const rawSizeSlots = {
+              size1: (item.size1 || '').toString().trim(),
+              size2: (item.size2 || '').toString().trim(),
+              size3: (item.size3 || '').toString().trim(),
+              size4: (item.size4 || '').toString().trim(),
+              size5: (item.size5 || '').toString().trim(),
+            };
+            // eslint-disable-next-line no-console
+            console.debug('[api-school] serializer no ORDERED slot match', {
+              selectedSize: entry.size,
+              canonicalSelectedSize: entry.canonicalSize,
+              selectedQty: entry.qty,
+              rawSizeSlots,
+              normalizedRawSizeSlots: Object.fromEntries(
+                Object.entries(rawSizeSlots).map(([key, value]) => [
+                  key,
+                  normalizeApiSizeToCanonical(value),
+                ])
+              ),
+            });
+          }
+          return;
+        }
+
+        const previousQty = Number(ordered[orderedField]) || 0;
+        ordered[orderedField] = String(previousQty + entry.qty);
+
+        if (debugProblemStyle) {
+          const rawSizeSlots = {
+            size1: (item.size1 || '').toString().trim(),
+            size2: (item.size2 || '').toString().trim(),
+            size3: (item.size3 || '').toString().trim(),
+            size4: (item.size4 || '').toString().trim(),
+            size5: (item.size5 || '').toString().trim(),
+          };
+          // eslint-disable-next-line no-console
+          console.debug('[api-school] serializer mapped size to ORDERED field', {
+            selectedSize: entry.size,
+            canonicalSelectedSize: entry.canonicalSize,
+            selectedQty: entry.qty,
+            variant: entry.variant,
+            sourceImageKey,
+            rawSizeSlots,
+            normalizedRawSizeSlots: Object.fromEntries(
+              Object.entries(rawSizeSlots).map(([key, value]) => [
+                key,
+                normalizeApiSizeToCanonical(value),
+              ])
+            ),
+            orderedField,
+            orderedValue: ordered[orderedField],
+          });
+        }
+      });
     }
 
     const itemTotal = (ordered.ORDERED1 ? parseInt(ordered.ORDERED1, 10) || 0 : 0) +
@@ -755,10 +1178,26 @@ export function buildApiOrderPayload(
     const unitPrice = Number(item.UNITPRICE) || 0;
     subtotal += itemTotal * unitPrice;
 
-    return { ...item, ...ordered } as ApiOrderPayload['items'][0];
+    const serializedRow = { ...item, ...ordered } as ApiOrderPayload['items'][0];
+    if (isProblemStyleDebugEnabled(product, item.STYLE_NUM as string | null | undefined)) {
+      // eslint-disable-next-line no-console
+      console.debug('[api-school] serializer final serialized row', {
+        sourceImageKey,
+        styleNum: (serializedRow.STYLE_NUM || '').toString().trim(),
+        itemId: (serializedRow.ITEM_ID || '').toString().trim(),
+        ordered: {
+          ORDERED1: serializedRow.ORDERED1,
+          ORDERED2: serializedRow.ORDERED2,
+          ORDERED3: serializedRow.ORDERED3,
+          ORDERED4: serializedRow.ORDERED4,
+          ORDERED5: serializedRow.ORDERED5,
+        },
+      });
+    }
+    return serializedRow;
   });
 
-  return {
+  const payload = {
     orderTemplateId: rawPageData.orderTemplateId,
     school: rawPageData.school,
     items: mutatedItems,
@@ -773,6 +1212,31 @@ export function buildApiOrderPayload(
     subtotal: Math.round(subtotal * 100) / 100,
     total: Math.round(subtotal * 100) / 100,
   };
+
+  if (process.env.NODE_ENV !== 'production') {
+    const nonZeroItems = payload.items.filter((item) =>
+      ['ORDERED1', 'ORDERED2', 'ORDERED3', 'ORDERED4', 'ORDERED5'].some((key) => Number(item[key as keyof typeof item]) > 0)
+    );
+    // eslint-disable-next-line no-console
+    console.debug('[api-school] serialized payload preview', {
+      orderTemplateId: payload.orderTemplateId,
+      totalItems: payload.items.length,
+      nonZeroItems: nonZeroItems.length,
+      sample: nonZeroItems.slice(0, 10).map((item) => ({
+        styleNum: (item.STYLE_NUM || '').toString().trim(),
+        itemId: (item.ITEM_ID || '').toString().trim(),
+        ordered: {
+          ORDERED1: item.ORDERED1,
+          ORDERED2: item.ORDERED2,
+          ORDERED3: item.ORDERED3,
+          ORDERED4: item.ORDERED4,
+          ORDERED5: item.ORDERED5,
+        },
+      })),
+    });
+  }
+
+  return payload;
 }
 
 /**

@@ -22,6 +22,7 @@ export interface College {
 export interface ApiOrderProduct {
   productKey: string;
   imageKey: string;
+  groupKey?: string;
   productName: string;
   subtitle?: string;
   imageUrl?: string | null;
@@ -38,11 +39,34 @@ export interface ApiOrderProduct {
   sizeOptionsByVariant?: Record<string, Size[]>;
   packSizeByVariant?: Record<string, number>;
   allowAnyQuantityByVariant?: Record<string, boolean>;
+  /**
+   * For grouped API products, maps selected `variant + size` back to the
+   * original raw API row key used for final payload serialization.
+   */
+  sizeSourceByVariant?: Record<string, Record<string, string>>;
+  /**
+   * Grouped API products retain raw row metadata for debugging and payload mapping.
+   */
+  variantRecords?: Array<{
+    sourceImageKey: string;
+    sourceStyleNum: string | null;
+    sourceRecordIndex: number;
+    sourceItemId: string | null;
+  }>;
+  availableSizes?: Array<{
+    size: string;
+    sourceStyleNum: string | null;
+    sourceRecordIndex: number;
+    sourceItemId: string | null;
+    sourceImageKey: string;
+    variant: string;
+  }>;
 }
 
 export interface ApiOrderCategoryModel {
   categories: Category[];
   productMap: Record<string, ApiOrderProduct>;
+  sourceToGroupKeyMap: Record<string, string>;
 }
 
 export interface ShirtVersion {

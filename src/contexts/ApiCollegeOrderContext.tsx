@@ -82,6 +82,7 @@ interface ApiCollegeOrderContextValue {
   error: string | null;
   categories: Category[];
   productMap: Record<string, ApiOrderProduct>;
+  sourceToGroupKeyMap: Record<string, string>;
   rawPageData: ApiSchoolPageData | null;
   formData: FormData;
   orderedByProduct: Record<string, ApiProductSelection>;
@@ -113,6 +114,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
   const [error, setError] = React.useState<string | null>(null);
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [productMap, setProductMap] = React.useState<Record<string, ApiOrderProduct>>({});
+  const [sourceToGroupKeyMap, setSourceToGroupKeyMap] = React.useState<Record<string, string>>({});
   const [rawPageData, setRawPageData] = React.useState<ApiSchoolPageData | null>(null);
   const [formData, setFormData] = React.useState<FormData>(createInitialFormData);
   const [orderedByProduct, setOrderedByProduct] = React.useState<Record<string, ApiProductSelection>>({});
@@ -140,6 +142,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
         const model = buildApiOrderCategoryModel(cached.items);
         setCategories(model.categories);
         setProductMap(model.productMap);
+        setSourceToGroupKeyMap(model.sourceToGroupKeyMap);
         const stored = loadApiSchoolOrderState(id);
         if (stored) {
           setFormData((prev) => ({
@@ -179,6 +182,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
         const model = buildApiOrderCategoryModel(data.items);
         setCategories(model.categories);
         setProductMap(model.productMap);
+        setSourceToGroupKeyMap(model.sourceToGroupKeyMap);
         const stored = loadApiSchoolOrderState(id);
         if (stored) {
           setFormData((prev) => ({
@@ -236,6 +240,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
       error,
       categories,
       productMap,
+      sourceToGroupKeyMap,
       rawPageData,
       formData,
       orderedByProduct,
@@ -250,6 +255,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
       error,
       categories,
       productMap,
+      sourceToGroupKeyMap,
       rawPageData,
       formData,
       orderedByProduct,
