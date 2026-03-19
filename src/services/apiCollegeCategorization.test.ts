@@ -33,6 +33,7 @@ describe('categorizeApiCollegeProduct', () => {
     expect(classify({ STYL_NUM: 'IC47WR' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
     expect(classify({ STYL_NUM: '88MR' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
     expect(classify({ STYL_NUM: '240MS' })).toBe(API_COLLEGE_CATEGORIES.UNISEX_TSHIRT);
+    expect(classify({ STYL_NUM: '240MS2X' })).toBe(API_COLLEGE_CATEGORIES.UNISEX_TSHIRT);
   });
 
   it('matches prefix style overrides', () => {

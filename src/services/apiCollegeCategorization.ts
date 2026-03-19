@@ -77,6 +77,17 @@ const hasAnyStyleExact = (styleNum: string, exactValues: readonly string[]): boo
 const hasAnyStylePrefix = (styleNum: string, prefixes: readonly string[]): boolean =>
   prefixes.some((prefix) => styleNum.startsWith(normalizeStyleNum(prefix)));
 
+const EXTENDED_STYLE_SUFFIX_REGEX = /(2X|3X|4X|5X)$/;
+
+const hasAnyStyleExactWithExtendedSuffix = (
+  styleNum: string,
+  exactValues: readonly string[]
+): boolean => {
+  if (hasAnyStyleExact(styleNum, exactValues)) return true;
+  const baseStyleNum = styleNum.replace(EXTENDED_STYLE_SUFFIX_REGEX, '');
+  return hasAnyStyleExact(baseStyleNum, exactValues);
+};
+
 const WATER_BOTTLE_PHRASES = ['WATER BOTTLE', 'WATERBOTTLE', 'BOTTLE', 'POLYCARB BTL', 'UV WB'] as const;
 const WATER_BOTTLE_STYLES = ['SSBOT', 'H20BTL', 'H20BTL2'] as const;
 
@@ -253,7 +264,7 @@ export const API_COLLEGE_CATEGORY_RULES: readonly CategoryRule[] = [
   {
     category: API_COLLEGE_CATEGORIES.UNISEX_TSHIRT,
     matches: (context) =>
-      hasAnyStyleExact(context.styleNum, UNISEX_TSHIRT_STYLES) ||
+      hasAnyStyleExactWithExtendedSuffix(context.styleNum, UNISEX_TSHIRT_STYLES) ||
       hasAnyStylePrefix(context.styleNum, UNISEX_TSHIRT_STYLE_PREFIX) ||
       hasAnyPhrase(context.text, UNISEX_FALLBACK_PHRASES),
   },
