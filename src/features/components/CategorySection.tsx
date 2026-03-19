@@ -38,8 +38,8 @@ interface CategorySectionProps {
   apiOrderedByProduct?: Record<string, { activeVariant: string; variantQuantities: Record<string, Record<string, number>> }>;
   /** API school mode: product map by productId */
   apiProductMap?: Record<string, { variantOptions?: string[]; defaultVariant?: string }>;
-  /** API school mode: get cart items for In Cart bar - returns { label, qty }[] */
-  getApiCartItems?: (imagePath: string, imageName: string) => { label: string; qty: number }[];
+  /** API school mode: get cart items for In Cart bar - returns variant totals and optional size details */
+  getApiCartItems?: (imagePath: string, imageName: string) => { label: string; qty: number; sizeDetail?: string }[];
 }
 
 
@@ -486,8 +486,11 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           const totalQuantity = getQuantityTotal(imagePath, img);
           const hasAnyQuantity = totalQuantity > 0;
           const isInCartState = hasAnyQuantity && !shouldHighlight && !readOnly && Boolean(apiProductMap);
+          const formatApiCartItem = (item: { label: string; qty: number; sizeDetail?: string }) =>
+            `${item.label}: ${item.qty}${item.sizeDetail ? ` (${item.sizeDetail})` : ''}`;
+          const apiCartItems = getApiCartItems ? getApiCartItems(imagePath, img) : [];
           const cartDetails = getApiCartItems
-            ? getApiCartItems(imagePath, img).map((item) => `${item.label}: ${item.qty}`)
+            ? apiCartItems.map(formatApiCartItem)
             : getCartVariations(imagePath, img);
           const selectedOptions = cartDetails.length > 0
             ? cartDetails
@@ -626,7 +629,45 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   </p>
                 )}
 
-                {readOnly && hasAnyFormData && (
+                {readOnly && hasAnyFormData && apiProductMap && getApiCartItems && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '8px',
+                    left: '8px',
+                    right: '8px',
+                    background: 'var(--color-primary)',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: 'var(--radius)',
+                    fontSize: '0.75rem',
+                    fontWeight: '500',
+                    zIndex: 1,
+                    opacity: 0.9
+                  }}>
+                    <div>
+                      <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+                        Qty: {totalQuantity}
+                      </div>
+                      {selectedOptions.length > 0 && (
+                        <div style={{
+                          fontSize: '0.65rem',
+                          opacity: 0.9,
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word'
+                        }}>
+                          {selectedOptions.map((option, optionIdx) => (
+                            <div key={`${option}-${optionIdx}`}>
+                              {option}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {readOnly && hasAnyFormData && (!apiProductMap || !getApiCartItems) && (
                   <OrderSummaryCard
                     categoryPath={category.path}
                     imageName={img}

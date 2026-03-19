@@ -2,8 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
-import { getVersionDisplayName } from '../../features/utils';
-import { getProductSelectionTotal } from '../../features/utils/apiOrderState';
+import { buildApiReceiptCategories } from '../../features/utils';
 import Footer from '../layout/Footer';
 import Header from '../layout/Header';
 import '../../styles/college-pages.css';
@@ -29,6 +28,8 @@ const ApiCollegeReceiptPage: React.FC = () => {
   const handlePrintReceipt = () => {
     window.print();
   };
+
+  const receiptCategories = buildApiReceiptCategories(categories, orderedByProduct, productMap);
 
   return (
     <div className="api-schools-flow" style={{
@@ -85,22 +86,8 @@ const ApiCollegeReceiptPage: React.FC = () => {
             </div>
           </div>
 
-          {[...categories].sort((a, b) => {
-            const aIsDisplay = a.name.toLowerCase().includes('display');
-            const bIsDisplay = b.name.toLowerCase().includes('display');
-            if (aIsDisplay && !bIsDisplay) return 1;
-            if (!aIsDisplay && bIsDisplay) return -1;
-            return 0;
-          }).map((category) => {
-            const itemsWithQty = category.images.filter((img) => {
-              const selection = orderedByProduct[img];
-              if (!selection) return false;
-              return getProductSelectionTotal(selection) > 0;
-            });
-            if (itemsWithQty.length === 0) return null;
-
-            return (
-              <div key={category.name} style={{ marginBottom: 'var(--space-4)' }}>
+          {receiptCategories.map((category) => (
+            <div key={category.category} style={{ marginBottom: 'var(--space-4)' }}>
                 <div style={{
                   fontWeight: '600',
                   fontSize: '1.125rem',
@@ -109,39 +96,11 @@ const ApiCollegeReceiptPage: React.FC = () => {
                   paddingBottom: 'var(--space-2)',
                   color: 'var(--color-primary)',
                 }}>
-                  {category.name}
+                  {category.category}
                 </div>
-                {itemsWithQty.map((img) => {
-                  const product = productMap[img];
-                  const selection = orderedByProduct[img];
-                  if (!product || !selection) return null;
-                  const productName = product.productName || img;
-                  const defaultVariant = product.defaultVariant || 'default';
-                  const variantOptions = product.variantOptions?.length ? product.variantOptions : [defaultVariant];
-
-                  const rows: { label: string; qty: number }[] = [];
-                  variantOptions.forEach((variant: string) => {
-                    const sizeMap = selection.variantQuantities[variant] || {};
-                    const total = Object.values(sizeMap).reduce((s, q) => s + (Number(q) || 0), 0);
-                    if (total > 0) {
-                      const sizeParts = Object.entries(sizeMap)
-                        .filter(([, q]) => (Number(q) || 0) > 0)
-                        .map(([sz, q]) => `${sz}: ${q}`)
-                        .join(', ');
-                      const label =
-                        variant === defaultVariant && !product.variantOptions?.length
-                          ? (sizeParts || 'Qty')
-                          : `${getVersionDisplayName(variant)} ${sizeParts}`.trim();
-                      rows.push({ label, qty: total });
-                    }
-                  });
-
-                  const totalQty = rows.reduce((sum, r) => sum + r.qty, 0);
-                  if (totalQty === 0) return null;
-
-                  return (
+                {category.products.map((product) => (
                     <div
-                      key={img}
+                      key={`${product.sku}-${product.name}`}
                       style={{
                         marginBottom: 'var(--space-3)',
                         padding: 'var(--space-3)',
@@ -151,9 +110,9 @@ const ApiCollegeReceiptPage: React.FC = () => {
                       }}
                     >
                       <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: 'var(--space-2)', color: 'var(--color-text)' }}>
-                        {productName}
+                        {product.name}
                       </div>
-                      {rows.map((row, idx) => (
+                      {product.rows.map((row, idx) => (
                         <div
                           key={idx}
                           style={{
@@ -169,11 +128,9 @@ const ApiCollegeReceiptPage: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                  );
-                })}
-              </div>
-            );
-          })}
+                ))}
+            </div>
+          ))}
 
           {formData.orderNotes && (
             <div style={{

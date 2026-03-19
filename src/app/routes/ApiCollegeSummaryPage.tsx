@@ -64,20 +64,28 @@ const ApiCollegeSummaryPage: React.FC = () => {
   );
 
   const getApiCartItems = useCallback(
-    (imagePath: string, imageName: string): { label: string; qty: number }[] => {
+    (imagePath: string, imageName: string): { label: string; qty: number; sizeDetail?: string }[] => {
       const product = productMap[imageName];
       const selection = orderedByProduct[imageName];
       if (!product || !selection) return [];
-      const items: { label: string; qty: number }[] = [];
+      const items: { label: string; qty: number; sizeDetail?: string }[] = [];
+      const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'S/M', 'L/XL', 'SM'] as const;
       const defaultVariant = product.defaultVariant || 'default';
       Object.entries(selection.variantQuantities || {}).forEach(([variant, sizeMap]) => {
         const total = Object.values(sizeMap).reduce((s, q) => s + (Number(q) || 0), 0);
         if (total > 0) {
+          const sizeDetail = sizeOrder
+            .map((size) => {
+              const qty = Number(sizeMap[size] || 0);
+              return qty > 0 ? `${size} ${qty}` : '';
+            })
+            .filter(Boolean)
+            .join(' ');
           const displayName =
             variant === defaultVariant && !product.variantOptions?.length
               ? 'Qty'
               : getVersionDisplayName(variant);
-          items.push({ label: displayName, qty: total });
+          items.push({ label: displayName, qty: total, sizeDetail: sizeDetail || undefined });
         }
       });
       return items;

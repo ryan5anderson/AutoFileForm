@@ -600,7 +600,7 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
     allowAnyQuantityByVariant[variant] = allowsAnyQuantityForVariant(categoryPath, variant);
   });
 
-  const productName = [item.STYLE_NUM, item.DESIGN_NUM, item.COLOR_INIT]
+  const productName = [item.STYLE_NUM, item.DESIGN_NUM, item.COLOR_INIT, item.Expr1]
     .map((part) => (part || '').trim())
     .filter(Boolean)
     .join(' ');

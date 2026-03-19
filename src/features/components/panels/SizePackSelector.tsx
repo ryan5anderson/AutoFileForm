@@ -35,6 +35,8 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
 }) => {
   const totals = calcTotals(counts, packSize, allowAnyQuantity);
   const SIZE_LIST: Size[] = sizes && sizes.length > 0 ? sizes : ALL_SIZES_DEFAULT;
+  const isSingleSizePackMode = !allowAnyQuantity && packSize > 1 && SIZE_LIST.length === 1;
+  const stepAmount = isSingleSizePackMode ? packSize : 1;
   
   // State for size distribution ratios (loaded from Firebase if college key provided)
   const [sizeDistributionRatios, setSizeDistributionRatios] = useState<Record<string, number> | null>(null);
@@ -67,16 +69,20 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
 
   const handleDelta = (size: Size, delta: number) => {
     if (disabled) return;
-    // Use single unit increment/decrement for better UX, validation happens in input
-    const next: SizeCounts = { ...counts, [size]: Math.max(0, (counts[size] || 0) + delta) } as SizeCounts;
+    const next: SizeCounts = {
+      ...counts,
+      [size]: Math.max(0, (counts[size] || 0) + (delta * stepAmount))
+    } as SizeCounts;
     onChange(next);
   };
 
   const handleInput = (size: Size, value: string) => {
     const numeric = Math.max(0, Number(value.replace(/[^0-9]/g, '')) || 0);
 
-    // If allowAnyQuantity is true, allow any quantity. Otherwise, round to nearest multiple of packSize.
-    const adjustedValue = allowAnyQuantity ? numeric : Math.round(numeric / packSize) * packSize;
+    // Enforce strict pack multiples only for single-size products sold in packs.
+    const adjustedValue = isSingleSizePackMode
+      ? (numeric === 0 ? 0 : Math.ceil(numeric / packSize) * packSize)
+      : numeric;
 
     const next: SizeCounts = { ...counts, [size]: adjustedValue } as SizeCounts;
     onChange(next);

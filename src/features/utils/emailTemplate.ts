@@ -6,6 +6,122 @@ import { getVersionDisplayName } from './naming';
 
 import { getFilteredShirtVersions } from './index';
 
+type ApiSelectionMap = Record<string, { variantQuantities: Record<string, Record<string, number>> }>;
+type ApiProductMap = Record<string, { productName?: string; defaultVariant?: string; variantOptions?: string[]; sizeOptionsByVariant?: Record<string, string[]> }>;
+
+export interface ApiReceiptRow {
+  label: string;
+  qty: number;
+}
+
+export interface ApiReceiptProduct {
+  sku: string;
+  name: string;
+  rows: ApiReceiptRow[];
+  totalQty: number;
+}
+
+export interface ApiReceiptCategory {
+  category: string;
+  products: ApiReceiptProduct[];
+}
+
+const buildReceiptText = (
+  receiptCategories: Array<{ category: string; products: Array<{ sku: string; name: string; details: string; total_qty: string }> }>
+): string => {
+  const lines: string[] = [];
+  receiptCategories.forEach((category) => {
+    lines.push(category.category);
+    category.products.forEach((product) => {
+      lines.push(`- ${product.name}`);
+      const detailLines = String(product.details || '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+      detailLines.forEach((line) => lines.push(`  ${line}`));
+      lines.push(`  Total Qty: ${product.total_qty}`);
+    });
+    lines.push('');
+  });
+  return lines.join('\n').trim();
+};
+
+const sortCategoriesForReceipt = (categories: Category[]): Category[] =>
+  [...categories].sort((a, b) => {
+    const aIsDisplay = a.name.toLowerCase().includes('display');
+    const bIsDisplay = b.name.toLowerCase().includes('display');
+    if (aIsDisplay && !bIsDisplay) return 1;
+    if (!aIsDisplay && bIsDisplay) return -1;
+    return 0;
+  });
+
+const buildApiReceiptRows = (
+  product: { defaultVariant?: string; variantOptions?: string[] },
+  selection: { variantQuantities: Record<string, Record<string, number>> }
+): ApiReceiptRow[] => {
+  const defaultVariant = product.defaultVariant || 'default';
+  const variantOptions = product.variantOptions?.length ? product.variantOptions : [defaultVariant];
+  const rows: ApiReceiptRow[] = [];
+
+  variantOptions.forEach((variant: string) => {
+    const sizeMap = selection.variantQuantities[variant] || {};
+    const total = Object.values(sizeMap).reduce((sum, qty) => sum + (Number(qty) || 0), 0);
+    if (total > 0) {
+      const sizeParts = Object.entries(sizeMap)
+        .filter(([, qty]) => (Number(qty) || 0) > 0)
+        .map(([size, qty]) => `${size}: ${qty}`)
+        .join(', ');
+      const label =
+        variant === defaultVariant && !product.variantOptions?.length
+          ? (sizeParts || 'Qty')
+          : `${getVersionDisplayName(variant)} ${sizeParts}`.trim();
+      rows.push({ label, qty: total });
+    }
+  });
+
+  return rows;
+};
+
+/** API school mode: shared receipt/email category model */
+export function buildApiReceiptCategories(
+  categories: Category[],
+  orderedByProduct: ApiSelectionMap,
+  productMap: ApiProductMap
+): ApiReceiptCategory[] {
+  const receiptCategories: ApiReceiptCategory[] = [];
+
+  sortCategoriesForReceipt(categories).forEach((category) => {
+    const products: ApiReceiptProduct[] = [];
+
+    category.images.forEach((img: string) => {
+      const product = productMap[img];
+      const selection = orderedByProduct[img];
+      if (!product || !selection) return;
+
+      const rows = buildApiReceiptRows(product, selection);
+      const totalQty = rows.reduce((sum, row) => sum + row.qty, 0);
+      if (totalQty === 0) return;
+
+      const productName = product.productName || img;
+      products.push({
+        sku: img.split(' ')[0],
+        name: productName,
+        rows,
+        totalQty,
+      });
+    });
+
+    if (products.length > 0) {
+      receiptCategories.push({
+        category: category.name,
+        products,
+      });
+    }
+  });
+
+  return receiptCategories;
+}
+
 const createEmailCategories = (formData: FormData, categories: Category[]): EmailCategory[] => {
   const emailCategories: EmailCategory[] = [];
 
@@ -312,6 +428,16 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
 export const createTemplateParams = (formData: FormData, categories: Category[], schoolName: string = ''): TemplateParams => {
   const emailCategories = createEmailCategories(formData, categories);
   const total_units = calculateTotalUnits(emailCategories);
+  const receipt_categories = emailCategories.map((category) => ({
+    category: category.category,
+    products: category.items.map((item) => ({
+      sku: item.sku,
+      name: item.sku,
+      details: item.name.split(' ; ').join('\n'),
+      total_qty: item.qty,
+    })),
+  }));
+  const receipt_text = buildReceiptText(receipt_categories);
 
   return {
     company: formData.company,
@@ -321,6 +447,8 @@ export const createTemplateParams = (formData: FormData, categories: Category[],
     date: formData.date,
     order_notes: formData.orderNotes,
     categories: emailCategories,
+    receipt_categories,
+    receipt_text,
     total_units: total_units.toString(),
     provider_email: PROVIDER_EMAIL,
     school_name: schoolName,
@@ -331,57 +459,44 @@ export const createTemplateParams = (formData: FormData, categories: Category[],
 export function createApiTemplateParams(
   formData: Pick<FormData, 'company' | 'storeNumber' | 'storeManager' | 'orderedBy' | 'date' | 'orderNotes'>,
   categories: Category[],
-  orderedByProduct: Record<string, { variantQuantities: Record<string, Record<string, number>> }>,
-  productMap: Record<string, { productName?: string; defaultVariant?: string; variantOptions?: string[]; sizeOptionsByVariant?: Record<string, string[]> }>,
+  orderedByProduct: ApiSelectionMap,
+  productMap: ApiProductMap,
   schoolName: string = ''
 ): TemplateParams {
   const emailCategories: EmailCategory[] = [];
+  const receiptCategories = buildApiReceiptCategories(categories, orderedByProduct, productMap);
 
-  categories.forEach((cat: Category) => {
+  receiptCategories.forEach((cat) => {
     const categoryItems: EmailItem[] = [];
 
-    cat.images.forEach((img: string) => {
-      const product = productMap[img];
-      const selection = orderedByProduct[img];
-      if (!product || !selection) return;
-
-      const sku = img.split(' ')[0];
-      const variantOptions = product.variantOptions?.length ? product.variantOptions : [product.defaultVariant || 'default'];
-
-      let totalQty = 0;
-      const details: string[] = [];
-
-      variantOptions.forEach((variant: string) => {
-        const sizeMap = selection.variantQuantities[variant] || {};
-        const variantTotal = Object.values(sizeMap).reduce((s, q) => s + (Number(q) || 0), 0);
-        if (variantTotal > 0) {
-          totalQty += variantTotal;
-          const sizeParts = Object.entries(sizeMap)
-            .filter(([, q]) => (Number(q) || 0) > 0)
-            .map(([sz, q]) => `${sz}: ${q}`)
-            .join(', ');
-          const displayName = variant === (product.defaultVariant || 'default') && !product.variantOptions?.length
-            ? (sizeParts || 'Qty')
-            : `${getVersionDisplayName(variant)} ${sizeParts}`.trim();
-          details.push(displayName);
-        }
-      });
-
-      if (totalQty > 0) {
+    cat.products.forEach((product) => {
+      if (product.totalQty > 0) {
         categoryItems.push({
-          sku,
-          name: details.join(' ; '),
-          qty: String(totalQty),
+          sku: product.sku,
+          name: product.rows.map((row) => row.label).join(' ; '),
+          qty: String(product.totalQty),
         });
       }
     });
 
     if (categoryItems.length > 0) {
-      emailCategories.push({ category: cat.name, items: categoryItems });
+      emailCategories.push({ category: cat.category, items: categoryItems });
     }
   });
 
   const total_units = calculateTotalUnits(emailCategories);
+  const receipt_categories = receiptCategories.map((category) => ({
+    category: category.category,
+    products: category.products.map((product) => ({
+      sku: product.sku,
+      name: product.name,
+      details: product.rows
+        .map((row) => `${row.label} | Qty: ${row.qty}`)
+        .join('\n'),
+      total_qty: String(product.totalQty),
+    })),
+  }));
+  const receipt_text = buildReceiptText(receipt_categories);
 
   return {
     company: formData.company,
@@ -391,6 +506,8 @@ export function createApiTemplateParams(
     date: formData.date,
     order_notes: formData.orderNotes || '',
     categories: emailCategories,
+    receipt_categories,
+    receipt_text,
     total_units: total_units.toString(),
     provider_email: PROVIDER_EMAIL,
     school_name: schoolName,
