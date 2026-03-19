@@ -87,6 +87,55 @@
   text-align: center;
 }
 
+/* API school card: blue glow backlight */
+.card--api-school {
+  border-color: rgb(37 99 235 / 20%);
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 10%),
+    0 1px 2px rgb(0 0 0 / 6%),
+    0 0 0 1px rgb(37 99 235 / 10%);
+}
+
+.card--api-school.card--clickable:hover {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 8px 16px rgb(0 0 0 / 12%),
+    0 4px 8px rgb(0 0 0 / 8%),
+    0 0 0 1px rgb(37 99 235 / 20%);
+}
+
+/* Variant listing text on product card */
+.card__variant-text {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+  margin: 0 0 var(--space-2) 0;
+  text-align: center;
+  white-space: pre-line;
+}
+
+/* "Choose Apparel" button on product card */
+.card__choose-btn {
+  align-self: stretch;
+  background: var(--color-primary, #2563eb);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+  color: white;
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  text-align: center;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card--clickable:hover .card__choose-btn {
+  filter: brightness(1.1);
+}
+
 /* Card body styles kept for backward compatibility in read-only views */
 .card__body {
   overflow: hidden;

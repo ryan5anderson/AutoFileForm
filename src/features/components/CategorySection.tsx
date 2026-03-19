@@ -37,7 +37,7 @@ interface CategorySectionProps {
   /** API school mode: ordered product selections by productId */
   apiOrderedByProduct?: Record<string, { activeVariant: string; variantQuantities: Record<string, Record<string, number>> }>;
   /** API school mode: product map by productId */
-  apiProductMap?: Record<string, unknown>;
+  apiProductMap?: Record<string, { variantOptions?: string[]; defaultVariant?: string }>;
   /** API school mode: get cart items for In Cart bar - returns { label, qty }[] */
   getApiCartItems?: (imagePath: string, imageName: string) => { label: string; qty: number }[];
 }
@@ -482,7 +482,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           return (
             <Card
               key={img}
-              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''}`}
+              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''} ${apiProductMap ? 'card--api-school' : ''}`}
               style={shouldHighlight ? {
                 position: 'relative',
                 overflow: 'hidden'
@@ -629,7 +629,31 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   />
                 </div>
 
-                {!readOnly && showTapToSelectText && (
+                {!readOnly && apiProductMap && (() => {
+                  const product = apiProductMap[img];
+                  const variants = product?.variantOptions;
+                  const hasMultipleVariants = variants && variants.length > 1;
+                  return (
+                    <>
+                      {hasMultipleVariants && (
+                        <p className="card__variant-text">
+                          Available on{'\n'}
+                          {variants.map((v, i) => (
+                            <span key={v}>
+                              {getVersionDisplayName(v)}
+                              {i < variants.length - 1 ? ' \u2022 ' : ''}
+                            </span>
+                          ))}
+                        </p>
+                      )}
+                      <span className="card__choose-btn">
+                        Choose Apparel
+                      </span>
+                    </>
+                  );
+                })()}
+
+                {!readOnly && showTapToSelectText && !apiProductMap && (
                   <p className="card__action-text">
                     Tap to select options
                   </p>
