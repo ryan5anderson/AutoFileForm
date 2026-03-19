@@ -243,16 +243,15 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     return variations;
   };
 
-  // Helper function to check if an item has any quantity
-  const hasQuantity = (imagePath: string, imageName: string) => {
+  // Helper function to get total quantity for a product across all supported selection models
+  const getQuantityTotal = (imagePath: string, imageName: string): number => {
     // Handle display options
     if (category.name === 'Display Options') {
       const displayOption = displayOptions[imagePath];
       if (displayOption) {
-        const totalQty = Number(displayOption.displayOnly || 0) + Number(displayOption.displayStandardCasePack || 0);
-        return totalQty > 0;
+        return Number(displayOption.displayOnly || 0) + Number(displayOption.displayStandardCasePack || 0);
       }
-      return false;
+      return 0;
     }
 
     // Handle pants with style/color/size options
@@ -269,9 +268,9 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
         const sweatpantsTotal = calculateTotal(pOptions.sweatpants);
         const joggersTotal = calculateTotal(pOptions.joggers);
-        return (sweatpantsTotal + joggersTotal) > 0;
+        return sweatpantsTotal + joggersTotal;
       }
-      return false;
+      return 0;
     }
 
     // Handle infant products (only check by image name, not category name)
@@ -279,20 +278,18 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     if (imageName.toLowerCase().includes('infant') || imageName.toLowerCase().includes('onsie')) {
       const infantCounts = infantSizeCounts[imagePath];
       if (infantCounts) {
-        const totalQty = Object.values(infantCounts).reduce((sum, count) => sum + count, 0);
-        return totalQty > 0;
+        return Object.values(infantCounts).reduce((sum, count) => sum + count, 0);
       }
-      return false;
+      return 0;
     }
 
     // Handle sweatpants/joggers (legacy)
     if (category.name === 'Sweatpants/Joggers') {
       const sjOptions = sweatpantJoggerOptions[imagePath];
       if (sjOptions) {
-        const totalQty = Object.values(sjOptions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-        return totalQty > 0;
+        return Object.values(sjOptions).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
       }
-      return false;
+      return 0;
     }
 
     // Handle shirt versions (tshirt, longsleeve, hoodie, crewneck)
@@ -309,7 +306,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           }, 0);
           return sum + colorTotal;
         }, 0);
-        if (totalQty > 0) return true;
+        if (totalQty > 0) return totalQty;
       }
 
       // Regular size counts
@@ -320,14 +317,13 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           const versionTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
           return sum + versionTotal;
         }, 0);
-        if (totalQty > 0) return true;
+        if (totalQty > 0) return totalQty;
       }
       const shirtVersion = shirtVersions[imagePath];
       if (shirtVersion) {
-        const totalQty = getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
-        return totalQty > 0;
+        return getShirtVersionTotal(shirtVersion, ['tshirt', 'longsleeve', 'hoodie', 'crewneck']);
       }
-      return false;
+      return 0;
     }
 
     // Handle products with size options (check shirtSizeCounts first for all products with size options)
@@ -345,7 +341,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             }, 0);
             return sum + colorTotal;
           }, 0);
-          if (totalQty > 0) return true;
+          if (totalQty > 0) return totalQty;
         }
       }
 
@@ -357,42 +353,45 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           const versionTotal = Object.values(counts).reduce((a: number, b: number) => a + b, 0);
           return sum + versionTotal;
         }, 0);
-        if (totalQty > 0) return true;
+        if (totalQty > 0) return totalQty;
       }
 
       // For products with size options but no shirt versions, also check regular quantities
       if (!category.hasShirtVersions) {
         const quantity = quantities[imagePath];
         if (quantity && Number(quantity) > 0) {
-          return true;
+          return Number(quantity);
         }
 
         // Also check for color-based quantities
         if (hasColorOptions(imageName)) {
           const colorQty = colorOptions[imagePath];
           if (colorQty) {
-            const totalQty = Object.values(colorQty).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
-            if (totalQty > 0) return true;
+            return Object.values(colorQty).reduce((sum: number, qty) => sum + Number(qty || 0), 0);
           }
         }
       }
 
-      return false;
+      return 0;
     }
 
     // Handle non-shirt items with color options (like hats)
     if (hasColorOptions(imageName)) {
       const colorQty = colorOptions[imagePath];
       if (colorQty) {
-        const totalQty = Object.values(colorQty).reduce((sum, qty) => sum + Number(qty || 0), 0);
-        return totalQty > 0;
+        return Object.values(colorQty).reduce((sum, qty) => sum + Number(qty || 0), 0);
       }
-      return false;
+      return 0;
     }
 
     // Handle regular quantities
     const quantity = quantities[imagePath];
-    return quantity && Number(quantity) > 0;
+    return Number(quantity || 0);
+  };
+
+  // Helper function to check if an item has any quantity
+  const hasQuantity = (imagePath: string, imageName: string) => {
+    return getQuantityTotal(imagePath, imageName) > 0;
   };
 
   // Filter images to only show those with quantities in read-only mode
@@ -483,8 +482,18 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           
           // Check if this product has validation errors or valid quantities
           const hasValidationError = invalidProductPaths.includes(imagePath);
-          const hasAnyQuantity = hasQuantity(imagePath, img);
           const shouldHighlight = hasValidationError;
+          const totalQuantity = getQuantityTotal(imagePath, img);
+          const hasAnyQuantity = totalQuantity > 0;
+          const isInCartState = hasAnyQuantity && !shouldHighlight && !readOnly && Boolean(apiProductMap);
+          const cartDetails = getApiCartItems
+            ? getApiCartItems(imagePath, img).map((item) => `${item.label}: ${item.qty}`)
+            : getCartVariations(imagePath, img);
+          const selectedOptions = cartDetails.length > 0
+            ? cartDetails
+            : totalQuantity > 0
+              ? [`Quantity: ${totalQuantity}`]
+              : [];
 
           // Ensure onClick is always set when card should be clickable
           const shouldBeClickable = !readOnly || (isAdmin && college);
@@ -492,7 +501,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           return (
             <Card
               key={img}
-              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''} ${apiProductMap ? 'card--api-school' : ''}`}
+              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''} ${apiProductMap ? 'card--api-school' : ''} ${isInCartState ? 'card--in-cart' : ''}`}
               style={shouldHighlight ? {
                 position: 'relative',
                 overflow: 'hidden'
@@ -524,86 +533,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 </div>
               )}
 
-              {/* Blue cart icon for valid quantities */}
-              {hasAnyQuantity && !shouldHighlight && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: shouldHighlight ? '52px' : '8px',
-                    zIndex: 20,
-                    width: '40px',
-                    height: '40px',
-                    backgroundColor: '#2563eb',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    pointerEvents: 'none'
-                  }}
-                >
-                  🛒
-                </div>
-              )}
-
-              {/* Cart variations box at bottom of card - always visible */}
-              {hasAnyQuantity && !shouldHighlight && !readOnly && (() => {
-                const variations = getApiCartItems
-                  ? getApiCartItems(imagePath, img).map((item) => `${item.label}: ${item.qty}`)
-                  : getCartVariations(imagePath, img);
-                if (variations.length === 0 && !getApiCartItems) {
-                  const fallbackQty = Number(quantities[imagePath] || 0);
-                  if (fallbackQty <= 0) {
-                    return null;
-                  }
-                  variations.push(`Qty: ${fallbackQty}`);
-                }
-                
-                return (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '8px',
-                      left: '8px',
-                      right: '8px',
-                      backgroundColor: 'rgba(37, 99, 235, 0.85)',
-                      color: 'white',
-                      padding: '6px 10px',
-                      borderRadius: '6px',
-                      fontSize: '0.7rem',
-                      zIndex: 10,
-                      backdropFilter: 'blur(4px)',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                    }}
-                  >
-                    <div style={{ fontWeight: '600', marginBottom: '3px', fontSize: '0.75rem' }}>
-                      In Cart:
-                    </div>
-                    <div style={{ 
-                      display: 'flex', 
-                      flexWrap: 'wrap', 
-                      gap: '4px',
-                      lineHeight: '1.3'
-                    }}>
-                      {variations.map((variation, idx) => (
-                        <span key={idx} style={{ 
-                          display: 'inline-block',
-                          padding: '2px 6px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          borderRadius: '4px',
-                          fontSize: '0.65rem',
-                        }}>
-                          {variation}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-
               {/* Red overlay for invalid quantities */}
               {shouldHighlight && (
                 <div
@@ -621,7 +550,13 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 />
               )}
               <Card.Header>
-                <h3 className="card__title">
+                {/* Selected state badge for in-cart products */}
+                {isInCartState && (
+                  <div className="card__status-badge">
+                    In Cart
+                  </div>
+                )}
+                <h3 className={`card__title ${isInCartState ? 'card__title--in-cart' : 'card__title--default'}`}>
                   {productTitleResolver
                     ? productTitleResolver(category.path, img, imagePath)
                     : (category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img))}
@@ -645,7 +580,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   const hasMultipleVariants = variants && variants.length > 1;
                   return (
                     <>
-                      {hasMultipleVariants && (
+                      {hasMultipleVariants && !isInCartState && (
                         <p className="card__variant-text">
                           Available on{'\n'}
                           {variants.map((v, i) => (
@@ -656,9 +591,31 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                           ))}
                         </p>
                       )}
-                      <span className="card__choose-btn">
-                        Choose Apparel
-                      </span>
+                      {isInCartState ? (
+                        <div className="card__selected-footer">
+                          {selectedOptions.length > 0 && (
+                            <div className="card__selected-options">
+                              {selectedOptions.map((option, optionIdx) => (
+                                <span key={`${option}-${optionIdx}`} className="card__selected-option-chip">
+                                  {option}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {totalQuantity > 0 && (
+                            <p className="card__selected-qty">
+                              Quantity selected: {totalQuantity}
+                            </p>
+                          )}
+                          <span className="card__selected-action">
+                            Edit selection
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="card__choose-btn">
+                          Choose Apparel
+                        </span>
+                      )}
                     </>
                   );
                 })()}
