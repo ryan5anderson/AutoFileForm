@@ -40,6 +40,8 @@ interface CategorySectionProps {
   apiProductMap?: Record<string, { variantOptions?: string[]; defaultVariant?: string }>;
   /** API school mode: get cart items for In Cart bar - returns variant totals and optional size details */
   getApiCartItems?: (imagePath: string, imageName: string) => { label: string; qty: number; sizeDetail?: string }[];
+  /** Enables API-style catalog card UX for local school flows */
+  useCatalogCardUi?: boolean;
 }
 
 
@@ -71,6 +73,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   apiOrderedByProduct,
   apiProductMap,
   getApiCartItems,
+  useCatalogCardUi = false,
 }) => {
   const navigate = useNavigate();
 
@@ -485,13 +488,23 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           const shouldHighlight = hasValidationError;
           const totalQuantity = getQuantityTotal(imagePath, img);
           const hasAnyQuantity = totalQuantity > 0;
-          const isInCartState = hasAnyQuantity && !shouldHighlight && !readOnly && Boolean(apiProductMap);
+          const shouldUseCatalogCardUi = !readOnly && (useCatalogCardUi || Boolean(apiProductMap));
+          const isInCartState = hasAnyQuantity && !shouldHighlight && shouldUseCatalogCardUi;
           const formatApiCartItem = (item: { label: string; qty: number; sizeDetail?: string }) =>
             `${item.label}: ${item.qty}${item.sizeDetail ? ` (${item.sizeDetail})` : ''}`;
           const apiCartItems = getApiCartItems ? getApiCartItems(imagePath, img) : [];
           const cartDetails = getApiCartItems
             ? apiCartItems.map(formatApiCartItem)
             : getCartVariations(imagePath, img);
+          const availableVariants = (() => {
+            const apiVariants = apiProductMap?.[img]?.variantOptions;
+            if (apiVariants && apiVariants.length > 0) return apiVariants;
+            if (category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length > 0) {
+              return category.shirtVersions;
+            }
+            return [];
+          })();
+          const hasMultipleVariants = availableVariants.length > 1;
           const selectedOptions = cartDetails.length > 0
             ? cartDetails
             : totalQuantity > 0
@@ -504,7 +517,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           return (
             <Card
               key={img}
-              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''} ${apiProductMap ? 'card--api-school' : ''} ${isInCartState ? 'card--in-cart' : ''}`}
+              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''} ${shouldUseCatalogCardUi ? 'card--catalog-enhanced' : ''} ${apiProductMap ? 'card--api-school' : ''} ${isInCartState ? 'card--in-cart' : ''}`}
               style={shouldHighlight ? {
                 position: 'relative',
                 overflow: 'hidden'
@@ -577,53 +590,48 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   />
                 </div>
 
-                {!readOnly && apiProductMap && (() => {
-                  const product = apiProductMap[img];
-                  const variants = product?.variantOptions;
-                  const hasMultipleVariants = variants && variants.length > 1;
-                  return (
-                    <>
-                      {hasMultipleVariants && !isInCartState && (
-                        <p className="card__variant-text">
-                          Available on{'\n'}
-                          {variants.map((v, i) => (
-                            <span key={v}>
-                              {getVersionDisplayName(v)}
-                              {i < variants.length - 1 ? ' \u2022 ' : ''}
-                            </span>
-                          ))}
-                        </p>
-                      )}
-                      {isInCartState ? (
-                        <div className="card__selected-footer">
-                          {selectedOptions.length > 0 && (
-                            <div className="card__selected-options">
-                              {selectedOptions.map((option, optionIdx) => (
-                                <span key={`${option}-${optionIdx}`} className="card__selected-option-chip">
-                                  {option}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {totalQuantity > 0 && (
-                            <p className="card__selected-qty">
-                              Quantity selected: {totalQuantity}
-                            </p>
-                          )}
-                          <span className="card__selected-action">
-                            Edit selection
+                {shouldUseCatalogCardUi && (
+                  <>
+                    {hasMultipleVariants && !isInCartState && (
+                      <p className="card__variant-text">
+                        Available on{'\n'}
+                        {availableVariants.map((v, i) => (
+                          <span key={v}>
+                            {getVersionDisplayName(v)}
+                            {i < availableVariants.length - 1 ? ' \u2022 ' : ''}
                           </span>
-                        </div>
-                      ) : (
-                        <span className="card__choose-btn">
-                          Choose Apparel
+                        ))}
+                      </p>
+                    )}
+                    {isInCartState ? (
+                      <div className="card__selected-footer">
+                        {selectedOptions.length > 0 && (
+                          <div className="card__selected-options">
+                            {selectedOptions.map((option, optionIdx) => (
+                              <span key={`${option}-${optionIdx}`} className="card__selected-option-chip">
+                                {option}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {totalQuantity > 0 && (
+                          <p className="card__selected-qty">
+                            Quantity selected: {totalQuantity}
+                          </p>
+                        )}
+                        <span className="card__selected-action">
+                          Edit selection
                         </span>
-                      )}
-                    </>
-                  );
-                })()}
+                      </div>
+                    ) : (
+                      <span className="card__choose-btn">
+                        Choose Apparel
+                      </span>
+                    )}
+                  </>
+                )}
 
-                {!readOnly && showTapToSelectText && !apiProductMap && (
+                {!readOnly && showTapToSelectText && !shouldUseCatalogCardUi && (
                   <p className="card__action-text">
                     Tap to select options
                   </p>

@@ -87,8 +87,9 @@
   text-align: center;
 }
 
-/* API school card: blue glow backlight */
-.card--api-school {
+/* API/local catalog card: blue glow backlight */
+.card--api-school,
+.card--catalog-enhanced {
   border-color: rgb(37 99 235 / 20%);
   box-shadow:
     0 1px 3px rgb(0 0 0 / 10%),
@@ -96,7 +97,8 @@
     0 0 0 1px rgb(37 99 235 / 10%);
 }
 
-.card--api-school.card--clickable:hover {
+.card--api-school.card--clickable:hover,
+.card--catalog-enhanced.card--clickable:hover {
   border-color: var(--color-primary);
   box-shadow:
     0 8px 16px rgb(0 0 0 / 12%),

@@ -186,6 +186,7 @@ const FormPage: React.FC<FormPageProps> = ({
               onDisplayOptionChange={onDisplayOptionChange}
               onSweatpantJoggerOptionChange={onSweatpantJoggerOptionChange}
               college={college}
+              useCatalogCardUi={true}
             />
           ))}
 
