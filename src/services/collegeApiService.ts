@@ -521,32 +521,7 @@ const getCategoryName = (categoryPath: string): string => {
 };
 
 const inferVariantOptions = (categoryPath: string, sourceText: string): string[] => {
-  if (categoryPath === 'tshirt/men') {
-    let versions = [...SHIRT_MEN_VERSIONS];
-
-    if (/\bcrew(?:neck)?\b/.test(sourceText)) {
-      versions = ['crewneck'];
-    } else if (sourceText.includes('hood') || sourceText.includes('cm7031')) {
-      versions = ['hoodie'];
-    } else {
-      if (sourceText.includes('applique')) {
-        versions = versions.filter((version) => version === 'crewneck' || version === 'hoodie');
-      }
-      if (sourceText.includes('tie-dye') || sourceText.includes('tie dye')) {
-        versions = versions.filter((version) => version !== 'crewneck');
-      }
-    }
-
-    if (sourceText.includes('long sleeve') || sourceText.includes('longsleeve')) {
-      versions = versions.filter((version) => version === 'longsleeve');
-    } else if (sourceText.includes('crewneck')) {
-      versions = versions.filter((version) => version === 'crewneck');
-    } else if (sourceText.includes('hoodie')) {
-      versions = versions.filter((version) => version === 'hoodie');
-    }
-
-    return versions.length > 0 ? versions : ['tshirt'];
-  }
+  if (categoryPath === 'tshirt/men') return [...SHIRT_MEN_VERSIONS];
 
   if (categoryPath === 'pants') {
     return sourceText.includes('jogger') ? ['joggers'] : ['sweatpants'];
@@ -602,7 +577,11 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
   });
   const categoryPath = getCategoryPathForApiCollegeCategory(categorizedAs);
   const categoryName = categorizedAs;
-  const variantOptions = inferVariantOptions(categoryPath, sourceText);
+  let variantOptions = inferVariantOptions(categoryPath, sourceText);
+  // Ensure Unisex T-shirt always has all 4 options (defensive override)
+  if (categoryPath === 'tshirt/men' && variantOptions.length < 4) {
+    variantOptions = [...SHIRT_MEN_VERSIONS];
+  }
   const defaultVariant = variantOptions[0];
   const sizeOptionsByVariant: Record<string, string[]> = {};
   const packSizeByVariant: Record<string, number> = {};
