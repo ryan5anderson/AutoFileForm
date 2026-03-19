@@ -26,8 +26,6 @@ const ZERO_COUNTS: SizeCounts = {
   SM: 0,
 };
 
-const UNISEX_TSHIRT_VARIANTS = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
-
 interface ApiReturnNavigationState {
   returnFromProduct: true;
   returnScrollY: number;
@@ -37,7 +35,7 @@ const ApiCollegeProductDetail: React.FC = () => {
   const { orderTemplateId, productId } = useParams<{ orderTemplateId: string; productId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { productMap, orderedByProduct, updateOrderedByProduct, categories, loading, error } = useApiCollegeOrder();
+  const { productMap, orderedByProduct, updateOrderedByProduct, loading, error } = useApiCollegeOrder();
 
   const decodedProductId = productId ? decodeURIComponent(productId) : '';
   const product = decodedProductId ? productMap[decodedProductId] ?? null : null;
