@@ -5,10 +5,11 @@ import {
   categorizeApiCollegeProduct,
 } from './apiCollegeCategorization';
 
-const classify = (input: { SHIRT_NAME?: string; DESCRIPT?: string; STYL_NUM?: string }) =>
+const classify = (input: { SHIRT_NAME?: string; DESCRIPT?: string; DESIGN_NUM?: string; STYL_NUM?: string }) =>
   categorizeApiCollegeProduct({
     SHIRT_NAME: input.SHIRT_NAME || '',
     DESCRIPT: input.DESCRIPT || '',
+    DESIGN_NUM: input.DESIGN_NUM || '',
     STYL_NUM: input.STYL_NUM || '',
   });
 
@@ -30,6 +31,8 @@ describe('categorizeApiCollegeProduct', () => {
     expect(classify({ STYL_NUM: '4890P' })).toBe(API_COLLEGE_CATEGORIES.SHORTS);
     expect(classify({ STYL_NUM: '560WVR' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
     expect(classify({ STYL_NUM: 'IC47WR' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
+    expect(classify({ STYL_NUM: '88MR' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
+    expect(classify({ STYL_NUM: '240MS' })).toBe(API_COLLEGE_CATEGORIES.UNISEX_TSHIRT);
   });
 
   it('matches prefix style overrides', () => {
@@ -37,6 +40,8 @@ describe('categorizeApiCollegeProduct', () => {
     expect(classify({ STYL_NUM: '974MP' })).toBe(API_COLLEGE_CATEGORIES.PANTS);
     expect(classify({ STYL_NUM: '974MPP' })).toBe(API_COLLEGE_CATEGORIES.PANTS);
     expect(classify({ STYL_NUM: '975MPR' })).toBe(API_COLLEGE_CATEGORIES.PANTS);
+    expect(classify({ STYL_NUM: '88MRSDLOCS' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
+    expect(classify({ STYL_NUM: '996ESHCMDW' })).toBe(API_COLLEGE_CATEGORIES.UNISEX_TSHIRT);
   });
 
   it('matches keyword-only rule groups', () => {
@@ -47,6 +52,9 @@ describe('categorizeApiCollegeProduct', () => {
     expect(classify({ DESCRIPT: 'Vinyl decal pack' })).toBe(API_COLLEGE_CATEGORIES.STICKERS);
     expect(classify({ SHIRT_NAME: 'Bookbag' })).toBe(API_COLLEGE_CATEGORIES.BACKPACK);
     expect(classify({ DESCRIPT: 'Youth onesie' })).toBe(API_COLLEGE_CATEGORIES.YOUTH_INFANT);
+    expect(classify({ DESCRIPT: 'MSU MOM TEE' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
+    expect(classify({ DESCRIPT: 'GO GREEN GIRL SHIRT' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
+    expect(classify({ DESIGN_NUM: 'SDFAMS' })).toBe(API_COLLEGE_CATEGORIES.LADIES_TOPS);
     expect(classify({ SHIRT_NAME: 'Tri-blend tee' })).toBe(API_COLLEGE_CATEGORIES.UNISEX_TSHIRT);
   });
 

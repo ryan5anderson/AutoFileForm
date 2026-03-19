@@ -703,6 +703,7 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
   const categorizedAs = categorizeApiCollegeProduct({
     SHIRT_NAME: item.SHIRTNAME || '',
     DESCRIPT: item.DESCRIPT || '',
+    DESIGN_NUM: item.DESIGN_NUM || '',
     STYL_NUM: item.STYLE_NUM || '',
   });
   const categoryPath = getCategoryPathForApiCollegeCategory(categorizedAs);

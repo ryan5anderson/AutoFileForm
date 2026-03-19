@@ -22,6 +22,7 @@ export type ApiCollegeCategory =
 
 export interface ApiCollegeCategorizationInput {
   DESCRIPT?: string | null;
+  DESIGN_NUM?: string | null;
   SHIRT_NAME?: string | null;
   STYL_NUM?: string | null;
 }
@@ -29,6 +30,7 @@ export interface ApiCollegeCategorizationInput {
 interface SearchContext {
   shirtName: string;
   description: string;
+  designNum: string;
   styleNum: string;
   text: string;
 }
@@ -115,7 +117,12 @@ const SHORTS_STYLES = ['4890P'] as const;
 const YOUTH_INFANT_PHRASES = ['YOUTH', 'YTH', 'TODDLER', 'INFANT', 'ONESIE', 'BABY'] as const;
 
 const LADIES_TOPS_PHRASES = ['WOMENS', 'WOMEN', 'LADIES', 'LADY', 'GIRLS', 'LADIES TEE', 'WOMENS TEE'] as const;
+const LADIES_TOPS_DESCRIPT_PHRASES = ['GIRL', 'MOM'] as const;
+const LADIES_TOPS_DESIGN_NUM_PHRASES = ['SDFAMS'] as const;
 const LADIES_TOPS_STYLES = ['560WVR', 'IC47WR'] as const;
+const LADIES_TOPS_STYLE_PREFIX = ['88MR'] as const;
+const UNISEX_TSHIRT_STYLES = ['240MS'] as const;
+const UNISEX_TSHIRT_STYLE_PREFIX = ['996E'] as const;
 
 const UNISEX_FALLBACK_PHRASES = [
   'TEE',
@@ -134,9 +141,12 @@ const UNISEX_FALLBACK_PHRASES = [
 const buildSearchContext = (input: ApiCollegeCategorizationInput): SearchContext => {
   const shirtName = normalizeSearchText(input.SHIRT_NAME);
   const description = normalizeSearchText(input.DESCRIPT);
+  const designNum = normalizeSearchText(input.DESIGN_NUM);
   const styleNum = normalizeStyleNum(input.STYL_NUM);
-  const text = normalizeSearchText([input.SHIRT_NAME, input.DESCRIPT, input.STYL_NUM].filter(Boolean).join(' '));
-  return { shirtName, description, styleNum, text };
+  const text = normalizeSearchText(
+    [input.SHIRT_NAME, input.DESCRIPT, input.DESIGN_NUM, input.STYL_NUM].filter(Boolean).join(' ')
+  );
+  return { shirtName, description, designNum, styleNum, text };
 };
 
 const matchesBackpackRule = (context: SearchContext): boolean => {
@@ -234,12 +244,18 @@ export const API_COLLEGE_CATEGORY_RULES: readonly CategoryRule[] = [
     // Ladies keywords must beat unisex tee fallback.
     category: API_COLLEGE_CATEGORIES.LADIES_TOPS,
     matches: (context) =>
+      hasAnyPhrase(context.description, LADIES_TOPS_DESCRIPT_PHRASES) ||
+      hasAnyPhrase(context.designNum, LADIES_TOPS_DESIGN_NUM_PHRASES) ||
       hasAnyPhrase(context.text, LADIES_TOPS_PHRASES) ||
-      hasAnyStyleExact(context.styleNum, LADIES_TOPS_STYLES),
+      hasAnyStyleExact(context.styleNum, LADIES_TOPS_STYLES) ||
+      hasAnyStylePrefix(context.styleNum, LADIES_TOPS_STYLE_PREFIX),
   },
   {
     category: API_COLLEGE_CATEGORIES.UNISEX_TSHIRT,
-    matches: (context) => hasAnyPhrase(context.text, UNISEX_FALLBACK_PHRASES),
+    matches: (context) =>
+      hasAnyStyleExact(context.styleNum, UNISEX_TSHIRT_STYLES) ||
+      hasAnyStylePrefix(context.styleNum, UNISEX_TSHIRT_STYLE_PREFIX) ||
+      hasAnyPhrase(context.text, UNISEX_FALLBACK_PHRASES),
   },
 ];
 
