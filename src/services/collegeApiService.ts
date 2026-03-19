@@ -1036,6 +1036,17 @@ export function buildApiOrderPayload(
 ): ApiOrderPayload | null {
   if (!rawPageData?.items?.length) return null;
 
+  const shouldSerializeVariant = (
+    product: ApiOrderProduct | undefined,
+    variant: string
+  ): boolean => {
+    if (!product) return false;
+    if (product.categoryPath === 'tshirt/men') {
+      return variant === 'tshirt';
+    }
+    return true;
+  };
+
   const isProblemStyleDebugEnabled = (
     product: ApiOrderProduct | undefined,
     sourceStyleNum: string | null | undefined
@@ -1072,7 +1083,7 @@ export function buildApiOrderPayload(
       const debugProblemStyle = isProblemStyleDebugEnabled(product, item.STYLE_NUM as string | null | undefined);
       const groupedSelectedSizes = Object.entries(selection.variantQuantities).flatMap(
         ([variant, variantMap]) =>
-          Object.entries(variantMap)
+          (shouldSerializeVariant(product, variant) ? Object.entries(variantMap) : [])
             .filter(([, qty]) => Number(qty) > 0)
             .map(([size, qty]) => ({
               variant,

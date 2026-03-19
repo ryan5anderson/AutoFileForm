@@ -8,43 +8,43 @@ import {
 } from './collegeApiService';
 
 describe('buildApiOrderPayload size-to-raw-row serialization', () => {
-  it('maps grouped S/M/L/XL/XXL/XXXL selections back to the correct raw rows and ORDERED fields', () => {
-    const rawItems: OrderItem[] = [
-      {
-        ORDER_NUM: 'SH2COC',
-        DESIGN_NUM: 'D1',
-        ITEM_ID: 'A',
-        SHIRTNAME: 'Classic Tee',
-        Expr1: 'Black',
-        STYLE_NUM: '3930R  ',
-        size2: 'SM',
-        size3: 'MD',
-        size4: 'LG',
-        size5: 'XL',
-        UNITPRICE: 10,
-      },
-      {
-        ORDER_NUM: 'SH2COC',
-        DESIGN_NUM: 'D1',
-        ITEM_ID: 'B',
-        SHIRTNAME: 'Classic Tee',
-        Expr1: 'Black',
-        STYLE_NUM: '3930R2X',
-        size5: '2XL',
-        UNITPRICE: 10,
-      },
-      {
-        ORDER_NUM: 'SH2COC',
-        DESIGN_NUM: 'D1',
-        ITEM_ID: 'C',
-        SHIRTNAME: 'Classic Tee',
-        Expr1: 'Black',
-        STYLE_NUM: '3930R3X',
-        size5: '3XL',
-        UNITPRICE: 10,
-      },
-    ];
+  const rawItems: OrderItem[] = [
+    {
+      ORDER_NUM: 'SH2COC',
+      DESIGN_NUM: 'D1',
+      ITEM_ID: 'A',
+      SHIRTNAME: 'Classic Tee',
+      Expr1: 'Black',
+      STYLE_NUM: '3930R  ',
+      size2: 'SM',
+      size3: 'MD',
+      size4: 'LG',
+      size5: 'XL',
+      UNITPRICE: 10,
+    },
+    {
+      ORDER_NUM: 'SH2COC',
+      DESIGN_NUM: 'D1',
+      ITEM_ID: 'B',
+      SHIRTNAME: 'Classic Tee',
+      Expr1: 'Black',
+      STYLE_NUM: '3930R2X',
+      size5: '2XL',
+      UNITPRICE: 10,
+    },
+    {
+      ORDER_NUM: 'SH2COC',
+      DESIGN_NUM: 'D1',
+      ITEM_ID: 'C',
+      SHIRTNAME: 'Classic Tee',
+      Expr1: 'Black',
+      STYLE_NUM: '3930R3X',
+      size5: '3XL',
+      UNITPRICE: 10,
+    },
+  ];
 
+  it('maps grouped S/M/L/XL/XXL/XXXL selections back to the correct raw rows and ORDERED fields', () => {
     const model = buildApiOrderCategoryModel(rawItems);
     const groupKey = Object.keys(model.productMap)[0];
     expect(groupKey).toBeTruthy();
@@ -114,5 +114,60 @@ describe('buildApiOrderPayload size-to-raw-row serialization', () => {
     expect(row3X?.ORDERED3).toBe('0');
     expect(row3X?.ORDERED4).toBe('0');
     expect(row3X?.ORDERED5).toBe('1');
+  });
+
+  it('does not serialize ORDERED fields when only non-tshirt variants have quantities', () => {
+    const model = buildApiOrderCategoryModel(rawItems);
+    const groupKey = Object.keys(model.productMap)[0];
+    expect(groupKey).toBeTruthy();
+
+    const groupedProduct = model.productMap[groupKey];
+    const nonTshirtVariant =
+      groupedProduct.variantOptions?.find((variant) => variant !== 'tshirt') || 'longsleeve';
+    expect(nonTshirtVariant).not.toBe('tshirt');
+
+    const payload = buildApiOrderPayload(
+      {
+        orderTemplateId: 'TEMPLATE-1',
+        school: null,
+        items: rawItems,
+        fetchedAt: new Date().toISOString(),
+        expiresAt: new Date().toISOString(),
+      } as ApiSchoolPageData,
+      {
+        [groupKey]: {
+          activeVariant: nonTshirtVariant,
+          variantQuantities: {
+            [nonTshirtVariant]: {
+              S: 2,
+              M: 1,
+              L: 1,
+              XL: 1,
+              XXL: 1,
+              XXXL: 1,
+            },
+          },
+        },
+      },
+      model.productMap,
+      model.sourceToGroupKeyMap,
+      {
+        company: 'Store',
+        storeNumber: '1',
+        storeManager: 'Manager',
+        orderedBy: 'Manager',
+        date: '2026-03-19',
+        orderNotes: '',
+      }
+    );
+
+    expect(payload).not.toBeNull();
+    (payload?.items || []).forEach((row) => {
+      expect(row.ORDERED1).toBe('0');
+      expect(row.ORDERED2).toBe('0');
+      expect(row.ORDERED3).toBe('0');
+      expect(row.ORDERED4).toBe('0');
+      expect(row.ORDERED5).toBe('0');
+    });
   });
 });
