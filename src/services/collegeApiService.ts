@@ -660,15 +660,6 @@ const getSourcePriorityScore = (sizeLabel: string, styleInfo: NormalizedStyleNum
   return 1;
 };
 
-const findSelectionSizeKey = (sizeMap: Record<string, number>, targetSize: string): string | null => {
-  if (Object.prototype.hasOwnProperty.call(sizeMap, targetSize)) {
-    return targetSize;
-  }
-  const targetToken = normalizeApiSizeToCanonical(targetSize);
-  const matched = Object.keys(sizeMap).find((size) => normalizeApiSizeToCanonical(size) === targetToken);
-  return matched || null;
-};
-
 const findCanonicalMapKey = (
   map: Record<string, unknown>,
   targetSize: string
