@@ -454,20 +454,30 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           const imagePath = `${category.path}/${img}`;
           
           const handleCardClick = () => {
+            const returnNavigationState = {
+              returnFromProduct: true,
+              returnScrollY: window.scrollY,
+            };
             if (!readOnly) {
               if (productDetailPathResolver) {
-                navigate(productDetailPathResolver(category.path, img, imagePath));
+                navigate(productDetailPathResolver(category.path, img, imagePath), {
+                  state: returnNavigationState,
+                });
               } else {
                 // Navigate to product detail page
                 const encodedCategory = encodeURIComponent(category.path);
                 const encodedProductId = encodeURIComponent(img);
-                navigate(`/${college}/product/${encodedCategory}/${encodedProductId}`);
+                navigate(`/${college}/product/${encodedCategory}/${encodedProductId}`, {
+                  state: returnNavigationState,
+                });
               }
             } else if (isAdmin && college) {
               // Navigate to admin product detail page
               const encodedCategory = encodeURIComponent(category.path);
               const encodedProductId = encodeURIComponent(img);
-              navigate(`/admin/college/${college}/product/${encodedCategory}/${encodedProductId}`);
+              navigate(`/admin/college/${college}/product/${encodedCategory}/${encodedProductId}`, {
+                state: returnNavigationState,
+              });
             }
           };
           

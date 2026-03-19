@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
@@ -14,6 +14,7 @@ import '../../styles/college-pages.css';
 
 const ApiCollegeOrderForm: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const formRef = React.useRef<HTMLFormElement>(null);
   const productSectionRef = React.useRef<HTMLDivElement>(null);
 
@@ -52,6 +53,16 @@ const ApiCollegeOrderForm: React.FC = () => {
   const [copyFeedback, setCopyFeedback] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
   const [sendState, setSendState] = React.useState<{ status: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({ status: 'idle' });
+
+  React.useEffect(() => {
+    const state = location.state as { returnFromProduct?: boolean; returnScrollY?: number } | null;
+    if (state?.returnFromProduct && typeof state.returnScrollY === 'number') {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: state.returnScrollY, behavior: 'auto' });
+      });
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleFormSubmit = React.useCallback(
     (e: React.FormEvent) => {

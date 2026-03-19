@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
@@ -28,13 +28,30 @@ const ZERO_COUNTS: SizeCounts = {
 
 const UNISEX_TSHIRT_VARIANTS = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
 
+interface ApiReturnNavigationState {
+  returnFromProduct: true;
+  returnScrollY: number;
+}
+
 const ApiCollegeProductDetail: React.FC = () => {
   const { orderTemplateId, productId } = useParams<{ orderTemplateId: string; productId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { productMap, orderedByProduct, updateOrderedByProduct, categories, loading, error } = useApiCollegeOrder();
 
   const decodedProductId = productId ? decodeURIComponent(productId) : '';
   const product = decodedProductId ? productMap[decodedProductId] ?? null : null;
+  const backToFormPath = `/api-school/${encodeURIComponent(orderTemplateId || '')}`;
+  const returnNavigationState = React.useMemo<ApiReturnNavigationState | null>(() => {
+    const state = location.state as { returnFromProduct?: boolean; returnScrollY?: number } | null;
+    if (state?.returnFromProduct && typeof state.returnScrollY === 'number') {
+      return {
+        returnFromProduct: true,
+        returnScrollY: state.returnScrollY,
+      };
+    }
+    return null;
+  }, [location.state]);
   const defaultVariant = product?.defaultVariant || product?.variantOptions?.[0] || 'default';
   const sizeLabelsByVariant = product?.sizeOptionsByVariant || { [defaultVariant]: product?.sizeLabels || [] };
   const rawSelection = decodedProductId ? orderedByProduct[decodedProductId] : undefined;
@@ -107,8 +124,20 @@ const ApiCollegeProductDetail: React.FC = () => {
     persistSelection(normalized);
   };
 
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [productId]);
+
+  const navigateBackToForm = React.useCallback(() => {
+    if (returnNavigationState) {
+      navigate(backToFormPath, { state: returnNavigationState });
+      return;
+    }
+    navigate(backToFormPath);
+  }, [backToFormPath, navigate, returnNavigationState]);
+
   const handleSaveAndReturn = () => {
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`);
+    navigateBackToForm();
   };
 
   if (loading && !product) {
@@ -119,7 +148,7 @@ const ApiCollegeProductDetail: React.FC = () => {
     return (
       <div className="product-detail-container">
         <div className="error-message">{error}</div>
-        <button className="btn-secondary" onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}>
+        <button className="btn-secondary" onClick={navigateBackToForm}>
           Back to Order Form
         </button>
       </div>
@@ -130,7 +159,7 @@ const ApiCollegeProductDetail: React.FC = () => {
     return (
       <div className="product-detail-container">
         <div className="error-message">Product not found.</div>
-        <button className="btn-secondary" onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}>
+        <button className="btn-secondary" onClick={navigateBackToForm}>
           Back to Order Form
         </button>
       </div>
@@ -156,7 +185,7 @@ const ApiCollegeProductDetail: React.FC = () => {
             <button
               className="product-detail-back"
               type="button"
-              onClick={() => navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`)}
+              onClick={navigateBackToForm}
             >
               Back to Form
             </button>
