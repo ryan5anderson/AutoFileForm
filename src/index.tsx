@@ -53,7 +53,7 @@ function AppShell() {
 
   const handleBackToColleges = React.useCallback(() => {
     setIsSidebarOpen(false);
-    navigate('/');
+    navigate('/', { state: { showApiSchools: true } });
   }, [navigate]);
 
   // Provide categories when on a college route; otherwise empty

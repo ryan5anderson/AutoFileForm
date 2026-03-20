@@ -191,7 +191,7 @@ const ApiCollegeOrderForm: React.FC = () => {
         activeSection={categories[0]?.name.toLowerCase().replace(/\s+/g, '-') || ''}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen((s) => !s)}
-        onBackToColleges={() => navigate('/')}
+        onBackToColleges={() => navigate('/', { state: { showApiSchools: true } })}
         showCategories={true}
       />
 
@@ -200,7 +200,7 @@ const ApiCollegeOrderForm: React.FC = () => {
           <button
             className="college-page-title-btn college-page-title-btn--back"
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/', { state: { showApiSchools: true } })}
           >
             ← Back to schools
           </button>

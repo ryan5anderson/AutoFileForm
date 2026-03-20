@@ -75,6 +75,7 @@ const Header: React.FC<HeaderProps> = ({
       {/* Center: Logos - click to go to main/home */}
       <Link
         to="/"
+        state={{ showApiSchools: true }}
         style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', textDecoration: 'none' }}
         aria-label="Go to home"
       >
