@@ -166,8 +166,9 @@ const ApiCollegeOrderForm: React.FC = () => {
       Object.entries(selection.variantQuantities || {}).forEach(([variant, sizeMap]) => {
         const total = Object.values(sizeMap).reduce((s, q) => s + (Number(q) || 0), 0);
         if (total > 0) {
+          const hasSingleVariant = !product.variantOptions || product.variantOptions.length <= 1;
           const displayName =
-            variant === defaultVariant && !product.variantOptions?.length
+            variant === defaultVariant && hasSingleVariant
               ? 'Qty'
               : getVersionDisplayName(variant);
           items.push({ label: displayName, qty: total });

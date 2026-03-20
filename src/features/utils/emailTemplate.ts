@@ -67,12 +67,13 @@ const buildApiReceiptRows = (
     const sizeMap = selection.variantQuantities[variant] || {};
     const total = Object.values(sizeMap).reduce((sum, qty) => sum + (Number(qty) || 0), 0);
     if (total > 0) {
+      const hasSingleVariant = !product.variantOptions || product.variantOptions.length <= 1;
       const sizeParts = Object.entries(sizeMap)
         .filter(([, qty]) => (Number(qty) || 0) > 0)
         .map(([size, qty]) => `${size}: ${qty}`)
         .join(', ');
       const label =
-        variant === defaultVariant && !product.variantOptions?.length
+        variant === defaultVariant && hasSingleVariant
           ? (sizeParts || 'Qty')
           : `${getVersionDisplayName(variant)} ${sizeParts}`.trim();
       rows.push({ label, qty: total });

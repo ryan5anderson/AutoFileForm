@@ -486,7 +486,14 @@ export const getApiOrderProductKey = (item: OrderItem): string => {
 export const getApiOrderImageKey = (item: OrderItem): string =>
   `${getApiOrderProductKey(item)}_image`;
 
-const SHIRT_MEN_VERSIONS = ['tshirt', 'longsleeve', 'hoodie', 'crewneck'];
+const inferApparelVariantFromSource = (sourceText: string): string => {
+  if (/\bhood(?:ie|ed)?\b/.test(sourceText)) return 'hoodie';
+  if (/\bcrew[\s-]?neck\b/.test(sourceText) || /\bcrew\s+sweatshirt\b/.test(sourceText)) {
+    return 'crewneck';
+  }
+  if (/\blong[\s-]?sleeve\b/.test(sourceText)) return 'longsleeve';
+  return 'tshirt';
+};
 
 const getRuleSourceText = (item: OrderItem): string =>
   [
@@ -524,12 +531,12 @@ const getCategoryName = (categoryPath: string): string => {
 };
 
 const inferVariantOptions = (categoryPath: string, sourceText: string): string[] => {
-  if (categoryPath === 'tshirt/men') return [...SHIRT_MEN_VERSIONS];
+  if (categoryPath === 'tshirt/men') return [inferApparelVariantFromSource(sourceText)];
 
   if (categoryPath === 'pants') {
     return sourceText.includes('jogger') ? ['joggers'] : ['sweatpants'];
   }
-  if (categoryPath === 'tshirt/women') return ['tshirt'];
+  if (categoryPath === 'tshirt/women') return [inferApparelVariantFromSource(sourceText)];
   if (categoryPath === 'cap') return ['cap'];
   if (categoryPath === 'knit-cap') return ['beanie'];
   if (categoryPath === 'jacket') return ['jacket'];
@@ -555,8 +562,8 @@ const getFallbackSizesForVariant = (variant: string): string[] => {
   return [];
 };
 
-const allowsAnyQuantityForVariant = (categoryPath: string, variant: string): boolean => {
-  if (categoryPath === 'tshirt/men' && SHIRT_MEN_VERSIONS.includes(variant)) {
+const allowsAnyQuantityForVariant = (categoryPath: string, _variant: string): boolean => {
+  if (categoryPath === 'tshirt/men') {
     return true;
   }
   return (
@@ -711,11 +718,7 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
   });
   const categoryPath = getCategoryPathForApiCollegeCategory(categorizedAs);
   const categoryName = categorizedAs;
-  let variantOptions = inferVariantOptions(categoryPath, sourceText);
-  // Ensure Unisex T-shirt always has all 4 options (defensive override)
-  if (categoryPath === 'tshirt/men' && variantOptions.length < 4) {
-    variantOptions = [...SHIRT_MEN_VERSIONS];
-  }
+  const variantOptions = inferVariantOptions(categoryPath, sourceText);
   const defaultVariant = variantOptions[0];
   const sizeOptionsByVariant: Record<string, string[]> = {};
   const packSizeByVariant: Record<string, number> = {};
@@ -724,7 +727,12 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
   variantOptions.forEach((variant) => {
     const ratioScale = getSizeScaleFromRatiosSync(categoryPath, variant);
     const ratioSizes = ratioScale ? parseSizeScale(ratioScale) : [];
-    const resolvedSizes = ratioSizes.length > 0 ? ratioSizes : (apiSizeLabels.length > 0 ? apiSizeLabels : getFallbackSizesForVariant(variant));
+    // API payload sizes are the source of truth for selectable sizes.
+    // This prevents injecting 2X/3X options when those rows are not present.
+    const resolvedSizes =
+      apiSizeLabels.length > 0
+        ? apiSizeLabels
+        : (ratioSizes.length > 0 ? ratioSizes : getFallbackSizesForVariant(variant));
     sizeOptionsByVariant[variant] = resolvedSizes;
 
     const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, variant);
@@ -1031,17 +1039,6 @@ export function buildApiOrderPayload(
 ): ApiOrderPayload | null {
   if (!rawPageData?.items?.length) return null;
 
-  const shouldSerializeVariant = (
-    product: ApiOrderProduct | undefined,
-    variant: string
-  ): boolean => {
-    if (!product) return false;
-    if (product.categoryPath === 'tshirt/men') {
-      return variant === 'tshirt';
-    }
-    return true;
-  };
-
   const isProblemStyleDebugEnabled = (
     product: ApiOrderProduct | undefined,
     sourceStyleNum: string | null | undefined
@@ -1078,7 +1075,7 @@ export function buildApiOrderPayload(
       const debugProblemStyle = isProblemStyleDebugEnabled(product, item.STYLE_NUM as string | null | undefined);
       const groupedSelectedSizes = Object.entries(selection.variantQuantities).flatMap(
         ([variant, variantMap]) =>
-          (shouldSerializeVariant(product, variant) ? Object.entries(variantMap) : [])
+          Object.entries(variantMap)
             .filter(([, qty]) => Number(qty) > 0)
             .map(([size, qty]) => ({
               variant,

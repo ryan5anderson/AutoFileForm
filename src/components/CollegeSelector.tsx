@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { colleges } from '../config';
 import { fetchColleges, getCollegesFromCache, getProxiedImageUrl, type CollegeData } from '../services/collegeApiService';
-import { getSchoolBrandPalette } from '../utils/collegeBranding';
 import { asset } from '../utils/asset';
+import { getSchoolBrandPalette } from '../utils/collegeBranding';
 import './CollegeSelector.css';
 
 const CollegeSelector: React.FC = () => {
