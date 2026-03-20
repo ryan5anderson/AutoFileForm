@@ -33,6 +33,8 @@ export interface CollegeData {
   school_ID: string;
   schoolName: string;
   logoUrl?: string | null;
+  schoolColors?: string | null;
+  mascot?: string | null;
   orderNumTemplate: string;
   [key: string]: unknown; // Allow for additional fields from the API
 }
@@ -115,6 +117,7 @@ export interface ApiSchoolPageData {
     schoolId: string | null;
     schoolName: string | null;
     logoUrl: string | null;
+    schoolColors?: string | null;
     orderTemplateId: string;
   } | null;
   items: OrderItem[];

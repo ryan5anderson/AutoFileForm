@@ -7,6 +7,7 @@ import StoreInfoForm from '../../features/components/StoreInfoForm';
 import { getVersionDisplayName, validateStoreInfo } from '../../features/utils';
 import { getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
 import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../services/collegeApiService';
+import { getSchoolBrandPalette } from '../../utils/collegeBranding';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
 import Header from '../layout/Header';
@@ -54,6 +55,10 @@ const ApiCollegeOrderForm: React.FC = () => {
   const [copyFeedback, setCopyFeedback] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
   const [sendState, setSendState] = React.useState<{ status: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({ status: 'idle' });
+  const schoolPalette = React.useMemo(
+    () => getSchoolBrandPalette(rawPageData?.school?.schoolColors),
+    [rawPageData?.school?.schoolColors]
+  );
 
   React.useEffect(() => {
     const state = location.state as { returnFromProduct?: boolean; returnScrollY?: number } | null;
@@ -174,7 +179,20 @@ const ApiCollegeOrderForm: React.FC = () => {
   );
 
   return (
-    <div className="college-page-container api-schools-flow">
+    <div
+      className="college-page-container api-schools-flow api-school-themed"
+      style={
+        {
+          '--school-accent': schoolPalette.primary,
+          '--school-accent-secondary': schoolPalette.secondary,
+          '--school-accent-text': schoolPalette.textOnPrimary,
+          '--school-accent-surface': schoolPalette.accentSurface,
+          '--school-accent-surface-strong': schoolPalette.accentSurfaceStrong,
+          '--school-accent-border': schoolPalette.accentBorder,
+          '--school-accent-ring': schoolPalette.accentRing,
+        } as React.CSSProperties
+      }
+    >
       <div className="college-page-header">
         <Header showSidebarToggle={true} onSidebarToggle={() => setSidebarOpen((s) => !s)} />
       </div>

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { colleges } from '../config';
 import { fetchColleges, getCollegesFromCache, getProxiedImageUrl, type CollegeData } from '../services/collegeApiService';
+import { getSchoolBrandPalette } from '../utils/collegeBranding';
 import { asset } from '../utils/asset';
 import './CollegeSelector.css';
 
@@ -139,29 +140,47 @@ const CollegeSelector: React.FC = () => {
       
       <div className="college-buttons">
         {showApiSchools
-          ? filteredApiColleges.map((college) => (
-              <button
-                key={`${college.school_ID}-${college.orderNumTemplate}`}
-                className="college-button"
-                onClick={() => handleApiCollegeSelect(college.orderNumTemplate)}
-              >
-                <div className="college-logo">
-                  {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-                  <img
-                    src={getProxiedImageUrl(college.logoUrl) || asset('logo/asulogo.png')}
-                    alt={`${college.schoolName} Logo`}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = asset('logo/asulogo.png');
-                    }}
-                  />
-                </div>
-                <div className="college-info">
-                  <h2>{college.schoolName}</h2>
-                  <span className="college-key">{college.school_ID}</span>
-                </div>
-              </button>
-            ))
+          ? filteredApiColleges.map((college) => {
+              const palette = getSchoolBrandPalette(college.schoolColors);
+              const displayName = college.schoolName.trim();
+              const displayMascot = (college.mascot || '').trim();
+              return (
+                <button
+                  key={`${college.school_ID}-${college.orderNumTemplate}`}
+                  className="college-button college-button--themed"
+                  style={
+                    {
+                      '--college-accent': palette.primary,
+                      '--college-accent-secondary': palette.secondary,
+                      '--college-accent-surface': palette.accentSurface,
+                      '--college-accent-surface-strong': palette.accentSurfaceStrong,
+                      '--college-accent-border': palette.accentBorder,
+                      '--college-accent-ring': palette.accentRing,
+                      '--college-accent-text': palette.textOnPrimary,
+                    } as React.CSSProperties
+                  }
+                  onClick={() => handleApiCollegeSelect(college.orderNumTemplate)}
+                >
+                  <div className="college-logo">
+                    {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+                    <img
+                      src={getProxiedImageUrl(college.logoUrl) || asset('logo/asulogo.png')}
+                      alt={`${displayName} Logo`}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = asset('logo/asulogo.png');
+                      }}
+                    />
+                  </div>
+                  <div className="college-info">
+                    <h2>{displayName}</h2>
+                    <div className="college-meta-row">
+                      <span className="college-key">{displayMascot || 'Mascot unavailable'}</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })
           : filteredLocalColleges.map(([key, college]) => (
               <button
                 key={key}

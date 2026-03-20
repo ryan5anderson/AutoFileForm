@@ -109,9 +109,25 @@
   width: 100%;
 }
 
+.college-button--themed {
+  background:
+    linear-gradient(140deg, var(--college-accent-surface, rgb(37 99 235 / 8%)) 0%, rgb(255 255 255 / 100%) 45%),
+    white;
+  border: 1px solid var(--college-accent-border, rgb(37 99 235 / 20%));
+  box-shadow:
+    0 4px 6px rgb(0 0 0 / 10%),
+    inset 0 0 0 1px var(--college-accent-surface, rgb(37 99 235 / 8%));
+}
+
 .college-button:hover {
   box-shadow: 0 8px 25px rgb(0 0 0 / 15%);
   transform: translateY(-4px);
+}
+
+.college-button--themed:hover {
+  box-shadow:
+    0 10px 25px rgb(0 0 0 / 14%),
+    0 0 0 3px var(--college-accent-ring, rgb(37 99 235 / 22%));
 }
 
 .college-button:active {
@@ -150,6 +166,25 @@
   font-family: 'Courier New', monospace;
   font-size: var(--font-size-sm);
   padding: 0.25rem 0.5rem;
+}
+
+.college-button--themed .college-key {
+  background: linear-gradient(
+    120deg,
+    var(--college-accent, #2563eb) 0%,
+    var(--college-accent-secondary, #1d4ed8) 100%
+  );
+  color: var(--college-accent-text, #ffffff);
+  font-family: inherit;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+}
+
+.college-meta-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 /* Responsive design */
@@ -219,6 +254,10 @@
   
   .college-key {
     font-size: var(--font-size-xs);
+  }
+
+  .college-meta-row {
+    gap: 0.35rem;
   }
 }
 

@@ -97,6 +97,15 @@
     0 0 0 1px rgb(37 99 235 / 10%);
 }
 
+.api-school-themed .card--api-school,
+.api-school-themed .card--catalog-enhanced {
+  border-color: var(--school-accent-border, rgb(37 99 235 / 35%));
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 10%),
+    0 1px 2px rgb(0 0 0 / 6%),
+    0 0 0 1px var(--school-accent-surface, rgb(37 99 235 / 10%));
+}
+
 .card--api-school.card--clickable:hover,
 .card--catalog-enhanced.card--clickable:hover {
   border-color: var(--color-primary);
@@ -104,6 +113,15 @@
     0 8px 16px rgb(0 0 0 / 12%),
     0 4px 8px rgb(0 0 0 / 8%),
     0 0 0 1px rgb(37 99 235 / 20%);
+}
+
+.api-school-themed .card--api-school.card--clickable:hover,
+.api-school-themed .card--catalog-enhanced.card--clickable:hover {
+  border-color: var(--school-accent, var(--color-primary));
+  box-shadow:
+    0 8px 16px rgb(0 0 0 / 12%),
+    0 4px 8px rgb(0 0 0 / 8%),
+    0 0 0 3px var(--school-accent-ring, rgb(37 99 235 / 20%));
 }
 
 /* Variant listing text on product card */
@@ -132,6 +150,15 @@
   padding: var(--space-2) var(--space-3);
   text-align: center;
   transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.api-school-themed .card__choose-btn {
+  background: linear-gradient(
+    135deg,
+    var(--school-accent, #2563eb) 0%,
+    var(--school-accent-secondary, #1d4ed8) 100%
+  );
+  color: var(--school-accent-text, #ffffff);
 }
 
 .card--clickable:hover .card__choose-btn {
@@ -172,6 +199,15 @@
   text-transform: uppercase;
 }
 
+.api-school-themed .card__status-badge {
+  background: linear-gradient(
+    135deg,
+    var(--school-accent, #2563eb) 0%,
+    var(--school-accent-secondary, #1d4ed8) 100%
+  );
+  color: var(--school-accent-text, #ffffff);
+}
+
 .card__title--default {
   color: var(--color-text);
 }
@@ -194,6 +230,10 @@
   padding: var(--space-2);
 }
 
+.api-school-themed .card__selected-footer {
+  background: var(--school-accent-surface, rgb(37 99 235 / 10%));
+  border-color: var(--school-accent-border, rgb(37 99 235 / 35%));
+}
 .card__selected-options {
   display: flex;
   flex-wrap: wrap;

@@ -5,15 +5,33 @@
   --color-primary: #2563eb;
 }
 
+.api-school-themed {
+  --color-primary: var(--school-accent, #2563eb);
+}
+
 .api-schools-flow .college-page-title-btn--back {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border: none;
   color: white;
 }
 
+.api-school-themed .college-page-title-btn--back {
+  background: linear-gradient(
+    135deg,
+    var(--school-accent, #2563eb) 0%,
+    var(--school-accent-secondary, #1d4ed8) 100%
+  );
+  box-shadow: 0 6px 14px var(--school-accent-ring, rgb(37 99 235 / 22%));
+  color: var(--school-accent-text, #ffffff);
+}
+
 .api-schools-flow .college-page-title-btn--back:hover {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
+}
+
+.api-school-themed .college-page-title-btn--back:hover {
+  filter: brightness(1.05);
 }
 
 .college-page-container {
@@ -49,6 +67,7 @@
 .college-page-title {
   backdrop-filter: blur(10px);
   background: rgb(255 255 255 / 90%);
+  border: 1px solid var(--school-accent-border, rgb(37 99 235 / 18%));
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
   margin-bottom: var(--space-6);
