@@ -575,7 +575,7 @@ const allowsAnyQuantityForVariant = (categoryPath: string, _variant: string): bo
   );
 };
 
-const STYLE_VARIANT_SUFFIX_REGEX = /(2X|3X|4X|5X)$/i;
+const STYLE_VARIANT_SUFFIX_REGEX = /(2X|3X|4X|5X|2XL|3XL|4XL|5XL)$/i;
 const EXTENDED_SIZE_REGEX = /^(2X|3X|4X|5X|2XL|3XL|4XL|5XL)$/i;
 
 export interface NormalizedStyleNum {
@@ -610,12 +610,33 @@ const CANONICAL_SIZE_BY_TOKEN: Record<string, string> = {
   AST: 'AST',
 };
 
+const SIZE_SORT_ORDER: Record<string, number> = {
+  XS: 10,
+  SM: 20,
+  MD: 30,
+  LG: 40,
+  XL: 50,
+  '2XL': 60,
+  '3XL': 70,
+  '4XL': 80,
+  '5XL': 90,
+  'S/M': 100,
+  'L/XL': 110,
+  OSFA: 120,
+  AST: 130,
+};
+
 export const normalizeApiSizeToCanonical = (
   value: string | null | undefined
 ): string => {
   const token = normalizeSizeToken(value);
   if (!token) return '';
   return CANONICAL_SIZE_BY_TOKEN[token] || token;
+};
+
+const getSizeSortRank = (displaySize: string): number => {
+  const canonical = normalizeApiSizeToCanonical(displaySize);
+  return SIZE_SORT_ORDER[canonical] ?? Number.MAX_SAFE_INTEGER;
 };
 
 const isExtendedSizeLabel = (value: string | null | undefined): boolean => {
@@ -794,7 +815,6 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
       normalizeComparisonToken(record.item.COLOR_INIT),
       normalizeComparisonToken(record.item.Expr1),
       normalizeComparisonToken(record.item.productUrl),
-      normalizeComparisonToken(record.item.SHIRTNAME),
       normalizeComparisonToken(record.normalizedProduct.categoryPath),
       normalizeComparisonToken(record.styleInfo.baseStyleNum || record.styleInfo.rawStyleNum),
     ].join('|');
@@ -904,7 +924,13 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
 
     variantOrder.forEach((variant) => {
       const orderedSizeTokens = sizeOrderByVariant[variant] || [];
-      const displaySizes = orderedSizeTokens.map((token) => sizeTokenToDisplayByVariant[variant][token]);
+      const displaySizes = orderedSizeTokens
+        .map((token) => sizeTokenToDisplayByVariant[variant][token])
+        .sort((a, b) => {
+          const rankDiff = getSizeSortRank(a) - getSizeSortRank(b);
+          if (rankDiff !== 0) return rankDiff;
+          return a.localeCompare(b);
+        });
       if (displaySizes.length > 0) {
         mergedProduct.sizeOptionsByVariant![variant] = displaySizes as import('../types').Size[];
       }
