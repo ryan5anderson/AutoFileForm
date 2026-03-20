@@ -106,10 +106,13 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
   // Fallback to default values for categories not in ratios or config
   switch (normalizedCategory) {
     case 'tshirt/men':
-      if (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck') {
+      if (normalizedVersion === 'tshirt') {
+        return 12; // allowsAny = true
+      }
+      if (normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck') {
         return 6; // allowsAny = true
       }
-      return 6; // default
+      return 12; // default to tshirt behavior when unspecified
     case 'tshirt/women':
       return 4;
     case 'hat':

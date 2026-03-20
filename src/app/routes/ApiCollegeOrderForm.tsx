@@ -6,7 +6,7 @@ import CategorySection from '../../features/components/CategorySection';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
 import { getVersionDisplayName, validateStoreInfo } from '../../features/utils';
 import { getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
-import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../services/collegeApiService';
+import { buildApiOrderPayload, getProxiedImageUrl } from '../../services/collegeApiService';
 import { getSchoolBrandPalette } from '../../utils/collegeBranding';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
@@ -54,7 +54,6 @@ const ApiCollegeOrderForm: React.FC = () => {
   const [orderJsonOpen, setOrderJsonOpen] = React.useState(false);
   const [copyFeedback, setCopyFeedback] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
-  const [sendState, setSendState] = React.useState<{ status: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({ status: 'idle' });
   const schoolPalette = React.useMemo(
     () => getSchoolBrandPalette(rawPageData?.school?.schoolColors),
     [rawPageData?.school?.schoolColors]
@@ -117,17 +116,6 @@ const ApiCollegeOrderForm: React.FC = () => {
       setTimeout(() => setCopyFeedback(false), 2000);
     } catch {
       setCopyFeedback(false);
-    }
-  }, [orderPayload]);
-
-  const handleSendOrder = React.useCallback(async () => {
-    if (!orderPayload) return;
-    setSendState({ status: 'loading' });
-    const result = await submitApiOrder(orderPayload);
-    if (result.success) {
-      setSendState({ status: 'success', message: result.message });
-    } else {
-      setSendState({ status: 'error', message: result.error });
     }
   }, [orderPayload]);
 
@@ -331,25 +319,7 @@ const ApiCollegeOrderForm: React.FC = () => {
                     >
                       {copyFeedback ? 'Copied!' : 'Copy JSON'}
                     </button>
-                    <button
-                      type="button"
-                      className="college-page-title-btn"
-                      onClick={handleSendOrder}
-                      disabled={!orderPayload || sendState.status === 'loading'}
-                    >
-                      {sendState.status === 'loading' ? 'Sending...' : 'Send Order'}
-                    </button>
                   </div>
-                  {sendState.status === 'success' && (
-                    <p style={{ marginTop: 'var(--space-2)', color: 'var(--color-success, #059669)', fontWeight: 500 }}>
-                      {sendState.message}
-                    </p>
-                  )}
-                  {sendState.status === 'error' && (
-                    <p style={{ marginTop: 'var(--space-2)', color: 'var(--color-error, #dc2626)', fontWeight: 500 }}>
-                      {sendState.message}
-                    </p>
-                  )}
                 </div>
               )}
             </div>

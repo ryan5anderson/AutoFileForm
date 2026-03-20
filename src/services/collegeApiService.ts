@@ -531,7 +531,7 @@ const getCategoryName = (categoryPath: string): string => {
 };
 
 const inferVariantOptions = (categoryPath: string, sourceText: string): string[] => {
-  if (categoryPath === 'tshirt/men') return [inferApparelVariantFromSource(sourceText)];
+  if (categoryPath === 'tshirt/men') return ['tshirt'];
 
   if (categoryPath === 'pants') {
     return sourceText.includes('jogger') ? ['joggers'] : ['sweatpants'];

@@ -6,7 +6,7 @@ import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
 import { createApiTemplateParams, getVersionDisplayName, validateStoreInfo } from '../../features/utils';
 import { getApiSchoolStorageKey, getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
-import { getProxiedImageUrl } from '../../services/collegeApiService';
+import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../services/collegeApiService';
 import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService } from '../../services/firebaseOrderService';
 import Footer from '../layout/Footer';
@@ -21,6 +21,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
     orderTemplateId,
     categories,
     productMap,
+    sourceToGroupKeyMap,
     rawPageData,
     formData,
     orderedByProduct,
@@ -137,6 +138,22 @@ const ApiCollegeSummaryPage: React.FC = () => {
         formData: { ...formData, quantities } as never,
       });
 
+      const apiPayload = buildApiOrderPayload(rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, {
+        company: formData.company,
+        storeNumber: formData.storeNumber,
+        storeManager: formData.storeManager,
+        orderedBy: formData.orderedBy,
+        date: formData.date,
+        orderNotes: formData.orderNotes,
+      });
+      if (!apiPayload) {
+        throw new Error('Unable to build order payload for API submission.');
+      }
+      const apiSubmitResult = await submitApiOrder(apiPayload);
+      if (!apiSubmitResult.success) {
+        throw new Error(apiSubmitResult.error || 'Failed to submit order to API.');
+      }
+
       const schoolName = rawPageData && typeof rawPageData === 'object' && 'schoolName' in rawPageData
         ? (rawPageData as { schoolName?: string }).schoolName
         : '';
@@ -157,15 +174,20 @@ const ApiCollegeSummaryPage: React.FC = () => {
       console.error('Order submit error:', err);
       const message = err instanceof Error ? err.message : String(err);
       const isFirebaseError = message.toLowerCase().includes('firebase') || message.toLowerCase().includes('permission');
+      const isApiSubmitError = message.toLowerCase().includes('submit')
+        || message.toLowerCase().includes('payload')
+        || message.toLowerCase().includes('api');
       setConfirmationError(
         isFirebaseError
           ? 'Failed to save order. Please check your Firebase connection and Firestore rules.'
-          : 'Failed to send email. Please check your EmailJS configuration and try again.'
+          : isApiSubmitError
+            ? `Failed to submit order JSON to API. ${message}`
+            : 'Failed to send email. Please check your EmailJS configuration and try again.'
       );
     } finally {
       setSending(false);
     }
-  }, [formData, categories, orderedByProduct, productMap, quantities, orderTemplateId, navigate, rawPageData]);
+  }, [formData, categories, orderedByProduct, productMap, quantities, orderTemplateId, navigate, rawPageData, sourceToGroupKeyMap]);
 
   const handleConfirmCancel = useCallback(() => {
     setShowConfirmModal(false);
