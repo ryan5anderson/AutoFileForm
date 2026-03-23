@@ -1041,12 +1041,10 @@ export interface ApiOrderPayload {
   school: ApiSchoolPageData['school'];
   items: Array<OrderItem & { ORDERED1: string; ORDERED2: string; ORDERED3: string; ORDERED4: string; ORDERED5: string }>;
   storeInfo: {
-    company: string;
+    storeName: string;
     storeNumber: string;
-    storeManager: string;
-    orderedBy: string;
+    poNumber: string;
     date: string;
-    orderNotes?: string;
   };
   subtotal: number;
   total: number;
@@ -1061,7 +1059,7 @@ export function buildApiOrderPayload(
   orderedByProduct: Record<string, import('../features/utils/apiOrderState').ApiProductSelection>,
   productMap: Record<string, ApiOrderProduct>,
   sourceToGroupKeyMap: Record<string, string>,
-  formData: { company: string; storeNumber: string; storeManager: string; orderedBy: string; date: string; orderNotes?: string }
+  formData: { company: string; storeNumber: string; poNumber: string; storeManager: string; orderedBy: string; date: string; orderNotes?: string }
 ): ApiOrderPayload | null {
   if (!rawPageData?.items?.length) return null;
 
@@ -1231,12 +1229,10 @@ export function buildApiOrderPayload(
     school: rawPageData.school,
     items: mutatedItems,
     storeInfo: {
-      company: formData.company || '',
+      storeName: formData.company || '',
       storeNumber: formData.storeNumber || '',
-      storeManager: formData.storeManager || '',
-      orderedBy: formData.orderedBy || '',
+      poNumber: formData.poNumber || '',
       date: formData.date || '',
-      orderNotes: formData.orderNotes || '',
     },
     subtotal: Math.round(subtotal * 100) / 100,
     total: Math.round(subtotal * 100) / 100,
@@ -1273,11 +1269,18 @@ export function buildApiOrderPayload(
  */
 export async function submitApiOrder(payload: ApiOrderPayload): Promise<{ success: boolean; message?: string; error?: string }> {
   const submitUrl = `${API_BASE_URL}/submitorder`;
+  const serializedPayload = JSON.stringify(payload);
+  // eslint-disable-next-line no-console
+  console.info('[api-school] submitting order payload to api/submitorder', {
+    endpoint: submitUrl,
+    payload,
+    serializedPayload,
+  });
   try {
     const response = await fetch(submitUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(payload),
+      body: serializedPayload,
     });
     const text = await response.text();
     let data: { message?: string; error?: string; success?: boolean };
@@ -1287,11 +1290,28 @@ export async function submitApiOrder(payload: ApiOrderPayload): Promise<{ succes
       data = { message: text };
     }
     if (!response.ok) {
+      // eslint-disable-next-line no-console
+      console.error('[api-school] order submission failed', {
+        endpoint: submitUrl,
+        status: response.status,
+        response: data,
+      });
       return { success: false, error: data.message || data.error || `Submission failed: ${response.status}` };
     }
+    // eslint-disable-next-line no-console
+    console.info('[api-school] order submission confirmed', {
+      endpoint: submitUrl,
+      status: response.status,
+      response: data,
+    });
     return { success: true, message: data.message || 'Order submitted successfully!' };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    // eslint-disable-next-line no-console
+    console.error('[api-school] order submission threw error', {
+      endpoint: submitUrl,
+      error: msg,
+    });
     return { success: false, error: msg };
   }
 }

@@ -121,6 +121,7 @@ export type ShirtColorSizeCounts = Record<string, Partial<Record<keyof ShirtVers
 export interface FormData {
   company: string;
   storeNumber: string;
+  poNumber?: string;
   storeManager: string;
   orderedBy: string;
   date: string;

@@ -100,12 +100,13 @@ const ApiCollegeOrderForm: React.FC = () => {
       buildApiOrderPayload(rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, {
         company: formData.company,
         storeNumber: formData.storeNumber,
+        poNumber: formData.poNumber || '',
         storeManager: formData.storeManager,
         orderedBy: formData.orderedBy,
         date: formData.date,
         orderNotes: formData.orderNotes,
       }),
-    [rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, formData.company, formData.storeNumber, formData.storeManager, formData.orderedBy, formData.date, formData.orderNotes]
+    [rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, formData.company, formData.storeNumber, formData.poNumber, formData.storeManager, formData.orderedBy, formData.date, formData.orderNotes]
   );
 
   const handleCopyJson = React.useCallback(async () => {

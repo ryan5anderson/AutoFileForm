@@ -80,6 +80,7 @@ describe('buildApiOrderPayload size-to-raw-row serialization', () => {
       {
         company: 'Store',
         storeNumber: '1',
+        poNumber: '12345678',
         storeManager: 'Manager',
         orderedBy: 'Manager',
         date: '2026-03-19',
@@ -152,6 +153,7 @@ describe('buildApiOrderPayload size-to-raw-row serialization', () => {
       {
         company: 'Store',
         storeNumber: '1',
+        poNumber: '12345678',
         storeManager: 'Manager',
         orderedBy: 'Manager',
         date: '2026-03-19',

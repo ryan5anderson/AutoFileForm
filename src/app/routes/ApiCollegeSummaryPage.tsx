@@ -141,6 +141,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
       const apiPayload = buildApiOrderPayload(rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, {
         company: formData.company,
         storeNumber: formData.storeNumber,
+        poNumber: formData.poNumber || '',
         storeManager: formData.storeManager,
         orderedBy: formData.orderedBy,
         date: formData.date,
@@ -212,6 +213,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
             <div><strong>Store Name:</strong> {formData.company}</div>
             <div><strong>Store Number:</strong> {formData.storeNumber}</div>
+            <div><strong>PO Number:</strong> {formData.poNumber || '-'}</div>
             <div><strong>Store Manager:</strong> {formData.storeManager}</div>
             <div><strong>Ordered By:</strong> {formData.orderedBy || formData.storeManager}</div>
             <div><strong>Date:</strong> {formData.date}</div>

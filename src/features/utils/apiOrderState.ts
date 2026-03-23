@@ -9,7 +9,7 @@ export interface ApiOrderedFields {
 }
 
 export interface ApiSchoolOrderState {
-  formData: Pick<FormData, 'company' | 'storeNumber' | 'storeManager' | 'orderedBy' | 'date'>;
+  formData: Pick<FormData, 'company' | 'storeNumber' | 'poNumber' | 'storeManager' | 'orderedBy' | 'date'>;
   orderedByProduct: Record<string, ApiProductSelection | ApiOrderedFields>;
 }
 

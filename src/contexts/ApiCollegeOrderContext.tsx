@@ -97,6 +97,7 @@ const ApiCollegeOrderContext = createContext<ApiCollegeOrderContextValue | null>
 const createInitialFormData = (): FormData => ({
   company: '',
   storeNumber: '',
+  poNumber: '',
   storeManager: '',
   orderedBy: '',
   date: new Date().toISOString().split('T')[0] || '',
@@ -149,6 +150,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
             ...prev,
             company: stored.formData.company ?? prev.company,
             storeNumber: stored.formData.storeNumber ?? prev.storeNumber,
+            poNumber: stored.formData.poNumber ?? prev.poNumber,
             storeManager: stored.formData.storeManager ?? prev.storeManager,
             orderedBy: stored.formData.orderedBy ?? prev.orderedBy,
             date: stored.formData.date ?? prev.date,
@@ -189,6 +191,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
             ...prev,
             company: stored.formData.company ?? prev.company,
             storeNumber: stored.formData.storeNumber ?? prev.storeNumber,
+            poNumber: stored.formData.poNumber ?? prev.poNumber,
             storeManager: stored.formData.storeManager ?? prev.storeManager,
             orderedBy: stored.formData.orderedBy ?? prev.orderedBy,
             date: stored.formData.date ?? prev.date,
@@ -225,13 +228,14 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
       formData: {
         company: formData.company,
         storeNumber: formData.storeNumber,
+        poNumber: formData.poNumber,
         storeManager: formData.storeManager,
         orderedBy: formData.orderedBy,
         date: formData.date,
       },
       orderedByProduct,
     });
-  }, [orderTemplateId, loading, productMap, formData.company, formData.date, formData.orderedBy, formData.storeManager, formData.storeNumber, orderedByProduct]);
+  }, [orderTemplateId, loading, productMap, formData.company, formData.storeNumber, formData.poNumber, formData.storeManager, formData.orderedBy, formData.date, orderedByProduct]);
 
   const value = useMemo(
     () => ({
