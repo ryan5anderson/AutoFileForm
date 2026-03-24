@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FormData } from '../../types';
+import { sanitizeSingleLineInput } from '../utils/sanitize';
 
 interface StoreInfoFormProps {
   formData: FormData;
@@ -23,7 +24,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           type="text"
           id="company"
           value={formData.company}
-          onChange={(e) => onFormDataChange({ company: e.target.value })}
+          onChange={(e) => onFormDataChange({ company: sanitizeSingleLineInput(e.target.value) })}
           style={{
             width: '100%',
             padding: 'var(--space-3)',
@@ -50,7 +51,34 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           type="text"
           id="storeNumber"
           value={formData.storeNumber}
-          onChange={(e) => onFormDataChange({ storeNumber: e.target.value })}
+          onChange={(e) => onFormDataChange({ storeNumber: sanitizeSingleLineInput(e.target.value) })}
+          style={{
+            width: '100%',
+            padding: 'var(--space-3)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius)',
+            fontSize: '1rem',
+            background: 'var(--color-input-bg)',
+            color: '#000000',
+            boxSizing: 'border-box'
+          }}
+          required
+        />
+      </div>
+      <div style={{ marginBottom: 'var(--space-4)' }}>
+        <label htmlFor="poNumber" style={{ 
+          display: 'block', 
+          marginBottom: 'var(--space-2)', 
+          fontWeight: '600',
+          color: 'var(--color-text)'
+        }}>
+          PO Number
+        </label>
+        <input
+          type="text"
+          id="poNumber"
+          value={formData.poNumber || ''}
+          onChange={(e) => onFormDataChange({ poNumber: sanitizeSingleLineInput(e.target.value) })}
           style={{
             width: '100%',
             padding: 'var(--space-3)',
@@ -77,7 +105,34 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({ formData, onFormDataChang
           type="text"
           id="storeManager"
           value={formData.storeManager}
-          onChange={(e) => onFormDataChange({ storeManager: e.target.value })}
+          onChange={(e) => onFormDataChange({ storeManager: sanitizeSingleLineInput(e.target.value) })}
+          style={{
+            width: '100%',
+            padding: 'var(--space-3)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius)',
+            fontSize: '1rem',
+            background: 'var(--color-input-bg)',
+            color: '#000000',
+            boxSizing: 'border-box'
+          }}
+          required
+        />
+      </div>
+      <div style={{ marginBottom: 'var(--space-4)' }}>
+        <label htmlFor="orderedBy" style={{ 
+          display: 'block', 
+          marginBottom: 'var(--space-2)', 
+          fontWeight: '600',
+          color: 'var(--color-text)'
+        }}>
+          Ordered By
+        </label>
+        <input
+          type="text"
+          id="orderedBy"
+          value={formData.orderedBy}
+          onChange={(e) => onFormDataChange({ orderedBy: sanitizeSingleLineInput(e.target.value) })}
           style={{
             width: '100%',
             padding: 'var(--space-3)',

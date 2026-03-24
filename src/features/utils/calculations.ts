@@ -106,10 +106,13 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
   // Fallback to default values for categories not in ratios or config
   switch (normalizedCategory) {
     case 'tshirt/men':
-      if (normalizedVersion === 'tshirt' || normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck') {
+      if (normalizedVersion === 'tshirt') {
+        return 12; // allowsAny = true
+      }
+      if (normalizedVersion === 'longsleeve' || normalizedVersion === 'hoodie' || normalizedVersion === 'crewneck') {
         return 6; // allowsAny = true
       }
-      return 6; // default
+      return 12; // default to tshirt behavior when unspecified
     case 'tshirt/women':
       return 4;
     case 'hat':
@@ -154,6 +157,33 @@ interface ValidationResult {
   errorMessage: string | null;
   invalidProductPaths: string[];
 }
+
+/** Minimal store info shape for validation */
+interface StoreInfoFields {
+  company: string;
+  storeNumber: string;
+  storeManager: string;
+  orderedBy: string;
+  date: string;
+}
+
+/**
+ * Validate store information fields (company, storeNumber, storeManager, orderedBy, date)
+ * @param formData - Form data containing store info fields
+ * @returns { isValid, errorMessage } - Validation result for store info only
+ */
+export const validateStoreInfo = (formData: StoreInfoFields): { isValid: boolean; errorMessage: string | null } => {
+  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.orderedBy.trim() || !formData.date.trim()) {
+    return {
+      isValid: false,
+      errorMessage: 'Please fill out all store information fields.',
+    };
+  }
+  return {
+    isValid: true,
+    errorMessage: null,
+  };
+};
 
 /**
  * Check if the order form data contains any products (non-empty order)
@@ -211,11 +241,11 @@ export const hasOrderProducts = (formData: FormData): boolean => {
 };
 
 export const validateFormData = (formData: FormData, categories?: Category[]): ValidationResult => {
-  // Check all required fields
-  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.date.trim()) {
+  const storeInfoResult = validateStoreInfo(formData);
+  if (!storeInfoResult.isValid) {
     return {
       isValid: false,
-      errorMessage: 'Please fill out all store information fields.',
+      errorMessage: storeInfoResult.errorMessage,
       invalidProductPaths: []
     };
   }

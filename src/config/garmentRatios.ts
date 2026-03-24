@@ -172,6 +172,11 @@ export async function getPackSizeFromRatios(
   version?: string, 
   collegeKey?: string
 ): Promise<number | null> {
+  const normalizedCategory = categoryPath.trim().toLowerCase();
+  const normalizedVersion = (version || '').trim().toLowerCase();
+  if (normalizedCategory === 'tshirt/men' && (normalizedVersion === '' || normalizedVersion === 'tshirt')) {
+    return 12;
+  }
   const ratio = await getGarmentRatio(categoryPath, version, collegeKey);
   return ratio?.["Set Pack"] ?? null;
 }
@@ -181,6 +186,11 @@ export async function getPackSizeFromRatios(
  * Supports college-specific ratios if collegeKey is provided and cache is available
  */
 export function getPackSizeFromRatiosSync(categoryPath: string, version?: string, collegeKey?: string): number | null {
+  const normalizedCategory = categoryPath.trim().toLowerCase();
+  const normalizedVersion = (version || '').trim().toLowerCase();
+  if (normalizedCategory === 'tshirt/men' && (normalizedVersion === '' || normalizedVersion === 'tshirt')) {
+    return 12;
+  }
   // If college key provided, try to get from college-specific cache
   if (collegeKey && ratiosCache[collegeKey]) {
     const garmentName = getGarmentName(categoryPath, version);

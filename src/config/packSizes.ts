@@ -26,17 +26,17 @@ interface VersionPackSizes {
  * You can customize these values as needed for your business requirements
  */
 const PACK_SIZES: PackSizeConfig = {
-  // T-Shirts (Unisex) - 6 or any quantity allowed for t-shirts and longsleeve
+  // T-Shirts (Unisex) - 12 or any quantity allowed for t-shirts and longsleeve
   'tshirt/men': {
-    tshirt: 6,        // 6 or any quantity allowed
+    tshirt: 12,       // 12 or any quantity allowed
     longsleeve: 6,    // 6 or any quantity allowed
     crewneck: 6,      // 6 or any quantity allowed
     hoodie: 6,        // 6 or any quantity allowed
-    default: 6,       // 6 or any quantity allowed
+    default: 12,      // 12 or any quantity allowed
   },
 
-  // Women's T-Shirts - multiples of 4
-  'tshirt/women': 4,
+  // Women's T-Shirts
+  'tshirt/women': 5,
 
   // Outerwear
   'jacket': 6,       // Multiples of 6
@@ -204,7 +204,7 @@ export const getPackSize = async (
  * @returns true if the category/version allows any quantity OR multiples of pack size
  */
 export const allowsAnyQuantity = (categoryPath: string, version?: string, productName?: string): boolean => {
-  // Unisex t-shirts and longsleeve allow any quantity OR multiples of 6
+  // Unisex t-shirts and longsleeve allow any quantity OR multiples of pack size
   if (categoryPath === 'tshirt/men' && (version === 'tshirt' || version === 'longsleeve' || version === 'hoodie' || version === 'crewneck')) {
     return true;
   }

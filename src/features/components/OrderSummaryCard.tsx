@@ -43,6 +43,18 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   hasPantOptions = false
 }) => {
   const imagePath = `${categoryPath}/${imageName}`;
+  const standardSizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
+
+  const formatSizePieces = (counts: Partial<Record<Size, number>> | undefined, sizeOrder: Size[] = standardSizeOrder): string => {
+    if (!counts) return '';
+    return sizeOrder
+      .map((sz) => {
+        const val = counts[sz] || 0;
+        return val > 0 ? `${sz} ${val}` : '';
+      })
+      .filter(Boolean)
+      .join(' ');
+  };
 
   const getQuantityInfo = () => {
     // Handle display options
@@ -80,15 +92,8 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
               if (colorTotal > 0) {
                 styleTotal += colorTotal;
 
-                // Build size detail like S7 M7 XL7
-                const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
-                const sizePieces = sizeOrder
-                  .map(sz => {
-                    const val = sizeCounts[sz] || 0;
-                    return val > 0 ? `${sz}${val}` : '';
-                  })
-                  .filter(Boolean)
-                  .join(' ');
+                // Keep size display consistent across all product types (e.g. S 7 M 7 XL 7).
+                const sizePieces = formatSizePieces(sizeCounts);
 
                 details.push(`${styleName} ${colorName}: ${colorTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
               }
@@ -178,39 +183,22 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         if (totalQty > 0) {
           const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
           
-          // Group by color first
-          const colorGroups: Map<string, string[]> = new Map();
-
+          const details: string[] = [];
           versionOrder.forEach((vk) => {
             const byColor = colorSizeCountsByVersion[vk];
-            if (byColor) {
-              const versionName = labels[vk as keyof typeof labels];
-              Object.entries(byColor)
-                .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
-                .forEach(([colorName, counts]) => {
-                  if (!counts) return;
-                  const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
-                  
-                  sizeOrder.forEach(sz => {
-                    const val = counts[sz] || 0;
-                    if (val > 0) {
-                      if (!colorGroups.has(colorName)) {
-                        colorGroups.set(colorName, []);
-                      }
-                      colorGroups.get(colorName)!.push(`${versionName} ${sz}:${val}`);
-                    }
-                  });
-                });
-            }
+            if (!byColor) return;
+            const versionName = labels[vk as keyof typeof labels];
+            Object.entries(byColor)
+              .filter(([_, counts]) => counts && Object.values(counts).some((qty) => qty > 0))
+              .forEach(([colorName, counts]) => {
+                if (!counts) return;
+                const colorTotal = Object.values(counts).reduce((sum, qty) => sum + qty, 0);
+                const sizePieces = formatSizePieces(counts);
+                details.push(`${versionName} ${colorName}: ${colorTotal}${sizePieces ? ` (${sizePieces})` : ''}`);
+              });
           });
 
-          // Format as "Color: Version Size:qty ; Version Size:qty"
-          const colorLines: string[] = [];
-          colorGroups.forEach((versionSizes, colorName) => {
-            colorLines.push(`${colorName}: ${versionSizes.join(' ; ')}`);
-          });
-
-          return { total: totalQty, details: colorLines.join(' ; ') };
+          return { total: totalQty, details: details.join(' ; ') };
         }
       }
 
@@ -226,15 +214,8 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         if (vTotal > 0) {
           totalQty += vTotal;
           const labels: Record<string, string> = { tshirt: 'T-Shirt', longsleeve: 'Long Sleeve', hoodie: 'Hoodie', crewneck: 'Crew' };
-          const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
-          const sizePieces = c ? sizeOrder
-            .map((sz: Size) => {
-              const val = c[sz] || 0;
-              return val > 0 ? `${sz}: ${val}` : '';
-            })
-            .filter(Boolean)
-            .join(', ') : '';
-          const detail = `${labels[vk as keyof typeof labels]}${sizePieces ? ` ${sizePieces}` : ''}`;
+          const sizePieces = formatSizePieces(c);
+          const detail = `${labels[vk as keyof typeof labels]}: ${vTotal}${sizePieces ? ` (${sizePieces})` : ''}`;
           versionDetails.push(detail);
         }
       });
@@ -273,14 +254,7 @@ const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
                   .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
                   .map(([colorName, counts]) => {
                     if (!counts) return '';
-                    const sizeOrder: Size[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL'];
-                    const sizePieces = sizeOrder
-                      .map(sz => {
-                        const val = counts[sz] || 0;
-                        return val > 0 ? `${sz}${val}` : '';
-                      })
-                      .filter(Boolean)
-                      .join(' ');
+                    const sizePieces = formatSizePieces(counts);
                     return `${colorName}: ${Object.values(counts).reduce((a, b) => a + b, 0)}${sizePieces ? ` (${sizePieces})` : ''}`;
                   })
                   .filter(Boolean)

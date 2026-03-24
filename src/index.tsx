@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Outlet } from 'react-router-dom';
 
 import CollapsibleSidebar from './app/layout/CollapsibleSidebar';
 import Header from './app/layout/Header';
@@ -10,14 +10,17 @@ import AdminCollegeSelection from './app/routes/adminCollegeSelection';
 import AdminCollegeView from './app/routes/adminCollegeView';
 import AdminProductDetail from './app/routes/adminProductDetail';
 import AllOrdersPage from './app/routes/allOrders';
+import ApiCollegeProductDetail from './app/routes/ApiCollegeProductDetail';
 import ContactPage from './app/routes/contact';
 import OrderReceiptPage from './app/routes/orderReceipt';
 import TestApiPage from './app/routes/testApi';
 import TestApiOrderPage from './app/routes/TestApiOrder';
 import TestApiProductDetailPage from './app/routes/TestApiProductDetail';
+import ApiCollegeOrderPage from './components/ApiCollegeOrderPage';
 import CollegeRouteWrapper from './components/CollegeRouteWrapper';
 import CollegeSelector from './components/CollegeSelector';
 import { colleges } from './config';
+import { ApiCollegeOrderProvider } from './contexts/ApiCollegeOrderContext';
 import { Category } from './types';
 import './styles/global.css';
 import './styles/tokens.css';
@@ -50,7 +53,7 @@ function AppShell() {
 
   const handleBackToColleges = React.useCallback(() => {
     setIsSidebarOpen(false);
-    navigate('/');
+    navigate('/', { state: { showApiSchools: true } });
   }, [navigate]);
 
   // Provide categories when on a college route; otherwise empty
@@ -64,6 +67,7 @@ function AppShell() {
   // Avoid rendering global sidebar on the form root where the page has its own sidebar
   const segments = location.pathname.split('/').filter(Boolean);
   const isAdminRoute = segments[0] === 'admin';
+  const isApiSchoolRoute = segments[0] === 'api-school';
   const isAdminCollegeView = isAdminRoute && segments.length === 3 && segments[1] === 'college';
   const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact' || segments[0] === 'admin' || segments[0] === 'all-orders');
   
@@ -78,7 +82,7 @@ function AppShell() {
   return (
     <>
       <Header />
-      {!isFormRoot && !isAdminCollegeView && (
+      {!isFormRoot && !isAdminCollegeView && !isApiSchoolRoute && (
         <CollapsibleSidebar
           categories={categories}
           activeSection={''}
@@ -92,6 +96,13 @@ function AppShell() {
         <Route path='/' element={<CollegeSelector />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
+        <Route path='/api-school/:orderTemplateId' element={<ApiCollegeOrderProvider><Outlet /></ApiCollegeOrderProvider>}>
+          <Route index element={<ApiCollegeOrderPage />} />
+          <Route path='summary' element={<ApiCollegeOrderPage />} />
+          <Route path='receipt' element={<ApiCollegeOrderPage />} />
+          <Route path='thankyou' element={<ApiCollegeOrderPage />} />
+          <Route path='product/:productId' element={<ApiCollegeProductDetail />} />
+        </Route>
         <Route path='/test-api/:orderTemplateId/product/:itemId' element={<TestApiProductDetailPage />} />
         <Route path='/test-api/:orderTemplateId' element={<TestApiOrderPage />} />
         <Route path='/test-api' element={<TestApiPage />} />

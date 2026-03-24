@@ -19,6 +19,56 @@ export interface College {
   categories: Category[];
 }
 
+export interface ApiOrderProduct {
+  productKey: string;
+  imageKey: string;
+  groupKey?: string;
+  productName: string;
+  subtitle?: string;
+  imageUrl?: string | null;
+  orderNum: string;
+  designNum: string;
+  itemId: string;
+  expr1?: string | null;
+  color?: string | null;
+  sizeLabels: string[];
+  categoryPath?: string;
+  categoryName?: string;
+  variantOptions?: string[];
+  defaultVariant?: string;
+  sizeOptionsByVariant?: Record<string, Size[]>;
+  packSizeByVariant?: Record<string, number>;
+  allowAnyQuantityByVariant?: Record<string, boolean>;
+  /**
+   * For grouped API products, maps selected `variant + size` back to the
+   * original raw API row key used for final payload serialization.
+   */
+  sizeSourceByVariant?: Record<string, Record<string, string>>;
+  /**
+   * Grouped API products retain raw row metadata for debugging and payload mapping.
+   */
+  variantRecords?: Array<{
+    sourceImageKey: string;
+    sourceStyleNum: string | null;
+    sourceRecordIndex: number;
+    sourceItemId: string | null;
+  }>;
+  availableSizes?: Array<{
+    size: string;
+    sourceStyleNum: string | null;
+    sourceRecordIndex: number;
+    sourceItemId: string | null;
+    sourceImageKey: string;
+    variant: string;
+  }>;
+}
+
+export interface ApiOrderCategoryModel {
+  categories: Category[];
+  productMap: Record<string, ApiOrderProduct>;
+  sourceToGroupKeyMap: Record<string, string>;
+}
+
 export interface ShirtVersion {
   tshirt: string;
   longsleeve?: string;
@@ -71,7 +121,9 @@ export type ShirtColorSizeCounts = Record<string, Partial<Record<keyof ShirtVers
 export interface FormData {
   company: string;
   storeNumber: string;
+  poNumber?: string;
   storeManager: string;
+  orderedBy: string;
   date: string;
   orderNotes: string;
   quantities: Record<string, string>;
@@ -105,6 +157,7 @@ export interface TemplateParams extends Record<string, unknown> {
   company: string;
   store_number: string;
   manager_name: string;
+  ordered_by: string;
   date: string;
   order_notes: string;
   categories: EmailCategory[];

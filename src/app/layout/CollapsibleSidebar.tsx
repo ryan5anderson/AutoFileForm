@@ -133,6 +133,16 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           {/* About Us & Contact Us Links - Bottom of sidebar */}
           <div className="sidebar-bottom-section">
             <Link
+              to="/"
+              state={{ showApiSchools: false }}
+              className="sidebar-nav-item sidebar-link"
+              onClick={onToggle}
+            >
+              <span className="nav-icon">🏫</span>
+              <span className="nav-text">Local schools</span>
+            </Link>
+
+            <Link
               to="/about"
               className="sidebar-nav-item sidebar-link"
               onClick={onToggle}

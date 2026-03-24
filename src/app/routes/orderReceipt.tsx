@@ -69,6 +69,7 @@ const OrderReceiptPage: React.FC = () => {
       company: order.college,
       storeNumber: order.storeNumber,
       storeManager: order.storeManager,
+      orderedBy: order.orderedBy || order.storeManager,
       date: order.date,
       orderNotes: order.orderNotes || '',
       quantities: {},

@@ -529,6 +529,7 @@ service cloud.firestore {
                       <th className="col-college">College</th>
                       <th className="col-store">Store</th>
                       <th className="col-manager">Manager</th>
+                      <th className="col-ordered-by">Ordered By</th>
                       <th className="col-date">Date</th>
                       <th className="col-status">Status</th>
                       <th className="col-actions">Actions</th>
@@ -549,6 +550,7 @@ service cloud.firestore {
                           </Link>
                         </td>
                         <td className="col-manager">{order.storeManager}</td>
+                        <td className="col-ordered-by">{order.orderedBy || order.storeManager}</td>
                         <td className="col-date">{new Date(order.date).toLocaleDateString()}</td>
                         <td className="col-status">
                           <span className={`status-${order.status}`}>
@@ -756,6 +758,7 @@ service cloud.firestore {
         .col-order-id,
         .col-college,
         .col-manager,
+        .col-ordered-by,
         .col-date {
           display: table-cell;
         }
@@ -1097,6 +1100,7 @@ service cloud.firestore {
           .col-order-id,
           .col-college,
           .col-manager,
+          .col-ordered-by,
           .col-date {
             display: none;
           }
@@ -1220,6 +1224,7 @@ service cloud.firestore {
           .col-order-id,
           .col-college,
           .col-manager,
+          .col-ordered-by,
           .col-date {
             display: none;
           }

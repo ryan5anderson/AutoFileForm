@@ -6,6 +6,7 @@ import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService } from '../../services/firebaseOrderService';
 import { FormData, Page, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, Category, SizeCounts, ColorOption, ShirtColorSizeCounts, InfantSizeCounts } from '../../types';
 import { validateFormData, validateQuantities, createTemplateParams, hasOrderProducts, calculateTotalItems } from '../utils/index';
+import { sanitizeFormDataTextFields, sanitizeFormDataUpdates } from '../utils/sanitize';
 
 export const useOrderForm = (categories: Category[]) => {
   // Store categories for validation
@@ -14,14 +15,16 @@ export const useOrderForm = (categories: Category[]) => {
   const { college } = useParams();
   const location = useLocation();
   const [formData, setFormData] = useState<FormData>(() => {
+    const today = new Date().toISOString().split('T')[0];
     const storageKey = `orderFormData_${college || 'default'}`;
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Ensure date is set if missing
-        if (!parsed.date) parsed.date = new Date().toISOString().split('T')[0];
-        return parsed;
+        // Always default date to today for each new session.
+        parsed.date = today;
+        if (!parsed.orderedBy) parsed.orderedBy = '';
+        return sanitizeFormDataTextFields(parsed);
       } catch (e) {
         console.error('Failed to load saved form data:', e);
       }
@@ -31,7 +34,8 @@ export const useOrderForm = (categories: Category[]) => {
       company: '',
       storeNumber: '',
       storeManager: '',
-      date: new Date().toISOString().split('T')[0],
+      orderedBy: '',
+      date: today,
       orderNotes: '',
       quantities: {} as Record<string, string>,
       shirtVersions: {} as Record<string, ShirtVersion>,
@@ -126,7 +130,8 @@ export const useOrderForm = (categories: Category[]) => {
   }, [formData, college]);
 
   const handleFormDataChange = (updates: Partial<FormData>) => {
-    setFormData((prev: FormData) => ({ ...prev, ...updates }));
+    const sanitizedUpdates = sanitizeFormDataUpdates(updates);
+    setFormData((prev: FormData) => ({ ...prev, ...sanitizedUpdates }));
   };
 
   const handleQuantityChange = (imagePath: string, value: string) => {
@@ -307,6 +312,8 @@ export const useOrderForm = (categories: Category[]) => {
     setSending(true);
 
     try {
+      const sanitizedFormData = sanitizeFormDataTextFields(formData);
+
       // Get school name from college config
       const schoolName = college && colleges[college as keyof typeof colleges]
         ? colleges[college as keyof typeof colleges].name
@@ -315,16 +322,17 @@ export const useOrderForm = (categories: Category[]) => {
       // Save order to Firebase first (so it appears in admin and persists even if email fails)
       await firebaseOrderService.addOrder({
         college: college || 'default',
-        storeNumber: formData.storeNumber,
-        storeManager: formData.storeManager,
-        date: formData.date,
+        storeNumber: sanitizedFormData.storeNumber,
+        storeManager: sanitizedFormData.storeManager,
+        orderedBy: sanitizedFormData.orderedBy,
+        date: sanitizedFormData.date,
         status: 'pending',
-        totalItems: calculateTotalItems(formData),
-        orderNotes: formData.orderNotes,
-        formData,
+        totalItems: calculateTotalItems(sanitizedFormData),
+        orderNotes: sanitizedFormData.orderNotes,
+        formData: sanitizedFormData,
       });
 
-      const templateParams = createTemplateParams(formData, categories, schoolName);
+      const templateParams = createTemplateParams(sanitizedFormData, categories, schoolName);
       await sendOrderEmail(templateParams);
 
       // Clear saved form data after successful submission
