@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui';
 import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts, InfantSizeCounts, SizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
-import { getDisplayProductName, getRackDisplayName, getFilteredShirtVersions, getShirtVersionTotal, hasColorOptions, getVersionDisplayName } from '../utils';
+import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions, getVersionDisplayName } from '../utils';
 
 import OrderSummaryCard from './OrderSummaryCard';
 
