@@ -52,7 +52,7 @@ const PACK_SIZES: PackSizeConfig = {
 
   // Accessories
   'socks': 6,       // Packs of 6
-  'bottle': 1,       // Any quantity allowed
+  'bottle': 3,       // Packs of 3
   'sticker': 7,      // Packs of 7 (like bags/default)
   'plush': 6,       // Packs of 6
   'signage': 1,      // Signage items - any quantity allowed
@@ -83,6 +83,7 @@ const FORCED_PACK_SIZES: Record<string, number> = {
   jacket: 6,
   flannels: 8,
   pants: 4,
+  bottle: 3,
 };
 
 const FORCED_PACK_SIZES_BY_VERSION: Record<string, number> = {

@@ -567,7 +567,6 @@ const allowsAnyQuantityForVariant = (categoryPath: string, _variant: string): bo
     return true;
   }
   return (
-    categoryPath === 'bottle' ||
     categoryPath === 'signage' ||
     categoryPath === 'sticker' ||
     categoryPath === 'plush' ||

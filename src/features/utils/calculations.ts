@@ -96,6 +96,10 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     return 4;
   }
 
+  if (normalizedCategory === 'bottle' || normalizedCategory.includes('bottle')) {
+    return 3;
+  }
+
   // Try to get pack size from garment ratios first
   const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, version);
   if (ratioPackSize !== null && ratioPackSize !== undefined) {
@@ -142,6 +146,7 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
     case 'beanie':
       return 6;
     case 'bottle':
+      return 3;
     case 'signage':
       return 1;
     default:
@@ -167,7 +172,7 @@ const getAllowsAnyQuantity = (categoryPath: string, version?: string, productNam
   }
 
   // Also check for accessories that allow any quantity
-  if (normalizedCategory === 'bottle' || normalizedCategory === 'signage') {
+  if (normalizedCategory === 'signage') {
     return true;
   }
 
@@ -754,11 +759,6 @@ export function getQuantityMultiples(
   const multiples: number[] = [];
   for (let i = 1; i <= 6; i++) {
     multiples.push(packSize * i);
-  }
-
-  // Special handling for bottles (allow individual quantities)
-  if (categoryName.toLowerCase().includes('bottle')) {
-    return [1, 2, 3, 4, 5, 6];
   }
 
   // For all other categories, return multiples based on pack size
