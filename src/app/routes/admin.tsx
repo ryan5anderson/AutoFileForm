@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import { colleges } from '../../config';
-import { db } from '../../config/firebase';
 import { adminConfig } from '../../config/env';
+import { db } from '../../config/firebase';
 import { createTemplateParams } from '../../features/utils';
 import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
