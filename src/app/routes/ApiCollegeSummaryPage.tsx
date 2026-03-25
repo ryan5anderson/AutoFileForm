@@ -31,6 +31,9 @@ const ApiCollegeSummaryPage: React.FC = () => {
   const [sending, setSending] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmationError, setConfirmationError] = useState<string | null>(null);
+  const [orderJsonOpen, setOrderJsonOpen] = useState(false);
+  const [apiPosting, setApiPosting] = useState(false);
+  const [apiPostResult, setApiPostResult] = useState<string | null>(null);
 
   const quantities = React.useMemo(() => {
     const next: Record<string, string> = {};
@@ -47,6 +50,20 @@ const ApiCollegeSummaryPage: React.FC = () => {
     });
     return next;
   }, [categories, orderedByProduct, productMap]);
+
+  const orderPayload = React.useMemo(
+    () =>
+      buildApiOrderPayload(rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, {
+        company: formData.company,
+        storeNumber: formData.storeNumber,
+        poNumber: formData.poNumber || '',
+        storeManager: formData.storeManager,
+        orderedBy: formData.orderedBy,
+        date: formData.date,
+        orderNotes: formData.orderNotes,
+      }),
+    [rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, formData]
+  );
 
   const imageSrcResolver = useCallback(
     (_categoryPath: string, imageName: string) => {
@@ -138,23 +155,6 @@ const ApiCollegeSummaryPage: React.FC = () => {
         formData: { ...formData, quantities } as never,
       });
 
-      const apiPayload = buildApiOrderPayload(rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, {
-        company: formData.company,
-        storeNumber: formData.storeNumber,
-        poNumber: formData.poNumber || '',
-        storeManager: formData.storeManager,
-        orderedBy: formData.orderedBy,
-        date: formData.date,
-        orderNotes: formData.orderNotes,
-      });
-      if (!apiPayload) {
-        throw new Error('Unable to build order payload for API submission.');
-      }
-      const apiSubmitResult = await submitApiOrder(apiPayload);
-      if (!apiSubmitResult.success) {
-        throw new Error(apiSubmitResult.error || 'Failed to submit order to API.');
-      }
-
       const schoolName = rawPageData && typeof rawPageData === 'object' && 'schoolName' in rawPageData
         ? (rawPageData as { schoolName?: string }).schoolName
         : '';
@@ -175,20 +175,36 @@ const ApiCollegeSummaryPage: React.FC = () => {
       console.error('Order submit error:', err);
       const message = err instanceof Error ? err.message : String(err);
       const isFirebaseError = message.toLowerCase().includes('firebase') || message.toLowerCase().includes('permission');
-      const isApiSubmitError = message.toLowerCase().includes('submit')
-        || message.toLowerCase().includes('payload')
-        || message.toLowerCase().includes('api');
       setConfirmationError(
         isFirebaseError
           ? 'Failed to save order. Please check your Firebase connection and Firestore rules.'
-          : isApiSubmitError
-            ? `Failed to submit order JSON to API. ${message}`
-            : 'Failed to send email. Please check your EmailJS configuration and try again.'
+          : 'Failed to send email. Please check your EmailJS configuration and try again.'
       );
     } finally {
       setSending(false);
     }
-  }, [formData, categories, orderedByProduct, productMap, quantities, orderTemplateId, navigate, rawPageData, sourceToGroupKeyMap]);
+  }, [formData, categories, orderedByProduct, productMap, quantities, orderTemplateId, navigate, rawPageData]);
+
+  const handlePostOrderJson = useCallback(async () => {
+    setApiPostResult(null);
+    if (!orderPayload) {
+      setApiPostResult('Unable to build order payload for API submission.');
+      return;
+    }
+    setApiPosting(true);
+    try {
+      const apiSubmitResult = await submitApiOrder(orderPayload);
+      if (!apiSubmitResult.success) {
+        throw new Error(apiSubmitResult.error || 'Failed to submit order to API.');
+      }
+      setApiPostResult(apiSubmitResult.message || 'Order JSON posted successfully.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setApiPostResult(`Failed to submit order JSON to API. ${message}`);
+    } finally {
+      setApiPosting(false);
+    }
+  }, [orderPayload]);
 
   const handleConfirmCancel = useCallback(() => {
     setShowConfirmModal(false);
@@ -260,6 +276,61 @@ const ApiCollegeSummaryPage: React.FC = () => {
           <button type="button" onClick={fromReceipt ? handleBackToReceipt : handleConfirm} disabled={sending} className="college-page-title-btn" style={{ background: 'var(--color-primary)', color: 'white', border: 'none', minWidth: '150px' }}>
             {fromReceipt ? 'Back to Receipt' : (sending ? 'Sending...' : 'Send Order')}
           </button>
+        </div>
+
+        <div className="view-order-json-section" style={{ marginTop: 'var(--space-6)' }}>
+          <button
+            type="button"
+            className="college-page-title-btn"
+            onClick={() => setOrderJsonOpen((open) => !open)}
+          >
+            {orderJsonOpen ? 'Hide Order JSON' : 'View Order JSON'}
+          </button>
+          {orderJsonOpen && (
+            <div
+              className="view-order-json-panel"
+              style={{
+                marginTop: 'var(--space-4)',
+                padding: 'var(--space-4)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: 'var(--color-surface)',
+              }}
+            >
+              <pre
+                style={{
+                  maxHeight: '400px',
+                  overflow: 'auto',
+                  padding: 'var(--space-4)',
+                  margin: 0,
+                  fontSize: '0.75rem',
+                  backgroundColor: 'var(--color-gray-100)',
+                  borderRadius: 'var(--radius-md)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {orderPayload
+                  ? JSON.stringify(orderPayload, null, 2)
+                  : 'No order data available. Add products to your order.'}
+              </pre>
+              <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-4)', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="college-page-title-btn"
+                  onClick={handlePostOrderJson}
+                  disabled={!orderPayload || apiPosting}
+                >
+                  {apiPosting ? 'Posting...' : 'Post Order JSON to API'}
+                </button>
+              </div>
+              {apiPostResult && (
+                <div style={{ marginTop: 'var(--space-3)', fontSize: '0.875rem' }}>
+                  {apiPostResult}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {confirmationError && !showConfirmModal && (
