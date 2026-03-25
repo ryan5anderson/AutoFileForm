@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import { colleges } from '../../config';
+import { db } from '../../config/firebase';
 import { adminConfig } from '../../config/env';
 import { createTemplateParams } from '../../features/utils';
-import { db } from '../../config/firebase';
 import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 import { TemplateParams } from '../../types';
