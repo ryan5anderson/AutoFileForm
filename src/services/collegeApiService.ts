@@ -587,6 +587,47 @@ export interface NormalizedStyleNum {
 const normalizeComparisonToken = (value: string | null | undefined): string =>
   (value || '').trim().toUpperCase();
 
+const readFirstNonEmptyToken = (
+  values: Array<string | number | null | undefined>
+): string => {
+  for (const value of values) {
+    const normalized = normalizeComparisonToken(value == null ? '' : String(value));
+    if (normalized) return normalized;
+  }
+  return '';
+};
+
+const getMockupGroupToken = (item: OrderItem): string => {
+  const dynamicRecord = item as Record<string, unknown>;
+  const explicitToken = readFirstNonEmptyToken([
+    dynamicRecord['M#'] as string | null | undefined,
+    dynamicRecord['M_NUM'] as string | null | undefined,
+    dynamicRecord['MNUM'] as string | null | undefined,
+    dynamicRecord['M_NUMBER'] as string | null | undefined,
+    dynamicRecord['M'] as string | null | undefined,
+  ]);
+  if (explicitToken) return explicitToken;
+
+  // Some payloads only expose M# as free text (commonly Expr1).
+  const textCandidates = [
+    item.Expr1,
+    item.DESCRIPT,
+    item.SHIRTNAME,
+    dynamicRecord['MOCKUP'] as string | null | undefined,
+    dynamicRecord['MOCKUP_NUM'] as string | null | undefined,
+  ];
+  for (const candidate of textCandidates) {
+    const normalized = normalizeComparisonToken(candidate || '');
+    if (!normalized) continue;
+    const directMatch = normalized.match(/^M\d{5,}$/);
+    if (directMatch) return directMatch[0];
+    const embeddedMatch = normalized.match(/\bM\d{5,}\b/);
+    if (embeddedMatch) return embeddedMatch[0];
+  }
+
+  return '';
+};
+
 const normalizeSizeToken = (value: string | null | undefined): string =>
   (value || '').trim().toUpperCase().replace(/\s+/g, '');
 
@@ -810,14 +851,21 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
 
   const groupedByFamily = new Map<string, typeof normalized>();
   normalized.forEach((record) => {
-    const groupingKey = [
-      normalizeComparisonToken(record.item.DESIGN_NUM),
-      normalizeComparisonToken(record.item.COLOR_INIT),
-      normalizeComparisonToken(record.item.Expr1),
-      normalizeComparisonToken(record.item.productUrl),
-      normalizeComparisonToken(record.normalizedProduct.categoryPath),
-      normalizeComparisonToken(record.styleInfo.baseStyleNum || record.styleInfo.rawStyleNum),
-    ].join('|');
+    const mockupToken = getMockupGroupToken(record.item);
+    const groupingKey = mockupToken
+      ? [
+        mockupToken,
+        normalizeComparisonToken(record.item.DESIGN_NUM),
+        normalizeComparisonToken(record.item.COLOR_INIT),
+      ].join('|')
+      : [
+        normalizeComparisonToken(record.item.DESIGN_NUM),
+        normalizeComparisonToken(record.item.COLOR_INIT),
+        normalizeComparisonToken(record.item.Expr1),
+        normalizeComparisonToken(record.item.productUrl),
+        normalizeComparisonToken(record.normalizedProduct.categoryPath),
+        normalizeComparisonToken(record.styleInfo.baseStyleNum || record.styleInfo.rawStyleNum),
+      ].join('|');
 
     const existing = groupedByFamily.get(groupingKey);
     if (existing) {
@@ -850,11 +898,13 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
     };
 
     const variantOrder: string[] = [];
+    const variantDisplayNameByKey: Record<string, string> = {};
     const sizeSourceByVariant: Record<string, Record<string, string>> = {};
     const sizeOrderByVariant: Record<string, string[]> = {};
     const sizeTokenToDisplayByVariant: Record<string, Record<string, string>> = {};
     const sourceStyleByImageKey: Record<string, NormalizedStyleNum> = {};
 
+    const recordsByBaseStyle = new Map<string, typeof sortedRecords>();
     sortedRecords.forEach((record) => {
       sourceToGroupKeyMap[record.sourceImageKey] = groupKey;
       sourceStyleByImageKey[record.sourceImageKey] = record.styleInfo;
@@ -865,61 +915,83 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
         sourceItemId: (record.item.ITEM_ID || '').trim() || null,
       });
 
-      const recordVariants =
-        record.normalizedProduct.variantOptions?.length
-          ? record.normalizedProduct.variantOptions
-          : [record.normalizedProduct.defaultVariant || 'default'];
+      const styleGroupKey = normalizeComparisonToken(
+        record.styleInfo.baseStyleNum || record.styleInfo.rawStyleNum
+      ) || `STYLE-${record.sourceRecordIndex}`;
+      const existing = recordsByBaseStyle.get(styleGroupKey);
+      if (existing) {
+        existing.push(record);
+      } else {
+        recordsByBaseStyle.set(styleGroupKey, [record]);
+      }
+    });
 
-      recordVariants.forEach((variant) => {
-        if (!variantOrder.includes(variant)) variantOrder.push(variant);
-        if (!sizeSourceByVariant[variant]) sizeSourceByVariant[variant] = {};
-        if (!sizeOrderByVariant[variant]) sizeOrderByVariant[variant] = [];
-        if (!sizeTokenToDisplayByVariant[variant]) sizeTokenToDisplayByVariant[variant] = {};
+    recordsByBaseStyle.forEach((styleRecords, styleGroupKey) => {
+      const sortedStyleRecords = [...styleRecords].sort((a, b) => a.sourceRecordIndex - b.sourceRecordIndex);
+      const stylePrimaryRecord =
+        sortedStyleRecords.find((record) => !record.styleInfo.variantSuffix) || sortedStyleRecords[0];
+      if (!stylePrimaryRecord) return;
 
-        if (record.normalizedProduct.packSizeByVariant?.[variant] != null) {
-          mergedProduct.packSizeByVariant![variant] = record.normalizedProduct.packSizeByVariant[variant];
-        }
-        if (record.normalizedProduct.allowAnyQuantityByVariant?.[variant] != null) {
-          mergedProduct.allowAnyQuantityByVariant![variant] =
-            record.normalizedProduct.allowAnyQuantityByVariant[variant];
-        }
+      if (!variantOrder.includes(styleGroupKey)) variantOrder.push(styleGroupKey);
 
-        const configuredSizes = record.normalizedProduct.sizeOptionsByVariant?.[variant] || [];
+      const styleKeyDisplay =
+        stylePrimaryRecord.styleInfo.baseStyleNum ||
+        stylePrimaryRecord.styleInfo.rawStyleNum ||
+        styleGroupKey;
+      // For grouped M# cards, tab labels should be the base style number.
+      variantDisplayNameByKey[styleGroupKey] = styleKeyDisplay;
+
+      if (!sizeSourceByVariant[styleGroupKey]) sizeSourceByVariant[styleGroupKey] = {};
+      if (!sizeOrderByVariant[styleGroupKey]) sizeOrderByVariant[styleGroupKey] = [];
+      if (!sizeTokenToDisplayByVariant[styleGroupKey]) sizeTokenToDisplayByVariant[styleGroupKey] = {};
+
+      const stylePrimaryVariant = stylePrimaryRecord.normalizedProduct.defaultVariant || stylePrimaryRecord.normalizedProduct.variantOptions?.[0] || 'default';
+      mergedProduct.packSizeByVariant![styleGroupKey] =
+        stylePrimaryRecord.normalizedProduct.packSizeByVariant?.[stylePrimaryVariant] || 1;
+      mergedProduct.allowAnyQuantityByVariant![styleGroupKey] =
+        stylePrimaryRecord.normalizedProduct.allowAnyQuantityByVariant?.[stylePrimaryVariant] || false;
+
+      sortedStyleRecords.forEach((record) => {
+        const recordVariant = record.normalizedProduct.defaultVariant || record.normalizedProduct.variantOptions?.[0] || 'default';
+        const configuredSizes = record.normalizedProduct.sizeOptionsByVariant?.[recordVariant] || [];
         const sizesForVariant =
           configuredSizes.length > 0
             ? [...configuredSizes, ...record.apiSizes]
             : record.apiSizes;
+
         sizesForVariant.forEach((size) => {
           const displaySize = (size || '').trim();
           if (!displaySize) return;
           const sizeToken = normalizeApiSizeToCanonical(displaySize);
           if (!sizeToken) return;
 
-          if (!sizeTokenToDisplayByVariant[variant][sizeToken]) {
-            sizeTokenToDisplayByVariant[variant][sizeToken] = displaySize;
-            sizeOrderByVariant[variant].push(sizeToken);
+          if (!sizeTokenToDisplayByVariant[styleGroupKey][sizeToken]) {
+            sizeTokenToDisplayByVariant[styleGroupKey][sizeToken] = displaySize;
+            sizeOrderByVariant[styleGroupKey].push(sizeToken);
           }
 
-          const currentSource = sizeSourceByVariant[variant][sizeToken];
+          const currentSource = sizeSourceByVariant[styleGroupKey][sizeToken];
           if (!currentSource) {
-            sizeSourceByVariant[variant][sizeToken] = record.sourceImageKey;
+            sizeSourceByVariant[styleGroupKey][sizeToken] = record.sourceImageKey;
             return;
           }
           const currentSourceStyle = sourceStyleByImageKey[currentSource] || normalizeStyleNum(null);
           const incomingScore = getSourcePriorityScore(displaySize, record.styleInfo);
           const currentScore = getSourcePriorityScore(displaySize, currentSourceStyle);
           if (incomingScore > currentScore) {
-            sizeSourceByVariant[variant][sizeToken] = record.sourceImageKey;
+            sizeSourceByVariant[styleGroupKey][sizeToken] = record.sourceImageKey;
           }
         });
       });
     });
 
     mergedProduct.variantOptions = variantOrder;
+    mergedProduct.variantDisplayNameByKey = variantDisplayNameByKey;
     mergedProduct.defaultVariant =
-      (primaryRecord.normalizedProduct.defaultVariant &&
-      variantOrder.includes(primaryRecord.normalizedProduct.defaultVariant))
-        ? primaryRecord.normalizedProduct.defaultVariant
+      variantOrder.includes(
+        normalizeComparisonToken(primaryRecord.styleInfo.baseStyleNum || primaryRecord.styleInfo.rawStyleNum)
+      )
+        ? normalizeComparisonToken(primaryRecord.styleInfo.baseStyleNum || primaryRecord.styleInfo.rawStyleNum)
         : variantOrder[0] || 'default';
 
     variantOrder.forEach((variant) => {
@@ -972,6 +1044,15 @@ export const buildApiOrderCategoryModel = (items: OrderItem[]): ApiOrderCategory
       expandedSizeSourceByVariant[variant] = mapForVariant;
     });
     mergedProduct.sizeSourceByVariant = expandedSizeSourceByVariant;
+    if (variantOrder.length > 1) {
+      const groupedTitle = [primaryRecord.item.DESIGN_NUM, primaryRecord.item.COLOR_INIT, primaryRecord.item.Expr1]
+        .map((part) => (part || '').trim())
+        .filter(Boolean)
+        .join(' ');
+      if (groupedTitle) {
+        mergedProduct.productName = groupedTitle;
+      }
+    }
 
     productMap[groupKey] = mergedProduct;
     const categoryPath = mergedProduct.categoryPath || 'api-products';

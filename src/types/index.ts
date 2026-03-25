@@ -40,6 +40,11 @@ export interface ApiOrderProduct {
   packSizeByVariant?: Record<string, number>;
   allowAnyQuantityByVariant?: Record<string, boolean>;
   /**
+   * Optional UI labels for variant/tab keys.
+   * Keyed by variant key in `variantOptions`.
+   */
+  variantDisplayNameByKey?: Record<string, string>;
+  /**
    * For grouped API products, maps selected `variant + size` back to the
    * original raw API row key used for final payload serialization.
    */

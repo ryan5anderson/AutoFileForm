@@ -7,7 +7,13 @@ import { getVersionDisplayName } from './naming';
 import { getFilteredShirtVersions } from './index';
 
 type ApiSelectionMap = Record<string, { variantQuantities: Record<string, Record<string, number>> }>;
-type ApiProductMap = Record<string, { productName?: string; defaultVariant?: string; variantOptions?: string[]; sizeOptionsByVariant?: Record<string, string[]> }>;
+type ApiProductMap = Record<string, {
+  productName?: string;
+  defaultVariant?: string;
+  variantOptions?: string[];
+  sizeOptionsByVariant?: Record<string, string[]>;
+  variantDisplayNameByKey?: Record<string, string>;
+}>;
 
 export interface ApiReceiptRow {
   label: string;
@@ -56,7 +62,11 @@ const sortCategoriesForReceipt = (categories: Category[]): Category[] =>
   });
 
 const buildApiReceiptRows = (
-  product: { defaultVariant?: string; variantOptions?: string[] },
+  product: {
+    defaultVariant?: string;
+    variantOptions?: string[];
+    variantDisplayNameByKey?: Record<string, string>;
+  },
   selection: { variantQuantities: Record<string, Record<string, number>> }
 ): ApiReceiptRow[] => {
   const defaultVariant = product.defaultVariant || 'default';
@@ -75,7 +85,7 @@ const buildApiReceiptRows = (
       const label =
         variant === defaultVariant && hasSingleVariant
           ? (sizeParts || 'Qty')
-          : `${getVersionDisplayName(variant)} ${sizeParts}`.trim();
+          : `${product.variantDisplayNameByKey?.[variant] || getVersionDisplayName(variant)} ${sizeParts}`.trim();
       rows.push({ label, qty: total });
     }
   });

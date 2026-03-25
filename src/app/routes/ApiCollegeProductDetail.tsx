@@ -212,7 +212,7 @@ const ApiCollegeProductDetail: React.FC = () => {
                       className={`product-detail-tab ${currentVariant === variant ? 'product-detail-tab--active' : ''}`}
                       onClick={() => handleVariantChange(variant)}
                     >
-                      {getVersionDisplayName(variant)}
+                      {product.variantDisplayNameByKey?.[variant] || getVersionDisplayName(variant)}
                     </button>
                   ))}
                 </div>

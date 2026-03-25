@@ -103,7 +103,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
           const displayName =
             variant === defaultVariant && hasSingleVariant
               ? 'Qty'
-              : getVersionDisplayName(variant);
+              : (product.variantDisplayNameByKey?.[variant] || getVersionDisplayName(variant));
           items.push({ label: displayName, qty: total, sizeDetail: sizeDetail || undefined });
         }
       });

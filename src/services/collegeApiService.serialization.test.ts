@@ -212,4 +212,75 @@ describe('buildApiOrderPayload size-to-raw-row serialization', () => {
     expect(sizes).not.toContain('2XL');
     expect(sizes).not.toContain('3XL');
   });
+
+  it('groups shared M# into one card and keeps each base STYLE_NUM as its own tab variant', () => {
+    const sharedMockupRows: OrderItem[] = [
+      {
+        ORDER_NUM: 'SH2COC',
+        DESIGN_NUM: 'D3',
+        ITEM_ID: 'A',
+        SHIRTNAME: 'Short Sleeve Tee',
+        Expr1: 'Black',
+        STYLE_NUM: '3930R',
+        COLOR_INIT: 'BLK',
+        size2: 'SM',
+        size3: 'MD',
+        UNITPRICE: 10,
+        'M#': 'M57704058',
+      },
+      {
+        ORDER_NUM: 'SH2COC',
+        DESIGN_NUM: 'D3',
+        ITEM_ID: 'B',
+        SHIRTNAME: 'Long Sleeve Tee',
+        Expr1: 'Black',
+        STYLE_NUM: '4930R',
+        COLOR_INIT: 'BLK',
+        size2: 'SM',
+        size3: 'MD',
+        UNITPRICE: 12,
+        'M#': 'M57704058',
+      },
+      {
+        ORDER_NUM: 'SH2COC',
+        DESIGN_NUM: 'D3',
+        ITEM_ID: 'C',
+        SHIRTNAME: 'Hoodie',
+        Expr1: 'Black',
+        STYLE_NUM: '996G',
+        COLOR_INIT: 'BLK',
+        size2: 'SM',
+        size3: 'MD',
+        UNITPRICE: 18,
+        'M#': 'M57704058',
+      },
+      {
+        ORDER_NUM: 'SH2COC',
+        DESIGN_NUM: 'D3',
+        ITEM_ID: 'D',
+        SHIRTNAME: 'Crew Sweatshirt',
+        Expr1: 'Black',
+        STYLE_NUM: '562MR',
+        COLOR_INIT: 'BLK',
+        size2: 'SM',
+        size3: 'MD',
+        UNITPRICE: 16,
+        'M#': 'M57704058',
+      },
+    ];
+
+    const model = buildApiOrderCategoryModel(sharedMockupRows);
+    const productKeys = Object.keys(model.productMap);
+    expect(productKeys).toHaveLength(1);
+
+    const groupedProduct = model.productMap[productKeys[0]];
+    expect(groupedProduct).toBeDefined();
+    expect(groupedProduct.variantOptions).toEqual(['3930R', '4930R', '996G', '562MR']);
+
+    const tabLabels = groupedProduct.variantDisplayNameByKey || {};
+    expect(tabLabels['3930R']).toBeTruthy();
+    expect(tabLabels['4930R']).toBeTruthy();
+    expect(tabLabels['996G']).toBeTruthy();
+    expect(tabLabels['562MR']).toBeTruthy();
+  });
 });

@@ -37,7 +37,7 @@ interface CategorySectionProps {
   /** API school mode: ordered product selections by productId */
   apiOrderedByProduct?: Record<string, { activeVariant: string; variantQuantities: Record<string, Record<string, number>> }>;
   /** API school mode: product map by productId */
-  apiProductMap?: Record<string, { variantOptions?: string[]; defaultVariant?: string }>;
+  apiProductMap?: Record<string, { variantOptions?: string[]; defaultVariant?: string; variantDisplayNameByKey?: Record<string, string> }>;
   /** API school mode: get cart items for In Cart bar - returns variant totals and optional size details */
   getApiCartItems?: (imagePath: string, imageName: string) => { label: string; qty: number; sizeDetail?: string }[];
   /** Enables API-style catalog card UX for local school flows */
@@ -418,6 +418,24 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     return hasQuantity(imagePath, img);
   });
 
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    if (!apiProductMap) return;
+    const debugCards = filteredImages.map((imageName) => {
+      const product = apiProductMap[imageName];
+      return {
+        imageName,
+        variantOptions: product?.variantOptions || [],
+      };
+    });
+    // eslint-disable-next-line no-console
+    console.debug('[api-school] category card render inputs', {
+      categoryPath: category.path,
+      cardCount: filteredImages.length,
+      cards: debugCards,
+    });
+  }, [apiProductMap, category.path, filteredImages]);
+
   // Don't render the category section if no items have quantities in read-only mode
   // Exception: If all form data is empty, always show (admin preview mode)
   if (readOnly && filteredImages.length === 0 && hasAnyFormData) {
@@ -597,7 +615,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                         Available on{'\n'}
                         {availableVariants.map((v, i) => (
                           <span key={v}>
-                            {getVersionDisplayName(v)}
+                            {apiProductMap?.[img]?.variantDisplayNameByKey?.[v] || getVersionDisplayName(v)}
                             {i < availableVariants.length - 1 ? ' \u2022 ' : ''}
                           </span>
                         ))}
