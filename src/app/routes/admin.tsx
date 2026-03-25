@@ -2,9 +2,13 @@ import { collection, getDocs, query, limit } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
+import { colleges } from '../../config';
 import { adminConfig } from '../../config/env';
+import { createTemplateParams } from '../../features/utils';
 import { db } from '../../config/firebase';
+import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
+import { TemplateParams } from '../../types';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
@@ -139,6 +143,47 @@ const AdminPage: React.FC = () => {
 
   const [funButtonActive, setFunButtonActive] = useState(false);
   const [funMessage, setFunMessage] = useState('');
+  const [reorderLoading, setReorderLoading] = useState<Record<string, boolean>>({});
+
+  const buildTemplateParamsFromOrder = (order: Order): TemplateParams | null => {
+    if (order.emailTemplateParams) {
+      return order.emailTemplateParams;
+    }
+
+    const collegeKey = order.college as keyof typeof colleges;
+    const collegeConfig = colleges[collegeKey];
+    if (!collegeConfig || !order.formData) {
+      return null;
+    }
+
+    return createTemplateParams(order.formData, collegeConfig.categories, collegeConfig.name);
+  };
+
+  const handleReorder = async (order: Order) => {
+    const templateParams = buildTemplateParamsFromOrder(order);
+    if (!templateParams) {
+      window.alert('Cannot reorder this order yet. This order is missing the saved email details needed to resend.');
+      return;
+    }
+
+    const shouldSend = window.confirm(
+      `Send this order email again for Store #${order.storeNumber}?`
+    );
+    if (!shouldSend) {
+      return;
+    }
+
+    setReorderLoading((prev) => ({ ...prev, [order.id]: true }));
+    try {
+      await sendOrderEmail(templateParams);
+      window.alert(`Reorder email sent for Store #${order.storeNumber}.`);
+    } catch (error) {
+      console.error('Reorder email error:', error);
+      window.alert('Failed to resend the order email. Please check EmailJS configuration and try again.');
+    } finally {
+      setReorderLoading((prev) => ({ ...prev, [order.id]: false }));
+    }
+  };
 
   const funMessages = [
     '🎤 Why don\'t scientists trust atoms? Because they make up everything! 🎤',
@@ -576,6 +621,13 @@ service cloud.firestore {
                               </button>
                             )}
                             <button 
+                              className="action-btn reorder-btn"
+                              onClick={() => handleReorder(order)}
+                              disabled={Boolean(reorderLoading[order.id])}
+                            >
+                              {reorderLoading[order.id] ? 'Sending...' : 'Reorder'}
+                            </button>
+                            <button 
                               className="action-btn delete-btn"
                               onClick={() => handleDeleteOrder(order.id)}
                             >
@@ -865,6 +917,20 @@ service cloud.firestore {
         .delete-btn {
           background: #fee2e2;
           color: #dc2626;
+        }
+
+        .reorder-btn {
+          background: #dbeafe;
+          color: #1d4ed8;
+        }
+
+        .reorder-btn:hover:not(:disabled) {
+          background: #bfdbfe;
+        }
+
+        .reorder-btn:disabled {
+          opacity: 0.7;
+          cursor: wait;
         }
 
         .delete-btn:hover {

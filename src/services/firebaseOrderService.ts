@@ -12,7 +12,7 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '../config/firebase';
-import { FormData } from '../types';
+import { FormData, TemplateParams } from '../types';
 
 export interface OrderProduct {
   category: string;
@@ -44,6 +44,7 @@ export interface Order {
   adminNotes?: string;
   products?: OrderProduct[]; // New: detailed product information
   formData?: FormData; // Store the original form data for detailed receipt generation
+  emailTemplateParams?: TemplateParams; // Persist template params for reorder/resend
 }
 
 class FirebaseOrderService {

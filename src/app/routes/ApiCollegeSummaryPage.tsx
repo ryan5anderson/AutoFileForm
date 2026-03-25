@@ -143,18 +143,6 @@ const ApiCollegeSummaryPage: React.FC = () => {
     setSending(true);
     try {
       const totalItems = Object.values(quantities).reduce((sum, v) => sum + (parseInt(v, 10) || 0), 0);
-      await firebaseOrderService.addOrder({
-        college: `api-school:${orderTemplateId}`,
-        storeNumber: formData.storeNumber,
-        storeManager: formData.storeManager,
-        orderedBy: formData.orderedBy || formData.storeManager,
-        date: formData.date,
-        status: 'pending',
-        totalItems,
-        orderNotes: formData.orderNotes,
-        formData: { ...formData, quantities } as never,
-      });
-
       const schoolName = rawPageData && typeof rawPageData === 'object' && 'schoolName' in rawPageData
         ? (rawPageData as { schoolName?: string }).schoolName
         : '';
@@ -165,6 +153,19 @@ const ApiCollegeSummaryPage: React.FC = () => {
         productMap,
         schoolName || ''
       );
+
+      await firebaseOrderService.addOrder({
+        college: `api-school:${orderTemplateId}`,
+        storeNumber: formData.storeNumber,
+        storeManager: formData.storeManager,
+        orderedBy: formData.orderedBy || formData.storeManager,
+        date: formData.date,
+        status: 'pending',
+        totalItems,
+        orderNotes: formData.orderNotes,
+        formData: { ...formData, quantities } as never,
+        emailTemplateParams: templateParams,
+      });
       await sendOrderEmail(templateParams);
 
       localStorage.removeItem(getApiSchoolStorageKey(orderTemplateId || ''));

@@ -319,6 +319,7 @@ export const useOrderForm = (categories: Category[]) => {
         ? colleges[college as keyof typeof colleges].name
         : '';
 
+      const templateParams = createTemplateParams(sanitizedFormData, categories, schoolName);
       // Save order to Firebase first (so it appears in admin and persists even if email fails)
       await firebaseOrderService.addOrder({
         college: college || 'default',
@@ -330,9 +331,9 @@ export const useOrderForm = (categories: Category[]) => {
         totalItems: calculateTotalItems(sanitizedFormData),
         orderNotes: sanitizedFormData.orderNotes,
         formData: sanitizedFormData,
+        emailTemplateParams: templateParams,
       });
 
-      const templateParams = createTemplateParams(sanitizedFormData, categories, schoolName);
       await sendOrderEmail(templateParams);
 
       // Clear saved form data after successful submission

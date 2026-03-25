@@ -12,17 +12,26 @@ const removeControlCharsExceptNewlines = (value: string): string => {
     .join('');
 };
 
-const cleanBaseText = (value: string): string => {
-  return removeControlCharsExceptNewlines(value)
-    .replace(UNSAFE_TAG_CHARS, '')
-    .trim();
+const cleanBaseText = (value: string, trimEdges = true): string => {
+  const cleaned = removeControlCharsExceptNewlines(value).replace(UNSAFE_TAG_CHARS, '');
+  return trimEdges ? cleaned.trim() : cleaned;
 };
 
 export const sanitizeSingleLineInput = (value: string): string => {
-  return cleanBaseText(value).replace(MULTI_SPACE, ' ');
+  return cleanBaseText(value, false).replace(MULTI_SPACE, ' ');
 };
 
 export const sanitizeMultiLineInput = (value: string): string => {
+  return cleanBaseText(value, false)
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n');
+};
+
+const sanitizeSingleLineForSubmit = (value: string): string => {
+  return cleanBaseText(value).replace(MULTI_SPACE, ' ');
+};
+
+const sanitizeMultiLineForSubmit = (value: string): string => {
   return cleanBaseText(value)
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n');
@@ -53,10 +62,10 @@ export const sanitizeFormDataUpdates = (updates: Partial<FormData>): Partial<For
 export const sanitizeFormDataTextFields = (formData: FormData): FormData => {
   return {
     ...formData,
-    company: sanitizeSingleLineInput(formData.company),
-    storeNumber: sanitizeSingleLineInput(formData.storeNumber),
-    storeManager: sanitizeSingleLineInput(formData.storeManager),
-    orderedBy: sanitizeSingleLineInput(formData.orderedBy),
-    orderNotes: sanitizeMultiLineInput(formData.orderNotes),
+    company: sanitizeSingleLineForSubmit(formData.company),
+    storeNumber: sanitizeSingleLineForSubmit(formData.storeNumber),
+    storeManager: sanitizeSingleLineForSubmit(formData.storeManager),
+    orderedBy: sanitizeSingleLineForSubmit(formData.orderedBy),
+    orderNotes: sanitizeMultiLineForSubmit(formData.orderNotes),
   };
 };
