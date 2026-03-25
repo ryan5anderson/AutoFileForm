@@ -5,7 +5,7 @@
  * through Vercel serverless functions.
  */
 
-import { getPackSizeFromRatiosSync, getSizeScaleFromRatiosSync, parseSizeScale } from '../config/garmentRatios';
+import { getSizeScaleFromRatiosSync, parseSizeScale } from '../config/garmentRatios';
 import { getPackSizeSync } from '../config/packSizes';
 import { ApiOrderCategoryModel, ApiOrderProduct, Category } from '../types';
 
@@ -797,9 +797,9 @@ export const normalizeApiOrderItem = (item: OrderItem): ApiOrderProduct => {
         : (ratioSizes.length > 0 ? ratioSizes : getFallbackSizesForVariant(variant));
     sizeOptionsByVariant[variant] = resolvedSizes;
 
-    const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, variant);
-    const fallbackPackSize = getPackSizeSync(categoryPath, variant, sourceText);
-    const packSize = ratioPackSize ?? fallbackPackSize ?? 1;
+    // Use getPackSizeSync as the single source of truth so forced category
+    // pack rules (e.g. flannels -> 8) are honored consistently.
+    const packSize = getPackSizeSync(categoryPath, variant, sourceText);
     packSizeByVariant[variant] = packSize > 0 ? packSize : 1;
     allowAnyQuantityByVariant[variant] = allowsAnyQuantityForVariant(categoryPath, variant);
   });

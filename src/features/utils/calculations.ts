@@ -73,6 +73,29 @@ const getCorrectPackSize = (categoryPath: string, version?: string, productName?
   const normalizedCategory = categoryPath.trim().toLowerCase();
   const normalizedVersion = version?.trim().toLowerCase();
 
+  if (
+    normalizedCategory === 'hat' ||
+    normalizedCategory === 'beanie' ||
+    normalizedCategory === 'jacket' ||
+    normalizedCategory.includes('hat') ||
+    normalizedCategory.includes('beanie') ||
+    normalizedCategory.includes('jacket')
+  ) {
+    return 6;
+  }
+
+  if (normalizedCategory.includes('flannel')) {
+    return 8;
+  }
+
+  if (
+    normalizedVersion === 'sweatpants' ||
+    normalizedCategory.includes('sweatpant') ||
+    normalizedCategory === 'pants'
+  ) {
+    return 4;
+  }
+
   // Try to get pack size from garment ratios first
   const ratioPackSize = getPackSizeFromRatiosSync(categoryPath, version);
   if (ratioPackSize !== null && ratioPackSize !== undefined) {

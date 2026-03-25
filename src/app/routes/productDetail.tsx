@@ -95,9 +95,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         setPackSizes(sizes);
       } catch (error) {
         console.error('Error loading pack sizes:', error);
-        // Fallback to sync version if async fails
-        const { getPackSizeFromRatiosSync } = await import('../../config/garmentRatios');
-        const fallbackSize = getPackSizeFromRatiosSync(category.path, undefined) || 7;
+        // Fallback to sync pack-size resolver if async lookup fails.
+        const fallbackSize = getPackSizeSync(category.path, undefined, imageName);
         setPackSizes({ default: fallbackSize });
       }
     };

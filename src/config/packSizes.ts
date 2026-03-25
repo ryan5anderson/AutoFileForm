@@ -75,6 +75,38 @@ const SPECIAL_PACK_SIZES: { [key: string]: number } = {
   'onsie': 6,
 };
 
+const FORCED_PACK_SIZES: Record<string, number> = {
+  hat: 6,
+  cap: 6,
+  beanie: 6,
+  'knit-cap': 6,
+  jacket: 6,
+  flannels: 8,
+  pants: 4,
+};
+
+const FORCED_PACK_SIZES_BY_VERSION: Record<string, number> = {
+  sweatpants: 4,
+};
+
+const getForcedPackSize = (categoryPath: string, version?: string): number | null => {
+  const normalizedVersion = version?.trim().toLowerCase();
+  if (normalizedVersion) {
+    const matchedVersion = Object.keys(FORCED_PACK_SIZES_BY_VERSION).find(
+      (forcedVersion) => normalizedVersion === forcedVersion || normalizedVersion.includes(forcedVersion)
+    );
+    if (matchedVersion) {
+      return FORCED_PACK_SIZES_BY_VERSION[matchedVersion];
+    }
+  }
+
+  const normalized = categoryPath.trim().toLowerCase();
+  const matchedCategory = Object.keys(FORCED_PACK_SIZES).find(
+    (category) => normalized === category || normalized.includes(category)
+  );
+  return matchedCategory ? FORCED_PACK_SIZES[matchedCategory] : null;
+};
+
 /**
  * Synchronous version of getPackSize for backward compatibility
  * Uses default ratios from JSON (not college-specific)
@@ -84,6 +116,11 @@ export const getPackSizeSync = (
   version?: string, 
   productName?: string
 ): number => {
+  const forcedPackSize = getForcedPackSize(categoryPath, version);
+  if (forcedPackSize !== null) {
+    return forcedPackSize;
+  }
+
   // Determine if this is an infant product based on product name
   const isInfantProduct = productName && (productName.toLowerCase().includes('infant') || productName.toLowerCase().includes('onsie'));
   
@@ -143,6 +180,11 @@ export const getPackSize = async (
   productName?: string,
   collegeKey?: string
 ): Promise<number> => {
+  const forcedPackSize = getForcedPackSize(categoryPath, version);
+  if (forcedPackSize !== null) {
+    return forcedPackSize;
+  }
+
   // Determine if this is an infant product based on product name
   const isInfantProduct = productName && (productName.toLowerCase().includes('infant') || productName.toLowerCase().includes('onsie'));
   
