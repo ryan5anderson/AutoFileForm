@@ -10,7 +10,6 @@ import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../
 import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService } from '../../services/firebaseOrderService';
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 const ApiCollegeSummaryPage: React.FC = () => {
@@ -214,10 +213,6 @@ const ApiCollegeSummaryPage: React.FC = () => {
 
   return (
     <div className="summary-page-container api-schools-flow">
-      <div className="college-page-header">
-        <Header showBackButton={true} />
-      </div>
-
       <main className="summary-page-main">
         <h1 style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-6)', fontSize: '2rem', fontWeight: '600', textAlign: 'center' }}>
           Order Summary

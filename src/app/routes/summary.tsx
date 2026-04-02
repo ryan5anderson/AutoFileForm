@@ -7,7 +7,6 @@ import CategorySection from '../../features/components/CategorySection';
 import { useOrderForm } from '../../features/hooks';
 import { FormData, Category } from '../../types';
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 interface SummaryPageProps {
@@ -79,10 +78,6 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
   }
   return (
     <div className="summary-page-container">
-      <div className="college-page-header">
-        <Header showBackButton={true} />
-      </div>
-      
       <main className="summary-page-main">
         <h1 style={{ 
           color: 'var(--color-primary)', 

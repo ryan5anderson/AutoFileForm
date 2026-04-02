@@ -5,7 +5,6 @@ import { colleges } from '../../config';
 import CategorySection from '../../features/components/CategorySection';
 import { Category } from '../../types';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 const AdminCollegeView: React.FC = () => {
@@ -111,13 +110,6 @@ const AdminCollegeView: React.FC = () => {
 
   return (
     <div className="college-page-container">
-      <div className="college-page-header">
-        <Header 
-          showSidebarToggle={true} 
-          onSidebarToggle={toggleSidebar}
-        />
-      </div>
-      
       <CollapsibleSidebar
         categories={sortedCategories}
         activeSection={activeSection}

@@ -1,14 +1,10 @@
 import React from 'react';
 
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 
 const ContactPage: React.FC = () => {
   return (
     <div className="summary-page-container">
-      <div className="college-page-header">
-        <Header />
-      </div>
       <main className="summary-page-main" style={{ maxWidth: 800 }}>
         <h1 style={{ color: 'var(--color-text)', marginBottom: 'var(--space-4)' }}>Contact Us</h1>
         <div className="summary-card" style={{ marginBottom: 'var(--space-4)' }}>

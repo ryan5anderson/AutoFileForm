@@ -7,7 +7,6 @@ import StoreInfoForm from '../../features/components/StoreInfoForm';
 import { FormData, Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, SizeCounts } from '../../types';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 interface CollegeConfig {
@@ -119,13 +118,6 @@ const FormPage: React.FC<FormPageProps> = ({
   }, [sortedCategories]);
   return (
     <div className="college-page-container">
-      <div className="college-page-header">
-        <Header 
-          showSidebarToggle={true} 
-          onSidebarToggle={toggleSidebar}
-        />
-      </div>
-      
       <CollapsibleSidebar
         categories={sortedCategories}
         activeSection={activeSection}

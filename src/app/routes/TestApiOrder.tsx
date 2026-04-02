@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
 import { fetchCollegeOrder, getProxiedImageUrl, type OrderItem } from '../../services/collegeApiService';
-import Header from '../layout/Header';
 
 // API configuration - use relative URL for proxy endpoints
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
@@ -418,7 +417,6 @@ const TestApiOrderPage: React.FC = () => {
 
   return (
     <div className="summary-page-container">
-      <Header showSidebarToggle={false} />
       <main className="summary-page-main" style={{ maxWidth: 1200, padding: 'var(--space-4)', marginTop: '64px' }}>
         <div style={{ 
           display: 'flex', 

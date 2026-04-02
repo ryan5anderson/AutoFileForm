@@ -10,7 +10,6 @@ import { buildApiOrderPayload, getProxiedImageUrl } from '../../services/college
 import { getSchoolBrandPalette } from '../../utils/collegeBranding';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 const ApiCollegeOrderForm: React.FC = () => {
@@ -183,10 +182,6 @@ const ApiCollegeOrderForm: React.FC = () => {
         } as React.CSSProperties
       }
     >
-      <div className="college-page-header">
-        <Header showSidebarToggle={true} onSidebarToggle={() => setSidebarOpen((s) => !s)} />
-      </div>
-
       <CollapsibleSidebar
         categories={categories}
         activeSection={categories[0]?.name.toLowerCase().replace(/\s+/g, '-') || ''}

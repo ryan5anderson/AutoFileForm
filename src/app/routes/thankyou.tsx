@@ -1,14 +1,11 @@
 import React from 'react';
 
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 const ThankYouPage: React.FC = () => {
   return (
     <div className="thank-you-container">
-      <Header showBackButton={false} />
-      
       <div className="thank-you-card">
         <div style={{
           fontSize: '3rem',

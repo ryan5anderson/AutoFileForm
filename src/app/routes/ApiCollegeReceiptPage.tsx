@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import { buildApiReceiptCategories } from '../../features/utils';
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 const ApiCollegeReceiptPage: React.FC = () => {
@@ -38,8 +37,6 @@ const ApiCollegeReceiptPage: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
     }}>
-      <Header showBackButton={true} />
-
       <main style={{
         flex: 1,
         padding: 'var(--space-4)',

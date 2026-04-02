@@ -6,7 +6,6 @@ import { useOrderForm } from '../../features/hooks';
 import { getProductName, getVersionDisplayName, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
 import { FormData, Category, ShirtVersion, SizeCounts } from '../../types';
 import Footer from '../layout/Footer';
-import Header from '../layout/Header';
 import '../../styles/college-pages.css';
 
 interface ReceiptPageProps {
@@ -65,8 +64,6 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <Header showBackButton={true} />
-      
       <main style={{
         flex: 1,
         padding: 'var(--space-4)',
