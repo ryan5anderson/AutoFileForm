@@ -20,7 +20,6 @@ const AdminPage: React.FC = () => {
   const [error, setError] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
   const [firebaseConnected, setFirebaseConnected] = useState<boolean | null>(null);
-  const [connectionError, setConnectionError] = useState<string>('');
 
   // Check Firebase connection status
   useEffect(() => {
@@ -78,25 +77,9 @@ const AdminPage: React.FC = () => {
       
       // If we get here, the connection is working
       setFirebaseConnected(true);
-      setConnectionError('');
       return true;
     } catch (error: unknown) {
-      // Connection failed
       setFirebaseConnected(false);
-      
-      // Check if it's a permissions error
-      const errorObj = error && typeof error === 'object' ? error as { code?: string; message?: string } : null;
-      const isPermissionError = errorObj?.code === 'permission-denied' || 
-                                errorObj?.message?.toLowerCase().includes('permission') ||
-                                errorObj?.message?.toLowerCase().includes('insufficient');
-      
-      let errorMessage = errorObj?.message || errorObj?.code || 'Failed to connect to Firebase';
-      
-      if (isPermissionError) {
-        errorMessage = `Permission Denied: ${errorMessage}. Please update your Firestore security rules to allow read/write access to the 'orders' collection.`;
-      }
-      
-      setConnectionError(errorMessage);
       console.error('Firebase connection error:', error);
       return false;
     }
@@ -104,7 +87,6 @@ const AdminPage: React.FC = () => {
 
   const handleReconnectFirebase = async () => {
     setFirebaseConnected(null);
-    setConnectionError('');
     const connected = await checkFirebaseConnection();
     if (connected) {
       loadOrders();
