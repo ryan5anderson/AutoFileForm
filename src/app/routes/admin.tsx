@@ -386,10 +386,9 @@ const AdminPage: React.FC = () => {
                         <td className="col-order-id">{order.id}</td>
                         <td className="col-college">{order.college}</td>
                         <td className="col-store">
-                          <Link 
-                            to={`/all-orders?orderId=${order.id}`}
+                          <Link
+                            to={`/receipt/${order.id}`}
                             className="store-link"
-                            onClick={(e) => e.stopPropagation()}
                           >
                             Store #{order.storeNumber}
                           </Link>

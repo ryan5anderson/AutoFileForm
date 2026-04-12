@@ -33,7 +33,7 @@ const CollegeRouteWrapper: React.FC = () => {
   }, [college]);
   
   // Don't treat admin routes as college routes
-  if (college === 'admin' || college === 'about' || college === 'contact' || college === 'all-orders') {
+  if (college === 'admin' || college === 'about' || college === 'contact') {
     return null;
   }
 

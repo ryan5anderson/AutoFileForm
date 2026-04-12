@@ -84,11 +84,11 @@ const OrderReceiptPage: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate('/all-orders');
+    navigate('/admin', { state: { isAuthenticated: true } });
   };
 
   const handleExit = () => {
-    navigate('/all-orders');
+    navigate('/admin', { state: { isAuthenticated: true } });
   };
 
   if (loading) {
@@ -130,7 +130,7 @@ const OrderReceiptPage: React.FC = () => {
             fontWeight: '500'
           }}
         >
-          Back to All Orders
+          Back to Admin
         </button>
       </div>
     );
