@@ -19,13 +19,6 @@ const AdminPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
-  const [orderStats, setOrderStats] = useState({
-    totalOrders: 0,
-    recentOrders: 0,
-    completedOrders: 0,
-    pendingOrders: 0,
-    totalProducts: 0,
-  });
   const [firebaseConnected, setFirebaseConnected] = useState<boolean | null>(null);
   const [connectionError, setConnectionError] = useState<string>('');
 
@@ -36,11 +29,10 @@ const AdminPage: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  // Load orders and stats when authenticated
+  // Load orders when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       loadOrders();
-      loadStats();
     }
   }, [isAuthenticated]);
 
@@ -75,11 +67,6 @@ const AdminPage: React.FC = () => {
   const loadOrders = async () => {
     const recentOrders = await firebaseOrderService.getRecentOrders(10);
     setOrders(recentOrders);
-  };
-
-  const loadStats = async () => {
-    const stats = await firebaseOrderService.getOrderStats();
-    setOrderStats(stats);
   };
 
   const checkFirebaseConnection = async () => {
@@ -121,14 +108,12 @@ const AdminPage: React.FC = () => {
     const connected = await checkFirebaseConnection();
     if (connected) {
       loadOrders();
-      loadStats();
     }
   };
 
   const handleStatusChange = async (orderId: string, newStatus: Order['status']) => {
     if (await firebaseOrderService.updateOrderStatus(orderId, newStatus)) {
       loadOrders();
-      loadStats();
     }
   };
 
@@ -136,7 +121,6 @@ const AdminPage: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this order?')) {
       if (await firebaseOrderService.deleteOrder(orderId)) {
         loadOrders();
-        loadStats();
       }
     }
   };
@@ -520,44 +504,6 @@ service cloud.firestore {
           </div>
         )}
 
-        <div className="admin-stats-grid">
-          <div className="admin-stat-card">
-            <div className="stat-icon">📊</div>
-            <div className="stat-content">
-              <h3>Total Orders</h3>
-              <p className="stat-number">{orderStats.totalOrders}</p>
-              <p className="stat-change">{orderStats.recentOrders} this month</p>
-            </div>
-          </div>
-
-          <div className="admin-stat-card">
-            <div className="stat-icon">⏳</div>
-            <div className="stat-content">
-              <h3>Pending Orders</h3>
-              <p className="stat-number">{orderStats.pendingOrders}</p>
-              <p className="stat-change">Awaiting processing</p>
-            </div>
-          </div>
-
-          <div className="admin-stat-card">
-            <div className="stat-icon">📦</div>
-            <div className="stat-content">
-              <h3>Total Products</h3>
-              <p className="stat-number">{orderStats.totalProducts}</p>
-              <p className="stat-change">Items ordered</p>
-            </div>
-          </div>
-
-          <div className="admin-stat-card">
-            <div className="stat-icon">✅</div>
-            <div className="stat-content">
-              <h3>Completed</h3>
-              <p className="stat-number">{orderStats.completedOrders}</p>
-              <p className="stat-change">Successfully processed</p>
-            </div>
-          </div>
-        </div>
-
         <div className="admin-sections">
           <div className="admin-section">
             <h2>Recent Orders</h2>
@@ -729,48 +675,6 @@ service cloud.firestore {
           padding: 30px 20px;
           width: 100%;
           box-sizing: border-box;
-        }
-
-        .admin-stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 20px;
-          margin-bottom: 40px;
-        }
-
-        .admin-stat-card {
-          background: white;
-          border-radius: 12px;
-          padding: 24px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          display: flex;
-          align-items: center;
-          gap: 16px;
-        }
-
-        .stat-icon {
-          font-size: 32px;
-          opacity: 0.8;
-        }
-
-        .stat-content h3 {
-          margin: 0 0 8px 0;
-          color: #6b7280;
-          font-size: 0.875rem;
-          font-weight: 500;
-        }
-
-        .stat-number {
-          margin: 0 0 4px 0;
-          color: #1f2937;
-          font-size: 1.5rem;
-          font-weight: 700;
-        }
-
-        .stat-change {
-          margin: 0;
-          color: #059669;
-          font-size: 0.75rem;
         }
 
         .admin-sections {
@@ -1116,24 +1020,6 @@ service cloud.firestore {
             text-align: center;
           }
 
-          .admin-stats-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-bottom: 30px;
-          }
-
-          .admin-stat-card {
-            padding: 20px;
-          }
-
-          .stat-icon {
-            font-size: 28px;
-          }
-
-          .stat-number {
-            font-size: 1.25rem;
-          }
-
           .admin-sections {
             gap: 24px;
           }
@@ -1230,32 +1116,6 @@ service cloud.firestore {
 
           .admin-welcome-section h1 {
             font-size: 1.25rem;
-          }
-
-          .admin-stats-grid {
-            gap: 12px;
-            margin-bottom: 24px;
-          }
-
-          .admin-stat-card {
-            padding: 16px;
-            gap: 12px;
-          }
-
-          .stat-icon {
-            font-size: 24px;
-          }
-
-          .stat-content h3 {
-            font-size: 0.8125rem;
-          }
-
-          .stat-number {
-            font-size: 1.125rem;
-          }
-
-          .stat-change {
-            font-size: 0.6875rem;
           }
 
           .admin-sections {
