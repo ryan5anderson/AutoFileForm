@@ -125,8 +125,6 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const [funButtonActive, setFunButtonActive] = useState(false);
-  const [funMessage, setFunMessage] = useState('');
   const [reorderLoading, setReorderLoading] = useState<Record<string, boolean>>({});
 
   const buildTemplateParamsFromOrder = (order: Order): TemplateParams | null => {
@@ -167,45 +165,6 @@ const AdminPage: React.FC = () => {
     } finally {
       setReorderLoading((prev) => ({ ...prev, [order.id]: false }));
     }
-  };
-
-  const funMessages = [
-    '🎤 Why don\'t scientists trust atoms? Because they make up everything! 🎤',
-    '🎭 I told my wife she was drawing her eyebrows too high. She looked surprised! 🎭',
-    '🌮 I would tell you a chemistry joke, but I know I wouldn\'t get a reaction! 🌮',
-    '🐴 I used to be a baker, but I couldn\'t make enough dough! 🐴',
-    '🚪 I\'m reading a book about anti-gravity. It\'s impossible to put down! 🚪',
-    '🍞 Why did the scarecrow win an award? He was outstanding in his field! 🍞',
-    '⏰ I told my computer a joke, but it didn\'t get it. It must need more RAM! ⏰',
-    '🥖 What do you call a fake noodle? An impasta! 🥖',
-    '🚗 Why don\'t eggs tell jokes? They\'d crack each other up! 🚗',
-    '🍝 I don\'t trust stairs. They\'re always up to something! 🍝',
-    '🌙 Why did the math book look so sad? Because it had too many problems! 🌙',
-    '🧀 What do you call a sleeping bull? A bulldozer! 🧀',
-    '🎪 Why don\'t programmers like nature? It has too many bugs! 🎪',
-    '🍕 I asked my dog what\'s two minus two. He said nothing! 🍕',
-    '📚 Why did the golfer bring two pairs of pants? In case he got a hole in one! 📚',
-    '🎸 What\'s the best thing about Switzerland? I don\'t know, but the flag is a big plus! 🎸',
-    '🚲 Why don\'t bicycles fall over? Because they\'re two tired! 🚲',
-    '☕ What do you call a bear with no teeth? A gummy bear! ☕',
-    '🎯 Why did the coffee file a police report? It got mugged! 🎯',
-    '🎨 What do you call a factory that makes okay products? A satisfactory! 🎨',
-    '🌮 Want to hear a joke about construction? I\'m still working on it! 🌮',
-    '🍔 Why don\'t skeletons fight each other? They don\'t have the guts! 🍔',
-    '🎭 What did one ocean say to the other? Nothing, they just waved! 🎭',
-    '🎪 Why did the tomato turn red? Because it saw the salad dressing! 🎪',
-    '🎵 How do you organize a space party? You planet! 🎵',
-  ];
-
-  const handleFunButton = () => {
-    const randomMessage = funMessages[Math.floor(Math.random() * funMessages.length)];
-    setFunMessage(randomMessage);
-    setFunButtonActive(true);
-    
-    // Reset after animation
-    setTimeout(() => {
-      setFunButtonActive(false);
-    }, 3000);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -395,114 +354,27 @@ const AdminPage: React.FC = () => {
           <p>Manage your application from the admin dashboard</p>
         </div>
         
-        {firebaseConnected === false && (
-          <div className="firebase-warning-banner" style={{
-            backgroundColor: '#fff3cd',
-            border: '1px solid #ffc107',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <span style={{ fontSize: '24px' }}>⚠️</span>
-            <div style={{ flex: 1 }}>
-              <strong style={{ color: '#856404', display: 'block', marginBottom: '4px' }}>
-                Firebase Database Not Connected
-              </strong>
-              <p style={{ color: '#856404', margin: '0 0 8px 0', fontSize: '14px' }}>
-                The Firebase database connection is currently disabled. Orders are being sent via email only and will not appear in this dashboard.
-              </p>
-              {connectionError && (
-                <div style={{ marginBottom: '12px' }}>
-                  <p style={{ color: '#dc2626', margin: '0 0 8px 0', fontSize: '12px', fontFamily: 'monospace' }}>
-                    Error: {connectionError}
-                  </p>
-                  {connectionError.includes('Permission Denied') && (
-                    <div style={{ 
-                      backgroundColor: '#fef3c7', 
-                      padding: '12px', 
-                      borderRadius: '6px', 
-                      marginTop: '8px',
-                      fontSize: '12px',
-                      color: '#92400e'
-                    }}>
-                      <strong>How to fix:</strong>
-                      <ol style={{ margin: '8px 0 0 20px', padding: 0 }}>
-                        <li>Go to Firebase Console → Firestore Database → Rules</li>
-                        <li>Update your security rules to allow access:</li>
-                      </ol>
-                      <pre style={{ 
-                        backgroundColor: '#1f2937', 
-                        color: '#10b981', 
-                        padding: '8px', 
-                        borderRadius: '4px', 
-                        marginTop: '8px',
-                        fontSize: '11px',
-                        overflow: 'auto'
-                      }}>
-{`rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /orders/{orderId} {
-      allow read, write: if true; // For testing
-      // In production, use: allow read, write: if request.auth != null;
-    }
-    match /garmentRatios/{docId} {
-      allow read: if true;
-      allow write: if true; // For testing
-    }
-  }
-}`}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              )}
-              <button
-                onClick={handleReconnectFirebase}
-                disabled={firebaseConnected === null}
-                style={{
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '8px 16px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: firebaseConnected === null ? 'wait' : 'pointer',
-                  opacity: firebaseConnected === null ? 0.6 : 1
-                }}
-              >
-                {firebaseConnected === null ? 'Connecting...' : 'Reconnect Firebase'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {firebaseConnected === true && (
-          <div className="firebase-success-banner" style={{
-            backgroundColor: '#d1fae5',
-            border: '1px solid #10b981',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <span style={{ fontSize: '24px' }}>✅</span>
-            <div>
-              <strong style={{ color: '#065f46', display: 'block', marginBottom: '4px' }}>
-                Firebase Database Connected
-              </strong>
-              <p style={{ color: '#065f46', margin: 0, fontSize: '14px' }}>
-                Orders are being saved to Firebase and will appear in this dashboard.
-              </p>
-            </div>
-          </div>
-        )}
+        <div className="firebase-status-bar">
+          {firebaseConnected === null && (
+            <span className="firebase-status-dot firebase-status-checking" />
+          )}
+          {firebaseConnected === true && (
+            <span className="firebase-status-dot firebase-status-connected" />
+          )}
+          {firebaseConnected === false && (
+            <span className="firebase-status-dot firebase-status-disconnected" />
+          )}
+          <span className="firebase-status-label">
+            {firebaseConnected === null && 'Checking Firebase connection...'}
+            {firebaseConnected === true && 'Firebase Connected'}
+            {firebaseConnected === false && 'Firebase not connected'}
+          </span>
+          {firebaseConnected === false && (
+            <button className="firebase-retry-btn" onClick={handleReconnectFirebase}>
+              Retry
+            </button>
+          )}
+        </div>
 
         <div className="admin-sections">
           <div className="admin-section">
@@ -589,57 +461,8 @@ service cloud.firestore {
             </div>
           </div>
 
-          <div className="admin-section">
-            <h2>Quick Actions</h2>
-            <div className="admin-actions-grid">
-              <button 
-                className="admin-action-button"
-                onClick={() => navigate('/all-orders')}
-              >
-                <span className="action-icon">📋</span>
-                <span>View All Orders</span>
-              </button>
-              <button 
-                className="admin-action-button"
-                onClick={() => navigate('/admin/colleges')}
-              >
-                <span className="action-icon">🏫</span>
-                <span>Manage Colleges</span>
-              </button>
-              <button className="admin-action-button">
-                <span className="action-icon">➕</span>
-                <span>Add New Product</span>
-              </button>
-              <button 
-                className={`admin-action-button fun-button ${funButtonActive ? 'active' : ''}`}
-                onClick={handleFunButton}
-              >
-                <span className="action-icon">🎉</span>
-                <span>Surprise Me!</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
-
-      {/* Fun Message Overlay */}
-      {funButtonActive && funMessage && (
-        <>
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                background: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7', '#a29bfe'][Math.floor(Math.random() * 8)],
-                top: '-10px',
-              }}
-            />
-          ))}
-          <div className="fun-message">{funMessage}</div>
-        </>
-      )}
 
       <style>{`
         .admin-dashboard {
@@ -696,13 +519,74 @@ service cloud.firestore {
           font-weight: 600;
         }
 
+        .firebase-status-bar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 14px;
+          background: white;
+          border-radius: 8px;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+          margin-bottom: 24px;
+          width: fit-content;
+        }
+
+        .firebase-status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .firebase-status-checking {
+          background: #94a3b8;
+        }
+
+        .firebase-status-connected {
+          background: #10b981;
+        }
+
+        .firebase-status-disconnected {
+          background: #f59e0b;
+        }
+
+        .firebase-status-label {
+          font-size: 0.8125rem;
+          color: #374151;
+          font-weight: 500;
+        }
+
+        .firebase-retry-btn {
+          background: #3b82f6;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 3px 10px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.2s ease;
+        }
+
+        .firebase-retry-btn:hover {
+          background: #2563eb;
+        }
+
         .admin-table-container {
           background: white;
           border-radius: 12px;
           overflow-x: auto;
-          overflow-y: visible;
+          overflow-y: auto;
+          max-height: 304px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           -webkit-overflow-scrolling: touch;
+        }
+
+        .admin-table thead tr {
+          position: sticky;
+          top: 0;
+          z-index: 1;
         }
 
         .admin-table {
@@ -841,162 +725,7 @@ service cloud.firestore {
           background: #fecaca;
         }
 
-        .admin-actions-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 16px;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .admin-action-button {
-          background: white;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 20px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
-          width: 100%;
-          box-sizing: border-box;
-          min-height: 100px;
-        }
-
-        .admin-action-button:hover {
-          border-color: #3b82f6;
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-          transform: translateY(-2px);
-        }
-
-        .action-icon {
-          font-size: 24px;
-        }
-
-        .admin-action-button span:last-child {
-          color: #374151;
-          font-weight: 500;
-          font-size: 0.875rem;
-        }
-
-        .fun-button {
-          position: relative;
-          overflow: hidden;
-        }
-
-        .fun-button.active {
-          animation: funPulse 0.5s ease-in-out;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
-          background-size: 400% 400%;
-          animation: gradientShift 2s ease infinite, funPulse 0.5s ease-in-out;
-          color: white;
-          border: none;
-          transform: scale(1.1);
-        }
-
-        .fun-button.active .action-icon {
-          animation: spin 0.5s ease-in-out, bounce 1s ease-in-out infinite;
-        }
-
-        .fun-button.active span:last-child {
-          color: white;
-          font-weight: 700;
-        }
-
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-
-        @keyframes funPulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.15); }
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-
-        .fun-message {
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 40px 60px;
-          border-radius: 20px;
-          font-size: clamp(1.125rem, 3vw, 1.75rem);
-          font-weight: 700;
-          z-index: 2000;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-          animation: messageAppear 0.5s ease-out, messageDisappear 0.5s ease-in 2.5s;
-          pointer-events: none;
-          text-align: center;
-          white-space: normal;
-          width: auto;
-          min-width: 300px;
-          max-width: min(90vw, 800px);
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-          line-height: 1.4;
-        }
-
-        @keyframes messageAppear {
-          from {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.5);
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-        }
-
-        @keyframes messageDisappear {
-          from {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-          to {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.5);
-          }
-        }
-
-        .confetti {
-          position: fixed;
-          width: 10px;
-          height: 10px;
-          background: #ff6b6b;
-          animation: confettiFall 3s linear forwards;
-          z-index: 1999;
-        }
-
-        @keyframes confettiFall {
-          to {
-            transform: translateY(100vh) rotate(720deg);
-            opacity: 0;
-          }
-        }
-
         @media (max-width: 768px) {
-          .fun-message {
-            padding: 30px 40px;
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            max-width: 85vw;
-            min-width: 280px;
-          }
-
           .admin-content {
             padding: 20px 16px;
           }
@@ -1076,35 +805,9 @@ service cloud.firestore {
             white-space: nowrap;
           }
 
-          .admin-actions-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-          }
-
-          .admin-action-button {
-            padding: 16px 12px;
-            min-height: 90px;
-          }
-
-          .action-icon {
-            font-size: 20px;
-          }
-
-          .admin-action-button span:last-child {
-            font-size: 0.8125rem;
-            text-align: center;
-          }
         }
 
         @media (max-width: 480px) {
-          .fun-message {
-            padding: 24px 30px;
-            font-size: clamp(0.9375rem, 4.5vw, 1.25rem);
-            max-width: 90vw;
-            min-width: 250px;
-            border-radius: 16px;
-          }
-
           .admin-content {
             padding: 16px 12px;
           }
@@ -1174,23 +877,6 @@ service cloud.firestore {
             white-space: nowrap;
           }
 
-          .admin-actions-grid {
-            grid-template-columns: 1fr;
-            gap: 10px;
-          }
-
-          .admin-action-button {
-            padding: 14px 10px;
-            min-height: 80px;
-          }
-
-          .action-icon {
-            font-size: 18px;
-          }
-
-          .admin-action-button span:last-child {
-            font-size: 0.75rem;
-          }
         }
       `}</style>
     </div>
