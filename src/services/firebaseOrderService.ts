@@ -161,41 +161,6 @@ class FirebaseOrderService {
     }
   }
 
-  // Get order statistics
-  async getOrderStats() {
-    try {
-      const orders = await this.getAllOrders();
-      const now = new Date();
-      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-      
-      const recentOrders = orders.filter(order => 
-        new Date(order.createdAt) >= lastMonth
-      );
-      
-      const completedOrders = orders.filter(order => order.status === 'completed');
-      const pendingOrders = orders.filter(order => order.status === 'pending');
-      
-      const totalProducts = orders.reduce((sum, order) => sum + order.totalItems, 0);
-      
-      return {
-        totalOrders: orders.length,
-        recentOrders: recentOrders.length,
-        completedOrders: completedOrders.length,
-        pendingOrders: pendingOrders.length,
-        totalProducts: totalProducts,
-      };
-    } catch (error) {
-      console.error('Error getting order stats:', error);
-      return {
-        totalOrders: 0,
-        recentOrders: 0,
-        completedOrders: 0,
-        pendingOrders: 0,
-        totalProducts: 0,
-      };
-    }
-  }
-
   // Subscribe to real-time updates (for admin dashboard)
   subscribeToOrders(callback: (orders: Order[]) => void) {
     return onSnapshot(
