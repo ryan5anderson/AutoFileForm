@@ -1,6 +1,6 @@
 import { collection, getDocs, query, limit } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { colleges } from '../../config';
 import { adminConfig } from '../../config/env';
@@ -10,12 +10,18 @@ import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService, Order } from '../../services/firebaseOrderService';
 import { TemplateParams } from '../../types';
 
+const SESSION_KEY = 'admin_auth_ts';
+const SESSION_DURATION = 15 * 60 * 1000;
+
+function isSessionValid(): boolean {
+  const ts = sessionStorage.getItem(SESSION_KEY);
+  if (!ts) return false;
+  return Date.now() - parseInt(ts, 10) < SESSION_DURATION;
+}
+
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    location.state?.isAuthenticated || false
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(isSessionValid);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
@@ -153,9 +159,9 @@ const AdminPage: React.FC = () => {
     e.preventDefault();
     // Simple password check - in production, this would be more secure
     if (password === adminConfig.password) {
+      sessionStorage.setItem(SESSION_KEY, Date.now().toString());
       setIsAuthenticated(true);
       setError('');
-      // Notify sidebar that admin is logged in
       window.dispatchEvent(new CustomEvent('admin-login'));
     } else {
       setError('Invalid password');
@@ -383,17 +389,17 @@ const AdminPage: React.FC = () => {
                   <tbody>
                     {orders.map((order) => (
                       <tr key={order.id}>
-                        <td className="col-order-id">{order.id}</td>
-                        <td className="col-college">{order.college}</td>
-                        <td className="col-store">
-                          <Link 
-                            to={`/all-orders?orderId=${order.id}`}
+                        <td className="col-order-id">
+                          <Link
+                            to={`/receipt/${order.id}`}
                             className="store-link"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            Store #{order.storeNumber}
+                            {order.id}
                           </Link>
                         </td>
+                        <td className="col-college">{order.college}</td>
+                        <td className="col-store">Store #{order.storeNumber}</td>
                         <td className="col-manager">{order.storeManager}</td>
                         <td className="col-ordered-by">{order.orderedBy || order.storeManager}</td>
                         <td className="col-date">{new Date(order.date).toLocaleDateString()}</td>
@@ -560,7 +566,7 @@ const AdminPage: React.FC = () => {
           border-radius: 12px;
           overflow-x: auto;
           overflow-y: auto;
-          max-height: 304px;
+          max-height: 560px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           -webkit-overflow-scrolling: touch;
         }

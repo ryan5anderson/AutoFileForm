@@ -9,7 +9,6 @@ import AdminPage from './app/routes/admin';
 import AdminCollegeSelection from './app/routes/adminCollegeSelection';
 import AdminCollegeView from './app/routes/adminCollegeView';
 import AdminProductDetail from './app/routes/adminProductDetail';
-import AllOrdersPage from './app/routes/allOrders';
 import ApiCollegeProductDetail from './app/routes/ApiCollegeProductDetail';
 import ContactPage from './app/routes/contact';
 import OrderReceiptPage from './app/routes/orderReceipt';
@@ -69,7 +68,7 @@ function AppShell() {
   const isAdminRoute = segments[0] === 'admin';
   const isApiSchoolRoute = segments[0] === 'api-school';
   const isAdminCollegeView = isAdminRoute && segments.length === 3 && segments[1] === 'college';
-  const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact' || segments[0] === 'admin' || segments[0] === 'all-orders');
+  const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact' || segments[0] === 'admin');
   
   // Determine if we should show categories in sidebar
   const shouldShowCategories = React.useMemo(() => {
@@ -110,8 +109,7 @@ function AppShell() {
         <Route path='/admin/colleges' element={<AdminCollegeSelection />} />
         <Route path='/admin/college/:collegeKey/product/:category/:productId' element={<AdminProductDetail />} />
         <Route path='/admin/college/:collegeKey' element={<AdminCollegeView />} />
-        <Route path='/all-orders' element={<AllOrdersPage />} />
-        <Route path='/receipt/:orderId' element={<OrderReceiptPage />} />
+<Route path='/receipt/:orderId' element={<OrderReceiptPage />} />
         <Route path='/:college/*' element={<CollegeRouteWrapper />} />
       </Routes>
     </>

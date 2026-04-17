@@ -17,7 +17,6 @@ const OrderReceiptPage: React.FC = () => {
     const loadOrder = async () => {
       if (orderId) {
         try {
-          // Try to get order from location state first (if navigating from allOrders)
           const stateOrder = (location.state as { order?: Order } | null)?.order;
           if (stateOrder) {
             setOrder(stateOrder);
@@ -83,12 +82,8 @@ const OrderReceiptPage: React.FC = () => {
     };
   };
 
-  const handleBack = () => {
-    navigate('/all-orders');
-  };
-
   const handleExit = () => {
-    navigate('/all-orders');
+    navigate('/admin');
   };
 
   if (loading) {
@@ -118,7 +113,7 @@ const OrderReceiptPage: React.FC = () => {
       }}>
         <div style={{ fontSize: '1.125rem', color: '#dc2626' }}>Order not found</div>
         <button
-          onClick={handleBack}
+          onClick={handleExit}
           style={{
             background: '#3b82f6',
             color: 'white',
@@ -130,18 +125,18 @@ const OrderReceiptPage: React.FC = () => {
             fontWeight: '500'
           }}
         >
-          Back to All Orders
+          Back to Admin
         </button>
       </div>
     );
   }
 
   return (
-    <ReceiptPage 
+    <ReceiptPage
       formData={convertOrderToFormData(order)}
       categories={getCollegeCategories(order.college)}
-      onBackToSummary={handleBack}
       onExit={handleExit}
+      hideBackToSummary={true}
     />
   );
 };

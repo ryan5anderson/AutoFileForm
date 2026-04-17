@@ -13,13 +13,15 @@ interface ReceiptPageProps {
   onBackToSummary?: () => void;
   onExit?: () => void;
   categories?: Category[];
+  hideBackToSummary?: boolean;
 }
 
-const ReceiptPage: React.FC<ReceiptPageProps> = ({ 
-  formData: propFormData, 
-  onBackToSummary: propOnBackToSummary, 
-  onExit: propOnExit, 
-  categories: propCategories 
+const ReceiptPage: React.FC<ReceiptPageProps> = ({
+  formData: propFormData,
+  onBackToSummary: propOnBackToSummary,
+  onExit: propOnExit,
+  categories: propCategories,
+  hideBackToSummary
 }) => {
   // URL parameter handling
   const { college: urlCollege } = useParams();
@@ -868,25 +870,27 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
           width: '100%',
           boxSizing: 'border-box'
         }}>
-          <button
-            type="button"
-            onClick={onBackToSummary}
-            className="receipt-button"
-            style={{
-              background: 'var(--color-bg)',
-              color: 'var(--color-primary)',
-              padding: 'var(--space-3) var(--space-4)',
-              border: '2px solid var(--color-primary)',
-              borderRadius: 'var(--radius-lg)',
-              fontSize: '1rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              minWidth: '150px',
-              boxSizing: 'border-box'
-            }}
-          >
-            Back to Summary
-          </button>
+          {!hideBackToSummary && (
+            <button
+              type="button"
+              onClick={onBackToSummary}
+              className="receipt-button"
+              style={{
+                background: 'var(--color-bg)',
+                color: 'var(--color-primary)',
+                padding: 'var(--space-3) var(--space-4)',
+                border: '2px solid var(--color-primary)',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: '1rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                minWidth: '150px',
+                boxSizing: 'border-box'
+              }}
+            >
+              Back to Summary
+            </button>
+          )}
           
           <button
             type="button"
