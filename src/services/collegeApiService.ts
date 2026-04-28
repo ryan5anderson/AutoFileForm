@@ -474,11 +474,19 @@ const sanitizeApiKey = (value: string): string =>
     .replace(/^_+|_+$/g, '');
 
 export const getApiOrderProductKey = (item: OrderItem): string => {
+  const normalizedItemId = (item.ITEM_ID || '').trim();
+  const normalizedStyleNum = (item.STYLE_NUM || '').trim();
+  const normalizedLineNum = String((item as Record<string, unknown>).LIN || '').trim();
+
+  // ITEM_ID is frequently blank in API-school payloads, so include STYLE_NUM + LIN
+  // to keep raw rows uniquely addressable during grouped payload serialization.
   const base = [
     item.ORDER_NUM || '',
     item.DESIGN_NUM || '',
-    item.ITEM_ID || '',
+    normalizedItemId || normalizedStyleNum || normalizedLineNum,
     item.Expr1 || '',
+    normalizedItemId ? '' : normalizedStyleNum,
+    normalizedItemId ? '' : normalizedLineNum,
   ].join('_');
   return sanitizeApiKey(base || `${Date.now()}`);
 };

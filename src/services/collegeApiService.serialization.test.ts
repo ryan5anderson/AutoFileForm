@@ -283,4 +283,123 @@ describe('buildApiOrderPayload size-to-raw-row serialization', () => {
     expect(tabLabels['996G']).toBeTruthy();
     expect(tabLabels['562MR']).toBeTruthy();
   });
+
+  it('keeps quantities scoped to the selected tab variant when ITEM_ID values are blank', () => {
+    const sharedMockupRowsWithBlankItemIds: OrderItem[] = [
+      {
+        ORDER_NUM: '100324',
+        DESIGN_NUM: 'SH2FDC',
+        ITEM_ID: '            ',
+        SHIRTNAME: 'ADULT SS COTTON TEE',
+        Expr1: 'M90635085',
+        STYLE_NUM: '3930R  ',
+        COLOR_INIT: 'GLD',
+        LIN: '9',
+        size2: 'SM',
+        size3: 'MD',
+        size4: 'LG',
+        size5: 'XL',
+      },
+      {
+        ORDER_NUM: '100324',
+        DESIGN_NUM: 'SH2FDC',
+        ITEM_ID: '            ',
+        SHIRTNAME: 'FRUIT L/S TEE',
+        Expr1: 'M90635085',
+        STYLE_NUM: '4930R  ',
+        COLOR_INIT: 'GLD',
+        LIN: '12',
+        size2: 'SM',
+        size3: 'MD',
+        size4: 'LG',
+        size5: 'XL',
+      },
+      {
+        ORDER_NUM: '100324',
+        DESIGN_NUM: 'SH2FDC',
+        ITEM_ID: '            ',
+        SHIRTNAME: 'JERZEE HOODED SWEAT',
+        Expr1: 'M90635085',
+        STYLE_NUM: '996MR  ',
+        COLOR_INIT: 'GLD',
+        LIN: '14',
+        size2: 'SM',
+        size3: 'MD',
+        size4: 'LG',
+        size5: 'XL',
+      },
+    ];
+
+    const model = buildApiOrderCategoryModel(sharedMockupRowsWithBlankItemIds);
+    const groupKey = Object.keys(model.productMap)[0];
+    expect(groupKey).toBeTruthy();
+
+    const payload = buildApiOrderPayload(
+      {
+        orderTemplateId: 'TEMPLATE-2',
+        school: null,
+        items: sharedMockupRowsWithBlankItemIds,
+        fetchedAt: new Date().toISOString(),
+        expiresAt: new Date().toISOString(),
+      } as ApiSchoolPageData,
+      {
+        [groupKey]: {
+          activeVariant: '3930R',
+          variantQuantities: {
+            '3930R': {
+              SM: 2,
+              MD: 2,
+              LG: 2,
+              XL: 2,
+            },
+            '4930R': {
+              SM: 0,
+              MD: 0,
+              LG: 0,
+              XL: 0,
+            },
+            '996MR': {
+              SM: 0,
+              MD: 0,
+              LG: 0,
+              XL: 0,
+            },
+          },
+        },
+      },
+      model.productMap,
+      model.sourceToGroupKeyMap,
+      {
+        company: 'Store',
+        storeNumber: '1',
+        poNumber: '12345678',
+        storeManager: 'Manager',
+        orderedBy: 'Manager',
+        date: '2026-03-19',
+        orderNotes: '',
+      }
+    );
+
+    expect(payload).not.toBeNull();
+    const items = payload?.items || [];
+    const byStyle = new Map(items.map((item) => [String(item.STYLE_NUM || '').trim(), item]));
+
+    const row3930 = byStyle.get('3930R');
+    expect(row3930?.ORDERED2).toBe('2');
+    expect(row3930?.ORDERED3).toBe('2');
+    expect(row3930?.ORDERED4).toBe('2');
+    expect(row3930?.ORDERED5).toBe('2');
+
+    const row4930 = byStyle.get('4930R');
+    expect(row4930?.ORDERED2).toBe('0');
+    expect(row4930?.ORDERED3).toBe('0');
+    expect(row4930?.ORDERED4).toBe('0');
+    expect(row4930?.ORDERED5).toBe('0');
+
+    const row996 = byStyle.get('996MR');
+    expect(row996?.ORDERED2).toBe('0');
+    expect(row996?.ORDERED3).toBe('0');
+    expect(row996?.ORDERED4).toBe('0');
+    expect(row996?.ORDERED5).toBe('0');
+  });
 });
