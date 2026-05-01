@@ -584,12 +584,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 />
               )}
               <Card.Header>
-                {/* Selected state badge for in-cart products */}
-                {isInCartState && (
-                  <div className="card__status-badge">
-                    In Cart
-                  </div>
-                )}
                 <h3 className={`card__title ${isInCartState ? 'card__title--in-cart' : 'card__title--default'}`}>
                   {productTitleResolver
                     ? productTitleResolver(category.path, img, imagePath)
