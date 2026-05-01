@@ -158,6 +158,19 @@ export interface EmailItem {
   version?: string;
 }
 
+/** Line items for receipts / emails (traditional and API schools) */
+export interface ReceiptCategoryProduct {
+  sku: string;
+  name: string;
+  details: string;
+  total_qty: string;
+}
+
+export interface ReceiptCategoryGroup {
+  category: string;
+  products: ReceiptCategoryProduct[];
+}
+
 export interface TemplateParams extends Record<string, unknown> {
   company: string;
   store_number: string;
@@ -169,6 +182,8 @@ export interface TemplateParams extends Record<string, unknown> {
   total_units: string;
   provider_email: string;
   school_name: string;
+  receipt_categories?: ReceiptCategoryGroup[];
+  receipt_text?: string;
 }
 
 export type Page = 'form' | 'summary' | 'receipt' | 'thankyou'; 
