@@ -53,7 +53,9 @@
   flex: 1;
   margin: 0 auto;
   max-width: 1200px;
+  /* padding shorthand would override global header offset — keep top explicit */
   padding: var(--space-6);
+  padding-top: calc(var(--app-content-below-header) + var(--space-6));
   width: 100%;
 }
 
@@ -242,6 +244,7 @@
   margin: 0 auto;
   max-width: 800px;
   padding: var(--space-6);
+  padding-top: calc(var(--app-content-below-header) + var(--space-6));
   width: 100%;
 }
 
@@ -300,7 +303,8 @@
   .college-page-main,
   .summary-page-main,
   .receipt-page-main {
-    padding: calc(64px + var(--space-4)) var(--space-4) var(--space-4) var(--space-4);
+    padding: var(--space-4);
+    padding-top: calc(var(--app-content-below-header) + env(safe-area-inset-top, 0px) + var(--space-4));
   }
   
   .college-page-title h1 {

@@ -453,7 +453,7 @@ export const createTemplateParams = (formData: FormData, categories: Category[],
   return {
     company: formData.company,
     store_number: formData.storeNumber,
-    manager_name: formData.storeManager,
+    manager_name: formData.orderedBy,
     ordered_by: formData.orderedBy,
     date: formData.date,
     order_notes: formData.orderNotes,
@@ -468,7 +468,7 @@ export const createTemplateParams = (formData: FormData, categories: Category[],
 
 /** API school mode: build EmailCategory[] from orderedByProduct + productMap for EmailJS */
 export function createApiTemplateParams(
-  formData: Pick<FormData, 'company' | 'storeNumber' | 'storeManager' | 'orderedBy' | 'date' | 'orderNotes'>,
+  formData: Pick<FormData, 'company' | 'storeNumber' | 'orderedBy' | 'date' | 'orderNotes'>,
   categories: Category[],
   orderedByProduct: ApiSelectionMap,
   productMap: ApiProductMap,
@@ -512,7 +512,7 @@ export function createApiTemplateParams(
   return {
     company: formData.company,
     store_number: formData.storeNumber,
-    manager_name: formData.storeManager,
+    manager_name: formData.orderedBy,
     ordered_by: formData.orderedBy,
     date: formData.date,
     order_notes: formData.orderNotes || '',

@@ -77,7 +77,12 @@ const parseArrayResponse = async (response: Response, endpoint: string, label: s
     );
   }
 
-  const parsed = JSON.parse(responseText) as unknown;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(responseText) as unknown;
+  } catch {
+    throw new Error(`${label} returned invalid JSON from ${endpoint}.`);
+  }
 
   if (Array.isArray(parsed)) {
     return parsed;
@@ -95,39 +100,128 @@ const parseArrayResponse = async (response: Response, endpoint: string, label: s
   throw new Error(`${label} payload was not an array from ${endpoint}.`);
 };
 
+/**
+ * College order endpoint sometimes returns different wrappers; avoid 500 for odd shapes.
+ * Some hosts return text/html or wrong Content-Type even when the body is JSON or empty.
+ */
+const parseItemsResponseLenient = async (response: Response, endpoint: string): Promise<unknown[]> => {
+  const contentType = (response.headers.get('content-type') || '').toLowerCase();
+  const responseText = await response.text();
+  const trimmed = responseText.trim();
+
+  if (!response.ok) {
+    const hint = trimmed ? trimmed.substring(0, 280) : '(empty body)';
+    throw new Error(
+      `College order request failed (${response.status} ${response.statusText}) from ${endpoint}. Response: ${hint}`
+    );
+  }
+
+  if (!trimmed) {
+    return [];
+  }
+
+  const looksLikeHtml = /^<!DOCTYPE/i.test(trimmed) || /^<\s*html/i.test(trimmed);
+  if (looksLikeHtml) {
+    const snippet = trimmed.replace(/\s+/g, ' ').substring(0, 200);
+    throw new Error(
+      `College order returned HTML instead of JSON from ${endpoint} (wrong path, redirect, or server error page). Snippet: ${snippet}`
+    );
+  }
+
+  const tryParseBody = (): unknown | null => {
+    try {
+      return JSON.parse(responseText) as unknown;
+    } catch {
+      return null;
+    }
+  };
+
+  let parsed: unknown | null = null;
+  if (contentType.includes('application/json') || contentType.includes('+json')) {
+    parsed = tryParseBody();
+  } else if (/^\s*[\[{]/.test(trimmed)) {
+    parsed = tryParseBody();
+  }
+
+  if (parsed === null) {
+    const hint = trimmed.substring(0, 280);
+    throw new Error(
+      `College order returned non-JSON from ${endpoint}. Content-Type: "${contentType || 'unknown'}". Body: ${hint}`
+    );
+  }
+
+  if (Array.isArray(parsed)) {
+    return parsed;
+  }
+  if (parsed && typeof parsed === 'object') {
+    const r = parsed as Record<string, unknown>;
+    const candidates = ['data', 'items', 'products', 'orderItems', 'order_items', 'lines'] as const;
+    for (const key of candidates) {
+      if (Array.isArray(r[key])) {
+        return r[key] as unknown[];
+      }
+    }
+  }
+
+  return [];
+};
+
+const normalizeTemplateId = (value: string | undefined | null): string => (value == null ? '' : String(value).trim());
+
+const findCollegeForTemplate = (colleges: CollegeListItem[], orderTemplateId: string): CollegeListItem | null => {
+  const want = normalizeTemplateId(orderTemplateId);
+  if (!want) return null;
+  const direct =
+    colleges.find((c) => normalizeTemplateId(c.orderNumTemplate) === want) ||
+    colleges.find((c) => normalizeTemplateId(c.school_ID) === want) ||
+    null;
+  if (direct) return direct;
+  return (
+    colleges.find(
+      (c) =>
+        normalizeTemplateId(c.orderNumTemplate).toUpperCase() === want.toUpperCase() ||
+        normalizeTemplateId(c.school_ID).toUpperCase() === want.toUpperCase()
+    ) || null
+  );
+};
+
+const fetchJsonHeaders = {
+  Accept: 'application/json',
+  'User-Agent': 'CampusTraditions-OrderForm/1.0',
+};
+
 const fetchFreshSchoolPageData = async (orderTemplateId: string): Promise<SchoolPageData> => {
+  const normalizedId = normalizeTemplateId(orderTemplateId);
   const collegesEndpoint = resolveCollegesEndpoint();
-  const collegeEndpoint = resolveCollegeEndpoint(orderTemplateId);
 
-  const [collegesResponse, itemsResponse] = await Promise.all([
-    fetch(collegesEndpoint, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    }),
-    fetch(collegeEndpoint, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    }),
-  ]);
+  const collegesResponse = await fetch(collegesEndpoint, {
+    method: 'GET',
+    headers: fetchJsonHeaders,
+  });
 
-  const [collegesRaw, items] = await Promise.all([
-    parseArrayResponse(collegesResponse, collegesEndpoint, 'Colleges'),
-    parseArrayResponse(itemsResponse, collegeEndpoint, 'College order'),
-  ]);
-
+  const collegesRaw = await parseArrayResponse(collegesResponse, collegesEndpoint, 'Colleges');
   const colleges = collegesRaw as CollegeListItem[];
-  const matchedSchool = colleges.find((college) => college.orderNumTemplate === orderTemplateId) || null;
+  const matchedSchool = findCollegeForTemplate(colleges, normalizedId);
   const nowMs = Date.now();
   const expiresAtMs = nowMs + CACHE_TTL_MS;
+  const canonicalTemplate =
+    normalizeTemplateId(matchedSchool?.orderNumTemplate) || normalizedId;
+  const collegeEndpoint = resolveCollegeEndpoint(canonicalTemplate);
+
+  const itemsResponse = await fetch(collegeEndpoint, {
+    method: 'GET',
+    headers: fetchJsonHeaders,
+  });
+  const items = await parseItemsResponseLenient(itemsResponse, collegeEndpoint);
 
   return {
-    orderTemplateId,
+    orderTemplateId: canonicalTemplate,
     school: matchedSchool
       ? {
           schoolId: matchedSchool.school_ID || null,
           schoolName: matchedSchool.schoolName || null,
           logoUrl: matchedSchool.logoUrl || null,
-          orderTemplateId: matchedSchool.orderNumTemplate || orderTemplateId,
+          orderTemplateId: normalizeTemplateId(matchedSchool.orderNumTemplate) || canonicalTemplate,
         }
       : null,
     items,
@@ -150,8 +244,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { id } = req.query;
-  if (!id || typeof id !== 'string') {
+  const rawId = req.query.id;
+  const idParam = Array.isArray(rawId) ? rawId[0] : rawId;
+  if (!idParam || typeof idParam !== 'string') {
+    return res.status(400).json({ error: 'Order template ID is required' });
+  }
+  const id = idParam.trim();
+  if (!id) {
     return res.status(400).json({ error: 'Order template ID is required' });
   }
 

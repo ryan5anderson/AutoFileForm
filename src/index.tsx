@@ -12,6 +12,7 @@ import AdminProductDetail from './app/routes/adminProductDetail';
 import ApiCollegeProductDetail from './app/routes/ApiCollegeProductDetail';
 import ContactPage from './app/routes/contact';
 import OrderReceiptPage from './app/routes/orderReceipt';
+import SendOrderUrlPage from './app/routes/sendOrderUrl';
 import TestApiPage from './app/routes/testApi';
 import TestApiOrderPage from './app/routes/TestApiOrder';
 import TestApiProductDetailPage from './app/routes/TestApiProductDetail';
@@ -68,7 +69,8 @@ function AppShell() {
   const isAdminRoute = segments[0] === 'admin';
   const isApiSchoolRoute = segments[0] === 'api-school';
   const isAdminCollegeView = isAdminRoute && segments.length === 3 && segments[1] === 'college';
-  const isFormRoot = segments.length === 1 && !(segments[0] === 'about' || segments[0] === 'contact' || segments[0] === 'admin');
+  const isFormRoot =
+    segments.length === 1 && colleges[segments[0] as keyof typeof colleges] !== undefined;
   
   // Determine if we should show categories in sidebar
   const shouldShowCategories = React.useMemo(() => {
@@ -95,6 +97,7 @@ function AppShell() {
         <Route path='/' element={<CollegeSelector />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
+        <Route path='/send-order-url' element={<SendOrderUrlPage />} />
         <Route path='/api-school/:orderTemplateId' element={<ApiCollegeOrderProvider><Outlet /></ApiCollegeOrderProvider>}>
           <Route index element={<ApiCollegeOrderPage />} />
           <Route path='summary' element={<ApiCollegeOrderPage />} />

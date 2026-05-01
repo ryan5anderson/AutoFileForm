@@ -100,10 +100,7 @@ const StoredApiReceiptFromEmail: React.FC<{
                 <strong>Store Number:</strong> {formData.storeNumber}
               </div>
               <div>
-                <strong>Store Manager:</strong> {formData.storeManager}
-              </div>
-              <div>
-                <strong>Ordered By:</strong> {formData.orderedBy || formData.storeManager}
+                <strong>Ordered By:</strong> {formData.orderedBy}
               </div>
               <div>
                 <strong>Date:</strong> {formData.date}
@@ -337,10 +334,7 @@ const ApiReceiptTextFallback: React.FC<{
               <strong>Store Number:</strong> {formData.storeNumber}
             </div>
             <div>
-              <strong>Store Manager:</strong> {formData.storeManager}
-            </div>
-            <div>
-              <strong>Ordered By:</strong> {formData.orderedBy || formData.storeManager}
+              <strong>Ordered By:</strong> {formData.orderedBy}
             </div>
             <div>
               <strong>Date:</strong> {formData.date}
@@ -449,8 +443,8 @@ const OrderReceiptPage: React.FC = () => {
     return {
       company: o.college,
       storeNumber: o.storeNumber,
-      storeManager: o.storeManager,
-      orderedBy: o.orderedBy || o.storeManager,
+      storeManager: o.storeManager || '',
+      orderedBy: o.orderedBy || o.storeManager || '',
       date: o.date,
       orderNotes: o.orderNotes || '',
       quantities: {},

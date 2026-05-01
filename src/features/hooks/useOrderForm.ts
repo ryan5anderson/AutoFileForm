@@ -324,7 +324,7 @@ export const useOrderForm = (categories: Category[]) => {
       await firebaseOrderService.addOrder({
         college: college || 'default',
         storeNumber: sanitizedFormData.storeNumber,
-        storeManager: sanitizedFormData.storeManager,
+        storeManager: sanitizedFormData.orderedBy,
         orderedBy: sanitizedFormData.orderedBy,
         date: sanitizedFormData.date,
         status: 'pending',

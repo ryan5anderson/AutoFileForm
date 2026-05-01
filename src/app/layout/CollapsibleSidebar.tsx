@@ -143,6 +143,15 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             </Link>
 
             <Link
+              to="/send-order-url"
+              className="sidebar-nav-item sidebar-link"
+              onClick={onToggle}
+            >
+              <span className="nav-icon">🔗</span>
+              <span className="nav-text">Send order URL</span>
+            </Link>
+
+            <Link
               to="/about"
               className="sidebar-nav-item sidebar-link"
               onClick={onToggle}

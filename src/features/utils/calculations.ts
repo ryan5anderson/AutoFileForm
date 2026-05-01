@@ -190,18 +190,17 @@ interface ValidationResult {
 interface StoreInfoFields {
   company: string;
   storeNumber: string;
-  storeManager: string;
   orderedBy: string;
   date: string;
 }
 
 /**
- * Validate store information fields (company, storeNumber, storeManager, orderedBy, date)
+ * Validate store information fields (company, storeNumber, orderedBy, date)
  * @param formData - Form data containing store info fields
  * @returns { isValid, errorMessage } - Validation result for store info only
  */
 export const validateStoreInfo = (formData: StoreInfoFields): { isValid: boolean; errorMessage: string | null } => {
-  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.storeManager.trim() || !formData.orderedBy.trim() || !formData.date.trim()) {
+  if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.orderedBy.trim() || !formData.date.trim()) {
     return {
       isValid: false,
       errorMessage: 'Please fill out all store information fields.',

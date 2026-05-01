@@ -1,13 +1,15 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import { buildApiReceiptCategories } from '../../features/utils';
+import { appendSearchToPath } from '../../features/utils/storeManagerLink';
 import Footer from '../layout/Footer';
 import '../../styles/college-pages.css';
 
 const ApiCollegeReceiptPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     orderTemplateId,
     categories,
@@ -17,11 +19,13 @@ const ApiCollegeReceiptPage: React.FC = () => {
   } = useApiCollegeOrder();
 
   const handleBackToSummary = () => {
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`, { state: { fromReceipt: true } });
+    navigate(appendSearchToPath(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`, searchParams), {
+      state: { fromReceipt: true },
+    });
   };
 
   const handleExit = () => {
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/thankyou`);
+    navigate(appendSearchToPath(`/api-school/${encodeURIComponent(orderTemplateId || '')}/thankyou`, searchParams));
   };
 
   const handlePrintReceipt = () => {
@@ -77,8 +81,7 @@ const ApiCollegeReceiptPage: React.FC = () => {
             }}>
               <div><strong>Store Name:</strong> {formData.company}</div>
               <div><strong>Store Number:</strong> {formData.storeNumber}</div>
-              <div><strong>Store Manager:</strong> {formData.storeManager}</div>
-              <div><strong>Ordered By:</strong> {formData.orderedBy || formData.storeManager}</div>
+              <div><strong>Ordered By:</strong> {formData.orderedBy}</div>
               <div><strong>Date:</strong> {formData.date}</div>
             </div>
           </div>

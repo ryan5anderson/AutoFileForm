@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { colleges } from '../config';
+import { normalizeApiOrderTemplateId } from '../features/utils/storeManagerLink';
 import { fetchColleges, getCollegesFromCache, getProxiedImageUrl, type CollegeData } from '../services/collegeApiService';
 import { asset } from '../utils/asset';
 import { getSchoolBrandPalette } from '../utils/collegeBranding';
@@ -26,7 +27,9 @@ const CollegeSelector: React.FC = () => {
   };
 
   const handleApiCollegeSelect = (orderTemplateId: string) => {
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId)}`);
+    const id = normalizeApiOrderTemplateId(orderTemplateId) ?? '';
+    if (!id) return;
+    navigate(`/api-school/${encodeURIComponent(id)}`);
   };
 
   const fetchApiColleges = React.useCallback(async () => {
@@ -35,10 +38,11 @@ const CollegeSelector: React.FC = () => {
     if (cached) {
       const seen = new Set<string>();
       const deduped = cached.filter((college) => {
-        if (seen.has(college.school_ID)) {
+        const key = college.school_ID.trim();
+        if (!key || seen.has(key)) {
           return false;
         }
-        seen.add(college.school_ID);
+        seen.add(key);
         return true;
       });
       setApiColleges(deduped);
@@ -52,10 +56,11 @@ const CollegeSelector: React.FC = () => {
       const results = await fetchColleges();
       const seen = new Set<string>();
       const deduped = results.filter((college) => {
-        if (seen.has(college.school_ID)) {
+        const key = college.school_ID.trim();
+        if (!key || seen.has(key)) {
           return false;
         }
-        seen.add(college.school_ID);
+        seen.add(key);
         return true;
       });
       setApiColleges(deduped);

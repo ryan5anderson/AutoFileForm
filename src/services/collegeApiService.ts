@@ -293,11 +293,27 @@ export async function fetchApiSchoolPageData(orderTemplateId: string): Promise<F
     },
   });
 
+  const responseText = await response.text();
+
   if (!response.ok) {
-    throw new Error(`Failed to fetch school page data: ${response.status} ${response.statusText}`);
+    let detail = '';
+    try {
+      const errBody = JSON.parse(responseText) as { message?: string; error?: string };
+      detail = (typeof errBody.message === 'string' && errBody.message) || (typeof errBody.error === 'string' && errBody.error) || '';
+    } catch {
+      detail = responseText.trim().slice(0, 240);
+    }
+    throw new Error(
+      detail || `Failed to fetch school page data: ${response.status} ${response.statusText}`
+    );
   }
 
-  const data = await response.json();
+  let data: unknown;
+  try {
+    data = JSON.parse(responseText) as unknown;
+  } catch {
+    throw new Error('School page response was not valid JSON.');
+  }
 
   let result: ApiSchoolPageData;
   // Backward-compatible fallback if endpoint returns a bare array.
@@ -1147,7 +1163,7 @@ export function buildApiOrderPayload(
   orderedByProduct: Record<string, import('../features/utils/apiOrderState').ApiProductSelection>,
   productMap: Record<string, ApiOrderProduct>,
   sourceToGroupKeyMap: Record<string, string>,
-  formData: { company: string; storeNumber: string; poNumber: string; storeManager: string; orderedBy: string; date: string; orderNotes?: string }
+  formData: { company: string; storeNumber: string; poNumber: string; orderedBy: string; date: string; orderNotes?: string }
 ): ApiOrderPayload | null {
   if (!rawPageData?.items?.length) return null;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import SizePackSelector from '../../features/components/panels/SizePackSelector';
@@ -9,6 +9,7 @@ import {
   type ApiProductSelection,
   type ApiVariantQuantities,
 } from '../../features/utils/apiOrderState';
+import { appendSearchToPath } from '../../features/utils/storeManagerLink';
 import { getProxiedImageUrl } from '../../services/collegeApiService';
 import { Size, SizeCounts } from '../../types';
 import '../../styles/product-detail.css';
@@ -32,14 +33,19 @@ interface ApiReturnNavigationState {
 }
 
 const ApiCollegeProductDetail: React.FC = () => {
-  const { orderTemplateId, productId } = useParams<{ orderTemplateId: string; productId: string }>();
+  const { productId } = useParams<{ orderTemplateId: string; productId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { productMap, orderedByProduct, updateOrderedByProduct, loading, error } = useApiCollegeOrder();
+  const [searchParams] = useSearchParams();
+  const { orderTemplateId, productMap, orderedByProduct, updateOrderedByProduct, loading, error } =
+    useApiCollegeOrder();
 
   const decodedProductId = productId ? decodeURIComponent(productId) : '';
   const product = decodedProductId ? productMap[decodedProductId] ?? null : null;
-  const backToFormPath = `/api-school/${encodeURIComponent(orderTemplateId || '')}`;
+  const backToFormPath = appendSearchToPath(
+    `/api-school/${encodeURIComponent(orderTemplateId || '')}`,
+    searchParams
+  );
   const returnNavigationState = React.useMemo<ApiReturnNavigationState | null>(() => {
     const state = location.state as { returnFromProduct?: boolean; returnScrollY?: number } | null;
     if (state?.returnFromProduct && typeof state.returnScrollY === 'number') {

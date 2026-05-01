@@ -379,7 +379,6 @@ const AdminPage: React.FC = () => {
                       <th className="col-order-id">Order ID</th>
                       <th className="col-college">College</th>
                       <th className="col-store">Store</th>
-                      <th className="col-manager">Manager</th>
                       <th className="col-ordered-by">Ordered By</th>
                       <th className="col-date">Date</th>
                       <th className="col-status">Status</th>
@@ -400,7 +399,6 @@ const AdminPage: React.FC = () => {
                         </td>
                         <td className="col-college">{order.college}</td>
                         <td className="col-store">Store #{order.storeNumber}</td>
-                        <td className="col-manager">{order.storeManager}</td>
                         <td className="col-ordered-by">{order.orderedBy || order.storeManager}</td>
                         <td className="col-date">{new Date(order.date).toLocaleDateString()}</td>
                         <td className="col-status">
@@ -580,12 +578,11 @@ const AdminPage: React.FC = () => {
         .admin-table {
           width: 100%;
           border-collapse: collapse;
-          min-width: 800px;
+          min-width: 720px;
         }
 
         .col-order-id,
         .col-college,
-        .col-manager,
         .col-ordered-by,
         .col-date {
           display: table-cell;
@@ -768,7 +765,6 @@ const AdminPage: React.FC = () => {
           /* Hide non-essential columns on tablet and mobile */
           .col-order-id,
           .col-college,
-          .col-manager,
           .col-ordered-by,
           .col-date {
             display: none;
@@ -840,7 +836,6 @@ const AdminPage: React.FC = () => {
           /* Ensure only Store, Status, Actions are visible on mobile */
           .col-order-id,
           .col-college,
-          .col-manager,
           .col-ordered-by,
           .col-date {
             display: none;

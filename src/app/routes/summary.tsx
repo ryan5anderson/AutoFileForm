@@ -120,12 +120,8 @@ const SummaryPage: React.FC<SummaryPageProps> = ({
               <span style={{ marginLeft: 'var(--space-2)' }}>{formData.storeNumber}</span>
             </div>
             <div style={{ marginBottom: 'var(--space-2)' }}>
-              <strong style={{ color: 'var(--color-text)' }}>Store Manager:</strong> 
-              <span style={{ marginLeft: 'var(--space-2)' }}>{formData.storeManager}</span>
-            </div>
-            <div style={{ marginBottom: 'var(--space-2)' }}>
               <strong style={{ color: 'var(--color-text)' }}>Ordered By:</strong> 
-              <span style={{ marginLeft: 'var(--space-2)' }}>{formData.orderedBy || formData.storeManager}</span>
+              <span style={{ marginLeft: 'var(--space-2)' }}>{formData.orderedBy}</span>
             </div>
             <div style={{ marginBottom: 'var(--space-2)' }}>
               <strong style={{ color: 'var(--color-text)' }}>Date:</strong> 

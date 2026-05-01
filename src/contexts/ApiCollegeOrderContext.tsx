@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useCallback, useMemo, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import {
   getProductSelectionTotal,
@@ -7,7 +7,15 @@ import {
   normalizeApiProductSelection,
   saveApiSchoolOrderState,
   type ApiProductSelection,
+  type ApiSchoolOrderState,
 } from '../features/utils/apiOrderState';
+import {
+  STORE_MANAGER_LINK_COMPANY_PARAM,
+  STORE_MANAGER_LINK_FLAG_PARAM,
+  STORE_MANAGER_LINK_PO_NUMBER_PARAM,
+  STORE_MANAGER_LINK_STORE_NUMBER_PARAM,
+  normalizeApiOrderTemplateId,
+} from '../features/utils/storeManagerLink';
 import {
   buildApiOrderCategoryModel,
   fetchApiSchoolPageData,
@@ -90,6 +98,7 @@ interface ApiCollegeOrderContextValue {
   validProductPaths: string[];
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   updateOrderedByProduct: (productId: string, selection: ApiProductSelection) => void;
+  isStoreManagerLink: boolean;
 }
 
 const ApiCollegeOrderContext = createContext<ApiCollegeOrderContextValue | null>(null);
@@ -110,7 +119,10 @@ interface ApiCollegeOrderProviderProps {
 }
 
 export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = ({ children }) => {
-  const { orderTemplateId } = useParams<{ orderTemplateId: string }>();
+  const { orderTemplateId: orderTemplateIdParam } = useParams<{ orderTemplateId: string }>();
+  const orderTemplateId = normalizeApiOrderTemplateId(orderTemplateIdParam);
+  const [searchParams] = useSearchParams();
+  const isStoreManagerLink = searchParams.get(STORE_MANAGER_LINK_FLAG_PARAM) === '1';
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [categories, setCategories] = React.useState<Category[]>([]);
@@ -132,9 +144,68 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
   useEffect(() => {
     const id = orderTemplateId;
     if (!id) {
+      setRawPageData(null);
+      setCategories([]);
+      setProductMap({});
+      setSourceToGroupKeyMap({});
+      setOrderedByProduct({});
+      setError(
+        'Could not determine which school to load. The URL should look like /api-school/YOUR_SCHOOL_ID. Go back to the school list or use Send order URL to copy a fresh link.'
+      );
       setLoading(false);
       return;
     }
+
+    setError(null);
+
+    const mergeFormState = (stored: ApiSchoolOrderState | null) => {
+      setFormData((prev) => {
+        let next = { ...prev };
+        if (stored) {
+          next = {
+            ...next,
+            company: stored.formData.company ?? next.company,
+            storeNumber: stored.formData.storeNumber ?? next.storeNumber,
+            poNumber: stored.formData.poNumber ?? next.poNumber,
+            storeManager: stored.formData.storeManager ?? next.storeManager,
+            orderedBy: stored.formData.orderedBy ?? next.orderedBy,
+            date: stored.formData.date ?? next.date,
+          };
+        }
+        if (isStoreManagerLink) {
+          next = {
+            ...next,
+            company: searchParams.get(STORE_MANAGER_LINK_COMPANY_PARAM) ?? '',
+            storeNumber: searchParams.get(STORE_MANAGER_LINK_STORE_NUMBER_PARAM) ?? '',
+            poNumber: searchParams.get(STORE_MANAGER_LINK_PO_NUMBER_PARAM) ?? '',
+          };
+        }
+        return next;
+      });
+    };
+
+    const applyStoredProducts = (
+      stored: ApiSchoolOrderState | null,
+      modelProductMap: Record<string, ApiOrderProduct>
+    ) => {
+      if (stored) {
+        const normalized: Record<string, ApiProductSelection> = {};
+        Object.keys(modelProductMap).forEach((productId) => {
+          const product = modelProductMap[productId];
+          const defaultVariant = product.defaultVariant || 'default';
+          const sizeLabelsByVariant =
+            product.sizeOptionsByVariant || { [product.defaultVariant || 'default']: product.sizeLabels };
+          normalized[productId] = normalizeApiProductSelection(
+            stored.orderedByProduct?.[productId],
+            defaultVariant,
+            sizeLabelsByVariant
+          );
+        });
+        setOrderedByProduct(normalized);
+      } else {
+        setOrderedByProduct({});
+      }
+    };
 
     const load = async () => {
       const cached = getSchoolPageFromCache(id);
@@ -145,32 +216,8 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
         setProductMap(model.productMap);
         setSourceToGroupKeyMap(model.sourceToGroupKeyMap);
         const stored = loadApiSchoolOrderState(id);
-        if (stored) {
-          setFormData((prev) => ({
-            ...prev,
-            company: stored.formData.company ?? prev.company,
-            storeNumber: stored.formData.storeNumber ?? prev.storeNumber,
-            poNumber: stored.formData.poNumber ?? prev.poNumber,
-            storeManager: stored.formData.storeManager ?? prev.storeManager,
-            orderedBy: stored.formData.orderedBy ?? prev.orderedBy,
-            date: stored.formData.date ?? prev.date,
-          }));
-          const normalized: Record<string, ApiProductSelection> = {};
-          Object.keys(model.productMap).forEach((productId) => {
-            const product = model.productMap[productId];
-            const defaultVariant = product.defaultVariant || 'default';
-            const sizeLabelsByVariant =
-              product.sizeOptionsByVariant || { [product.defaultVariant || 'default']: product.sizeLabels };
-            normalized[productId] = normalizeApiProductSelection(
-              stored.orderedByProduct?.[productId],
-              defaultVariant,
-              sizeLabelsByVariant
-            );
-          });
-          setOrderedByProduct(normalized);
-        } else {
-          setOrderedByProduct({});
-        }
+        mergeFormState(stored);
+        applyStoredProducts(stored, model.productMap);
         setLoading(false);
         setError(null);
         return;
@@ -186,32 +233,8 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
         setProductMap(model.productMap);
         setSourceToGroupKeyMap(model.sourceToGroupKeyMap);
         const stored = loadApiSchoolOrderState(id);
-        if (stored) {
-          setFormData((prev) => ({
-            ...prev,
-            company: stored.formData.company ?? prev.company,
-            storeNumber: stored.formData.storeNumber ?? prev.storeNumber,
-            poNumber: stored.formData.poNumber ?? prev.poNumber,
-            storeManager: stored.formData.storeManager ?? prev.storeManager,
-            orderedBy: stored.formData.orderedBy ?? prev.orderedBy,
-            date: stored.formData.date ?? prev.date,
-          }));
-          const normalized: Record<string, ApiProductSelection> = {};
-          Object.keys(model.productMap).forEach((productId) => {
-            const product = model.productMap[productId];
-            const defaultVariant = product.defaultVariant || 'default';
-            const sizeLabelsByVariant =
-              product.sizeOptionsByVariant || { [product.defaultVariant || 'default']: product.sizeLabels };
-            normalized[productId] = normalizeApiProductSelection(
-              stored.orderedByProduct?.[productId],
-              defaultVariant,
-              sizeLabelsByVariant
-            );
-          });
-          setOrderedByProduct(normalized);
-        } else {
-          setOrderedByProduct({});
-        }
+        mergeFormState(stored);
+        applyStoredProducts(stored, model.productMap);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load order.');
       } finally {
@@ -220,7 +243,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
     };
 
     void load();
-  }, [orderTemplateId]);
+  }, [orderTemplateId, searchParams, isStoreManagerLink]);
 
   useEffect(() => {
     if (!orderTemplateId || loading || Object.keys(productMap).length === 0) return;
@@ -252,6 +275,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
       validProductPaths: validationResult.validProductPaths,
       setFormData,
       updateOrderedByProduct,
+      isStoreManagerLink,
     }),
     [
       orderTemplateId,
@@ -266,6 +290,7 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
       validationResult.invalidProductPaths,
       validationResult.validProductPaths,
       updateOrderedByProduct,
+      isStoreManagerLink,
     ]
   );
 

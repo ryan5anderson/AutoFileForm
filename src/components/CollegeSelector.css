@@ -8,7 +8,7 @@
   justify-content: center;
   min-height: 100vh;
   padding: 2rem;
-  padding-top: calc(64px + 2rem); /* Account for fixed header */
+  padding-top: calc(var(--app-content-below-header, 72px) + 2rem); /* below fixed header */
 }
 
 .college-selector-header {

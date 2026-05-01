@@ -1,11 +1,13 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
+import ApiCollegeLoadingScreen from '../../components/ApiCollegeLoadingScreen';
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
 import StoreInfoForm from '../../features/components/StoreInfoForm';
 import { getVersionDisplayName, validateStoreInfo } from '../../features/utils';
 import { getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
+import { appendSearchToPath } from '../../features/utils/storeManagerLink';
 import { buildApiOrderPayload, getProxiedImageUrl } from '../../services/collegeApiService';
 import { getSchoolBrandPalette } from '../../utils/collegeBranding';
 import CollapsibleSidebar from '../layout/CollapsibleSidebar';
@@ -15,6 +17,7 @@ import '../../styles/college-pages.css';
 const ApiCollegeOrderForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const formRef = React.useRef<HTMLFormElement>(null);
   const productSectionRef = React.useRef<HTMLDivElement>(null);
 
@@ -31,6 +34,7 @@ const ApiCollegeOrderForm: React.FC = () => {
     invalidProductPaths,
     validProductPaths,
     setFormData,
+    isStoreManagerLink,
   } = useApiCollegeOrder();
 
   const quantities = React.useMemo(() => {
@@ -89,9 +93,9 @@ const ApiCollegeOrderForm: React.FC = () => {
         formRef.current?.reportValidity();
         return;
       }
-      navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`);
+      navigate(appendSearchToPath(`/api-school/${encodeURIComponent(orderTemplateId || '')}/summary`, searchParams));
     },
-    [formData, orderTemplateId, navigate, orderedByProduct, productMap, invalidProductPaths]
+    [formData, orderTemplateId, navigate, orderedByProduct, productMap, invalidProductPaths, searchParams]
   );
 
   const orderPayload = React.useMemo(
@@ -100,12 +104,11 @@ const ApiCollegeOrderForm: React.FC = () => {
         company: formData.company,
         storeNumber: formData.storeNumber,
         poNumber: formData.poNumber || '',
-        storeManager: formData.storeManager,
         orderedBy: formData.orderedBy,
         date: formData.date,
         orderNotes: formData.orderNotes,
       }),
-    [rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, formData.company, formData.storeNumber, formData.poNumber, formData.storeManager, formData.orderedBy, formData.date, formData.orderNotes]
+    [rawPageData, orderedByProduct, productMap, sourceToGroupKeyMap, formData.company, formData.storeNumber, formData.poNumber, formData.orderedBy, formData.date, formData.orderNotes]
   );
 
   const handleCopyJson = React.useCallback(async () => {
@@ -137,9 +140,10 @@ const ApiCollegeOrderForm: React.FC = () => {
 
   const productDetailPathResolver = React.useCallback(
     (_categoryPath: string, imageName: string) => {
-      return `/api-school/${encodeURIComponent(orderTemplateId || '')}/product/${encodeURIComponent(imageName)}`;
+      const path = `/api-school/${encodeURIComponent(orderTemplateId || '')}/product/${encodeURIComponent(imageName)}`;
+      return appendSearchToPath(path, searchParams);
     },
-    [orderTemplateId]
+    [orderTemplateId, searchParams]
   );
 
   const getApiCartItems = React.useCallback(
@@ -207,19 +211,21 @@ const ApiCollegeOrderForm: React.FC = () => {
           <p>Select your merchandise and quantities below</p>
         </div>
 
-        {loading && categories.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>Loading order data...</div>
-        )}
+        {loading && categories.length === 0 && <ApiCollegeLoadingScreen compact />}
         {error && <div className="error-message">{error}</div>}
 
         {!loading && !error && (
           <form ref={formRef} onSubmit={handleFormSubmit}>
             <StoreInfoForm
+              variant={isStoreManagerLink ? 'prefilledStore' : 'full'}
               formData={formData}
               onFormDataChange={(updates) =>
                 setFormData((prev) => ({
                   ...prev,
                   ...updates,
+                  ...(isStoreManagerLink
+                    ? { company: prev.company, storeNumber: prev.storeNumber, poNumber: prev.poNumber }
+                    : {}),
                 }))
               }
             />

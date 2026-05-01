@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { useApiCollegeOrder } from '../../contexts/ApiCollegeOrderContext';
 import CategorySection from '../../features/components/CategorySection';
 import { createApiTemplateParams, getVersionDisplayName, validateStoreInfo } from '../../features/utils';
 import { getApiSchoolStorageKey, getDefaultProductSelection, getProductSelectionTotal, hasApiOrderProducts } from '../../features/utils/apiOrderState';
+import { appendSearchToPath } from '../../features/utils/storeManagerLink';
 import { buildApiOrderPayload, getProxiedImageUrl, submitApiOrder } from '../../services/collegeApiService';
 import { sendOrderEmail } from '../../services/emailService';
 import { firebaseOrderService } from '../../services/firebaseOrderService';
@@ -15,6 +16,7 @@ import '../../styles/college-pages.css';
 const ApiCollegeSummaryPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const fromReceipt = (location.state as { fromReceipt?: boolean })?.fromReceipt ?? false;
   const {
     orderTemplateId,
@@ -54,7 +56,6 @@ const ApiCollegeSummaryPage: React.FC = () => {
         company: formData.company,
         storeNumber: formData.storeNumber,
         poNumber: formData.poNumber || '',
-        storeManager: formData.storeManager,
         orderedBy: formData.orderedBy,
         date: formData.date,
         orderNotes: formData.orderNotes,
@@ -110,12 +111,12 @@ const ApiCollegeSummaryPage: React.FC = () => {
   );
 
   const handleBack = useCallback(() => {
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}`);
-  }, [navigate, orderTemplateId]);
+    navigate(appendSearchToPath(`/api-school/${encodeURIComponent(orderTemplateId || '')}`, searchParams));
+  }, [navigate, orderTemplateId, searchParams]);
 
   const handleBackToReceipt = useCallback(() => {
-    navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/receipt`);
-  }, [navigate, orderTemplateId]);
+    navigate(appendSearchToPath(`/api-school/${encodeURIComponent(orderTemplateId || '')}/receipt`, searchParams));
+  }, [navigate, orderTemplateId, searchParams]);
 
   const handleConfirm = useCallback(() => {
     setConfirmationError(null);
@@ -162,8 +163,8 @@ const ApiCollegeSummaryPage: React.FC = () => {
       await firebaseOrderService.addOrder({
         college: `api-school:${orderTemplateId}`,
         storeNumber: formData.storeNumber,
-        storeManager: formData.storeManager,
-        orderedBy: formData.orderedBy || formData.storeManager,
+        storeManager: formData.orderedBy,
+        orderedBy: formData.orderedBy,
         date: formData.date,
         status: 'pending',
         totalItems,
@@ -180,7 +181,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
       localStorage.removeItem(getApiSchoolStorageKey(orderTemplateId || ''));
 
       setShowConfirmModal(false);
-      navigate(`/api-school/${encodeURIComponent(orderTemplateId || '')}/receipt`);
+      navigate(appendSearchToPath(`/api-school/${encodeURIComponent(orderTemplateId || '')}/receipt`, searchParams));
     } catch (err) {
       console.error('Order submit error:', err);
       const message = err instanceof Error ? err.message : String(err);
@@ -195,7 +196,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
     } finally {
       setSending(false);
     }
-  }, [formData, categories, orderedByProduct, productMap, quantities, orderTemplateId, navigate, rawPageData, orderPayload]);
+  }, [formData, categories, orderedByProduct, productMap, quantities, orderTemplateId, navigate, rawPageData, orderPayload, searchParams]);
 
   const handleConfirmCancel = useCallback(() => {
     setShowConfirmModal(false);
@@ -217,8 +218,7 @@ const ApiCollegeSummaryPage: React.FC = () => {
             <div><strong>Store Name:</strong> {formData.company}</div>
             <div><strong>Store Number:</strong> {formData.storeNumber}</div>
             <div><strong>PO Number:</strong> {formData.poNumber || '-'}</div>
-            <div><strong>Store Manager:</strong> {formData.storeManager}</div>
-            <div><strong>Ordered By:</strong> {formData.orderedBy || formData.storeManager}</div>
+            <div><strong>Ordered By:</strong> {formData.orderedBy}</div>
             <div><strong>Date:</strong> {formData.date}</div>
           </div>
         </div>

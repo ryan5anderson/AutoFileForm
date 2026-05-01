@@ -1,4 +1,10 @@
 /* global.css */
+:root {
+  /* Must match fixed header in Header.tsx (height 64px + small gap) */
+  --app-header-height: 64px;
+  --app-content-below-header: calc(var(--app-header-height) + 8px);
+}
+
 html, body {
   background-color: var(--color-bg);
   box-sizing: border-box;
@@ -10,9 +16,88 @@ html, body {
   padding: 0;
 }
 
-/* Account for fixed header height */
-main, .college-page-main, .summary-page-main, .receipt-page-main {
-  padding-top: 72px;
+/* Fixed header offset for plain <main>; routed pages use .college-page-main / .summary-page-main rules in college-pages.css */
+main {
+  padding-top: var(--app-content-below-header);
+}
+
+/**
+ * Use when a route renders a full-width block outside <main> (e.g. loading / error)
+ * so content is not hidden under position:fixed header.
+ */
+.content-below-app-header {
+  box-sizing: border-box;
+  margin-top: 0;
+  min-height: min(70vh, calc(100dvh - var(--app-header-height)));
+  padding-bottom: var(--space-6);
+  padding-left: max(var(--space-4), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--space-4), env(safe-area-inset-right, 0px));
+  padding-top: calc(var(--app-content-below-header) + env(safe-area-inset-top, 0px) + 8px);
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.content-below-app-header .error-message {
+  margin-top: 0;
+  text-align: left;
+  word-break: break-word;
+}
+
+.api-loading-page {
+  background: var(--color-bg);
+  min-height: calc(100dvh - var(--app-header-height));
+}
+
+.api-loading-screen {
+  align-items: center;
+  background: var(--color-bg);
+  display: flex;
+  justify-content: center;
+  min-height: calc(100dvh - var(--app-content-below-header) - var(--space-6));
+}
+
+.api-loading-screen--compact {
+  min-height: 160px;
+}
+
+.api-loading-card {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.api-loading-orb {
+  align-items: center;
+  animation: api-loading-spin 1.1s linear infinite;
+  background: conic-gradient(from 0deg, var(--color-blue-600), rgb(37 99 235 / 20%), transparent 72%);
+  border-radius: 999px;
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.api-loading-orb span {
+  background: white;
+  border-radius: inherit;
+  height: 26px;
+  width: 26px;
+}
+
+.api-loading-card p {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+
+@keyframes api-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 a {

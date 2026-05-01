@@ -121,8 +121,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
             }}>
               <div><strong style={{ color: 'var(--color-text)' }}>Store Name:</strong> {formData.company}</div>
               <div><strong style={{ color: 'var(--color-text)' }}>Store Number:</strong> {formData.storeNumber}</div>
-              <div><strong style={{ color: 'var(--color-text)' }}>Store Manager:</strong> {formData.storeManager}</div>
-              <div><strong style={{ color: 'var(--color-text)' }}>Ordered By:</strong> {formData.orderedBy || formData.storeManager}</div>
+              <div><strong style={{ color: 'var(--color-text)' }}>Ordered By:</strong> {formData.orderedBy}</div>
               <div><strong style={{ color: 'var(--color-text)' }}>Date:</strong> {formData.date}</div>
             </div>
           </div>
