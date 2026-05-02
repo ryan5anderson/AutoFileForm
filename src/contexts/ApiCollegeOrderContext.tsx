@@ -188,23 +188,19 @@ export const ApiCollegeOrderProvider: React.FC<ApiCollegeOrderProviderProps> = (
       stored: ApiSchoolOrderState | null,
       modelProductMap: Record<string, ApiOrderProduct>
     ) => {
-      if (stored) {
-        const normalized: Record<string, ApiProductSelection> = {};
-        Object.keys(modelProductMap).forEach((productId) => {
-          const product = modelProductMap[productId];
-          const defaultVariant = product.defaultVariant || 'default';
-          const sizeLabelsByVariant =
-            product.sizeOptionsByVariant || { [product.defaultVariant || 'default']: product.sizeLabels };
-          normalized[productId] = normalizeApiProductSelection(
-            stored.orderedByProduct?.[productId],
-            defaultVariant,
-            sizeLabelsByVariant
-          );
-        });
-        setOrderedByProduct(normalized);
-      } else {
-        setOrderedByProduct({});
-      }
+      const normalized: Record<string, ApiProductSelection> = {};
+      Object.keys(modelProductMap).forEach((productId) => {
+        const product = modelProductMap[productId];
+        const defaultVariant = product.defaultVariant || 'default';
+        const sizeLabelsByVariant =
+          product.sizeOptionsByVariant || { [defaultVariant]: product.sizeLabels };
+        normalized[productId] = normalizeApiProductSelection(
+          stored?.orderedByProduct?.[productId],
+          defaultVariant,
+          sizeLabelsByVariant
+        );
+      });
+      setOrderedByProduct(normalized);
     };
 
     const load = async () => {
