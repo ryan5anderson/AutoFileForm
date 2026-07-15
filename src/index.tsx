@@ -101,8 +101,8 @@ function AppShell() {
         />
       )}
       <Routes>
-        <Route path='/' element={<CollegeSelector />} />
-        <Route path='/local-schools' element={<CollegeSelector localOnly />} />
+        <Route path='/' element={<CollegeSelector key='all-schools' />} />
+        <Route path='/local-schools' element={<CollegeSelector key='local-schools' localOnly />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/send-order-url' element={<SendOrderUrlPage />} />
