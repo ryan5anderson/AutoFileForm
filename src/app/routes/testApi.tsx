@@ -146,31 +146,19 @@ const TestApiPage: React.FC = () => {
     });
   };
 
-  // Deduplicate colleges and filter based on search query
+  // Filter colleges based on search query
   const filteredColleges = useMemo(() => {
-    // First, deduplicate colleges by school_ID (keep first occurrence)
-    const seen = new Set<string>();
-    const uniqueColleges = colleges.filter((college) => {
-      if (seen.has(college.school_ID)) {
-        console.warn(`Duplicate college filtered out: ${college.schoolName} (ID: ${college.school_ID})`);
-        return false;
-      }
-      seen.add(college.school_ID);
-      return true;
-    });
-
-    // Then filter by search query if present
     const trimmedQuery = searchQuery.trim();
     if (!trimmedQuery) {
-      return uniqueColleges;
+      return colleges;
     }
-    
-    const filtered = uniqueColleges.filter((college) => 
+
+    const filtered = colleges.filter((college) =>
       college.schoolName.toLowerCase().includes(trimmedQuery.toLowerCase())
     );
-    
-    console.warn(`Search query: "${trimmedQuery}", Found ${filtered.length} colleges out of ${uniqueColleges.length}`);
-    
+
+    console.warn(`Search query: "${trimmedQuery}", Found ${filtered.length} colleges out of ${colleges.length}`);
+
     return filtered;
   }, [colleges, searchQuery]);
 
