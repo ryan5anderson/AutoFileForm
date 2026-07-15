@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { sanitizeSingleLineInput } from '../../features/utils/sanitize';
+import { isFiveDigitNumber } from '../../features/utils';
+import { sanitizeFiveDigitInput, sanitizeSingleLineInput } from '../../features/utils/sanitize';
 import { buildStoreManagerOrderUrl, normalizeApiOrderTemplateId } from '../../features/utils/storeManagerLink';
 import { fetchColleges, getCollegesFromCache, type CollegeData } from '../../services/collegeApiService';
 import Footer from '../layout/Footer';
@@ -92,7 +93,14 @@ const SendOrderUrlPage: React.FC = () => {
   }, []);
 
   const generatedUrl = React.useMemo(() => {
-    if (!selectedOrderTemplateId || !storeName.trim() || !storeNumber.trim() || !poNumber.trim()) return '';
+    if (
+      !selectedOrderTemplateId ||
+      !isFiveDigitNumber(storeName) ||
+      !isFiveDigitNumber(storeNumber) ||
+      !poNumber.trim()
+    ) {
+      return '';
+    }
     return buildStoreManagerOrderUrl(selectedOrderTemplateId, storeName.trim(), storeNumber.trim(), poNumber.trim());
   }, [selectedOrderTemplateId, storeName, storeNumber, poNumber]);
 
@@ -221,16 +229,21 @@ const SendOrderUrlPage: React.FC = () => {
 
             <div style={{ marginBottom: 'var(--space-4)' }}>
               <label
-                htmlFor="send-url-store-name"
+                htmlFor="send-url-account-name"
                 style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600, color: 'var(--color-text)' }}
               >
-                Store name
+                Account name
               </label>
               <input
-                id="send-url-store-name"
+                id="send-url-account-name"
                 type="text"
+                inputMode="numeric"
+                pattern="\d{5}"
+                maxLength={5}
+                title="Must be exactly 5 digits (e.g. 12345)"
+                placeholder="12345"
                 value={storeName}
-                onChange={(e) => setStoreName(sanitizeSingleLineInput(e.target.value))}
+                onChange={(e) => setStoreName(sanitizeFiveDigitInput(e.target.value))}
                 style={inputStyle}
               />
             </div>
@@ -245,8 +258,13 @@ const SendOrderUrlPage: React.FC = () => {
               <input
                 id="send-url-store-number"
                 type="text"
+                inputMode="numeric"
+                pattern="\d{5}"
+                maxLength={5}
+                title="Must be exactly 5 digits (e.g. 12345)"
+                placeholder="12345"
                 value={storeNumber}
-                onChange={(e) => setStoreNumber(sanitizeSingleLineInput(e.target.value))}
+                onChange={(e) => setStoreNumber(sanitizeFiveDigitInput(e.target.value))}
                 style={inputStyle}
               />
             </div>
@@ -300,7 +318,7 @@ const SendOrderUrlPage: React.FC = () => {
               </div>
             ) : (
               <p style={{ color: 'var(--color-text-muted, #64748b)', marginTop: 'var(--space-4)', marginBottom: 0 }}>
-                Search and select a school, then enter store name, store number, and PO number to generate a link.
+                Search and select a school, then enter a 5-digit account name, 5-digit store number, and PO number to generate a link.
               </p>
             )}
           </div>

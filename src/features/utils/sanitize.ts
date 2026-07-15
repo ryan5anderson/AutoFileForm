@@ -21,6 +21,11 @@ export const sanitizeSingleLineInput = (value: string): string => {
   return cleanBaseText(value, false).replace(MULTI_SPACE, ' ');
 };
 
+/** Digits only, max 5 characters — for API school account name / store number. */
+export const sanitizeFiveDigitInput = (value: string): string => {
+  return value.replace(/\D/g, '').slice(0, 5);
+};
+
 export const sanitizeMultiLineInput = (value: string): string => {
   return cleanBaseText(value, false)
     .replace(/[ \t]+\n/g, '\n')

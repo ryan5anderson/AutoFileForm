@@ -1,5 +1,6 @@
 // Re-export specific utilities that are used externally
-export { getSizeOptions, calculateTotalItems, validateFormData, validateQuantities, validateStoreInfo, hasOrderProducts, calcTotals, getQuantityMultiples, getShirtVersionTotal } from './calculations';
+export { getSizeOptions, calculateTotalItems, validateFormData, validateQuantities, validateStoreInfo, isFiveDigitNumber, hasOrderProducts, calcTotals, getQuantityMultiples, getShirtVersionTotal } from './calculations';
+export type { ValidateStoreInfoOptions } from './calculations';
 export { getDisplayProductName, getProductName, getVersionDisplayName, getRackDisplayName, hasColorOptions, getColorOptions, getColorDisplayName } from './naming';
 export { createTemplateParams, createApiTemplateParams, buildApiReceiptCategories } from './emailTemplate';
 

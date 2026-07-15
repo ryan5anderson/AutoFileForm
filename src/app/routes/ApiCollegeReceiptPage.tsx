@@ -79,7 +79,7 @@ const ApiCollegeReceiptPage: React.FC = () => {
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
               gap: 'var(--space-3)',
             }}>
-              <div><strong>Store Name:</strong> {formData.company}</div>
+              <div><strong>Account Name:</strong> {formData.company}</div>
               <div><strong>Store Number:</strong> {formData.storeNumber}</div>
               <div><strong>Ordered By:</strong> {formData.orderedBy}</div>
               <div><strong>Date:</strong> {formData.date}</div>

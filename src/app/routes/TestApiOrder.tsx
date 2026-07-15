@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom';
 
 import '../../styles/college-pages.css';
+import { sanitizeFiveDigitInput } from '../../features/utils/sanitize';
 import { fetchCollegeOrder, getProxiedImageUrl, type OrderItem } from '../../services/collegeApiService';
 
 // API configuration - use relative URL for proxy endpoints
@@ -508,14 +509,18 @@ const TestApiOrderPage: React.FC = () => {
                     color: 'var(--color-text)'
                   }}
                 >
-                  Store Name
+                  Account Name
                 </label>
                 <input
                   id="storeName"
                   type="text"
+                  inputMode="numeric"
+                  pattern="\d{5}"
+                  maxLength={5}
+                  title="Must be exactly 5 digits (e.g. 12345)"
                   value={storeName}
-                  onChange={(e) => setStoreName(e.target.value)}
-                  placeholder="Enter store name"
+                  onChange={(e) => setStoreName(sanitizeFiveDigitInput(e.target.value))}
+                  placeholder="12345"
                   style={{
                     padding: 'var(--space-2) var(--space-3)',
                     border: '1px solid var(--color-border)',
@@ -540,9 +545,13 @@ const TestApiOrderPage: React.FC = () => {
                 <input
                   id="storeNumber"
                   type="text"
+                  inputMode="numeric"
+                  pattern="\d{5}"
+                  maxLength={5}
+                  title="Must be exactly 5 digits (e.g. 12345)"
                   value={storeNumber}
-                  onChange={(e) => setStoreNumber(e.target.value)}
-                  placeholder="Enter store number"
+                  onChange={(e) => setStoreNumber(sanitizeFiveDigitInput(e.target.value))}
+                  placeholder="12345"
                   style={{
                     padding: 'var(--space-2) var(--space-3)',
                     border: '1px solid var(--color-border)',
