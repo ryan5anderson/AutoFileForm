@@ -3,7 +3,7 @@
 Extract images from a PDF, categorize them, and update college configs.
 
 This script:
-1. Prompts user to select a college (Arizona State, Michigan State, West Virginia University, University of Pittsburgh, Alabama University, or Oregon University)
+1. Prompts user to select a college (Arizona State, Michigan State, West Virginia University, University of Pittsburgh, Alabama University, Oregon University, or Indiana University)
 2. Extracts images from PDF and names them using captions
 3. Categorizes images into subfolders (beanie, tshirt/men, etc.)
 4. Cleans existing images in the target college's public folder
@@ -26,7 +26,8 @@ Usage:
     #   4. University of Pittsburgh
     #   5. Alabama University
     #   6. Oregon University
-    # Enter your choice (1, 2, 3, 4, 5, or 6): 1
+    #   7. Indiana University
+    # Enter your choice (1, 2, 3, 4, 5, 6, or 7): 1
     
     # Then extracts to public/ArizonaState/ and updates arizonastate.json
 
@@ -76,10 +77,11 @@ def prompt_college_selection() -> Tuple[str, str]:
     print("  4. University of Pittsburgh")
     print("  5. Alabama University")
     print("  6. Oregon University")
+    print("  7. Indiana University")
     print()
     
     while True:
-        choice = input("Enter your choice (1, 2, 3, 4, 5, or 6): ").strip()
+        choice = input("Enter your choice (1, 2, 3, 4, 5, 6, or 7): ").strip()
         if choice == "1":
             return ("ArizonaState", "arizonastate")
         elif choice == "2":
@@ -92,8 +94,10 @@ def prompt_college_selection() -> Tuple[str, str]:
             return ("AlabamaUniversity", "alabamauniversity")
         elif choice == "6":
             return ("OregonUniversity", "oregonUniversity")
+        elif choice == "7":
+            return ("IndianaUniversity", "indianauniversity")
         else:
-            print("Invalid choice. Please enter 1, 2, 3, 4, 5, or 6.")
+            print("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, or 7.")
 
 def clean_existing_images(college_dir: Path) -> int:
     """
@@ -299,7 +303,7 @@ def categorize_image(caption: str) -> Optional[str]:
         return "hat"
     
     # Check each rule in order (more specific rules first)
-    if "backpac" in caption_lower or "backpack" in caption_lower:
+    if "backpac" in caption_lower or "backpack" in caption_lower or "back pack" in caption_lower:
         return "backpack"
     if "beanie" in caption_lower:
         return "beanie"
@@ -309,7 +313,8 @@ def categorize_image(caption: str) -> Optional[str]:
         return "signage"
     if "header" in caption_lower:
         return "signage"
-    if "card" in caption_lower:
+    # Match "card" as a whole word only (avoid matching colors like "Cardinal")
+    if re.search(r'\bcard\b', caption_lower):
         return "signage"
     if "hat" in caption_lower:
         return "hat"

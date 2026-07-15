@@ -425,7 +425,8 @@ const OrderReceiptPage: React.FC = () => {
       'michiganstate': 'michiganstate',
       'pittsburghuniversity': 'pittsburghuniversity',
       'westvirginiauniversity': 'westvirginiauniversity',
-      'oregonuniversity': 'oregonuniversity'
+      'oregonuniversity': 'oregonuniversity',
+      'indianauniversity': 'indianauniversity'
     };
     
     const collegeKey = collegeKeyMap[collegeName.toLowerCase()] || collegeName.toLowerCase();

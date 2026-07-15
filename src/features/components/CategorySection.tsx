@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui';
 import { Category, ShirtVersion, DisplayOption, SweatpantJoggerOption, PantOption, ColorOption, ShirtColorSizeCounts, InfantSizeCounts, SizeCounts } from '../../types';
 import { asset, getCollegeFolderName } from '../../utils/asset';
-import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions, getVersionDisplayName } from '../utils';
+import { getDisplayProductName, getRackDisplayName, getShirtVersionTotal, hasColorOptions, getVersionDisplayName, getFilteredShirtVersions } from '../utils';
 
 import OrderSummaryCard from './OrderSummaryCard';
 
@@ -436,6 +436,11 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     });
   }, [apiProductMap, category.path, filteredImages]);
 
+  // Hide categories that have no products at all
+  if (category.images.length === 0) {
+    return null;
+  }
+
   // Don't render the category section if no items have quantities in read-only mode
   // Exception: If all form data is empty, always show (admin preview mode)
   if (readOnly && filteredImages.length === 0 && hasAnyFormData) {
@@ -518,11 +523,17 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             const apiVariants = apiProductMap?.[img]?.variantOptions;
             if (apiVariants && apiVariants.length > 0) return apiVariants;
             if (category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length > 0) {
-              return category.shirtVersions;
+              return getFilteredShirtVersions(img, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages);
             }
             return [];
           })();
-          const hasMultipleVariants = availableVariants.length > 1;
+          // Show the availability line whenever the category offers multiple
+          // versions, even if this specific product is limited to one (e.g.
+          // "Available on Hoodie" for a hoodie-only product).
+          const categoryHasMultipleVariants =
+            (apiProductMap?.[img]?.variantOptions?.length || 0) > 1 ||
+            (category.hasShirtVersions && (category.shirtVersions?.length || 0) > 1);
+          const showAvailabilityLine = categoryHasMultipleVariants && availableVariants.length > 0;
           const selectedOptions = cartDetails.length > 0
             ? cartDetails
             : totalQuantity > 0
@@ -604,7 +615,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
                 {shouldUseCatalogCardUi && (
                   <>
-                    {hasMultipleVariants && !isInCartState && (
+                    {showAvailabilityLine && !isInCartState && (
                       <p className="card__variant-text">
                         Available on{'\n'}
                         {availableVariants.map((v, i) => (

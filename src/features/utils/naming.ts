@@ -112,8 +112,35 @@ export const getVersionDisplayName = (version: string, imageName?: string): stri
   return display;
 };
 
+// Explicit color/style options for hats whose filenames can't be parsed
+// with the standard "on_Color1_or_Color2" pattern.
+// Keyed by exact image filename.
+const explicitColorOptions: Record<string, string[]> = {
+  // Michigan State
+  'M100489153_SHE1CH_Custom_Hat_on_White_or_Grays.png': ['White', 'Gray'],
+  'M206228277_SEVISO_Custom_Forest_or_Black_Visor.png': ['Forest', 'Black'],
+  'M206228371_SEVISO_Custom_Gray_or_White_Visor.png': ['Gray', 'White'],
+  // Arizona State
+  'M102300177_SHE1CH_Custom_Maroon_6235_or_6606.png': ['6235', '6606'],
+  'M102300329_SHE1CH_Gray_FlyGold_White_-_no_mesh.png': ['Gray Fly', 'Gold', 'White'],
+  'M102542014_SHE2CH_GrayGoldWhite_PE102-no_mesh.png': ['Gray', 'Gold', 'White'],
+  'M204457186_SHE2CH_Pitch_WhtPE102Gry_Fly-no_mesh.png': ['White', 'Gray'],
+  'M204457349_SHE2CH_Custom_AS_Gray_FlyWhite_Hat.png': ['Gray', 'White'],
+  'M204458312_SHE1CH_Gold_Pfork-No_mesh_or_gold_hat.png': ['No Mesh', 'Gold'],
+  // Alabama
+  'M100120547_SHE1CH_Custom_on_GrayWhite_Hat.png': ['Gray', 'White'],
+  'M100120777_SHE1CH_Custom_on_GrayWhite_Hat.png': ['Gray', 'White'],
+  // Indiana
+  'M206217389_SHE1CH_Athletic_Mark_Gray_or_White_Hat.png': ['Gray', 'White'],
+  'M101362966_SHE1CB_Custom_Gray_or_White_Beanie.png': ['Gray', 'White'],
+  'M101363128_SHE1CB_Custom_Gray_or_White_Beanie.png': ['Gray', 'White'],
+};
+
 // Check if a product has multiple color options
 export const hasColorOptions = (imageName: string): boolean => {
+  // Explicitly mapped products (hats with irregular filenames)
+  if (explicitColorOptions[imageName]) return true;
+
   // Standard pattern: "on_Color1_or_Color2" or "on_Color1_or_Color2_or_Color3"
   if (imageName.includes('_or_')) return true;
   
@@ -130,6 +157,11 @@ export const hasColorOptions = (imageName: string): boolean => {
 // e.g., "Scrap_WhiteGrayor_Navy_Hat.png" -> ["White", "Gray", "Navy"] (special case)
 export const getColorOptions = (imageName: string): string[] => {
   if (!hasColorOptions(imageName)) return [];
+  
+  // Explicitly mapped products take priority over filename parsing
+  if (explicitColorOptions[imageName]) {
+    return explicitColorOptions[imageName];
+  }
   
   // Special case: Handle "WhiteGrayor_Navy" pattern (for WVU hat)
   // Extract Navy before _Hat to avoid capturing "Hat" as a color
@@ -157,6 +189,9 @@ export const getColorOptions = (imageName: string): string[] => {
 
 // Get display name for a color
 export const getColorDisplayName = (color: string): string => {
-  // Capitalize first letter
-  return color.charAt(0).toUpperCase() + color.slice(1).toLowerCase();
+  // Capitalize each word (supports multi-word options like "Gray Fly" or "No Mesh")
+  return color
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 };

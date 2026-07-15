@@ -24,23 +24,16 @@
         "M100432187_SDFREG_Frege_DTF_on_Forest.png",
         "M100435370_SDVECS_Vector_DTF_on_Steel.png",
         "M100435821_SH2FDS_Custom_State_DTF_on_Steel.png",
-        "M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png",
         "M100437896_SHOUDC_Over_Under_DTF_on_Forest.png",
         "M100438285_SDARMS_Aristotle_DTF_on_Steel.png",
-        "M100438383_SH2FDW_Custom_DTFN_on_Forest.png",
-        "M100438745_SDLOCS_Locke_DTFN_on_Steel.png",
-        "M100439889_SDABSC_Absent_DTF_on_Forest.png",
         "M100444086_SH2FDS_Custom_School_DTF_on_Steel.png",
         "M100482538_SHHODC_Hover_DTF_on_Black_or_Forest.png",
-        "M100485992_SHE2CH_Custom_Spartan_on_Green.png",
         "M100965024_SHDCDS_Dad_Club_DTF_on_Steel.png",
         "M100965141_SHDCDW_Dad_Club_DTF_on_Forest.png",
         "M100965414_SHOUDC_OU_Go_Green_DTF_on_Forest.png",
         "M101005933_SDOLAS_Overlay_DTF_on_Steel.png",
         "M101010777_SH2FDC_Custom_Go_Green_DTF_of_Forest.png",
-        "M103998480_SDBMCS_Battle_Master_DTF_on_Steel.png",
-        "M206228277_SEVISO_Custom_Forest_or_Black_Visor.png",
-        "M206228371_SEVISO_Custom_Gray_or_White_Visor.png"
+        "M103998480_SDBMCS_Battle_Master_DTF_on_Steel.png"
       ]
     },
     {
@@ -51,6 +44,10 @@
         "tshirt"
       ],
       "images": [
+        "M100436060_SH2FDS_Custom_Spartan_DTFN_on_Steel.png",
+        "M100438383_SH2FDW_Custom_DTFN_on_Forest.png",
+        "M100438745_SDLOCS_Locke_DTFN_on_Steel.png",
+        "M100439889_SDABSC_Absent_DTF_on_Forest.png",
         "M100963545_SHMCDW_Jr_Mom_Club_DTF_on_Green.png",
         "M100963714_SDFAMW_Jr_Family_DTF_on_Forest.png",
         "M100964663_SDFAMS_Jr_Family_DTF_on_Steel.png",
@@ -63,11 +60,14 @@
       "name": "Caps",
       "path": "hat",
       "images": [
+        "M100485992_SHE2CH_Custom_Spartan_on_Green.png",
         "M100487428_SECHHC_Chirp_Gray_Hat.png",
         "M100488283_SHE1CH_Custom_Logo_on_White_or_Gray.png",
         "M100489153_SHE1CH_Custom_Hat_on_White_or_Grays.png",
         "M100489250_SHE1CH_Custom_Hat_on_Forest.png",
-        "M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png"
+        "M100490059_SHEHFL_Front_Line_Forest_Green_Hat.png",
+        "M206228277_SEVISO_Custom_Forest_or_Black_Visor.png",
+        "M206228371_SEVISO_Custom_Gray_or_White_Visor.png"
       ]
     },
     {

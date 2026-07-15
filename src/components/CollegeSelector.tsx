@@ -8,11 +8,16 @@ import { asset } from '../utils/asset';
 import { getSchoolBrandPalette } from '../utils/collegeBranding';
 import './CollegeSelector.css';
 
-const CollegeSelector: React.FC = () => {
+interface CollegeSelectorProps {
+  /** When true, only show local (config-based) schools and skip API school fetching. */
+  localOnly?: boolean;
+}
+
+const CollegeSelector: React.FC<CollegeSelectorProps> = ({ localOnly = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [showApiSchools, setShowApiSchools] = React.useState(true);
+  const [showApiSchools, setShowApiSchools] = React.useState(!localOnly);
   const [apiColleges, setApiColleges] = React.useState<CollegeData[]>([]);
   const [isLoadingApiColleges, setIsLoadingApiColleges] = React.useState(false);
   const [apiError, setApiError] = React.useState<string | null>(null);
@@ -56,6 +61,10 @@ const CollegeSelector: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
+    if (localOnly) {
+      return;
+    }
+
     const routeState = location.state as { showApiSchools?: boolean } | null;
     const shouldShowApiSchools = routeState?.showApiSchools;
 
@@ -73,7 +82,7 @@ const CollegeSelector: React.FC = () => {
     if (showApiSchools) {
       void fetchApiColleges();
     }
-  }, [fetchApiColleges, location.pathname, location.state, navigate, showApiSchools]);
+  }, [fetchApiColleges, localOnly, location.pathname, location.state, navigate, showApiSchools]);
 
   const filteredLocalColleges = React.useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -100,7 +109,7 @@ const CollegeSelector: React.FC = () => {
   return (
     <div className="college-selector">
       <div className="college-selector-header">
-        <h1>Select Your College</h1>
+        <h1>{localOnly ? 'Local Schools' : 'Select Your College'}</h1>
         <p>Choose your college to access the merchandise order form</p>
       </div>
 

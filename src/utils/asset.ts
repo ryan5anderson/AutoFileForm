@@ -19,7 +19,8 @@ export function getCollegeFolderName(collegeKey: string): string {
     'oregonuniversity': 'OregonUniversity',
     'westvirginiauniversity': 'WestVirginiaUniversity',
     'pittsburghuniversity': 'PittsburghUniversity',
-    'alabamauniversity': 'AlabamaUniversity'
+    'alabamauniversity': 'AlabamaUniversity',
+    'indianauniversity': 'IndianaUniversity'
   };
   
   return folderMap[collegeKey] || 'ArizonaState'; // Default fallback

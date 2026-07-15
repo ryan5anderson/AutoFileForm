@@ -53,8 +53,15 @@ function AppShell() {
 
   const handleBackToColleges = React.useCallback(() => {
     setIsSidebarOpen(false);
-    navigate('/', { state: { showApiSchools: true } });
-  }, [navigate]);
+    const firstSegment = location.pathname.split('/').filter(Boolean)[0];
+    const isLocalCollegeRoute =
+      firstSegment !== undefined && colleges[firstSegment as keyof typeof colleges] !== undefined;
+    if (isLocalCollegeRoute) {
+      navigate('/local-schools');
+    } else {
+      navigate('/', { state: { showApiSchools: true } });
+    }
+  }, [navigate, location.pathname]);
 
   // Provide categories when on a college route; otherwise empty
   const categories: Category[] = React.useMemo(() => {
@@ -95,6 +102,7 @@ function AppShell() {
       )}
       <Routes>
         <Route path='/' element={<CollegeSelector />} />
+        <Route path='/local-schools' element={<CollegeSelector localOnly />} />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/send-order-url' element={<SendOrderUrlPage />} />

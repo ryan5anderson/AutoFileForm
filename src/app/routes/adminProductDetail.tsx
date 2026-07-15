@@ -72,6 +72,8 @@ const AdminProductDetail: React.FC = () => {
       document.documentElement.style.setProperty('--color-primary', '#003594');
     } else if (collegeKey === 'alabamauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#9E1B32');
+    } else if (collegeKey === 'indianauniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#990000');
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111');
     }

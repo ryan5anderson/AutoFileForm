@@ -9,16 +9,22 @@ export const getFilteredShirtVersions = (imageName: string, versions: string[], 
   const isTiedye = tieDyeImages?.includes(imageName) || false;
   const isHoodieOnly = hoodOnlyImages?.includes(imageName) || imageName.toLowerCase().includes('hood') || imageName.includes('CM7031');
   const isCrewOnly = crewOnlyImages?.includes(imageName) || false;
-  
+  // Products whose filename is marked "LST_Only" are long-sleeve t-shirt only
+  const isLongsleeveOnly = imageName.toLowerCase().includes('lst_only');
+
   if (isCrewOnly) {
-    // Crew-only products only have crewneck
-    return versions.filter(version => version === 'crewneck');
+    // Crew-only products only have crewneck (even if the category doesn't list it)
+    return ['crewneck'];
   }
   
   // Check hoodOnlyImages BEFORE applique - hood-only takes precedence
   if (isHoodieOnly) {
-    // Hoodie-only products only have hoodie
-    return versions.filter(version => version === 'hoodie');
+    // Hoodie-only products only have hoodie (even if the category doesn't list it)
+    return ['hoodie'];
+  }
+
+  if (isLongsleeveOnly) {
+    return ['longsleeve'];
   }
   
   if (isApplique) {

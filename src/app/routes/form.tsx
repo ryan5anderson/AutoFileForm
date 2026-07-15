@@ -86,7 +86,7 @@ const FormPage: React.FC<FormPageProps> = ({
   };
 
   const handleBackToColleges = () => {
-    navigate('/');
+    navigate('/local-schools');
   };
 
   useEffect(() => {
@@ -128,6 +128,16 @@ const FormPage: React.FC<FormPageProps> = ({
       />
       
       <main className="college-page-main">
+        <div className="college-page-top-actions">
+          <button
+            className="college-page-title-btn college-page-title-btn--back"
+            type="button"
+            onClick={handleBackToColleges}
+          >
+            ← Back to schools
+          </button>
+        </div>
+
         <div className="college-page-title">
           <h1>{collegeName} Product Order Form</h1>
           <p>Select your merchandise and quantities below</p>

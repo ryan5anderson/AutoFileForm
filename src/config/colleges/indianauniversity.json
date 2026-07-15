@@ -1,0 +1,169 @@
+{
+  "name": "Indiana University",
+  "logo": "/logo/iu-logo.svg",
+  "categories": [
+    {
+      "name": "Unisex T-shirt, Long Sleeve T-shirt, Hoodie, Crew Sweatshirt",
+      "path": "tshirt/men",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt",
+        "longsleeve",
+        "hoodie",
+        "crewneck"
+      ],
+      "images": [
+        "M100782949_SDCPLS_Pride_Lives_DTF_on_Steel.png",
+        "M100783195_SDCOCS_Open_Country_DTF_on_Steel.png",
+        "M100783783_SDARMS_Aristotle_DTF_on_Steel.png",
+        "M100784447_SH2FDS_Custom_DTF_on_Steel.png",
+        "M100785076_SH2FDS_Custom_DTF_on_Steel.png",
+        "M100785213_SH2FDC_Custom_DTF_on_Black.png",
+        "M100785611_SDWIZS_Wizard_DTF_on_Steel.png",
+        "M100786380_SDMONK_Monk_DTF_on_Steel.png",
+        "M101195937_SH2FDW_Custom_DTF_on_Cardinal.png",
+        "M101196087_SH2FDW_Custom_DTF_on_Cardinal.png",
+        "M101196178_SH2FDW_Custom_DTF_on_Cardinal.png",
+        "M101196357_SH2FDW_Custom_DTF_on_Cardinal.png",
+        "M103307111_SDWIZC_Wizard_DTF_on_Black.png",
+        "M205585435_SDBLPC_Bootlegger_DTF_on_Cardinal.png",
+        "M205585584_SDHUMW_Hunters_Mark_on_Cardinal.png",
+        "M205585727_SDDDMB_Dime_Defense_DTF_on_Black.png",
+        "M205585830_SDWSMB_Wheelspin_DTF_on_Black.png",
+        "M205585992_SDFOFS_Fork_DTF_on_Steel.png",
+        "M205586011_SDSMMS_Sixth_Man_DTF_on_Steel.png",
+        "M205634988_SDSTMW_Steady_DTF_White_LST_Only.png"
+      ]
+    },
+    {
+      "name": "Ladies Tops",
+      "path": "tshirt/women",
+      "hasShirtVersions": true,
+      "shirtVersions": [
+        "tshirt"
+      ],
+      "images": [
+        "M100901119_SH2FDS_Jr_Custom_DTF_on_Steel.png",
+        "M100901455_SH2FDS_Jr_Custom_DTF_on_Steel.png",
+        "M205634666_SDTILS_Jr_Tilting_DTF_on_Black.png",
+        "M205635166_SDSCMC_Jr_Shot_Clock_DTF_on_Black.png"
+      ]
+    },
+    {
+      "name": "Hat",
+      "path": "hat",
+      "images": [
+        "M100915218_SHE1CH_Custom_Logo_Gray_Hat.png",
+        "M100915320_SHE2CH_Custom_Logo_Black_Hat.png",
+        "M206217389_SHE1CH_Athletic_Mark_Gray_or_White_Hat.png"
+      ]
+    },
+    {
+      "name": "Beanie",
+      "path": "beanie",
+      "images": [
+        "M101362966_SHE1CB_Custom_Gray_or_White_Beanie.png",
+        "M101363128_SHE1CB_Custom_Gray_or_White_Beanie.png"
+      ]
+    },
+    {
+      "name": "Jackets",
+      "path": "jacket",
+      "hasSizeOptions": true,
+      "images": [
+        "M100784216_SDLCJA_Custom_DTF_Charcoal_Jacket.png",
+        "M102986110_SHE1CJ_CustomCrimson_Fleece_Jacket.png",
+        "M104202880_SHE2CJ_Custom_Logo_Jacket.png"
+      ]
+    },
+    {
+      "name": "Flannel Pajama Pants",
+      "path": "flannels",
+      "hasSizeOptions": true,
+      "images": [
+        "M100784122_SHPHFD_Custom_DTF_Flannels.png",
+        "M100785570_SDGMPF_Game_Master_DTF_Flannels.png"
+      ]
+    },
+    {
+      "name": "Sweatpants & Joggers",
+      "path": "pants",
+      "hasPantOptions": true,
+      "pantStyles": [
+        "sweatpants",
+        "joggers"
+      ],
+      "images": [
+        "M100784033_SHPHDS_Custom_DTF_Steel_Pants.png",
+        "M100785388_SDINPS_Initiative_DTF_Steel_Pants.png"
+      ]
+    },
+    {
+      "name": "Shorts",
+      "path": "shorts",
+      "hasSizeOptions": true,
+      "images": [
+        "M100785727_SHSHDS_Custom_DTF_Charcoal_Shorts.png",
+        "M100786420_SHSHDC_Custom_DTFN_Black_Shorts.png",
+        "M103099838_SPSPSS_Custom_DTF_Gray_Stripe_Shorts.png",
+        "M205635443_SDSCSC_Score_DTF_Black_Shorts.png",
+        "M205635635_SDEVSS_Evocation_DTF_Gray_Shorts.png"
+      ]
+    },
+    {
+      "name": "Socks",
+      "path": "socks",
+      "hasSizeOptions": true,
+      "images": [
+        "M100785981_SS8052_Custom_Logo_Socks.png",
+        "M205635738_SS8052_Custom_Socks.png"
+      ]
+    },
+    {
+      "name": "Water Bottles",
+      "path": "bottle",
+      "images": [
+        "M100785836_SHWBOT_Custom_Logo_Water_Bottle.png",
+        "M102005540_SHSSUV_Stainless_Steel_Water_Bottle.png"
+      ]
+    },
+    {
+      "name": "Plush",
+      "path": "plush",
+      "images": [
+        "M100915719_SHPLUD_Custom_Plush_DTF_on_Steel.png"
+      ]
+    },
+    {
+      "name": "Stickers",
+      "path": "sticker",
+      "images": [
+        "M104272333_SHSTPK_Mascot_Sticker_Pack.png",
+        "M104272749_SHSWMS_Swoosh_Sticker_Pack.png"
+      ]
+    },
+    {
+      "name": "Backpack",
+      "path": "backpack",
+      "images": [
+        "M100786180_SDBAPA_Custom_DTF_Back_Pack.png"
+      ]
+    },
+    {
+      "name": "Youth & Infant",
+      "path": "youth&infant",
+      "hasSizeOptions": true,
+      "images": []
+    },
+    {
+      "name": "Signage",
+      "path": "signage",
+      "images": [
+        "M100910849_SHWGCS_Custom_Spinner_Header.png",
+        "M100910918_SHWGCH_Custom_PFD_Header.png",
+        "M103201372_SHMH23_3Ft_Shelf_Magnet.png",
+        "M103360752_SHMH24_4Ft_Shelf_Magnet.png"
+      ]
+    }
+  ]
+}

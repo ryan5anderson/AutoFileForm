@@ -46,6 +46,8 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
       document.documentElement.style.setProperty('--color-primary', '#003594'); // Pitt blue
     } else if (urlCollege === 'alabamauniversity') {
       document.documentElement.style.setProperty('--color-primary', '#9E1B32'); // Alabama Crimson
+    } else if (urlCollege === 'indianauniversity') {
+      document.documentElement.style.setProperty('--color-primary', '#990000'); // IU Crimson
     } else {
       document.documentElement.style.setProperty('--color-primary', '#111111'); // Default black
     }

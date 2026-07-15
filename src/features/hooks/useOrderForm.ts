@@ -24,6 +24,7 @@ export const useOrderForm = (categories: Category[]) => {
         // Always default date to today for each new session.
         parsed.date = today;
         if (!parsed.orderedBy) parsed.orderedBy = '';
+        if (!parsed.poNumber) parsed.poNumber = 'verbal';
         return sanitizeFormDataTextFields(parsed);
       } catch (e) {
         console.error('Failed to load saved form data:', e);
@@ -33,6 +34,7 @@ export const useOrderForm = (categories: Category[]) => {
     return {
       company: '',
       storeNumber: '',
+      poNumber: 'verbal',
       storeManager: '',
       orderedBy: '',
       date: today,

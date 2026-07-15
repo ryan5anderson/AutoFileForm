@@ -2,6 +2,7 @@ import { College } from '../types';
 
 import alabamaUniversityConfig from './colleges/alabamauniversity.json';
 import arizonaStateConfig from './colleges/arizonaState.json';
+import indianaUniversityConfig from './colleges/indianauniversity.json';
 import michiganStateConfig from './colleges/michiganState.json';
 import oregonUniversityConfig from './colleges/oregonUniversity.json';
 import pittsburghUniversityConfig from './colleges/pittsburghuniversity.json';
@@ -15,6 +16,7 @@ const oregonUniversity = oregonUniversityConfig as College;
 const westVirginiaUniversity = westVirginiaUniversityConfig as College;
 const pittsburghUniversity = pittsburghUniversityConfig as College;
 const alabamaUniversity = alabamaUniversityConfig as College;
+const indianaUniversity = indianaUniversityConfig as College;
 
 export const colleges = {
   michiganstate: michiganState,
@@ -23,6 +25,7 @@ export const colleges = {
   westvirginiauniversity: westVirginiaUniversity,
   pittsburghuniversity: pittsburghUniversity,
   alabamauniversity: alabamaUniversity,
+  indianauniversity: indianaUniversity,
 };
 
 // CollegeKey type removed - no external usage found

@@ -22,6 +22,9 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 }) => {
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
+  // Hide categories that have no products
+  const visibleCategories = categories.filter((category) => category.images.length > 0);
+
   React.useEffect(() => {
     const handler = () => onToggle();
     window.addEventListener('global-sidebar-toggle', handler);
@@ -95,7 +98,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             </button>
 
           {/* Categories Dropdown - Only show on form and summary pages */}
-          {showCategories && categories.length > 0 && (
+          {showCategories && visibleCategories.length > 0 && (
             <div className="sidebar-section">
               <button
                 className={`sidebar-nav-item dropdown-toggle ${categoriesExpanded ? 'expanded' : ''}`}
@@ -110,7 +113,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
               {categoriesExpanded && (
                 <div className="dropdown-content">
-                  {categories.map((category) => {
+                  {visibleCategories.map((category) => {
                     const sectionId = getSectionId(category.name);
                     const isActive = activeSection === sectionId;
                     
@@ -133,8 +136,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           {/* About Us & Contact Us Links - Bottom of sidebar */}
           <div className="sidebar-bottom-section">
             <Link
-              to="/"
-              state={{ showApiSchools: false }}
+              to="/local-schools"
               className="sidebar-nav-item sidebar-link"
               onClick={onToggle}
             >

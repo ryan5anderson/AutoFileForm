@@ -25,8 +25,7 @@
         "M104167839_SDHMAS_Hail_Mary_DTF_on_White.png",
         "M104171988_SDDDMS_Dime_Defense_DTF_on_Grays.png",
         "M104172760_SDWSMS_Wheel_Spin_DTF_on_Grays.png",
-        "M104183894_SDBBMS_Buzzer_Beater_DTF_on_Black.png",
-        "M206094970_SDSCSC_Score_DTF_on_Kelly.png"
+        "M104183894_SDBBMS_Buzzer_Beater_DTF_on_Black.png"
       ]
     },
     {
@@ -35,6 +34,9 @@
       "hasShirtVersions": true,
       "shirtVersions": [
         "tshirt"
+      ],
+      "hoodOnlyImages": [
+        "M103290611_SHOTDC_Jr_On_Track_DTF_on_Black.png"
       ],
       "images": [
         "M103290394_SH2FDC_Jr_Custom_DTF_on_Black.png",
@@ -93,6 +95,7 @@
       "images": [
         "M103293136_SDSPSS_Custom_DTF_Side_Print_Shorts.png",
         "M103293295_SDSKSS_Skill_Check_DTF_Gray_Shorts.png",
+        "M206094970_SDSCSC_Score_DTF_on_Kelly.png",
         "M206095041_SDEVSC_Evocation_DTF_Black_Shorts.png"
       ]
     },
