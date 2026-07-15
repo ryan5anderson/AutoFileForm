@@ -194,17 +194,40 @@ interface StoreInfoFields {
   date: string;
 }
 
+/** Exactly five digits (e.g. 12345). Used for API school account name & store number. */
+export const isFiveDigitNumber = (value: string): boolean => /^\d{5}$/.test(value.trim());
+
+export type ValidateStoreInfoOptions = {
+  /** API schools: account name (company) and store number must each be a 5-digit number. */
+  apiSchool?: boolean;
+};
+
 /**
  * Validate store information fields (company, storeNumber, orderedBy, date)
  * @param formData - Form data containing store info fields
+ * @param options - When apiSchool is true, company and storeNumber must be 5-digit numbers
  * @returns { isValid, errorMessage } - Validation result for store info only
  */
-export const validateStoreInfo = (formData: StoreInfoFields): { isValid: boolean; errorMessage: string | null } => {
+export const validateStoreInfo = (
+  formData: StoreInfoFields,
+  options?: ValidateStoreInfoOptions
+): { isValid: boolean; errorMessage: string | null } => {
+  const isApiSchool = options?.apiSchool === true;
   if (!formData.company.trim() || !formData.storeNumber.trim() || !formData.orderedBy.trim() || !formData.date.trim()) {
     return {
       isValid: false,
-      errorMessage: 'Please fill out all store information fields.',
+      errorMessage: isApiSchool
+        ? 'Please fill out all account information fields.'
+        : 'Please fill out all store information fields.',
     };
+  }
+  if (isApiSchool) {
+    if (!isFiveDigitNumber(formData.company) || !isFiveDigitNumber(formData.storeNumber)) {
+      return {
+        isValid: false,
+        errorMessage: 'Account name and store number must each be a 5-digit number (e.g. 12345).',
+      };
+    }
   }
   return {
     isValid: true,
