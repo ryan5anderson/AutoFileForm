@@ -88,7 +88,7 @@ const ApiCollegeOrderForm: React.FC = () => {
       }
       // Store fields are validated by native HTML5 (required) before submit fires.
       // Fallback: if store invalid, trigger native tooltip and stop
-      const storeResult = validateStoreInfo(formData);
+      const storeResult = validateStoreInfo(formData, { apiSchool: true });
       if (!storeResult.isValid) {
         formRef.current?.reportValidity();
         return;
@@ -217,6 +217,7 @@ const ApiCollegeOrderForm: React.FC = () => {
         {!loading && !error && (
           <form ref={formRef} onSubmit={handleFormSubmit}>
             <StoreInfoForm
+              apiSchool
               variant={isStoreManagerLink ? 'prefilledStore' : 'full'}
               formData={formData}
               onFormDataChange={(updates) =>

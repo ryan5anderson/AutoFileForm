@@ -120,9 +120,9 @@ const ApiCollegeSummaryPage: React.FC = () => {
 
   const handleConfirm = useCallback(() => {
     setConfirmationError(null);
-    const storeResult = validateStoreInfo(formData);
+    const storeResult = validateStoreInfo(formData, { apiSchool: true });
     if (!storeResult.isValid) {
-      setConfirmationError(storeResult.errorMessage ?? 'Please fill out all store information fields.');
+      setConfirmationError(storeResult.errorMessage ?? 'Please fill out all account information fields.');
       return;
     }
     if (!hasApiOrderProducts(orderedByProduct, productMap)) {
@@ -212,10 +212,10 @@ const ApiCollegeSummaryPage: React.FC = () => {
 
         <div style={{ background: 'var(--color-bg)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)', border: '1px solid var(--color-border)' }}>
           <h2 style={{ color: 'var(--color-primary)', fontSize: '1.25rem', fontWeight: '600', marginBottom: 'var(--space-3)', borderBottom: '2px solid var(--color-primary)', paddingBottom: 'var(--space-2)' }}>
-            Store Information
+            Account Information
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
-            <div><strong>Store Name:</strong> {formData.company}</div>
+            <div><strong>Account Name:</strong> {formData.company}</div>
             <div><strong>Store Number:</strong> {formData.storeNumber}</div>
             <div><strong>PO Number:</strong> {formData.poNumber || '-'}</div>
             <div><strong>Ordered By:</strong> {formData.orderedBy}</div>
