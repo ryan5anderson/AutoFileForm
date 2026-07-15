@@ -36,16 +36,7 @@ const CollegeSelector: React.FC = () => {
     // Sync cache check: skip loading state when colleges are already cached
     const cached = getCollegesFromCache();
     if (cached) {
-      const seen = new Set<string>();
-      const deduped = cached.filter((college) => {
-        const key = college.school_ID.trim();
-        if (!key || seen.has(key)) {
-          return false;
-        }
-        seen.add(key);
-        return true;
-      });
-      setApiColleges(deduped);
+      setApiColleges(cached);
       setApiError(null);
       return;
     }
@@ -54,16 +45,7 @@ const CollegeSelector: React.FC = () => {
     setApiError(null);
     try {
       const results = await fetchColleges();
-      const seen = new Set<string>();
-      const deduped = results.filter((college) => {
-        const key = college.school_ID.trim();
-        if (!key || seen.has(key)) {
-          return false;
-        }
-        seen.add(key);
-        return true;
-      });
-      setApiColleges(deduped);
+      setApiColleges(results);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to fetch API schools.';
       setApiError(message);

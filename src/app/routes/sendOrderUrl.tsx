@@ -32,19 +32,9 @@ const SendOrderUrlPage: React.FC = () => {
   const listId = 'send-url-college-listbox';
 
   const fetchApiColleges = React.useCallback(async () => {
-    const dedupe = (list: CollegeData[]): CollegeData[] => {
-      const seen = new Set<string>();
-      return list.filter((college) => {
-        const key = normalizeApiOrderTemplateId(college.orderNumTemplate) || college.school_ID.trim();
-        if (!key || seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-    };
-
     const cached = getCollegesFromCache();
     if (cached) {
-      setApiColleges(dedupe(cached));
+      setApiColleges(cached);
       setApiError(null);
       return;
     }
@@ -53,7 +43,7 @@ const SendOrderUrlPage: React.FC = () => {
     setApiError(null);
     try {
       const results = await fetchColleges();
-      setApiColleges(dedupe(results));
+      setApiColleges(results);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : 'Failed to fetch API schools.');
       setApiColleges([]);
