@@ -56,12 +56,13 @@ Additional image/category paths recognized in validation helpers:
 
 ## 3) Pack Size / Set Pack Rules (Source of Truth)
 
-Pack size is resolved in this order:
-1. College-specific Firebase ratio override (if available)
-2. `garment_ratios_final.json` `Set Pack`
-3. `packSizes.ts` fallback logic
+Pack size is resolved in this order (first hit wins; see §9 for known conflicts):
+1. Forced overrides in `packSizes.ts` / `getCorrectPackSize` (beat Firebase and ratios)
+2. College-specific Firebase ratio override (async paths; if available)
+3. `garment_ratios_final.json` `Set Pack`
+4. `packSizes.ts` `PACK_SIZES` / `SPECIAL_PACK_SIZES` fallback logic
 
-Current `Set Pack` values in `garment_ratios_final.json`:
+Current `Set Pack` values in `garment_ratios_final.json` (declarative defaults — forced overrides may override these at runtime):
 
 | Garment | Set Pack |
 |---|---:|
@@ -222,11 +223,40 @@ From `PantOptionsPanel` and types:
 - display cards: `N/A`, quantity `N/A`
 - shelf magnets: `N/A`, quantity `N/A`
 
-## 9) Important Consistency Note
+## 9) Known Pack-Size Conflicts — Runtime Priority Wins
 
-There are intentional/legacy differences between:
-- ratio-driven `Set Pack` values (`garment_ratios_final.json`)
-- fallback config values (`packSizes.ts`)
-- csv snapshot values (`productconfigs.csv`)
+Pack sizes are **not consistent** across config layers. Treat disagreements as known conflicts. Do **not** trust `garment_ratios_final.json` Set Pack, `packSizes.ts` tables, or `productconfigs.csv` in isolation — only the **runtime priority order** below decides what the app enforces.
 
-Current runtime behavior prioritizes ratio/Firebase values first, then falls back.
+### Runtime priority (first hit wins)
+
+Used by `getPackSizeSync` (`packSizes.ts`) and mirrored for local validation in `getCorrectPackSize` (`calculations.ts`):
+
+1. **Forced overrides** — `FORCED_PACK_SIZES` / `FORCED_PACK_SIZES_BY_VERSION` in `packSizes.ts` (and hardcoded early returns in `getCorrectPackSize`). These **beat** Firebase and ratio Set Pack.
+2. **Firebase college `garmentRatios` override** — async paths only (`getPackSizeFromRatios`); most UI sync reads skip this unless college cache is loaded.
+3. **`garment_ratios_final.json` `Set Pack`** — via `getPackSizeFromRatiosSync` (also hardcodes `tshirt/men` + empty/`tshirt` version → `12`).
+4. **`PACK_SIZES` / `SPECIAL_PACK_SIZES` fallbacks** in `packSizes.ts` (name-based specials, then category defaults, then `7`).
+
+§3 documents declarative Set Pack / fallback tables; when those tables disagree, **this section’s priority is authoritative**.
+
+### Known conflicts (do not “fix” the lower layer)
+
+| Garment / path | Set Pack (JSON) | Forced / `packSizes.ts` | `productconfigs.csv` | Runtime uses |
+|---|---:|---:|---:|---:|
+| flannels | 6 | **8** (forced) | 8 | **8** (forced wins over ratio) |
+| sweatpants / pants | 6 | **4** (forced) | 4 | **4** (forced wins over ratio) |
+| bottle | null | **3** (forced) | N/A | **3** (forced; not ratio) |
+| longsleeve | **7** | 6 (`PACK_SIZES`) | 6 or any | **7** (ratio wins over PACK_SIZES) |
+| crewneck | **5** | 6 (`PACK_SIZES`) | 6 or any | **5** (ratio wins over PACK_SIZES) |
+| hoodie | **8** | 6 (`PACK_SIZES`) | 6 or any | **8** (ratio wins over PACK_SIZES) |
+| womens-tshirt | **5** | 5 | 4 | **5** (ratio; CSV is stale) |
+| youth | **10** | 6 (`youth&infant` fallback) | — | **10** (ratio wins over PACK_SIZES) |
+| sticker | null | **7** (fallback) | 7 | **7** (fallback; JSON has no Set Pack) |
+| tshirt (men) | 12 | 12 | 6 or any | **12** (ratio / hardcode; CSV is stale) |
+
+Aligned (no conflict): jacket `6`, shorts `4`, socks `6`, infant `6`, plush fallback `6`, signage `1`.
+
+### Practical rule
+
+- Reading **JSON Set Pack alone** for flannels/sweatpants/bottle will give the **wrong** enforced pack size.
+- Reading **`packSizes.ts` PACK_SIZES alone** for longsleeve/crewneck/hoodie/youth will give the **wrong** enforced pack size.
+- **`productconfigs.csv` is a snapshot**, not runtime truth (especially tshirt/womens rows).

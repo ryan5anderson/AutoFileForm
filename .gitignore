@@ -11,6 +11,12 @@
 # production
 /build
 
+# local tool settings
+.claude/
+
+# source flyer PDFs (large, local-only)
+scripts/*.pdf
+
 # misc
 .DS_Store
 .env
