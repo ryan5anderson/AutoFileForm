@@ -97,9 +97,10 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
         </div>
       );
     } else {
-      // Sweatpants have 3 colors - split into two rows
+      // Sweatpants: Steel and Black for all schools; Dark Navy only for WVU
       const firstRowColors: Array<'steel' | 'black'> = ['steel', 'black'];
-      const secondRowColors: Array<'darkNavy'> = ['darkNavy'];
+      const showDarkNavy = collegeKey === 'westvirginiauniversity';
+      const secondRowColors: Array<'darkNavy'> = showDarkNavy ? ['darkNavy'] : [];
 
       return (
         <div style={{ width: '100%' }}>
@@ -109,7 +110,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
             flexDirection: 'row',
             gap: 'var(--space-3)',
             width: '100%',
-            marginBottom: 'var(--space-3)'
+            marginBottom: showDarkNavy ? 'var(--space-3)' : 0
           }}>
             {firstRowColors.map((color) => (
               <div key={color} style={{
@@ -140,7 +141,8 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
             ))}
           </div>
 
-          {/* Second row with Dark Navy centered */}
+          {/* Second row with Dark Navy centered (WVU only) */}
+          {showDarkNavy && (
           <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -174,6 +176,7 @@ const PantOptionsPanel: React.FC<PantOptionsPanelProps> = ({
               </div>
             ))}
           </div>
+          )}
         </div>
       );
     }

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import { colleges } from '../../config';
 import { useOrderForm } from '../../features/hooks';
-import { getProductName, getVersionDisplayName, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
+import { getDisplayProductName, getVersionDisplayName, getRackDisplayName, getFilteredShirtVersions } from '../../features/utils';
 import { FormData, Category, ShirtVersion, SizeCounts } from '../../types';
 import Footer from '../layout/Footer';
 import '../../styles/college-pages.css';
@@ -196,7 +196,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
               </div>
               {category.images.map((img) => {
                 const imagePath = `${category.path}/${img}`;
-                const productName = category.name === 'Display Options' ? getRackDisplayName(img) : getProductName(img);
+                const productName = category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img, category.path);
                 // Handle Display Options
                 if (category.hasDisplayOptions) {
                   const displayOption = formData.displayOptions?.[imagePath];
@@ -496,7 +496,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
 
                         if (versionTotal > 0) {
                           totalShirtQty += versionTotal;
-                          const displayName = getVersionDisplayName(version);
+                          const displayName = getVersionDisplayName(version, img, category.path);
                           
                           Object.entries(byColor)
                             .filter(([_, counts]) => counts && Object.values(counts).some(qty => qty > 0))
@@ -578,7 +578,7 @@ const ReceiptPage: React.FC<ReceiptPageProps> = ({
                     const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
                     if (vTotal > 0) {
                       totalQty += vTotal;
-                      const displayName = getVersionDisplayName(version);
+                      const displayName = getVersionDisplayName(version, img, category.path);
                       const sizeOrder: ('XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
                       
                       // Format sizes as "M: 1" etc.

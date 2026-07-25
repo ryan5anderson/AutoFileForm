@@ -124,7 +124,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const imagePath = `${category.path}/${imageName}`;
   const productName = category.name === 'Display Options'
     ? getRackDisplayName(imageName)
-    : getDisplayProductName(imageName);
+    : getDisplayProductName(imageName, category.path);
 
   const handleDone = () => {
     // Navigate back and pass state to restore scroll position
@@ -313,7 +313,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 color: 'var(--color-text)',
                 marginBottom: 'var(--space-3)'
               }}>
-                {getVersionDisplayName(version, imageName)}
+                {getVersionDisplayName(version, imageName, category.path)}
               </div>
               <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
               <ColorSizeSelector
@@ -343,7 +343,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 color: 'var(--color-text)',
                 marginBottom: 'var(--space-3)'
               }}>
-                {getVersionDisplayName(version, imageName)}
+                {getVersionDisplayName(version, imageName, category.path)}
               </div>
               <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
               <SizePackSelector
@@ -371,7 +371,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 className={`product-detail-tab ${activeTab === version ? 'product-detail-tab--active' : ''}`}
                 onClick={() => setActiveTab(version)}
               >
-                {getVersionDisplayName(version, imageName)}
+                {getVersionDisplayName(version, imageName, category.path)}
               </button>
             ))}
           </div>
@@ -453,9 +453,32 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         version = 'stickers';
       }
       const versionKey = version;
-      const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
       const packSize = packSizes[version] || packSizes['default'] || 6;
       const sizesArray = getSizeOptions(category.path, version, college);
+      const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
+      const hasColors = colors.length > 0;
+
+      if (hasColors) {
+        const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || {};
+        return (
+          <>
+            <div style={{ textAlign: 'center' }}>Choose your sizes or select a curated pack</div>
+            <ColorSizeSelector
+              colors={colors}
+              colorSizeCounts={colorSizeCounts}
+              onChange={(color, counts) => onShirtColorSizeCountsChange?.(imagePath, versionKey as keyof ShirtVersion, color, counts)}
+              categoryPath={category.path}
+              version={version}
+              sizes={sizesArray}
+              packSize={packSize}
+              allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
+              collegeKey={college}
+            />
+          </>
+        );
+      }
+
+      const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
 
       return (
         <>

@@ -137,7 +137,7 @@ const AdminProductDetail: React.FC = () => {
   const imagePath = `${category.path}/${imageName}`;
   const productName = category.name === 'Display Options'
     ? getRackDisplayName(imageName)
-    : getDisplayProductName(imageName);
+    : getDisplayProductName(imageName, category.path);
 
   const handleBack = () => {
     navigate(`/admin/college/${collegeKey}`);
@@ -372,7 +372,7 @@ const AdminProductDetail: React.FC = () => {
                   <>
                     <div className="product-detail-tabs">
                       {versionsToDisplay.map((version) => {
-                        const versionDisplayName = version ? getVersionDisplayName(version) : 'Default';
+                        const versionDisplayName = version ? getVersionDisplayName(version, imageName, category.path) : 'Default';
                         const { packSize, sizeScale, sizeDistribution } = getRatioInfo(version);
                         const hasInfo = packSize !== null || sizeScale || (sizeDistribution && Object.keys(sizeDistribution).length > 0);
                         

@@ -101,7 +101,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             });
             
             if (colorsWithQuantity.length > 0) {
-              const displayName = getVersionDisplayName(version);
+              const displayName = getVersionDisplayName(version, undefined, category.path);
               // Group colors in parentheses: "T-Shirt (Black, Forest)"
               if (colorsWithQuantity.length > 1) {
                 variations.push(`${displayName} (${colorsWithQuantity.join(', ')})`);
@@ -120,7 +120,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           if (counts) {
             const hasQuantity = Object.values(counts).some((qty) => qty > 0);
             if (hasQuantity) {
-              const displayName = getVersionDisplayName(version);
+              const displayName = getVersionDisplayName(version, undefined, category.path);
               if (!variations.includes(displayName)) {
                 variations.push(displayName);
               }
@@ -134,9 +134,29 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       if (shirtVersion) {
         Object.entries(shirtVersion).forEach(([version, qty]) => {
           if (qty && Number(qty) > 0) {
-            const displayName = getVersionDisplayName(version);
+            const displayName = getVersionDisplayName(version, undefined, category.path);
             if (!variations.includes(displayName)) {
               variations.push(displayName);
+            }
+          }
+        });
+      }
+    }
+
+    // Handle size-option products with color choices (e.g. Heather/Black shorts)
+    if (category.hasSizeOptions && hasColorOptions(imageName)) {
+      const colorSizeCountsByVersion = shirtColorSizeCounts?.[imagePath];
+      if (colorSizeCountsByVersion) {
+        Object.entries(colorSizeCountsByVersion).forEach(([, byColor]) => {
+          if (byColor) {
+            const colorsWithQuantity: string[] = [];
+            Object.entries(byColor).forEach(([colorName, counts]) => {
+              if (counts && Object.values(counts).some((qty) => qty > 0)) {
+                colorsWithQuantity.push(colorName.charAt(0).toUpperCase() + colorName.slice(1));
+              }
+            });
+            if (colorsWithQuantity.length > 0) {
+              variations.push(colorsWithQuantity.join(', '));
             }
           }
         });
@@ -598,7 +618,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                 <h3 className={`card__title ${isInCartState ? 'card__title--in-cart' : 'card__title--default'}`}>
                   {productTitleResolver
                     ? productTitleResolver(category.path, img, imagePath)
-                    : (category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img))}
+                    : (category.name === 'Display Options' ? getRackDisplayName(img) : getDisplayProductName(img, category.path))}
                 </h3>
 
                 <div className="card__image-container">
@@ -620,7 +640,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                         Available on{'\n'}
                         {availableVariants.map((v, i) => (
                           <span key={v}>
-                            {apiProductMap?.[img]?.variantDisplayNameByKey?.[v] || getVersionDisplayName(v)}
+                            {apiProductMap?.[img]?.variantDisplayNameByKey?.[v] || getVersionDisplayName(v, img, category.path)}
                             {i < availableVariants.length - 1 ? ' \u2022 ' : ''}
                           </span>
                         ))}

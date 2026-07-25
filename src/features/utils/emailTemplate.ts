@@ -2,7 +2,7 @@ import { PROVIDER_EMAIL } from '../../constants';
 import { Category, FormData, EmailCategory, EmailItem, TemplateParams, ShirtVersion, SizeCounts } from '../../types';
 
 import { calculateTotalUnits } from './calculations';
-import { getVersionDisplayName } from './naming';
+import { getVersionDisplayName, hasColorOptions } from './naming';
 
 import { getFilteredShirtVersions } from './index';
 
@@ -161,7 +161,7 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
           for (const version of filteredVersions) {
             const byColor = colorSizeCountsByVersion[version as keyof ShirtVersion];
             if (byColor) {
-              const versionName = getVersionDisplayName(version, img);
+              const versionName = getVersionDisplayName(version, img, cat.path);
               const versionTotal = Object.values(byColor).reduce((sum, counts) =>
                 sum + Object.values(counts || {}).reduce((a, b) => a + b, 0), 0);
 
@@ -211,7 +211,7 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
             const vTotal = counts ? Object.values(counts).reduce((a,b)=>a+b,0) : 0;
             if (vTotal > 0) {
               totalQty += vTotal;
-              const versionName = getVersionDisplayName(version, img);
+              const versionName = getVersionDisplayName(version, img, cat.path);
               // Format sizes as "S: 1 M: 2 XL: 3" etc.
               const sizeOrder: ('XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
               const formattedSizes = counts ? sizeOrder
@@ -260,6 +260,48 @@ const createEmailCategories = (formData: FormData, categories: Category[]): Emai
           }
         }
       } else if (cat.hasSizeOptions) {
+        // For size options with color choices (e.g. Heather/Black shorts)
+        const colorSizeCountsByVersion = formData.shirtColorSizeCounts?.[imagePath];
+        if (colorSizeCountsByVersion && hasColorOptions(img)) {
+          const colorGroups: Map<string, string[]> = new Map();
+          let totalQty = 0;
+
+          Object.entries(colorSizeCountsByVersion).forEach(([, byColor]) => {
+            if (!byColor) return;
+            Object.entries(byColor).forEach(([colorName, counts]) => {
+              if (!counts) return;
+              const colorTotal = Object.values(counts).reduce((a, b) => a + b, 0);
+              if (colorTotal <= 0) return;
+              totalQty += colorTotal;
+
+              const sizeOrder: ('XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL'|'S/M'|'L/XL'|'SM')[] = ['XS','S','M','L','XL','XXL','XXXL','S/M','L/XL','SM'];
+              sizeOrder.forEach(sz => {
+                const val = counts[sz] || 0;
+                if (val > 0) {
+                  if (!colorGroups.has(colorName)) {
+                    colorGroups.set(colorName, []);
+                  }
+                  colorGroups.get(colorName)!.push(`${sz}:${val}`);
+                }
+              });
+            });
+          });
+
+          const colorLines: string[] = [];
+          colorGroups.forEach((sizes, colorName) => {
+            colorLines.push(`${colorName}: ${sizes.join(', ')}`);
+          });
+
+          if (colorLines.length > 0) {
+            categoryItems.push({
+              sku,
+              name: colorLines.join(' ; '),
+              qty: String(totalQty)
+            });
+            return;
+          }
+        }
+
         // For size options categories (flannels, jackets, etc.), create items using size counts
         const sizeByVersion = (formData.shirtSizeCounts?.[imagePath] || {}) as Record<string, SizeCounts>;
 

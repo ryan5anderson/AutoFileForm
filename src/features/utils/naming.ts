@@ -13,9 +13,17 @@ export const getProductName = (imageName: string): string => {
   return baseName;
 };
 
+const isWomensTopCategory = (categoryPath?: string): boolean =>
+  categoryPath === 'tshirt/women';
+
+const appendVNeckToTitle = (name: string): string => {
+  if (name.toLowerCase().includes('v-neck')) return name;
+  return `${name} V-neck`;
+};
+
 // Get display name for user-facing pages (removes product ID and codes)
 // Example: "M102073197_SDCAVC_Cavalier_DTF_on_Maroon" -> "Cavalier DTF on Maroon"
-export const getDisplayProductName = (imageName: string): string => {
+export const getDisplayProductName = (imageName: string, categoryPath?: string): string => {
   const baseName = imageName.replace(/\.(png|jpg)$/, '');
 
   // Custom display names for specific sweatpant items (with ID/codes removed)
@@ -25,7 +33,12 @@ export const getDisplayProductName = (imageName: string): string => {
     'M100448649 SHFDDS Force Down DTF Gray Pants Straight-Leg.png': 'Force Down DTF Pants',
   };
 
-  if (sweatpantDisplayMapping[imageName]) return sweatpantDisplayMapping[imageName];
+  if (sweatpantDisplayMapping[imageName]) {
+    const mappedName = sweatpantDisplayMapping[imageName];
+    return isWomensTopCategory(categoryPath) ? appendVNeckToTitle(mappedName) : mappedName;
+  }
+
+  let displayName: string;
 
   // Step 1: Find the second underscore and remove everything before it (including the second underscore)
   const firstUnderscoreIndex = baseName.indexOf('_');
@@ -36,13 +49,16 @@ export const getDisplayProductName = (imageName: string): string => {
       const afterSecondUnderscore = baseName.substring(secondUnderscoreIndex + 1);
       // Step 2: Replace remaining underscores with spaces
       const cleanedName = afterSecondUnderscore.replace(/_/g, ' ').trim();
-      return removeColorFromPantsTitle(cleanedName || baseName);
+      displayName = removeColorFromPantsTitle(cleanedName || baseName);
+    } else {
+      displayName = removeColorFromPantsTitle(baseName.replace(/_/g, ' ').trim());
     }
+  } else {
+    // Fallback: just replace underscores with spaces if pattern doesn't match
+    displayName = removeColorFromPantsTitle(baseName.replace(/_/g, ' ').trim());
   }
 
-  // Fallback: just replace underscores with spaces if pattern doesn't match
-  const fallbackName = baseName.replace(/_/g, ' ').trim();
-  return removeColorFromPantsTitle(fallbackName);
+  return isWomensTopCategory(categoryPath) ? appendVNeckToTitle(displayName) : displayName;
 };
 
 // Remove color words from sweatpants/joggers titles
@@ -100,10 +116,12 @@ export const getRackDisplayName = (imageName: string): string => {
   return baseName.replace(/_/g, ' ').trim();
 };
 
-export const getVersionDisplayName = (version: string, imageName?: string): string => {
+export const getVersionDisplayName = (version: string, imageName?: string, categoryPath?: string): string => {
   let display = '';
   switch (version) {
-    case 'tshirt': display = 'T-Shirt'; break;
+    case 'tshirt':
+      display = isWomensTopCategory(categoryPath) ? 'V-neck T-Shirt' : 'T-Shirt';
+      break;
     case 'longsleeve': display = 'Long Sleeve T-shirt'; break;
     case 'hoodie': display = 'Hoodie'; break;
     case 'crewneck': display = 'Crew Sweatshirt'; break;
@@ -134,6 +152,8 @@ const explicitColorOptions: Record<string, string[]> = {
   'M206217389_SHE1CH_Athletic_Mark_Gray_or_White_Hat.png': ['Gray', 'White'],
   'M101362966_SHE1CB_Custom_Gray_or_White_Beanie.png': ['Gray', 'White'],
   'M101363128_SHE1CB_Custom_Gray_or_White_Beanie.png': ['Gray', 'White'],
+  // Arizona State shorts
+  'M103372816_SHSHDC_DTF_DK_Heather_or_Black_Shorts.png': ['Heather', 'Black'],
 };
 
 // Check if a product has multiple color options
@@ -182,6 +202,12 @@ export const getColorOptions = (imageName: string): string[] => {
   const twoColorMatch = imageName.match(/on_(\w+)_or_(\w+)(?:_(?:Hat|Beanie))?\./i);
   if (twoColorMatch) {
     return [twoColorMatch[1], twoColorMatch[2]];
+  }
+
+  // Shorts pattern: "..._Color1_or_Color2_Shorts.png"
+  const shortsColorMatch = imageName.match(/_(\w+)_or_(\w+)_Shorts\./i);
+  if (shortsColorMatch) {
+    return [shortsColorMatch[1], shortsColorMatch[2]];
   }
   
   return [];
