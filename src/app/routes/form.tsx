@@ -86,7 +86,7 @@ const FormPage: React.FC<FormPageProps> = ({
   };
 
   const handleBackToColleges = () => {
-    navigate('/local-schools');
+    navigate('/');
   };
 
   useEffect(() => {

@@ -1,43 +1,30 @@
-# Known Issues — V0 / V1 Fix List
+# Known Issues
 
-Distilled from [`V0_SYSTEM_REFERENCE.md`](./V0_SYSTEM_REFERENCE.md) §9. Each item is a v0 defect or fragile area that v1 should close (or deliberately drop). Details and file references live in the system reference.
+Open defects and fragile areas in the local-catalog app. Details live in [V0_SYSTEM_REFERENCE.md](./V0_SYSTEM_REFERENCE.md).
 
 ---
 
-## Architecture / correctness
+## Submit
 
-1. **Submit ordering** — Firebase write + email run before the on-prem POST; a failed POST leaves a saved/emailed orphan with no retry. `emailSent: true` is hardcoded regardless of send outcome.
-2. **Local orders never reach on-prem** — known gap (`LOCAL_ORDER_REVIEW_PLAN.md`); v1 drops local schools entirely.
-3. **Hardcoded submit URL** — `mytownoriginals.com` is baked into `api/submitorder.ts` while reads use `TARGET_API_URL`. Both on-prem hosts are plain HTTP.
-4. **"ORDER REVIEW" filter** — uppercase `SHIRTNAME` substring check duplicated in two places that must stay in sync.
-5. **Trailing-space template IDs** — API values often need trim/`%20` encoding; v1 must replicate or fix upstream.
-6. **Malformed image URLs** — `http:` patched to `http://` in the proxy helper.
-7. **Lenient `school-page` parsing** — on-prem returns wrong content-types / HTML error pages.
-8. **CORS / image proxy** — `Access-Control-Allow-Origin: *` everywhere; images round-trip through `/api/proxy-image`.
+1. **`emailSent` is hardcoded `true`** in `firebaseOrderService.addOrder` before EmailJS actually succeeds. A failed send still looks sent in Firestore.
+2. **Firebase write happens before email.** If the email fails, the order is already saved and the user sees an error with no automatic retry.
 
 ## Security
 
-9. **Admin password in the client bundle** — compared client-side; 15-min sessionStorage; admin sub-routes not gated.
-10. **Firestore effectively open** — client SDK, no auth; anyone can read/write orders and ratios.
-11. **Public receipts** — `/receipt/:orderId` exposes full order details.
-12. **Open submit proxy** — `/api/submitorder` forwards arbitrary JSON to on-prem.
+3. **Admin password is in the client bundle** — compared in the browser; 15-minute `sessionStorage`; admin sub-routes are not re-gated.
+4. **Firestore is open to the client SDK** — no Auth. Deployed rules must allow the unauthenticated reads and writes the app performs.
+5. **Public receipts** — `/receipt/:orderId` shows the full stored order to anyone with the id.
 
-## Dead / legacy / inconsistent
+## Rules and data
 
-13. **Legacy pant path** — `sweatpantJoggerOptions` still in validation/email/receipt; superseded by `pantOptions`.
-14. **Diagnostic leftovers** — `/test-api/*`, `fetchCollegeOrder`, deprecated `checkProxyHealth`.
-15. **Stale docs** — README/`review.txt` claim wrong React/TS versions, missing deps, HashRouter, deleted routes/components.
-16. **Dead Order fields** — `products` and `adminNotes` declared but never written.
-17. **Pack-size truth split across four layers** — real conflicts (flannels 8 vs 6, sweatpants 4 vs 6, sticker 7 vs 20, crewneck 5 vs 6). See also `GARMENT_RULES_REFERENCE.md` §9.
-18. **Debug noise in production** — style-`3930R` traces (dev-only) plus full-order `console.info` on every submit (production).
-19. **Committed junk** — `build/404.html`, workspace screenshot assets, `.claude/settings.local.json`, scratch notes.
-20. **Hardcoded college maps** — theming/folder fallbacks, filename→color, MSU-only rack names; unknown college → ArizonaState.
-21. **Peer-dep papering** — `.npmrc` / install `--legacy-peer-deps` for router 7 / CRA 5.
-22. **Tests not in CI** — only categorization + serialization suites exist; nothing runs them automatically.
-23. **Store-manager links leak IDs** — account/store/PO in plain query strings.
-24. **No draft schema versioning** — beyond `ORDERED1..5` migration; colleges cache key manually `_v1`.
-25. **Display options unvalidated** — empty validation block despite “max 4” business rule.
+6. **Legacy pant path** — `sweatpantJoggerOptions` is still in validation, email, and receipt alongside `pantOptions`.
+7. **Dead Order fields** — `products` and `adminNotes` are declared on `Order` and never written.
+8. **Pack sizes disagree across layers** — forced overrides, Firebase ratios, `garment_ratios_final.json`, and `packSizes.ts` can conflict (flannels, sweatpants, stickers, crewneck). See [GARMENT_RULES_REFERENCE.md](./GARMENT_RULES_REFERENCE.md).
+9. **Display options are not validated** — the validation block is empty despite a "max 4" business rule.
+10. **Unknown college image folders fall back to Arizona State** — `getCollegeFolderName` in `src/utils/asset.ts`.
+11. **Old non-catalog orders** — a Firestore `college` value that is not one of the seven keys (for example a historical `api-school:…` id) is rendered from stored `emailTemplateParams` on `/receipt/:orderId`, not from the live catalog.
 
----
+## Tooling
 
-When an item is fixed or intentionally dropped in v1, strike it here and note the ruling in `V1_SPEC.md` / `V1_PLAN.md`.
+12. **Peer dependencies** — `.npmrc` and the Vercel install command use `--legacy-peer-deps` for React Router 7 with Create React App 5.
+13. **No automated tests** — the Jest suites that existed covered the removed catalog API. Nothing runs in CI.

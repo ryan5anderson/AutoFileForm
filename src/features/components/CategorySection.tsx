@@ -34,13 +34,7 @@ interface CategorySectionProps {
   productTitleResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
   productDetailPathResolver?: (categoryPath: string, imageName: string, imagePath: string) => string;
   showTapToSelectText?: boolean;
-  /** API school mode: ordered product selections by productId */
-  apiOrderedByProduct?: Record<string, { activeVariant: string; variantQuantities: Record<string, Record<string, number>> }>;
-  /** API school mode: product map by productId */
-  apiProductMap?: Record<string, { variantOptions?: string[]; defaultVariant?: string; variantDisplayNameByKey?: Record<string, string> }>;
-  /** API school mode: get cart items for In Cart bar - returns variant totals and optional size details */
-  getApiCartItems?: (imagePath: string, imageName: string) => { label: string; qty: number; sizeDetail?: string }[];
-  /** Enables API-style catalog card UX for local school flows */
+  /** Catalog card UX with availability line, cart footer, and choose button */
   useCatalogCardUi?: boolean;
 }
 
@@ -70,9 +64,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   productTitleResolver,
   productDetailPathResolver,
   showTapToSelectText = true,
-  apiOrderedByProduct,
-  apiProductMap,
-  getApiCartItems,
   useCatalogCardUi = false,
 }) => {
   const navigate = useNavigate();
@@ -438,24 +429,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     return hasQuantity(imagePath, img);
   });
 
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
-    if (!apiProductMap) return;
-    const debugCards = filteredImages.map((imageName) => {
-      const product = apiProductMap[imageName];
-      return {
-        imageName,
-        variantOptions: product?.variantOptions || [],
-      };
-    });
-    // eslint-disable-next-line no-console
-    console.debug('[api-school] category card render inputs', {
-      categoryPath: category.path,
-      cardCount: filteredImages.length,
-      cards: debugCards,
-    });
-  }, [apiProductMap, category.path, filteredImages]);
-
   // Hide categories that have no products at all
   if (category.images.length === 0) {
     return null;
@@ -531,17 +504,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           const shouldHighlight = hasValidationError;
           const totalQuantity = getQuantityTotal(imagePath, img);
           const hasAnyQuantity = totalQuantity > 0;
-          const shouldUseCatalogCardUi = !readOnly && (useCatalogCardUi || Boolean(apiProductMap));
+          const shouldUseCatalogCardUi = !readOnly && useCatalogCardUi;
           const isInCartState = hasAnyQuantity && !shouldHighlight && shouldUseCatalogCardUi;
-          const formatApiCartItem = (item: { label: string; qty: number; sizeDetail?: string }) =>
-            `${item.label}: ${item.qty}${item.sizeDetail ? ` (${item.sizeDetail})` : ''}`;
-          const apiCartItems = getApiCartItems ? getApiCartItems(imagePath, img) : [];
-          const cartDetails = getApiCartItems
-            ? apiCartItems.map(formatApiCartItem)
-            : getCartVariations(imagePath, img);
+          const cartDetails = getCartVariations(imagePath, img);
           const availableVariants = (() => {
-            const apiVariants = apiProductMap?.[img]?.variantOptions;
-            if (apiVariants && apiVariants.length > 0) return apiVariants;
             if (category.hasShirtVersions && category.shirtVersions && category.shirtVersions.length > 0) {
               return getFilteredShirtVersions(img, category.shirtVersions, category.tieDyeImages, category.crewOnlyImages, category.hoodOnlyImages);
             }
@@ -551,8 +517,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           // versions, even if this specific product is limited to one (e.g.
           // "Available on Hoodie" for a hoodie-only product).
           const categoryHasMultipleVariants =
-            (apiProductMap?.[img]?.variantOptions?.length || 0) > 1 ||
-            (category.hasShirtVersions && (category.shirtVersions?.length || 0) > 1);
+            category.hasShirtVersions && (category.shirtVersions?.length || 0) > 1;
           const showAvailabilityLine = categoryHasMultipleVariants && availableVariants.length > 0;
           const selectedOptions = cartDetails.length > 0
             ? cartDetails
@@ -566,7 +531,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           return (
             <Card
               key={img}
-              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''} ${shouldUseCatalogCardUi ? 'card--catalog-enhanced' : ''} ${apiProductMap ? 'card--api-school' : ''} ${isInCartState ? 'card--in-cart' : ''}`}
+              className={`${shouldBeClickable ? 'card--clickable' : ''} ${shouldHighlight ? 'card--validation-error' : ''} ${shouldUseCatalogCardUi ? 'card--catalog-enhanced' : ''} ${isInCartState ? 'card--in-cart' : ''}`}
               style={shouldHighlight ? {
                 position: 'relative',
                 overflow: 'hidden'
@@ -640,7 +605,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                         Available on{'\n'}
                         {availableVariants.map((v, i) => (
                           <span key={v}>
-                            {apiProductMap?.[img]?.variantDisplayNameByKey?.[v] || getVersionDisplayName(v, img, category.path)}
+                            {getVersionDisplayName(v, img, category.path)}
                             {i < availableVariants.length - 1 ? ' \u2022 ' : ''}
                           </span>
                         ))}
@@ -680,45 +645,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   </p>
                 )}
 
-                {readOnly && hasAnyFormData && apiProductMap && getApiCartItems && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '8px',
-                    left: '8px',
-                    right: '8px',
-                    background: 'var(--color-primary)',
-                    color: 'white',
-                    padding: '4px 8px',
-                    borderRadius: 'var(--radius)',
-                    fontSize: '0.75rem',
-                    fontWeight: '500',
-                    zIndex: 1,
-                    opacity: 0.9
-                  }}>
-                    <div>
-                      <div style={{ fontWeight: '600', marginBottom: '2px' }}>
-                        Qty: {totalQuantity}
-                      </div>
-                      {selectedOptions.length > 0 && (
-                        <div style={{
-                          fontSize: '0.65rem',
-                          opacity: 0.9,
-                          whiteSpace: 'normal',
-                          wordBreak: 'break-word',
-                          overflowWrap: 'break-word'
-                        }}>
-                          {selectedOptions.map((option, optionIdx) => (
-                            <div key={`${option}-${optionIdx}`}>
-                              {option}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {readOnly && hasAnyFormData && (!apiProductMap || !getApiCartItems) && (
+                {readOnly && hasAnyFormData && (
                   <OrderSummaryCard
                     categoryPath={category.path}
                     imageName={img}

@@ -57,6 +57,28 @@ import pandas as pd
 import zipfile
 from typing import List, Tuple, Dict, Any, Optional, Set
 
+CATALOG_OVERRIDES: Dict[str, Dict[str, Set[str]]] = {
+    "WestVirginiaUniversity": {
+        "preserve_images": {
+            "tshirt/men/M89672118_SH2FDC_Custom_WV_DTF_Logo_on_Tie_Dye.png",
+        },
+        "exclude_product_codes": {
+            "M206830583",
+            "M206830611",
+            "M204655183",
+            "M103581810",
+            "M204655051",
+        },
+    },
+}
+
+CATEGORY_METADATA: Dict[str, Dict[str, Any]] = {
+    "polo": {
+        "name": "Polos",
+        "hasSizeOptions": True,
+    },
+}
+
 # ----------------------------
 # Utilities
 # ----------------------------
@@ -99,15 +121,22 @@ def prompt_college_selection() -> Tuple[str, str]:
         else:
             print("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, or 7.")
 
-def clean_existing_images(college_dir: Path) -> int:
+def clean_existing_images(
+    college_dir: Path,
+    preserved_relative_paths: Optional[Set[str]] = None,
+) -> int:
     """
     Delete all existing images in the college directory (clean slate).
-    Keeps folder structure intact.
+    Keeps folder structure and explicitly preserved images intact.
     Returns count of deleted files.
     """
     if not college_dir.exists():
         return 0
-    
+
+    preserved_paths = {
+        Path(relative_path).as_posix().lower()
+        for relative_path in (preserved_relative_paths or set())
+    }
     deleted_count = 0
     image_extensions = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.webp', '*.svg']
     
@@ -117,6 +146,9 @@ def clean_existing_images(college_dir: Path) -> int:
         for ext in image_extensions:
             for img_file in root_path.glob(ext):
                 if img_file.is_file():
+                    relative_path = img_file.relative_to(college_dir).as_posix().lower()
+                    if relative_path in preserved_paths:
+                        continue
                     img_file.unlink()
                     deleted_count += 1
     
@@ -194,6 +226,7 @@ def update_college_config(
                 "path": category_path,
                 "images": sorted(image_files)
             }
+            new_category.update(CATEGORY_METADATA.get(category_path, {}))
             
             # If this is tshirt/men category with hood-only items, add hoodOnlyImages field
             if category_path == "tshirt/men" and hood_only_images:
@@ -271,17 +304,19 @@ def categorize_image(caption: str) -> Optional[str]:
     15. plush → plush/
     16. fleece → jacket/
     17. jacket → jacket/
-    18. side_print → shorts/
-    19. side stripe → shorts/
-    20. shorts → shorts/
-    21. socks → socks/
-    22. sticker → sticker/
-    23. jogger → pants/
-    24. pant → pants/
-    25. pants → pants/
-    26. Hood → tshirt/men/ (hoodie only)
-    27. jr (as word) → tshirt/women/
-    28. default → tshirt/men/
+    18. polo → polo/
+    19. SDSBPC product style → shorts/
+    20. side_print → shorts/
+    21. side stripe → shorts/
+    22. shorts → shorts/
+    23. socks → socks/
+    24. sticker → sticker/
+    25. jogger → pants/
+    26. pant → pants/
+    27. pants → pants/
+    28. Hood → tshirt/men/ (hoodie only)
+    29. jr (as word) → tshirt/women/
+    30. default → tshirt/men/
     """
     caption_lower = caption.lower()
     
@@ -326,6 +361,10 @@ def categorize_image(caption: str) -> Optional[str]:
         return "jacket"
     if "jacket" in caption_lower:
         return "jacket"
+    if "polo" in caption_lower:
+        return "polo"
+    if "sdsbpc" in caption_lower:
+        return "shorts"
     if "side_print" in caption_lower or "side print" in caption_lower:
         return "shorts"
     if "side stripe" in caption_lower or "side_stripe" in caption_lower:
@@ -528,6 +567,7 @@ def extract_images_with_captions(
     max_vertical_gap: float = 110.0,
     min_overlap_ratio: float = 0.30,
     debug: bool = False,
+    excluded_product_codes: Optional[Set[str]] = None,
 ) -> Path:
     outdir.mkdir(parents=True, exist_ok=True)
     doc = fitz.open(pdf_path.as_posix())
@@ -536,6 +576,7 @@ def extract_images_with_captions(
     saved_count = 0
     skipped_duplicates = 0
     skipped_banners = 0
+    skipped_excluded = 0
     failed_captions = 0
     
     # Track seen images by hash to avoid duplicates
@@ -572,6 +613,13 @@ def extract_images_with_captions(
                 caption = f"page{pno+1}_image{idx}"
                 failed_captions += 1
                 print(f"  ⚠️  No caption found for image {idx} on page {pno+1}, using: {caption}")
+
+            product_code_match = re.match(r"^(M\d{6,})\b", caption)
+            product_code = product_code_match.group(1) if product_code_match else None
+            if product_code and product_code in (excluded_product_codes or set()):
+                skipped_excluded += 1
+                print(f"  ⊗ Skipped excluded item: {caption[:60]}")
+                continue
 
             # Categorize the image based on caption
             category = categorize_image(caption)
@@ -638,6 +686,7 @@ def extract_images_with_captions(
     print(f"✓ Saved {saved_count} unique images to {outdir}")
     print(f"⊗ Skipped {skipped_duplicates} duplicate images")
     print(f"⊗ Skipped {skipped_banners} banner items")
+    print(f"⊗ Skipped {skipped_excluded} excluded items")
     print(f"⚠  {failed_captions} images with generic names (caption detection failed)")
     print(f"📊 Manifest: {manifest_csv}")
     return manifest_csv
@@ -668,16 +717,21 @@ def main():
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
     outdir = project_root / "public" / college_folder
+    catalog_overrides = CATALOG_OVERRIDES.get(college_folder, {})
+    preserved_images = catalog_overrides.get("preserve_images", set())
+    excluded_product_codes = catalog_overrides.get("exclude_product_codes", set())
     
     print(f"\n📂 Output directory: {outdir}")
     
     # Step 4: Clean existing images (clean slate)
     print("\n🧹 Cleaning existing images...")
-    deleted_count = clean_existing_images(outdir)
+    deleted_count = clean_existing_images(outdir, preserved_images)
     if deleted_count > 0:
         print(f"   Deleted {deleted_count} existing images")
     else:
         print("   No existing images found")
+    if preserved_images:
+        print(f"   Preserved {len(preserved_images)} manually managed image(s)")
     
     # Step 5: Extract images with captions
     print(f"\n📄 Processing PDF: {pdf_path}")
@@ -690,6 +744,7 @@ def main():
         max_vertical_gap=args.max_gap,
         min_overlap_ratio=args.min_overlap_ratio,
         debug=args.debug,
+        excluded_product_codes=excluded_product_codes,
     )
     
     # Step 6: Build category_image_map from manifest
@@ -713,6 +768,19 @@ def main():
                 hood_only_images.add(filename)
             elif 'caption' in df.columns and 'hood' in str(row.get('caption', '')).lower():
                 hood_only_images.add(filename)
+
+        # Add manually managed images back into their configured categories.
+        for relative_path in sorted(preserved_images):
+            image_path = outdir / Path(relative_path)
+            if not image_path.exists():
+                print(f"  ⚠️  Preserved image not found: {relative_path}")
+                continue
+
+            category = Path(relative_path).parent.as_posix()
+            filename = Path(relative_path).name
+            category_image_map.setdefault(category, [])
+            if filename not in category_image_map[category]:
+                category_image_map[category].append(filename)
         
         # Step 7: Update JSON config
         print("\n⚙️  Updating JSON configuration...")

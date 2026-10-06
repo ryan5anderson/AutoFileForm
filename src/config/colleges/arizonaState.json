@@ -42,7 +42,7 @@
         "M102595122_SDWALC_Warlock_DTF_on_Black.png",
         "M102595496_SH2FDC_Custom_DTF_on_Maroon.png",
         "M102687033_SH2FDC_Custom_DTF_on_Gold.png",
-        "M103347282_SH2FDS_Custom_DTF_on_White_or_Steel.png",
+        "M103347282_SH2FDS_Custom_DTF_on_Stl_or_Wht.png",
         "M103347352_SDBARS_Barbarian_DTF_on_Steel.png",
         "M103725725_SH2FDC_Custom_Cavalier_DTF_on_Black.png",
         "M103824115_SDARMB_Aristotle_DTF_on_Black.png",
@@ -50,8 +50,8 @@
         "M103826167_SDDRUB_Druid_DTF_on_Black.png",
         "M103842644_SDOLAC_Overlay_DTF_on_Maroon.png",
         "M103842779_SH2FDS_Custom_Forks_Up_DTF_on_Gold.png",
-        "M103847986_SH2FDS_Forks_Up_DTF_on_Steel_or_White.png",
-        "M103954586_SH2FDC_Custom_Forks_Up_DTF_on_Maroon.png",
+        "M103847986_SH2FDS_Forks_Up_DTF_on_Stl_or_Wht.png",
+        "M103954586_SH2FDC_Custom_Forks_Up_DTF_on_Mrn.png",
         "M103954653_SH2FDC_Custom_Forks_Up_DTF_on_Black.png",
         "M104127930_SH2FDW_DTF_Distressed_Blush_Pink_Hood.png",
         "M204660118_CM7097_Blush_Pink_Applique_Hood.png"
@@ -70,10 +70,15 @@
       ],
       "images": [
         "M102073749_SDMAIC_Jr_Magician_DTF_on_Maroon.png",
-        "M102074486_SDSORS_Jr_Socrates_DTF_on_Steel.png",
+        "M102074486_SDSORS_Jr_Sorcerer_DTF_on_Steel.png",
         "M103825931_SDMAIB_Jr_Magicia_DTF_on_Black.png",
         "M103826467_SDTILS_Jr_Tilting_DTF_on_Black.png",
-        "M103954441_SH2FDS_Jr_Forks_up_DTF_on_Steel_or_White.png"
+        "M103954441_SH2FDS_Jr_Forks_up_DTF_on_Steel_or_White.png",
+        "M206237263_SH2FDW_Jr_DTF_Maroon_Tank_1012.png",
+        "M206249856_SDF2DS_Jr_DTF_White_Tank_1012.png",
+        "M206447214_SDF2DC_Jr_DTF_Black_Tank_1012.png",
+        "M206653019_SH2FDC_Jr_Custom_DTF_Black_Crop_5080.png",
+        "M206653142_SH2FDS_Jr_Custom_DTF_Charcoal_Crop_508.png"
       ]
     },
     {
@@ -107,7 +112,7 @@
       "images": [
         "M102133660_SHE1CJ_Custom_Logo_Maroon_Jacket.png",
         "M102260434_SHE1CJ_Custom_Logo_Charcoal_Jacket.png",
-        "M204460751_SHE2CJ_Custom_AS_Black_or_Gray_Jacket.png"
+        "M204460751_SHE2CJ_Custom_Black_or_Gray_Jacket.png"
       ]
     },
     {
@@ -140,11 +145,17 @@
       "hasSizeOptions": true,
       "images": [
         "M102075970_SDEVSS_Evocation_DTF_Oxford_Shorts.png",
-        "M102525019_SDSPSS_DTF_Side_Print_Maroon_Shorts.png",
         "M103372816_SHSHDC_DTF_DK_Heather_or_Black_Shorts.png",
         "M205565347_SDSCSC_Score_DTF_Maroon_Shorts.png",
         "M205857316_SHSHDS_Custom_DTF_Oxford_Shorts.png",
-        "M205863999_SDSBPS_Custom_Big_DTF_Oxford_Shorts.png"
+        "M205863999_SDSBPS_Custom_Big_DTF_Oxford_Shorts.png",
+        "M206313417_SHSHDS_Jr_Custom_Logo_Light_Gray_Shorts.png",
+        "M206469013_SDSBPC_Pitchfork_DTF_Black_or_Maroon.png",
+        "M206469143_SDSBPC_Custom_Big_DTF_Black_Shorts.png",
+        "M206469272_SDSBPC_Fear_the_Fork_DTF_Black_or_Mrn.png",
+        "M206469310_SDSBPC_Custom_ASU_DTF_Black_or_MRN.png",
+        "M206469532_SDEVSC_Evocation_DTF_Maroon_Shorts.png",
+        "M206469688_SDEVSC_Evocation_Black_Shorts.png"
       ]
     },
     {
@@ -199,8 +210,8 @@
       "name": "Backpack",
       "path": "backpack",
       "images": [
-        "M103842871_SDBAPA_Custom_DTF_Black_Cinch_Backpac.png",
-        "M103843288_SDBAPA_Custom_Logo_Gold_Cinch_Backpac.png"
+        "M103842871_SDBAPA_Black_DTF_Cinch_Backpack.png",
+        "M103843288_SDBAPA_Gold_DTF_Cinch_Backpack.png"
       ]
     },
     {
@@ -211,6 +222,14 @@
         "M102313972_SHWGCS_Custom_Spinner_Header_Card.png",
         "M102630540_SHMH24_Custom_4ft_Shelf_Magnet.png"
       ]
+    },
+    {
+      "name": "Polos",
+      "path": "polo",
+      "images": [
+        "M206238492_SELC2C_Custom_Maroon_Polo_8800.png"
+      ],
+      "hasSizeOptions": true
     }
   ]
 }

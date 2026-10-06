@@ -1,13 +1,8 @@
 # AutoFileForm ("College Order Form")
 
-College apparel ordering SPA for Ohiopyle Prints. Store runners and internal staff browse school catalogs, build cart orders with pack-size rules, and submit them. Production: [ohiopylecollege.com](https://ohiopylecollege.com).
+College apparel ordering app for Ohiopyle Prints. Store runners browse a local school catalog, build a cart with pack-size rules, and submit. Production: [ohiopylecollege.com](https://ohiopylecollege.com).
 
-Two catalog modes:
-
-| Mode | Routes | Catalog | On submit |
-|---|---|---|---|
-| **API schools** (default home) | `/api-school/:orderTemplateId` | Live on-prem catalog via Vercel proxies | Firestore write → EmailJS → POST to on-prem |
-| **Local schools** (7 hardcoded) | `/{college}` via `/local-schools` | JSON in `src/config/colleges/` + images in `public/` | Firestore write → EmailJS only (no on-prem POST) |
+Catalogs are JSON in `src/config/colleges/` with images in `public/`. Submitting an order writes it to Firestore and sends an EmailJS confirmation. There is no live catalog API.
 
 Repo: [ryan5anderson/AutoFileForm](https://github.com/ryan5anderson/AutoFileForm.git)
 
@@ -19,34 +14,52 @@ Repo: [ryan5anderson/AutoFileForm](https://github.com/ryan5anderson/AutoFileForm
 |---|---|
 | Frontend | React 18.2 + TypeScript 4.9.5, Create React App (`react-scripts` 5.0.1) |
 | Routing | `react-router-dom` 7.7, `BrowserRouter` (SPA rewrites in `vercel.json`) |
-| State | React Context + hooks (`OrderFormContext`, `ApiCollegeOrderContext`) — no Redux/zustand |
-| Serverless | Vercel Node functions in `/api` (ESM via `api/package.json`) |
-| Database | Firebase Firestore client SDK (`orders`, `garmentRatios`) — browser only, no Admin SDK |
-| Email | EmailJS (client-side; templates/recipients live in the EmailJS dashboard) |
-| Hosting | Vercel (static CRA build + `/api` functions); auto-deploy on push to `main` |
-| On-prem backends | `ohiopyleprints.com` (catalog), `mytownoriginals.com` (order submit, images) — plain HTTP |
+| State | React Context + hooks (`OrderFormContext`) |
+| Database | Firebase Firestore client SDK (`orders`, `garmentRatios`) — browser only |
+| Email | EmailJS (client-side; templates and recipients live in the EmailJS dashboard) |
+| Hosting | Vercel static CRA build; auto-deploy on push to `main` |
 
 ---
 
 ## Repo structure
 
 ```
-api/                        Vercel serverless proxies (colleges, college, school-page, submitorder, proxy-image, health)
 src/
-  index.tsx                 Entry + all route definitions (AppShell)
+  index.tsx                 Entry + route definitions (AppShell)
   app/layout/               Header, Footer, CollapsibleSidebar
-  app/routes/               Local flow, API flow, admin, test pages
-  components/               CollegeSelector, ApiCollegeOrderPage, wrappers, ui/
+  app/routes/               Order flow, admin, about, contact
+  components/               CollegeSelector, wrappers, ui/
   config/                   College JSONs, garment ratios, env validation, Firebase init
-  contexts/                 Local + API order form contexts
-  features/                 Order form hook, category UI, validation, email/naming utils
-  services/                 collegeApiService, EmailJS, Firestore order/ratio services
+  contexts/                 Order form context
+  features/                 Order form hook, category UI, validation, email helpers
+  services/                 EmailJS, Firestore order and ratio services
   types/                    Shared TypeScript types
-public/{CollegeName}/       Product images for local schools
-scripts/                    PDF → image/JSON ingest for local catalogs
-vercel.json                 Build, SPA rewrites, CORS/security headers
-docs/                       System reference + v1 plan (see below)
+public/{CollegeName}/       Product images
+scripts/                    PDF → image/JSON ingest for catalogs
+vercel.json                 Build, SPA rewrites, security headers
+docs/                       System reference, garment rules, known issues
 ```
+
+---
+
+## Routes
+
+| Route | What it does |
+|---|---|
+| `/` | School list (searchable) |
+| `/local-schools` | Redirects to `/` |
+| `/{college}` | Order form |
+| `/{college}/product/:category/:productId` | Product options |
+| `/{college}/summary` | Review |
+| `/{college}/receipt` | Printable receipt |
+| `/{college}/thankyou` | Confirmation |
+| `/about`, `/contact` | Static pages |
+| `/admin` | Password gate and recent orders |
+| `/admin/colleges` | Pick a catalog to preview |
+| `/admin/college/:collegeKey` | Catalog preview and ratio editor entry |
+| `/receipt/:orderId` | Stored order receipt |
+
+Schools: Michigan State, Arizona State, Oregon, West Virginia, Pittsburgh, Alabama, Indiana.
 
 ---
 
@@ -54,23 +67,11 @@ docs/                       System reference + v1 plan (see below)
 
 ```bash
 npm install          # .npmrc sets legacy-peer-deps=true
+npm start            # http://localhost:3000
+npm run build        # production build in build/
 ```
 
-Copy env vars into a local `.env` (see table below). The app **throws at startup** if any required `REACT_APP_*` var is missing (`src/config/env.ts`).
-
-| Command | What runs | What works |
-|---|---|---|
-| `npm start` | CRA only (port 3000) | Local-school flow (`/local-schools`, `/{college}`). `/api-school/*` and `/test-api/*` fail — no serverless proxies. |
-| `npm run dev:local` | `vercel dev` (port 3001) + CRA (port 3000); `src/setupProxy.js` proxies `/api/*` → 3001 | Full app: API schools, submit proxy, image proxy, health check. |
-| `npm run dev:vercel` | `vercel dev` alone | Serverless functions only. |
-| `npm run build` | Production CRA build → `build/` | Same as Vercel build. |
-| `npm test` | Jest (CRA) | Categorization + serialization unit tests exist; nothing runs them in CI. |
-
----
-
-## Environment variables
-
-Validated at boot by `src/config/env.ts` (no fallbacks for the client vars).
+Copy env vars into a local `.env` (see `.env.example`). The app throws at startup if any required `REACT_APP_*` var is missing (`src/config/env.ts`).
 
 | Variable | Purpose |
 |---|---|
@@ -78,29 +79,31 @@ Validated at boot by `src/config/env.ts` (no fallbacks for the client vars).
 | `REACT_APP_EMAILJS_TEMPLATE_ID_PROD` | Template when hostname is `ohiopylecollege.com` |
 | `REACT_APP_EMAILJS_TEMPLATE_ID_DEV` | Template on localhost and other hosts |
 | `REACT_APP_EMAILJS_USER_ID` | EmailJS public key |
-| `REACT_APP_PROVIDER_EMAIL` | Shown in email footer only — **not** the delivery address (recipients are set in the EmailJS template) |
-| `REACT_APP_FIREBASE_API_KEY` | Firestore client config |
-| `REACT_APP_FIREBASE_AUTH_DOMAIN` | |
-| `REACT_APP_FIREBASE_PROJECT_ID` | |
-| `REACT_APP_FIREBASE_STORAGE_BUCKET` | |
-| `REACT_APP_FIREBASE_MESSAGING_SENDER_ID` | |
-| `REACT_APP_FIREBASE_APP_ID` | |
-| `REACT_APP_FIREBASE_MEASUREMENT_ID` | |
+| `REACT_APP_PROVIDER_EMAIL` | Shown in the email footer only — not the delivery address |
+| `REACT_APP_FIREBASE_*` | Firestore client config |
 | `REACT_APP_ADMIN_PASSWORD` | Client-side admin gate (bundled into public JS) |
-| `REACT_APP_API_BASE_URL` | Frontend API prefix; defaults `/api`; set in `vercel.json` |
-| `TARGET_API_URL` | Server-side catalog base URL; default `http://ohiopyleprints.com` |
-| `VERCEL_DEV_PORT` | Dev only — port of `vercel dev`, default `3001` |
 
-Set client vars in Vercel project settings (and locally in `.env`). `TARGET_API_URL` is server-only for the `/api` functions.
+Set the same client vars in Vercel project settings for production.
+
+---
+
+## Adding or updating a school
+
+1. Add or edit `src/config/colleges/{key}.json` (`name`, `logo`, `categories`).
+2. Register it in `src/config/index.ts`.
+3. Put images under `public/{FolderName}/` and map the key in `src/utils/asset.ts` (`getCollegeFolderName`).
+4. Set the theme color in `src/components/CollegeRouteWrapper.tsx`.
+
+Art-approval PDFs can be ingested with `scripts/extract_pdf_images_with_captions.py`. See [scripts/README.md](scripts/README.md).
 
 ---
 
 ## Deploy
 
-- **Host:** Vercel Git integration builds on push to `main`. No in-repo CI.
-- **`vercel.json`:** `npm run build`, `npm install --legacy-peer-deps`, output `build`, framework `create-react-app`. SPA rewrite sends non-`/api` / non-`/static` paths to `index.html`.
+- **Host:** Vercel Git integration builds on push to `main`.
+- **`vercel.json`:** `npm run build`, `npm install --legacy-peer-deps`, output `build`. Non-static paths rewrite to `index.html`.
 - **Domain:** `ohiopylecollege.com`.
-- **External deps not in this repo:** EmailJS dashboard templates/recipients, Firebase project + Firestore rules, on-prem APIs at `ohiopyleprints.com` / `mytownoriginals.com`.
+- **Outside this repo:** EmailJS dashboard templates and recipients, Firebase project and Firestore rules.
 
 ---
 
@@ -108,8 +111,6 @@ Set client vars in Vercel project settings (and locally in `.env`). `TARGET_API_
 
 | Doc | Contents |
 |---|---|
-| [docs/V0_SYSTEM_REFERENCE.md](docs/V0_SYSTEM_REFERENCE.md) | Full technical reference for this codebase (architecture, data flows, routes, Firebase, pack rules, known issues) |
-| [docs/V1_PLAN.md](docs/V1_PLAN.md) | Ordered plan for the v1 rewrite |
-| [API_DOCUMENTATION.md](API_DOCUMENTATION.md) | On-prem / proxy API notes |
-| [GARMENT_RULES_REFERENCE.md](GARMENT_RULES_REFERENCE.md) | Pack and size-rule reference |
-| [LOCAL_ORDER_REVIEW_PLAN.md](LOCAL_ORDER_REVIEW_PLAN.md) | Unimplemented local-order → on-prem review flow |
+| [docs/V0_SYSTEM_REFERENCE.md](docs/V0_SYSTEM_REFERENCE.md) | Architecture, routes, submit flow, Firebase, pack rules |
+| [docs/GARMENT_RULES_REFERENCE.md](docs/GARMENT_RULES_REFERENCE.md) | Pack and size-rule reference |
+| [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) | Open defects and security notes |

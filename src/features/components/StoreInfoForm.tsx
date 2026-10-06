@@ -1,31 +1,19 @@
 import React from 'react';
 
 import { FormData } from '../../types';
-import { sanitizeFiveDigitInput, sanitizeSingleLineInput } from '../utils/sanitize';
+import { sanitizeSingleLineInput } from '../utils/sanitize';
 
 interface StoreInfoFormProps {
   formData: FormData;
   onFormDataChange: (updates: Partial<FormData>) => void;
-  /** When set, sales-prefilled fields are hidden for API store-manager links. */
-  variant?: 'full' | 'prefilledStore';
-  /** API schools: "Account Name" label and 5-digit constraints on account name & store number. */
-  apiSchool?: boolean;
 }
 
 const StoreInfoForm: React.FC<StoreInfoFormProps> = ({
   formData,
   onFormDataChange,
-  variant = 'full',
-  apiSchool = false,
 }) => {
-  const isPrefilledStore = variant === 'prefilledStore';
-  const nameLabel = apiSchool ? 'Account Name' : 'Store Name';
-  const fiveDigitTitle = 'Must be exactly 5 digits (e.g. 12345)';
-
   return (
     <div className="form-section">
-      {!isPrefilledStore && (
-        <>
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <label
               htmlFor="company"
@@ -36,7 +24,7 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({
                 color: 'var(--color-text)',
               }}
             >
-              {nameLabel}
+              Store Name
             </label>
             <input
               type="text"
@@ -44,16 +32,9 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({
               value={formData.company}
               onChange={(e) =>
                 onFormDataChange({
-                  company: apiSchool
-                    ? sanitizeFiveDigitInput(e.target.value)
-                    : sanitizeSingleLineInput(e.target.value),
+                  company: sanitizeSingleLineInput(e.target.value),
                 })
               }
-              inputMode={apiSchool ? 'numeric' : undefined}
-              pattern={apiSchool ? '\\d{5}' : undefined}
-              maxLength={apiSchool ? 5 : undefined}
-              title={apiSchool ? fiveDigitTitle : undefined}
-              placeholder={apiSchool ? '12345' : undefined}
               style={{
                 width: '100%',
                 padding: 'var(--space-3)',
@@ -85,16 +66,9 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({
               value={formData.storeNumber}
               onChange={(e) =>
                 onFormDataChange({
-                  storeNumber: apiSchool
-                    ? sanitizeFiveDigitInput(e.target.value)
-                    : sanitizeSingleLineInput(e.target.value),
+                  storeNumber: sanitizeSingleLineInput(e.target.value),
                 })
               }
-              inputMode={apiSchool ? 'numeric' : undefined}
-              pattern={apiSchool ? '\\d{5}' : undefined}
-              maxLength={apiSchool ? 5 : undefined}
-              title={apiSchool ? fiveDigitTitle : undefined}
-              placeholder={apiSchool ? '12345' : undefined}
               style={{
                 width: '100%',
                 padding: 'var(--space-3)',
@@ -135,8 +109,6 @@ const StoreInfoForm: React.FC<StoreInfoFormProps> = ({
               required
             />
           </div>
-        </>
-      )}
       <div style={{ marginBottom: 'var(--space-4)' }}>
         <label htmlFor="orderedBy" style={{ 
           display: 'block', 

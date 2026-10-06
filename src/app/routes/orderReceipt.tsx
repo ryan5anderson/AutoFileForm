@@ -21,8 +21,8 @@ function isReceiptCategoryList(value: unknown): value is ReceiptCategoryGroup[] 
   );
 }
 
-/** Admin /shared receipt for API-school orders using data saved at submit time (same as confirmation email). */
-const StoredApiReceiptFromEmail: React.FC<{
+/** Receipt for orders whose college is not in the local catalog, using data saved at submit time. */
+const StoredReceiptFromEmail: React.FC<{
   formData: FormData;
   receiptCategories: ReceiptCategoryGroup[];
   onExit: () => void;
@@ -37,7 +37,6 @@ const StoredApiReceiptFromEmail: React.FC<{
 
   return (
     <div
-      className="api-schools-flow"
       style={{
         background: 'var(--color-bg)',
         minHeight: '100vh',
@@ -273,7 +272,7 @@ const StoredApiReceiptFromEmail: React.FC<{
   );
 };
 
-const ApiReceiptTextFallback: React.FC<{
+const ReceiptTextFallback: React.FC<{
   formData: FormData;
   receiptText: string;
   onExit: () => void;
@@ -288,7 +287,6 @@ const ApiReceiptTextFallback: React.FC<{
 
   return (
     <div
-      className="api-schools-flow"
       style={{
         background: 'var(--color-bg)',
         minHeight: '100vh',
@@ -509,12 +507,13 @@ const OrderReceiptPage: React.FC = () => {
   }
 
   const formData = convertOrderToFormData(order);
-  const isApiSchoolOrder = order.college.toLowerCase().startsWith('api-school:');
+  const collegeKey = order.college.toLowerCase();
+  const hasLocalCollege = Boolean(colleges[collegeKey as keyof typeof colleges]);
   const storedCategories = order.emailTemplateParams?.receipt_categories;
 
-  if (isApiSchoolOrder && isReceiptCategoryList(storedCategories)) {
+  if (!hasLocalCollege && isReceiptCategoryList(storedCategories)) {
     return (
-      <StoredApiReceiptFromEmail
+      <StoredReceiptFromEmail
         formData={formData}
         receiptCategories={storedCategories}
         onExit={handleExit}
@@ -522,10 +521,10 @@ const OrderReceiptPage: React.FC = () => {
     );
   }
 
-  if (isApiSchoolOrder) {
+  if (!hasLocalCollege) {
     const receiptText = order.emailTemplateParams?.receipt_text;
     if (typeof receiptText === 'string' && receiptText.trim()) {
-      return <ApiReceiptTextFallback formData={formData} receiptText={receiptText} onExit={handleExit} />;
+      return <ReceiptTextFallback formData={formData} receiptText={receiptText} onExit={handleExit} />;
     }
   }
 
