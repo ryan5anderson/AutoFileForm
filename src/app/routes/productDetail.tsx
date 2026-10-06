@@ -110,7 +110,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }, [imageName, categoryPath]);
 
   // Early return AFTER all hooks
-  if (!category || !imageName) {
+  if (!category || !imageName || !category.images.includes(imageName)) {
     return (
       <div className="product-detail-error">
         <h2>Product not found</h2>
@@ -303,7 +303,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         if (hasColors) {
           // For products with colors, show ColorSizeSelector
           const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || {};
-          const sizesArray = getSizeOptions(category.path, version, college);
+          const sizesArray = getSizeOptions(category.path, version, college, imageName);
           return (
             <>
               <div style={{ 
@@ -326,6 +326,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 packSize={packSize}
                 allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
                 collegeKey={college}
+                imageName={imageName}
               />
             </>
           );
@@ -333,7 +334,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           // For single-color products, show regular SizePackSelector
           const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
           const packSize = packSizes[version] || packSizes['default'] || 6;
-          const sizesArray = getSizeOptions(category.path, version, college);
+          const sizesArray = getSizeOptions(category.path, version, college, imageName);
           return (
             <>
               <div style={{ 
@@ -355,6 +356,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 categoryPath={category.path}
                 version={version}
                 collegeKey={college}
+                imageName={imageName}
               />
             </>
           );
@@ -384,7 +386,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               if (hasColors) {
                 // For products with colors, show ColorSizeSelector
                 const colorSizeCounts = formData.shirtColorSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || {};
-                const sizesArray = getSizeOptions(category.path, version, college);
+                const sizesArray = getSizeOptions(category.path, version, college, imageName);
                 return (
                   <div
                     key={version}
@@ -401,6 +403,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     packSize={packSize}
                     allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
                     collegeKey={college}
+                    imageName={imageName}
                   />
                   </div>
                 );
@@ -408,7 +411,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 // For single-color products, show regular SizePackSelector
                 const counts: SizeCounts = formData.shirtSizeCounts?.[imagePath]?.[versionKey as keyof ShirtVersion] || { XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0, 'S/M': 0, 'L/XL': 0, SM: 0 };
                 const packSize = packSizes[version] || packSizes['default'] || 6;
-                const sizesArray = getSizeOptions(category.path, version, college);
+                const sizesArray = getSizeOptions(category.path, version, college, imageName);
                 return (
                   <div
                     key={version}
@@ -424,6 +427,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       categoryPath={category.path}
                       version={version}
                       collegeKey={college}
+                      imageName={imageName}
                     />
                   </div>
                 );
@@ -454,7 +458,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       }
       const versionKey = version;
       const packSize = packSizes[version] || packSizes['default'] || 6;
-      const sizesArray = getSizeOptions(category.path, version, college);
+      const sizesArray = getSizeOptions(category.path, version, college, imageName);
       const colors = hasColorOptions(imageName) ? getColorOptions(imageName) : [];
       const hasColors = colors.length > 0;
 
@@ -473,6 +477,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               packSize={packSize}
               allowAnyQuantity={!isApplique && allowsAnyQuantity(category.path, version, imageName)}
               collegeKey={college}
+              imageName={imageName}
             />
           </>
         );
@@ -496,6 +501,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   categoryPath={category.path}
                   version={version}
                   collegeKey={college}
+                  imageName={imageName}
                 />
               </div>
             </div>

@@ -92,7 +92,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             });
             
             if (colorsWithQuantity.length > 0) {
-              const displayName = getVersionDisplayName(version, undefined, category.path);
+              const displayName = getVersionDisplayName(version, imageName, category.path);
               // Group colors in parentheses: "T-Shirt (Black, Forest)"
               if (colorsWithQuantity.length > 1) {
                 variations.push(`${displayName} (${colorsWithQuantity.join(', ')})`);
@@ -111,7 +111,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           if (counts) {
             const hasQuantity = Object.values(counts).some((qty) => qty > 0);
             if (hasQuantity) {
-              const displayName = getVersionDisplayName(version, undefined, category.path);
+              const displayName = getVersionDisplayName(version, imageName, category.path);
               if (!variations.includes(displayName)) {
                 variations.push(displayName);
               }
@@ -125,7 +125,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       if (shirtVersion) {
         Object.entries(shirtVersion).forEach(([version, qty]) => {
           if (qty && Number(qty) > 0) {
-            const displayName = getVersionDisplayName(version, undefined, category.path);
+            const displayName = getVersionDisplayName(version, imageName, category.path);
             if (!variations.includes(displayName)) {
               variations.push(displayName);
             }

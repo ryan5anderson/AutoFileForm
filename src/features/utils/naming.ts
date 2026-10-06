@@ -16,6 +16,13 @@ export const getProductName = (imageName: string): string => {
 const isWomensTopCategory = (categoryPath?: string): boolean =>
   categoryPath === 'tshirt/women';
 
+/** Junior crop tops use their own size run and are not V-necks. */
+export const isCropProduct = (imageName?: string): boolean =>
+  !!imageName && /_Crop(?:_|\.)/i.test(imageName);
+
+const shouldLabelAsVNeck = (imageName?: string, categoryPath?: string): boolean =>
+  isWomensTopCategory(categoryPath) && !isCropProduct(imageName);
+
 const appendVNeckToTitle = (name: string): string => {
   if (name.toLowerCase().includes('v-neck')) return name;
   return `${name} V-neck`;
@@ -35,7 +42,7 @@ export const getDisplayProductName = (imageName: string, categoryPath?: string):
 
   if (sweatpantDisplayMapping[imageName]) {
     const mappedName = sweatpantDisplayMapping[imageName];
-    return isWomensTopCategory(categoryPath) ? appendVNeckToTitle(mappedName) : mappedName;
+    return shouldLabelAsVNeck(imageName, categoryPath) ? appendVNeckToTitle(mappedName) : mappedName;
   }
 
   let displayName: string;
@@ -58,7 +65,7 @@ export const getDisplayProductName = (imageName: string, categoryPath?: string):
     displayName = removeColorFromPantsTitle(baseName.replace(/_/g, ' ').trim());
   }
 
-  return isWomensTopCategory(categoryPath) ? appendVNeckToTitle(displayName) : displayName;
+  return shouldLabelAsVNeck(imageName, categoryPath) ? appendVNeckToTitle(displayName) : displayName;
 };
 
 // Remove color words from sweatpants/joggers titles
@@ -120,7 +127,7 @@ export const getVersionDisplayName = (version: string, imageName?: string, categ
   let display = '';
   switch (version) {
     case 'tshirt':
-      display = isWomensTopCategory(categoryPath) ? 'V-neck T-Shirt' : 'T-Shirt';
+      display = shouldLabelAsVNeck(imageName, categoryPath) ? 'V-neck T-Shirt' : 'T-Shirt';
       break;
     case 'longsleeve': display = 'Long Sleeve T-shirt'; break;
     case 'hoodie': display = 'Hoodie'; break;

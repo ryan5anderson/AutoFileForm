@@ -123,7 +123,7 @@ const AdminProductDetail: React.FC = () => {
   }, [category, collegeKey, isInfantProduct]);
 
   // Early return if category or image not found
-  if (!category || !imageName || !collegeConfig) {
+  if (!category || !imageName || !collegeConfig || !category.images.includes(imageName)) {
     return (
       <div className="product-detail-error">
         <h2>Product not found</h2>

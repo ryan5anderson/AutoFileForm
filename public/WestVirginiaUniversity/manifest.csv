@@ -1,5 +1,5 @@
 page,image_index_on_page,filename,caption,category_subfolder,output_path,image_hash,image_size_bytes,has_hood
-1,1,M89672118_SH2FDC_Custom_WV_DTF_Logo_on_Navy.png,M89672118 SH2FDC Custom WV DTF Logo on Navy,tshirt/men,tshirt\men\M89672118_SH2FDC_Custom_WV_DTF_Logo_on_Navy.png,18b4642d85c6d33c14e26188ae8af393,449406,False
+1,1,M89672118_SH2FDC_Custom_WV_DTF_Logo_on_Navy.png,M89672118 SH2FDC Custom WV DTF Logo on Navy,tshirt/men,tshirt\men\M89672118_SH2FDC_Custom_WV_DTF_Logo_on_Navy.png,34828419b957d67141ca66d931afaa92,683780,False
 1,2,M89672286_SH2FDC_Custom_DTF_Logo_on_Navy.png,M89672286 SH2FDC Custom DTF Logo on Navy,tshirt/men,tshirt\men\M89672286_SH2FDC_Custom_DTF_Logo_on_Navy.png,32fe1cb5010cb39810e776636ecea019,219673,False
 1,3,M89755682_SH2FDC_Country_Roads_DTF_Logo_on_Navy.png,M89755682 SH2FDC Country Roads DTF Logo on Navy,tshirt/men,tshirt\men\M89755682_SH2FDC_Country_Roads_DTF_Logo_on_Navy.png,bfaf703535e72b8e20d56dd67b8e1b2b,244297,False
 1,4,M205580982_SDFBMC_Fast_Break_DTF_on_Navy.png,M205580982 SDFBMC Fast Break DTF on Navy,tshirt/men,tshirt\men\M205580982_SDFBMC_Fast_Break_DTF_on_Navy.png,ba6470393c65d93219d4403d02286c33,247203,False
@@ -46,7 +46,6 @@ page,image_index_on_page,filename,caption,category_subfolder,output_path,image_h
 12,1,M206055412_SHY2DC_Youth_Custom_DTF_on_Steel.png,M206055412 SHY2DC Youth Custom DTF on Steel,youth&infant,youth&infant\M206055412_SHY2DC_Youth_Custom_DTF_on_Steel.png,7224681d907697c27c120a2d45e441ba,326131,False
 12,2,M206055950_SDYTWS_Youth_Tweener_DTF_on_Steel.png,M206055950 SDYTWS Youth Tweener DTF on Steel,youth&infant,youth&infant\M206055950_SDYTWS_Youth_Tweener_DTF_on_Steel.png,14cacd1bae4a113703e462213f77572f,323552,False
 12,3,M100330126_SHE1CJ_Custom_Logo_Navy_Jacket.png,M100330126 SHE1CJ Custom Logo Navy Jacket,jacket,jacket\M100330126_SHE1CJ_Custom_Logo_Navy_Jacket.png,629a5115fcede54c1a93fb8caa09ca29,454171,False
-12,4,M103273278_SHE1CJ_Custom_WV_Navy_Fleece_FZ.png,M103273278 SHE1CJ Custom WV Navy Fleece FZ,jacket,jacket\M103273278_SHE1CJ_Custom_WV_Navy_Fleece_FZ.png,f7cde848e76d37f0c09f59d4a359ef7e,310478,False
 13,1,M103955044_SH2BWF_Custom_Side_Leg_DTF_Flannels.png,M103955044 SH2BWF Custom Side Leg DTF Flannels,flannels,flannels\M103955044_SH2BWF_Custom_Side_Leg_DTF_Flannels.png,c827a1d1c091b954af7423b59e0d1b8f,405163,False
 13,2,M206730276_SDSPMF_Sparrow_DTF_Flannels.png,M206730276 SDSPMF Sparrow DTF Flannels,flannels,flannels\M206730276_SDSPMF_Sparrow_DTF_Flannels.png,990aecd1059714842fb10fd5794b091a,383252,False
 13,3,M89677268_SHPHFD_Custom_WV_DTF_Flannels.png,M89677268 SHPHFD Custom WV DTF Flannels,flannels,flannels\M89677268_SHPHFD_Custom_WV_DTF_Flannels.png,c33525b7edef172ccbd1185327322e0b,395946,False

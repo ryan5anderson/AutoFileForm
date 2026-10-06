@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { getSizeDistributionRatiosSync, getSizeDistributionRatios } from '../../../config/garmentRatios';
 import { Size, SizeCounts } from '../../../types';
 import { calcTotals } from '../../utils';
+import { isCropProduct } from '../../utils/naming';
 
 const ALL_SIZES_DEFAULT: Size[] = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -18,6 +19,7 @@ interface SizePackSelectorProps {
   categoryPath?: string;
   version?: string;
   collegeKey?: string;
+  imageName?: string;
 }
 
 const SizePackSelector: React.FC<SizePackSelectorProps> = ({
@@ -32,6 +34,7 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   categoryPath,
   version,
   collegeKey,
+  imageName,
 }) => {
   const totals = calcTotals(counts, packSize, allowAnyQuantity);
   const SIZE_LIST: Size[] = sizes && sizes.length > 0 ? sizes : ALL_SIZES_DEFAULT;
@@ -45,6 +48,12 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
   useEffect(() => {
     const loadRatios = async () => {
       if (!categoryPath) return;
+
+      // Crop packs are one of each size from XS through XL, not the ladies V-neck run.
+      if (isCropProduct(imageName)) {
+        setSizeDistributionRatios(null);
+        return;
+      }
       
       if (collegeKey) {
         // Use async version with college-specific support
@@ -65,7 +74,7 @@ const SizePackSelector: React.FC<SizePackSelectorProps> = ({
     };
 
     loadRatios();
-  }, [categoryPath, version, collegeKey]);
+  }, [categoryPath, version, collegeKey, imageName]);
 
   const handleDelta = (size: Size, delta: number) => {
     if (disabled) return;

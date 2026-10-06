@@ -2,6 +2,8 @@ import { getSizeScaleFromRatiosSync, parseSizeScale, getPackSizeFromRatiosSync, 
 import { getPackSizeSync } from '../../config/packSizes';
 import { FormData, EmailCategory, ShirtVersion, SizeCounts, Size, Category } from '../../types';
 
+import { isCropProduct } from './naming';
+
 /**
  * Find the category path for a given imagePath
  * @param imagePath - The image path of the product
@@ -766,7 +768,12 @@ export function getQuantityMultiples(
   return multiples;
 }
 
-export function getSizeOptions(categoryPath: string, version?: string, collegeKey?: string): Size[] {
+export function getSizeOptions(categoryPath: string, version?: string, collegeKey?: string, imageName?: string): Size[] {
+  // Junior crops run extra small through extra large
+  if (isCropProduct(imageName)) {
+    return ['XS', 'S', 'M', 'L', 'XL'];
+  }
+
   // First try to get size scale from JSON (using sync version with college key support)
   const sizeScale = getSizeScaleFromRatiosSync(categoryPath, version, collegeKey);
   if (sizeScale) {
