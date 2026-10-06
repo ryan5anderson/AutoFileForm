@@ -7,23 +7,10 @@ import './CollegeSelector.css';
 
 const CollegeSelector: React.FC = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = React.useState('');
 
   const handleCollegeSelect = (collegeKey: string) => {
     navigate(`/${collegeKey}`);
   };
-
-  const filteredColleges = React.useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) {
-      return Object.entries(colleges);
-    }
-    return Object.entries(colleges).filter(([, college]) =>
-      college.name.toLowerCase().includes(query)
-    );
-  }, [searchQuery]);
-
-  const hasNoResults = filteredColleges.length === 0;
 
   return (
     <div className="college-selector">
@@ -32,23 +19,8 @@ const CollegeSelector: React.FC = () => {
         <p>Choose your college to access the merchandise order form</p>
       </div>
 
-      <div className="college-controls">
-        <input
-          className="college-search"
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search schools..."
-          aria-label="Search schools"
-        />
-      </div>
-
-      {hasNoResults && (
-        <div className="college-status">No schools found for "{searchQuery.trim()}".</div>
-      )}
-
       <div className="college-buttons">
-        {filteredColleges.map(([key, college]) => (
+        {Object.entries(colleges).map(([key, college]) => (
           <button
             key={key}
             className="college-button"
